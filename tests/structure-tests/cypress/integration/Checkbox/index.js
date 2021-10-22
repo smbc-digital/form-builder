@@ -1,7 +1,7 @@
 describe('Checkbox', () => {
     it('Checkbox', () => {
       cy.visit('ui-checkbox')
-        .toMatchingDOM('govuk-form-group')
+        .toMatchingDOM('govuk-form-group', 0)
     });
 
     it('Checkbox validation', () => {
@@ -11,12 +11,12 @@ describe('Checkbox', () => {
     });
     
     it('Checkbox optional', () => {
-      cy.visit('ui-checkbox-conditional')
-        .toMatchingDOM('govuk-form-group')
+      cy.visit('ui-checkbox')
+        .toMatchingDOM('govuk-form-group', 1)
     });
 
     it('Checkbox conditional', () => {
       cy.visit('ui-checkbox-conditional')
-        .toMatchingDOM('govuk-form-group')
+        .toMatchingDOM()
     });
   }); 
