@@ -1,5 +1,5 @@
 describe('Street', () => {
-    it('Street search', () => {
+    it('Street Search', () => {
       cy.visit('ui-street')
         .toMatchingDOM()
     });
@@ -10,12 +10,13 @@ describe('Street', () => {
         .get('.govuk-button').click()
         .toMatchingDOM()
     });
-    
-    it('Street Select', () => {
+  
+    it('Optional Street Search', () => {
       cy.visit('ui-street')
-        .get('.govuk-input').type('nodata')
+        .get('.govuk-input').type('street name')
+        .get('.govuk-button').click()
+        .get('.govuk-select').select("Green street")
         .get('.govuk-button').click()
         .toMatchingDOM()
-    });
-    
+    });  
   });
