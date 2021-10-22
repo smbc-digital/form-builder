@@ -15,6 +15,6 @@ namespace form_builder.Extensions
                   : value.First().ToUpper();
         }
 
-        public static AppointmentType GetAppointmentTypeForEnvironment(this List<AppointmentType> value, string environment) => value.First(_ => _.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
+        public static AppointmentType GetAppointmentTypeForEnvironment(this List<AppointmentType> value, string environment) => value.First(_ => _.Environment.Equals(environment.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
     }
 }
