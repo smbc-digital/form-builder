@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Models.FormBuilder;
 
 namespace form_builder.Services.PayService
 {
@@ -106,8 +107,7 @@ namespace form_builder.Services.PayService
         private async Task HandleCallback(EPaymentStatus paymentStatus, string reference, string callbackUrl)
         {
             try {
-                var result = await _gateway.PostAsync(callbackUrl,
-                    new { CaseReference = reference, PaymentStatus = paymentStatus });
+                var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest{ Reference = reference, PaymentStatus = paymentStatus });
 
                 LogErrorIfCallbackFails(result, reference, EPaymentCallbackStatus.Failure);
             } catch(Exception e){
