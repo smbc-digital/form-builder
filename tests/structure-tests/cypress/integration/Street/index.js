@@ -17,6 +17,14 @@ describe('Street', () => {
         .toMatchingDOM()
     });
   
+    it('Street Select Validation', () => {
+      cy.visit('ui-street')
+        .get('.govuk-input').type('street name')
+        .get('.govuk-button').click()
+        .get('.govuk-button').click()   
+        .toMatchingDOM()
+    });
+  
     it('Optional Street Search', () => {
       cy.visit('ui-street')
         .get('.govuk-input').type('street name')
