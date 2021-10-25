@@ -24,13 +24,23 @@ namespace form_builder.Validators
 
             var value = viewModel[streetElement.StreetSearchQuestionId];
             var isValid = true;
+            var message = string.Empty;
+            
             if (!StreetConstants.STREET_REGEX.Match(value).Success) {
                 isValid = false;
+                message = ValidationConstants.STREET_INCORRECT_FORMAT;
             }
+            
+            if (!StreetConstants.STREET_LENGTH_REGEX.Match(value).Success)
+            {
+                isValid = false;
+                message = ValidationConstants.STREET_INCORRECT_LENGTH;
+            }
+
 
             return new ValidationResult {
                 IsValid = isValid,
-                Message = isValid ? string.Empty : ValidationConstants.STREET_INCORRECT_FORMAT
+                Message = message
             };
         }
     }
