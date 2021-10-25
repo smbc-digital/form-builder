@@ -13,10 +13,13 @@
   "license": "ISC",
   "devDependencies": {
     "@cypress/snapshot": "^2.1.7",
-    "cypress": "^6.1.0"
+    "cypress": "^7.1.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/smbc-digital/form-builder.git"
+  },
+  "dependencies": {
+    "cypress-file-upload": "^5.0.8"
   }
 }
