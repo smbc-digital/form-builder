@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldNotValidateStreet_WhenIncorrectLengtStreetSupplied()
+        public void Validate_ShouldNotValidateStreet_WhenIncorrectLengthStreetSupplied()
         {
             // Arrange
             var element = new ElementBuilder()
