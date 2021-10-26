@@ -21,7 +21,7 @@ namespace form_builder.Validators
 
             if (string.IsNullOrEmpty(viewModel[streetElement.StreetSearchQuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
-
+            
             var value = (string)viewModel[streetElement.StreetSearchQuestionId];
             var isValid = true;
             var message = string.Empty;

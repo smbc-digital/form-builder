@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using form_builder.Builders;
 using form_builder.Enum;
+using form_builder.Constants;
 using form_builder.Validators;
 using Xunit;
 
@@ -60,7 +61,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("Enter street name in the correct format", result.Message);
+            Assert.Equal(ValidationConstants.STREET_INCORRECT_FORMAT, result.Message);
         }
 
         [Fact]
@@ -80,7 +81,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("Street name must be 3 characters or more", result.Message);
+            Assert.Equal(ValidationConstants.STREET_INCORRECT_LENGTH, result.Message);
         }
     }
 }
