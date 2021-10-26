@@ -21,16 +21,26 @@ namespace form_builder.Validators
 
             if (string.IsNullOrEmpty(viewModel[streetElement.StreetSearchQuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
-
-            var value = viewModel[streetElement.StreetSearchQuestionId];
+            
+            var value = (string)viewModel[streetElement.StreetSearchQuestionId];
             var isValid = true;
-            if (!StreetConstants.STREET_REGEX.Match(value).Success) {
+            var message = string.Empty;
+            
+            if (!StreetConstants.STREET_REGEX.Match(value).Success)
+            {
                 isValid = false;
+                message = ValidationConstants.STREET_INCORRECT_FORMAT;
+            }
+            
+            if (value.Length < StreetConstants.STREET_MIN_LENGTH)
+            {
+                isValid = false;
+                message = ValidationConstants.STREET_INCORRECT_LENGTH;
             }
 
             return new ValidationResult {
                 IsValid = isValid,
-                Message = isValid ? string.Empty : ValidationConstants.STREET_INCORRECT_FORMAT
+                Message = message
             };
         }
     }

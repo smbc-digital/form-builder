@@ -148,6 +148,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, FormAnswerTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
             services.AddTransient<ITagParser, LinkTagParser>();
+            services.AddTransient<ITagParser, MailToTagParser>();
             services.AddTransient<ITagParser, PaymentAmountTagParser>();
             services.AddTransient<ITagParser, CaseReferenceTagParser>();
 
@@ -466,8 +467,8 @@ namespace form_builder.Utils.Startup
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
             services.Configure<AnalyticsConfiguration>(configuration.GetSection(AnalyticsConfiguration.ConfigValue));
             services.Configure<GoogleAnalyticsConfiguration>(configuration.GetSection(GoogleAnalyticsConfiguration.ConfigValue));
+            services.Configure<S3SchemaProviderConfiguration>(configuration.GetSection(S3SchemaProviderConfiguration.ConfigValue));
 
-            services.Configure<ApplicationVersionConfiguration>(applicationVersion => applicationVersion.Version = configuration.GetValue<string>(ApplicationVersionConfiguration.ConfigValue));
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
             services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>(PreviewModeConfiguration.ConfigValue));
             services.Configure<TagManagerConfiguration>(tagManagerId => tagManagerId.TagManagerId = configuration.GetValue<string>(TagManagerConfiguration.ConfigValue));

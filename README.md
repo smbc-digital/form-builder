@@ -13,6 +13,7 @@
 - [Payment Providers](#payment-providers)
 - [Storage Providers](#storage-providers)
 - [Running High Availability](#running-high-availability)
+- [Structure Tests](#structure-tests)
 - [UI Tests](#ui-Tests)
 - [Preview](#preview)
 - [Data Structure Preview](#data-structure-preview)
@@ -164,35 +165,9 @@ Distributed cache and DataProtecton key storage specification is wrapped up in t
   services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
 ```
 
-# UI Tests
-
-The form builder app has UI tests to ensure that the UI is expected. Our UI Tests are written using SpecFlow
-
-### Requirements
-- chromdrivers.exe
-- make (not required)
-
-### How to run UI tests locally
-
-```console
-$ make ui-test
-```
-
-It is also possible to run just a specific test case rather then running the whole ui-test suite, this is made possible by running the `ui-test-feature` make command. with a FEATURE paramater as the test suite to run. The example below runs only the organisation ui-tests.
-```console
-$ make FEATURE=organisation ui-test-feature
-```
-
-without make you can also run the UI Test locally by running the two commands listed below
-
-```console
-$ cd ./src && dotnet run
-```
-```console
-$ dotnet test ./form-builder-tests-ui/form-builder-tests-ui.csproj
-```
-
-It is possible to change the default browser the UI Tests are run from, to do this you need to modify the BrowserConfiguration to run with firefox or another browser of your choice.
+# Structure Tests
+  
+Structure tests use Cypress to compare the DOM structure of components against snapshots. New structure tests should be added when a new component type is created. Existing tests may need to be modified, or snapshots replaced if the DOM structure of an existing component changes. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Structure-tests)
 
 # AWS Architecture Decisions #
 This section will be used to document the decisions made throughout the development process.

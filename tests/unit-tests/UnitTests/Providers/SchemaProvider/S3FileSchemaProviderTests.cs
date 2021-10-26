@@ -10,7 +10,6 @@ using form_builder.Gateways;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -23,21 +22,26 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         private readonly S3FileSchemaProvider _s3Schema;
         private readonly Mock<IS3Gateway> _mockS3Gateway = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<S3SchemaProviderConfiguration>> _mocks3SchemaConfiguration = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new();
         private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new();
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
         private readonly Mock<ILogger<ISchemaProvider>> _mockLogger = new();
         private const int _indexExpiry = 10;
+        private const string _s3SchemaFolderName =  "test-folder-name";
+
 
         public S3FileSchemaProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
-            _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
-            _mockConfiguration.Setup(_ => _["ApplicationVersion"]).Returns("v2");
+            _mocks3SchemaConfiguration.Setup(_ => _.Value)
+                .Returns(new S3SchemaProviderConfiguration {
+                    S3BucketKey = "forms-storage",
+                    S3BucketFolderName = _s3SchemaFolderName
+                });
             _mockDistributedCacheConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheConfiguration { UseDistributedCache = true });
             _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration { Index = _indexExpiry });
-            _s3Schema = new S3FileSchemaProvider(_mockS3Gateway.Object, _mockHostingEnv.Object, _mockDistributedCacheWrapper.Object, _mockConfiguration.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
+            _s3Schema = new S3FileSchemaProvider(_mockS3Gateway.Object, _mockHostingEnv.Object, _mockDistributedCacheWrapper.Object, _mocks3SchemaConfiguration.Object, _mockDistributedCacheConfiguration.Object, _mockDistributedCacheExpirationConfiguration.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -101,7 +105,7 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
                 .Returns(string.Empty);
 
             _mockS3Gateway.Setup(_ => _.ListObjectsV2(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new ListObjectsV2Response{ S3Objects = new List<S3Object>{ new S3Object { Key = "Int/v2/testform.json" } } });
+                .ReturnsAsync(new ListObjectsV2Response{ S3Objects = new List<S3Object>{ new S3Object { Key = $"Int/{_s3SchemaFolderName}/testform.json" } } });
 
             var result = await _s3Schema.ValidateSchemaName(schemaName);
             
@@ -112,7 +116,7 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         [Fact]
         public async Task ValidateSchemaName_Should_Remove_BucketPrefix_WhenIndexing_List()
         {
-            var testIndexKey = "Int/v2/test-form-name.json";
+            var testIndexKey = $"local/{_s3SchemaFolderName}/test-form-name.json";
             var expected = "test-form-name.json";
             _mockS3Gateway.Setup(_ => _.ListObjectsV2(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ListObjectsV2Response{ S3Objects = new List<S3Object>{ new S3Object { Key = testIndexKey } } });

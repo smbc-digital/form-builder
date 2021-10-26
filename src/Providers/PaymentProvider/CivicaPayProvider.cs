@@ -41,7 +41,7 @@ namespace form_builder.Providers.PaymentProvider
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,
                 ApiPassword = _paymentConfig.ApiPassword,
-                ReturnURL = _environment.EnvironmentName.Equals("local") ? $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response" : $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/v2/{form}/{path}/payment-response",
+                ReturnURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
                 NotifyURL = string.Empty,
                 CallingAppTranReference = reference,
                 PaymentItems = new List<PaymentItem>
@@ -75,7 +75,7 @@ namespace form_builder.Providers.PaymentProvider
                 throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
             if (civicaResponse.ResponseContent.Success.Equals("false"))
-                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response from the provider, { civicaResponse.ResponseContent.ResponseCode }, Summary: { civicaResponse.ResponseContent.ErrorMessage } - { civicaResponse.ResponseContent.ErrorSummary }");
+                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response from the provider, { civicaResponse.ResponseContent.ResponseCode }, Summary: { civicaResponse.ResponseContent.ErrorMessage } - { civicaResponse.ResponseContent.ErrorSummary }, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
         }

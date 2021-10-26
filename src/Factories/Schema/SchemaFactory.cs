@@ -27,7 +27,6 @@ namespace form_builder.Factories.Schema
         private readonly DistributedCacheConfiguration _distributedCacheConfiguration;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
-        private readonly IConfiguration _configuration;
         private readonly IFormSchemaIntegrityValidator _formSchemaIntegrityValidator;
         private readonly IEnumerable<IUserPageTransformFactory> _userPageTransformFactories;
 
@@ -38,7 +37,6 @@ namespace form_builder.Factories.Schema
             IOptions<DistributedCacheConfiguration> distributedCacheConfiguration,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
-            IConfiguration configuration,
             IFormSchemaIntegrityValidator formSchemaIntegrityValidator, 
             IEnumerable<IUserPageTransformFactory> userPageTransformFactories)
         {
@@ -48,7 +46,6 @@ namespace form_builder.Factories.Schema
             _reusableElementSchemaFactory = reusableElementSchemaFactory;
             _distributedCacheConfiguration = distributedCacheConfiguration.Value;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-            _configuration = configuration;
             _previewModeConfiguration = previewModeConfiguration;
             _formSchemaIntegrityValidator = formSchemaIntegrityValidator;
             _userPageTransformFactories = userPageTransformFactories;
@@ -66,7 +63,7 @@ namespace form_builder.Factories.Schema
 
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {
-                string data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
+                string data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}");
 
                 if (data is not null)
                 {
@@ -82,14 +79,14 @@ namespace form_builder.Factories.Schema
             await _formSchemaIntegrityValidator.Validate(formSchema);
 
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
-                await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);
+                await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}", JsonConvert.SerializeObject(formSchema), _distributedCacheExpirationConfiguration.FormJson);
 
             return formSchema;
         }
 
         private async Task<FormSchema> InPreviewMode(string formKey)
         {
-            var data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix(_configuration["ApplicationVersion"])}{formKey}");
+            var data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}");
 
             if (data is null)
                 throw new ApplicationException("ScheamFactory::InPreviewMode, Requested form has expired");

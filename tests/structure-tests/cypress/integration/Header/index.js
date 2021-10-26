@@ -1,6 +1,6 @@
-describe('Button', () => {
-    it('Button', () => {
-      cy.visit('ui-button')
+describe('Header', () => {
+    it('Header', () => {
+      cy.visit('ui-header')
         .toMatchingDOM('smbc-header')
     });
   });

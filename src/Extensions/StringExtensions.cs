@@ -11,8 +11,8 @@ namespace form_builder.Extensions
             switch (value)
             {
                 case "local":
-                    return "local";
                 case "uitest":
+                    return "local";
                 case "int":
                     return "Int";
                 case "qa":
@@ -58,6 +58,6 @@ namespace form_builder.Extensions
             return $"{value.Substring(0, length - extension.Length)}{extension}";
         }
 
-        public static string ToBookingRequestedMonthUrl(this string form, string page, bool isLocal) => $"{(isLocal ? string.Empty : "/v2")}/booking/{form}/{page}/month";
+        public static string ToBookingRequestedMonthUrl(this string form, string page) => $"/booking/{form}/{page}/month";
     }
 }

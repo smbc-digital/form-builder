@@ -7,6 +7,7 @@ using form_builder.Gateways;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -17,13 +18,12 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
         private readonly S3PaymentConfigurationTransformDataProvider _s3TransformProvider;
         private readonly Mock<IS3Gateway> _mockS3Gateway = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-
-        private readonly Mock<IConfiguration> _mockConfiguration = new();
+        private readonly Mock<IOptions<S3SchemaProviderConfiguration>> _mockConfiguration = new();
 
         public S3PaymentConfigurationTransformDataProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
-            _mockConfiguration.Setup(_ => _["S3BucketKey"]).Returns("forms-storage");
+            _mockConfiguration.Setup(_ => _.Value).Returns(new S3SchemaProviderConfiguration{ S3BucketKey = "forms-storage" } );
             _s3TransformProvider = new S3PaymentConfigurationTransformDataProvider(_mockS3Gateway.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
         }
 

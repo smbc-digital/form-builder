@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("test");
+            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
             _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockLogger.Object);
         }
@@ -692,7 +692,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType { AppointmentId = bookingGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -782,7 +782,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithCustomerAddressId("address")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -830,7 +830,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -871,7 +871,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -908,7 +908,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "test" })
+                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -929,7 +929,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             string appointmentIdkey = "appointmentId";
             string appointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
-            AppointmentType appointmentType = new() { Environment = "test", AppointmentIdKey = appointmentIdkey };
+            AppointmentType appointmentType = new() { Environment = "local", AppointmentIdKey = appointmentIdkey };
             FormAnswers fromAnswers = new()
             {
                 Pages = new()
@@ -975,7 +975,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object>();
@@ -1007,7 +1007,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "test" })
+                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object>();

@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Models.FormBuilder;
 
 namespace form_builder.Services.PayService
 {
@@ -86,33 +87,31 @@ namespace form_builder.Services.PayService
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                var result = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Success.ToString() });
-
-                LogCallBackFailure(result, reference, EPaymentCallbackStatus.Success);
-                _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
-                return reference;
+                await HandleCallback(EPaymentStatus.Success, reference, postUrl.CallbackUrl);
             }
             catch (PaymentDeclinedException)
             {
-                var result = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Declined.ToString() });
-
-                LogCallBackFailure(result, reference, EPaymentCallbackStatus.Declined);
+                await HandleCallback(EPaymentStatus.Declined, reference, postUrl.CallbackUrl);
                 throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
             }
             catch (PaymentFailureException)
             {
-                var result = await _gateway.PostAsync(postUrl.CallbackUrl,
-                    new { CaseReference = reference, PaymentStatus = EPaymentStatus.Failure.ToString() });
-
-                LogCallBackFailure(result, reference, EPaymentCallbackStatus.Failure);
+                await HandleCallback(EPaymentStatus.Failure, reference, postUrl.CallbackUrl);
                 throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "The payment callback failed");
-                throw new Exception(ex.Message);
+
+             _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
+            return reference;
+        }
+
+        private async Task HandleCallback(EPaymentStatus paymentStatus, string reference, string callbackUrl)
+        {
+            try {
+                var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest{ Reference = reference, PaymentStatus = paymentStatus });
+
+                LogErrorIfCallbackFails(result, reference, EPaymentCallbackStatus.Failure);
+            } catch(Exception e){
+                _logger.LogError($"PayService::HandleCallback, Payment callback to url {callbackUrl} failed. Payment status was {paymentStatus}, failed with Exception: {e.Message}, Payment reference {reference}");
             }
         }
 
@@ -126,7 +125,7 @@ namespace form_builder.Services.PayService
             return paymentProvider;
         }
 
-        private void LogCallBackFailure(HttpResponseMessage callbackResponse, string reference, EPaymentCallbackStatus callbackType) 
+        private void LogErrorIfCallbackFails(HttpResponseMessage callbackResponse, string reference, EPaymentCallbackStatus callbackType) 
         {
             if(!callbackResponse.IsSuccessStatusCode)
                 _logger.LogError($"PayService::ProcessPaymentResponse, Payment callback for {callbackType} failed with statuscode: {callbackResponse.StatusCode}, Payment reference {reference}, Response: {JsonConvert.SerializeObject(callbackResponse)}");
