@@ -1,5 +1,5 @@
 describe('Address', () => {
-  it('Address search', () => {
+  it('Address Search', () => {
     cy.visit('ui-address')
       .toMatchingDOM()
   });
@@ -17,4 +17,26 @@ describe('Address', () => {
       .get('.govuk-button').click()
       .toMatchingDOM()
   });
+
+  it('Address Search Validation', () => {
+    cy.visit('ui-address')
+      .get('.govuk-button').click()
+      .toMatchingDOM()
+  });
+
+  it('Address Select Validation', () => {
+    cy.visit('ui-address')
+      .get('.govuk-input').type('sk11aa')
+      .get('.govuk-button').click()
+      .get('.govuk-button').click()
+      .toMatchingDOM()
+  });
+
+  it('Address Manual Validation', () => {
+    cy.visit('ui-address')
+      .get('.govuk-input').type('sk11zz')
+      .get('.govuk-button').click()
+      .get('.govuk-button').click()
+      .toMatchingDOM()
+  });  
 });

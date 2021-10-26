@@ -1,3 +1,4 @@
+import 'cypress-file-upload';
 require('@cypress/snapshot').register()
 
 const REGEX = /<input name="__RequestVerificationToken" type="hidden" value=".*?">/g
