@@ -34,9 +34,10 @@ describe('Address', () => {
 
   it('Address Manual Validation', () => {
     cy.visit('ui-address')
-      .get('.govuk-input').type('sk11aa')
+      .get('.govuk-input').type('sk11zz')
       .get('.govuk-button').click()
-      .get('.govuk-select').select("address 1")
+      .get('#address-AddressLine1').type('Address line 1')
+      .get('#address-AddressTown').type('Town or city')
       .get('.govuk-button').click()
       .toMatchingDOM()
   });  
