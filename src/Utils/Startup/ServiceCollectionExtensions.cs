@@ -545,7 +545,7 @@ namespace form_builder.Utils.Startup
         }
 
         
-        public static IServiceCollection AddAnalyticsProvider(this IServiceCollection services)
+        public static IServiceCollection AddAnalyticsProviders(this IServiceCollection services)
         {
             services.AddTransient<IAnalyticsProvider, FakeAnalyticsProvider>();
             services.AddTransient<IAnalyticsProvider, GoogleAnalyticsProvider>();
