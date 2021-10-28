@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Act
             string form = "test-form";
-            EAnalyticsEventType eventType = EAnalyticsEventType.Start;
+            EAnalyticsEventType eventType = EAnalyticsEventType.Finish;
 
             _service.RaiseEvent(form, eventType);
 
@@ -51,7 +51,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockAnalyticsConfiguration.Setup(_ => _.Value).Returns(new AnalyticsConfiguration { Enabled = false });
 
             string form = "test-form";
-            EAnalyticsEventType eventType = EAnalyticsEventType.Start;
+            EAnalyticsEventType eventType = EAnalyticsEventType.Finish;
 
             _service.RaiseEvent(form, eventType);
 
