@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Constants;
+using form_builder.Extensions;
 using form_builder.Providers.Analytics.Request;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,8 +31,8 @@ namespace form_builder.Providers.Analytics
                 var payload = new GoogleAnalyticsEventPayload
                 {
                     TrackingId = _configuration.Value.TrackingId,
-                    EventCategory = "useraction",
-                    EventAction = request.EventType.ToString(),
+                    EventCategory = AnalyticsConstants.EVENT_CATEGORY,
+                    EventAction = request.EventType.ToReadableTextForAnlayticsEvent(),
                     EventLabel = request.Form,
                     ClientId = _configuration.Value.ClientId
                 };

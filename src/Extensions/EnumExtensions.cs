@@ -1,5 +1,6 @@
 ﻿using System;
 using form_builder.Enum;
+using form_builder.Constants;
 
 namespace form_builder.Extensions
 {
@@ -28,5 +29,12 @@ namespace form_builder.Extensions
                     throw new Exception("Unknown document type");
             }
         }
+
+        public static string ToReadableTextForAnlayticsEvent(this EAnalyticsEventType value)
+            => value switch
+            {
+                EAnalyticsEventType.Finish => AnalyticsConstants.FINISH_EVENT_LABEL_NAME,
+                _ => throw new ArgumentOutOfRangeException($"Failed to convert EAnalyticsEventType: {value} to readble text")
+            };
     }
 }
