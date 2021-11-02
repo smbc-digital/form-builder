@@ -66,7 +66,7 @@ namespace form_builder.Services.MappingService
             return new BookingRequest
             {
                 AppointmentId = appointmentType.AppointmentId,
-                Customer = await GetCustomerBookingDetails (convertedAnswers, baseForm, bookingElement),
+                Customer = await GetCustomerBookingDetails(convertedAnswers, baseForm, bookingElement),
                 StartDateTime = GetStartDateTime(bookingElement.Properties.QuestionId, viewModel, form),
                 OptionalResources = appointmentType.OptionalResources
             };
@@ -89,21 +89,23 @@ namespace form_builder.Services.MappingService
                 throw new ApplicationException("MappingService::GetFormAnswers Session has expired");
 
             var sessionData = _distributedCache.GetString(sessionGuid);
-
             if (sessionData is null)
                 throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
-            foreach (var page in baseForm.Pages)
+            IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);
+            foreach (var pageSlug in visitedPageSlugs)
             {
-                await _schemaFactory.TransformPage(page, convertedAnswers);
+                Page page = baseForm.Pages
+                    .SingleOrDefault(page => page.PageSlug.Equals(pageSlug));
+
+                if (page is not null)
+                    await _schemaFactory.TransformPage(page, convertedAnswers);
             }
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
-
             convertedAnswers.FormName = form;
-
             if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
                 _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
 
@@ -236,7 +238,7 @@ namespace form_builder.Services.MappingService
                 {
                     var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(nestedElement));
                     incrementedElement.Properties.QuestionId = $"{nestedElement.Properties.QuestionId}:{i}:";
-                    fieldsetAnswers =  (Dictionary<string, dynamic>) await RecursiveCheckAndCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping) ? nestedElement.Properties.QuestionId : nestedElement.Properties.TargetMapping, incrementedElement, formAnswers, fieldsetAnswers);
+                    fieldsetAnswers = (Dictionary<string, dynamic>)await RecursiveCheckAndCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping) ? nestedElement.Properties.QuestionId : nestedElement.Properties.TargetMapping, incrementedElement, formAnswers, fieldsetAnswers);
                 }
 
                 answers.Add(fieldsetAnswers);
