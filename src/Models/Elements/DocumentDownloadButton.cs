@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
@@ -24,6 +25,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
+            Properties.Text = string.IsNullOrEmpty(Properties.Text) ? $"Download {Properties.DocumentType} document" : Properties.Text;
             Properties.Source = $"/document/Summary/{Properties.DocumentType}/{guid}";
             return viewRender.RenderAsync("DocumentDownloadButton", this);
         }        
