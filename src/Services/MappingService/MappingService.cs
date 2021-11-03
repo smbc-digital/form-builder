@@ -7,6 +7,7 @@ using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -25,16 +26,20 @@ namespace form_builder.Services.MappingService
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IElementMapper _elementMapper;
         private readonly ISchemaFactory _schemaFactory;
+        private readonly IPageHelper _pageHelper;
         private readonly IWebHostEnvironment _environment;
         private ILogger<MappingService> _logger;
 
-        public MappingService(IDistributedCacheWrapper distributedCache,
+        public MappingService(
+            IDistributedCacheWrapper distributedCache,
+            IPageHelper pageHelper,
             IElementMapper elementMapper,
             ISchemaFactory schemaFactory,
             IWebHostEnvironment environment,
             ILogger<MappingService> logger)
         {
             _distributedCache = distributedCache;
+            _pageHelper = pageHelper;
             _elementMapper = elementMapper;
             _schemaFactory = schemaFactory;
             _environment = environment;
@@ -94,14 +99,10 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
-            IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);
-            foreach (var pageSlug in visitedPageSlugs)
+            var index = baseForm.Pages.IndexOf(baseForm.GetPage(_pageHelper, convertedAnswers.Path));
+            for (int x = 0; x <= index; x++)
             {
-                Page page = baseForm.Pages
-                    .SingleOrDefault(page => page.PageSlug.Equals(pageSlug));
-
-                if (page is not null)
-                    await _schemaFactory.TransformPage(page, convertedAnswers);
+                await _schemaFactory.TransformPage(baseForm.Pages[x], convertedAnswers);
             }
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
