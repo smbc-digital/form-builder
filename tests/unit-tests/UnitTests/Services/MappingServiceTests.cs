@@ -6,6 +6,7 @@ using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -27,6 +28,7 @@ namespace form_builder_tests.UnitTests.Services
     {
         private readonly MappingService _service;
         private readonly Mock<ISchemaProvider> _mockSchemaProvider = new();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
         private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
         private readonly Mock<IElementMapper> _mockElementMapper = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
@@ -64,7 +66,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
 
-            _service = new MappingService(_mockDistributedCache.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockLogger.Object);
+            _service = new MappingService(_mockDistributedCache.Object, _mockPageHelper.Object, _mockElementMapper.Object, _mockSchemaFactory.Object, _mockHostingEnv.Object, _mockLogger.Object);
         }
 
         [Fact]
