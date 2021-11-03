@@ -58,7 +58,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
-                    Pages = new List<PageAnswers>()
+                    Pages = new List<PageAnswers>(),
+                    Path = "page-one"
                 }));
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
@@ -253,7 +254,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
-                   Pages = new List<PageAnswers>()
+                   Pages = new List<PageAnswers>(),
+                   Path = page.PageSlug
                }));
 
             // Act
@@ -309,7 +311,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
-                   Pages = new List<PageAnswers>()
+                   Pages = new List<PageAnswers>(),
+                   Path = page.PageSlug
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
@@ -364,7 +367,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
-                   Pages = new List<PageAnswers>()
+                   Pages = new List<PageAnswers>(),
+                   Path = page.PageSlug
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()))
@@ -408,7 +412,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
-                   Pages = new List<PageAnswers>()
+                   Pages = new List<PageAnswers>(),
+                   Path = page.PageSlug
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
@@ -470,7 +475,8 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
-                   Pages = new List<PageAnswers>()
+                   Pages = new List<PageAnswers>(),
+                   Path = page.PageSlug
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "file"), It.IsAny<FormAnswers>()))
@@ -529,7 +535,8 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>(),
-                    FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}person", 1 } }
+                    FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}person", 1 } },
+                    Path = page.PageSlug
                 }));
 
             // Act
@@ -570,7 +577,8 @@ namespace form_builder_tests.UnitTests.Services
                .Returns(JsonConvert.SerializeObject(new FormAnswers
                {
                    Pages = new List<PageAnswers>(),
-                   AdditionalFormData = new Dictionary<string, object> { { "additional", "answerData" } }
+                   AdditionalFormData = new Dictionary<string, object> { { "additional", "answerData" } },
+                   Path = page.PageSlug
                }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
@@ -616,7 +624,8 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     Pages = new List<PageAnswers>(),
-                    PaymentAmount = "10.00"
+                    PaymentAmount = "10.00",
+                    Path = page.PageSlug
                 }));
 
             _mockElementMapper.Setup(_ => _.GetAnswerValue(It.Is<IElement>(x => x.Properties.QuestionId == "textbox"), It.IsAny<FormAnswers>()))
@@ -777,7 +786,8 @@ namespace form_builder_tests.UnitTests.Services
                                 }
                             }
                         }
-                    }
+                    },
+                    Path = page.PageSlug
                 }));
 
             var element = new ElementBuilder()
