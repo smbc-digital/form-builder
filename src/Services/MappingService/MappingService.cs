@@ -99,10 +99,10 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
-            var index = baseForm.Pages.IndexOf(baseForm.GetPage(_pageHelper, convertedAnswers.Path));
-            for (int x = 0; x <= index; x++)
+            IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);
+            foreach (var pageSlug in visitedPageSlugs)
             {
-                await _schemaFactory.TransformPage(baseForm.Pages[x], convertedAnswers);
+                await _schemaFactory.TransformPage(baseForm.GetPage(_pageHelper, pageSlug), convertedAnswers);
             }
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
