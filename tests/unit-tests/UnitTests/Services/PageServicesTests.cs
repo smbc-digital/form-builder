@@ -1642,6 +1642,41 @@ namespace form_builder_tests.UnitTests.Services
             _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
+         [Fact]
+        public async Task FinalisePageJourney_Should_SetCache_WhenDocumentDownloadButton_IsThere() {
+            // Arrange
+            var guid = Guid.NewGuid();
+            var questionIDOne = "questionOne";
+            var questionIDTwo = "docDownloadButton";
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId(questionIDOne)
+                .Build();
+
+            var element2 = new ElementBuilder()
+                .WithType(EElementType.DocumentDownloadButton)
+                .WithQuestionId(questionIDTwo)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithPageSlug("page-one")
+                .WithElement(element2)
+                .WithElement(element2)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act
+            await _service.FinalisePageJourney("form", EBehaviourType.SubmitForm, schema);
+
+            // Assert
+            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
 
     }
 }
