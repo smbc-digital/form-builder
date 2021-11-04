@@ -182,6 +182,9 @@ module.exports = {
   "DocumentDownloadButton": {
     "Declaration": {
       "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"firstQuestion\">\n            Question label\n        </label>\n\n\n    \n\n\n    \n\n    \n\n    <input class=\"govuk-input\" id=\"firstQuestion\" maxlength=\"10\" name=\"firstQuestion\" spellcheck=\"true\" type=\"text\" value=\"\">\n"
+    },
+    "DocumentDownloadButton": {
+      "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"firstQuestion\">\n            Question label\n        </label>\n\n\n    \n\n\n    \n\n    \n\n    <input class=\"govuk-input\" id=\"firstQuestion\" maxlength=\"10\" name=\"firstQuestion\" spellcheck=\"true\" type=\"text\" value=\"\">\n"
     }
   }
 }
