@@ -27,6 +27,8 @@ namespace form_builder.Helpers.ElementHelpers
 
         bool CheckAllDateRestrictionsAreNotEnabled(Element element);
 
+        bool CheckForDocumentType(Element element);
+
         void ReSelectPreviousSelectedOptions(Element element);
 
         void ReCheckPreviousRadioOptions(Element element);

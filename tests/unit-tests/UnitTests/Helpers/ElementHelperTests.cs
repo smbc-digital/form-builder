@@ -239,6 +239,18 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<Exception>(() => _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element));
         }
 
+        [Fact]
+        public void CheckForDocumentType_ThrowsException_IfDocumentTypeIsMissing() {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DocumentDownloadButton)
+                .WithQuestionId("DocumentDownload")
+                .Build();
+
+            // Act & Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForDocumentType(element));
+        }
+
         [Theory]
         [InlineData(EElementType.Textbox)]
         [InlineData(EElementType.Textarea)]

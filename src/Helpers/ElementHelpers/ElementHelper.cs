@@ -134,6 +134,13 @@ namespace form_builder.Helpers.ElementHelpers
             return true;
         }
 
+        public bool CheckForDocumentType(Element element) {
+            if (element.Properties.DocumentType.Equals(EDocumentType.Unknown))
+                throw new Exception($"DocumentDownload element '{element.Properties.QuestionId}' requires valid DocumentType");
+
+            return true;
+        }
+
         public void ReSelectPreviousSelectedOptions(Element element)
         {
             foreach (var option in element.Properties.Options)
