@@ -251,6 +251,20 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<Exception>(() => _elementHelper.CheckForDocumentType(element));
         }
 
+        [Fact]
+        public void CheckForDocumentType_ThrowsException_IfDocumentTypeInvalid()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DocumentDownloadButton)
+                .WithQuestionId("DocumentDownload")
+                .WithDocumentType(EDocumentType.Unknown)
+                .Build();
+
+            // Act & Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForDocumentType(element));
+        }
+
         [Theory]
         [InlineData(EElementType.Textbox)]
         [InlineData(EElementType.Textarea)]
