@@ -672,12 +672,12 @@ namespace form_builder_tests.UnitTests.Helpers
                     new FormAnswers
                     {
                         Pages = new List<PageAnswers>
-                        { 
+                        {
                             new PageAnswers
                             {
                                 PageSlug = "page-one",
-                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }} 
-                            }    
+                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }}
+                            }
                         },
                     }));
 

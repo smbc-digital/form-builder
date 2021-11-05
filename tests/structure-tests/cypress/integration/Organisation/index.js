@@ -1,5 +1,5 @@
 describe('Organisation', () => {
-  it('Organisation search', () => {
+  it('Organisation Search', () => {
     cy.visit('ui-organisation')
       .toMatchingDOM()
   });
@@ -10,12 +10,18 @@ describe('Organisation', () => {
       .get('.govuk-button').click()
       .toMatchingDOM()
   });
-  
-  it('Organisation Select', () => {
+
+  it('Organisation Search Validation', () => {
     cy.visit('ui-organisation')
-      .get('.govuk-input').type('nodata')
       .get('.govuk-button').click()
       .toMatchingDOM()
   });
-  
+
+  it('Organisation Select Validation', () => {
+    cy.visit('ui-organisation')
+      .get('.govuk-input').type('org name')
+      .get('.govuk-button').click()
+      .get('.govuk-button').click()
+      .toMatchingDOM()
+  });
 });

@@ -222,7 +222,7 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
-        
+
         public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
@@ -292,7 +292,8 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
-        public static IServiceCollection ConfigureSubmitProviders(this IServiceCollection services) {
+        public static IServiceCollection ConfigureSubmitProviders(this IServiceCollection services)
+        {
             services.AddSingleton<ISubmitProvider, AuthenticationHeaderSubmitProvider>();
             services.AddSingleton<ISubmitProvider, PowerAppsSubmitProvider>();
 
@@ -337,7 +338,6 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
@@ -350,7 +350,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();            
+            services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
@@ -362,6 +362,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, BookingElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, DateValidationsCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, DocumentDownloadButtonCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();

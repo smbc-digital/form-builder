@@ -24,6 +24,7 @@
         DatePicker,
         Declaration,
         DocumentDownload,
+        DocumentDownloadButton,
         DocumentUpload,
         Fieldset,
         FileUpload,
