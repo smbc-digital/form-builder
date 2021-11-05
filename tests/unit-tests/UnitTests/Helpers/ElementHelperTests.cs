@@ -239,32 +239,6 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Throws<Exception>(() => _elementHelper.CheckAllDateRestrictionsAreNotEnabled(element));
         }
 
-        [Fact]
-        public void CheckForDocumentType_ThrowsException_IfDocumentTypeIsMissing() {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DocumentDownloadButton)
-                .WithQuestionId("DocumentDownload")
-                .Build();
-
-            // Act & Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForDocumentType(element));
-        }
-
-        [Fact]
-        public void CheckForDocumentType_ThrowsException_IfDocumentTypeInvalid()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DocumentDownloadButton)
-                .WithQuestionId("DocumentDownload")
-                .WithDocumentType(EDocumentType.Unknown)
-                .Build();
-
-            // Act & Assert
-            Assert.Throws<Exception>(() => _elementHelper.CheckForDocumentType(element));
-        }
-
         [Theory]
         [InlineData(EElementType.Textbox)]
         [InlineData(EElementType.Textarea)]
@@ -698,12 +672,12 @@ namespace form_builder_tests.UnitTests.Helpers
                     new FormAnswers
                     {
                         Pages = new List<PageAnswers>
-                        { 
+                        {
                             new PageAnswers
                             {
                                 PageSlug = "page-one",
-                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }} 
-                            }    
+                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }}
+                            }
                         },
                     }));
 
