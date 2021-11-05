@@ -10,6 +10,9 @@ namespace form_builder.Validators.IntegrityChecks.Elements
         {
             IntegrityCheckResult result = new();
 
+            if (!element.Type.Equals(EElementType.DocumentDownloadButton))
+                return result;
+
             if (element.Properties is null)
                 return result;
 
