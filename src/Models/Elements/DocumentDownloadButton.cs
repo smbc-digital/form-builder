@@ -25,6 +25,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null)
         {
+            elementHelper.CheckForDocumentType(this);
             Properties.Text = string.IsNullOrEmpty(Properties.Text) ? $"Download {Properties.DocumentType} document" : Properties.Text;
             Properties.Source = $"/document/Summary/{Properties.DocumentType}/{guid}";
             return viewRender.RenderAsync("DocumentDownloadButton", this);
