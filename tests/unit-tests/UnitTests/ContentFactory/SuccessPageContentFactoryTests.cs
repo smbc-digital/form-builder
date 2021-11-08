@@ -127,51 +127,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal(EElementType.H2, callBack.Elements[0].Type);
         }
 
-        [Theory]
-        [InlineData(EBehaviourType.SubmitAndPay)]
-        [InlineData(EBehaviourType.SubmitForm)]
-        public async Task Build_Should_AddDocumentDownloadButton_WhenDocumentDownloadEnabled(EBehaviourType behaviourType)
-        {
-            // Arrange
-            var callBack = new Page();
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.H2)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("success")
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithDocumentDownload(true)
-                .WithDocumentType(EDocumentType.Txt)
-                .WithFirstPageSlug("page-one")
-                .WithBaseUrl("base-test")
-                .WithPage(page)
-                .Build();
-
-            _mockPageContentFactory
-                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel())
-                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, List<object>>((a, b, c, d, e, f) => callBack = a);
-
-            _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
-                .Returns(formSchema.Pages.FirstOrDefault());
-
-            // Act 
-            var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), behaviourType);
-
-            // Assert
-            Assert.Equal("Success", result.ViewName);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
-            Assert.Equal(2, callBack.Elements.Count);
-            Assert.Equal(EElementType.DocumentDownload, callBack.Elements[1].Type);
-            Assert.Equal($"Download {EDocumentType.Txt} document", callBack.Elements[1].Properties.Label);
-        }
-
         [Fact]
         public async Task Build_Should_Set_IsInPreviewMode_ToTrue()
         {

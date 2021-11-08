@@ -67,24 +67,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 };
             }
 
-            if (baseForm.DocumentDownload)
-            {
-                var sourceBase = "/document/Summary";
-                baseForm.DocumentType.ForEach(docType =>
-                {
-                    var element = new ElementBuilder()
-                        .WithType(EElementType.DocumentDownload)
-                        .WithLabel($"Download {docType} document")
-                        .WithSource($"{sourceBase}/{docType}/{sessionGuid}")
-                        .WithDocumentType(docType)
-                        .Build();
-
-                    page.Elements.Add(element);
-                });
-                var successIndex = baseForm.Pages.IndexOf(page);
-                baseForm.Pages[successIndex] = page;
-            }
-
             var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid, formAnswers);
 
             return new SuccessPageEntity
