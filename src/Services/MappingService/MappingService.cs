@@ -99,13 +99,13 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
+            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);
             foreach (var pageSlug in visitedPageSlugs)
             {
                 await _schemaFactory.TransformPage(baseForm.GetPage(_pageHelper, pageSlug), convertedAnswers);
             }
 
-            convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
             convertedAnswers.FormName = form;
             if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
                 _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
