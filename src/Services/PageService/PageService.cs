@@ -328,7 +328,7 @@ namespace form_builder.Services.PageService
                     }
                 });
 
-            if (baseForm.DocumentDownload)
+            if (baseForm.Pages.Where(_ => _.PageSlug.ToLower().Equals("success")).Any() && baseForm.GetPage(_pageHelper, "success").Elements.Where(_ => _.Type.Equals(EElementType.DocumentDownload)).Any())
                 await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distributedCacheExpirationConfiguration.Document);
 
             return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);

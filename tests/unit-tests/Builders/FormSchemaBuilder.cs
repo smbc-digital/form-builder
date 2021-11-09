@@ -14,7 +14,6 @@ namespace form_builder_tests.Builders
         private List<Page> _pages = new List<Page>();
         private string _startPageUrl = "page-url";
         private string _firstPageSlug = "page-one";
-        private bool _documentDownload;
         private bool _generateReferenceNumber = false;
         public string _generatedReferenceNumberMapping { get; set; }
         private bool _savePaymentAmount { get; set; }
@@ -35,7 +34,6 @@ namespace form_builder_tests.Builders
             StartPageUrl = _startPageUrl,
             FirstPageSlug = _firstPageSlug,
             EnvironmentAvailabilities = _environmentAvailability,
-            DocumentDownload = _documentDownload,
             DocumentType = _documentType,
             FormActions = _formActions,
             GenerateReferenceNumber = _generateReferenceNumber,
@@ -85,13 +83,6 @@ namespace form_builder_tests.Builders
         public FormSchemaBuilder WithFirstPageSlug(string slug)
         {
             _firstPageSlug = slug;
-
-            return this;
-        }
-
-        public FormSchemaBuilder WithDocumentDownload(bool value)
-        {
-            _documentDownload = value;
 
             return this;
         }
