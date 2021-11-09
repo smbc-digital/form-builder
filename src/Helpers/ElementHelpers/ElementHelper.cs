@@ -224,7 +224,7 @@ namespace form_builder.Helpers.ElementHelpers
                         addAnotherPageSummary.Answers = await GenerateSummaryAnswers(listOfNestedElements, page, formAnswers, false);
                         listOfPageSummary.Add(addAnotherPageSummary);
                     }
-                    
+
                     formSummary.AddRange(listOfPageSummary);
                 }
 
@@ -253,8 +253,8 @@ namespace form_builder.Helpers.ElementHelpers
         public int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers)
         {
             var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
-            return formAnswers.FormData.ContainsKey(formDataIncrementKey) 
-                ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) 
+            return formAnswers.FormData.ContainsKey(formDataIncrementKey)
+                ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString())
                 : throw new ApplicationException($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {formDataIncrementKey}");
         }
 

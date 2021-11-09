@@ -1607,11 +1607,11 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task FinalisePageJourney_Should_SetCache_WhenDocumentDownload_True() {
+        public async Task FinalisePageJourney_Should_SetCache_WhenDocumentDownload_IsThere() {
             // Arrange
             var guid = Guid.NewGuid();
             var questionIDOne = "questionOne";
-            var questionIDTwo = "questionTwo";
+            var questionIDTwo = "docDownloadButton";
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
 
             var element = new ElementBuilder()
@@ -1620,8 +1620,9 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             var element2 = new ElementBuilder()
-                .WithType(EElementType.Textarea)
+                .WithType(EElementType.DocumentDownload)
                 .WithQuestionId(questionIDTwo)
+                .WithDocumentType(EDocumentType.Txt)
                 .Build();
 
             var page = new PageBuilder()
@@ -1630,18 +1631,21 @@ namespace form_builder_tests.UnitTests.Services
                 .WithElement(element2)
                 .Build();
 
+            var successPage = new PageBuilder()
+                .WithPageSlug("success")
+                .WithElement(element2)
+                .Build();
+
             var schema = new FormSchemaBuilder()
                 .WithPage(page)
-                .WithDocumentDownload(true)
+                .WithPage(successPage)
                 .Build();
 
             // Act
-            await _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema);
+            await _service.FinalisePageJourney("form", EBehaviourType.SubmitForm, schema);
 
             // Assert
             _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
-
-
     }
 }
