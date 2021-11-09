@@ -1,5 +1,9 @@
 module.exports = {
+<<<<<<< HEAD
   "__version": "6.1.0",
+=======
+  "__version": "7.7.0",
+>>>>>>> master
   "Breadcrumbs": {
     "Breadcrumbs": {
       "1": "\n    <ol class=\"govuk-breadcrumbs__list\">\n            <li class=\"govuk-breadcrumbs__list-item\"><a class=\"govuk-breadcrumbs__link\" href=\"https://www.stockport.gov.uk\">Home</a></li>\n            <li class=\"govuk-breadcrumbs__list-item\"><a class=\"govuk-breadcrumbs__link\" href=\"https://www.stockport.gov.uk/topic/bins-and-recycling\">Bins and recycling</a></li>\n    </ol>\n"
@@ -186,10 +190,13 @@ module.exports = {
     "Address Manual Validation": {
       "1": "\n                    \n<form action=\"/ui-address/page1/manual\" autocomplete=\"on\" enctype=\"multipart/form-data\" method=\"post\" novalidate=\"novalidate\"><h1 class=\"govuk-heading-l\">What is your home address?\n</h1>\n<input id=\"address-postcode\" name=\"address-postcode\" type=\"hidden\" value=\"sk11zz\">\n\n<fieldset class=\"govuk-fieldset\">\n        <legend class=\"govuk-fieldset__legend govuk-fieldset__legend--m\">\n        Enter an address\n    </legend>\n\n\n    <p class=\"smbc-body\">\n    <strong class=\"govuk-!-margin-right-1\">Postcode:</strong>\n    sk11zz\n    <a class=\"govuk-!-margin-left-6 govuk-link\" href=\"/ui-address/page1\">Change</a>\n</p>\n\n        \n    <div class=\"govuk-inset-text\">\n        We cannot find the address, please enter it manually.\n    </div>\n\n\n\n    <div class=\"govuk-form-group  govuk-form-group--error\">\n        <label class=\"govuk-label govuk-label--m\" for=\"address-AddressLine1\">Address line 1</label>\n            <span class=\"smbc-error-message\" id=\"address-AddressLine1-error\">\n        <span class=\"govuk-visually-hidden\">Error:</span>Enter the address \n    </span>\n\n        <input aria-describedby=\"address-AddressLine1-error\" autocomplete=\"address-line1\" class=\"govuk-input govuk-input--error\" id=\"address-AddressLine1\" name=\"address-AddressLine1\" type=\"text\" value=\"\">\n    </div>\n\n    <div class=\"govuk-form-group\">\n        <label class=\"govuk-label govuk-label--m\" for=\"address-AddressLine2\">\n            Address line 2\n            <span class=\"smbc-body\">(optional)</span>\n        </label>\n        <input autocomplete=\"address-line2\" class=\"govuk-input\" id=\"address-AddressLine2\" name=\"address-AddressLine2\" type=\"text\" value=\"\">\n    </div>\n\n    <div class=\"govuk-form-group  govuk-form-group--error\">\n        <label class=\"govuk-label govuk-label--m\" for=\"address-AddressTown\">Town or city</label>\n            <span class=\"smbc-error-message\" id=\"address-AddressTown-error\">\n        <span class=\"govuk-visually-hidden\">Error:</span>Enter the town or city \n    </span>\n\n        <input aria-describedby=\"address-AddressTown-error\" autocomplete=\"address-level1\" class=\"govuk-input govuk-input--error govuk-!-width-two-thirds\" id=\"address-AddressTown\" name=\"address-AddressTown\" type=\"text\" value=\"\">\n    </div>\n\n    <div class=\"govuk-form-group \">\n        <label class=\"govuk-label govuk-label--m\" for=\"address-ManualPostcode\">Postcode</label>\n        \n        <input autocomplete=\"postal-code\" class=\"govuk-input govuk-input--width-10\" id=\"address-ManualPostcode\" name=\"address-ManualPostcode\" type=\"text\" value=\"sk11zz\">\n    </div>\n</fieldset>\n\n<button data-prevent-double-click=\"true\" class=\"govuk-button \" id=\"nextStep\" data-module=\"govuk-button\">\n    Continue\n</button>\n\n<input id=\"Path\" name=\"Path\" type=\"hidden\" value=\"page1\"></form>\n                "
     }
+<<<<<<< HEAD
   },
   "DocumentDownload": {
     "DocumentDownload": {
       "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"firstQuestion\">\n            Question label\n        </label>\n\n\n    \n\n\n    \n\n    \n\n    <input class=\"govuk-input\" id=\"firstQuestion\" maxlength=\"10\" name=\"firstQuestion\" spellcheck=\"true\" type=\"text\" value=\"\">\n"
     }
+=======
+>>>>>>> master
   }
 }
