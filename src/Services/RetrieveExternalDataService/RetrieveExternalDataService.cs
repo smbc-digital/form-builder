@@ -50,8 +50,9 @@ namespace form_builder.Services.RetrieveExternalDataService
 
             foreach (var action in actions)
             {
-                var submitSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ =>
-                    _.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
+                var submitSlug = action.Properties.PageActionSlugs
+                    .FirstOrDefault(_ => _.Environment
+                        .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
                 if (submitSlug is null)
                     throw new ApplicationException("RetrieveExternalDataService::Process, there is no PageActionSlug defined for this environment");

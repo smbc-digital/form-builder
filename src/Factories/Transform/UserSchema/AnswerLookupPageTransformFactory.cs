@@ -31,6 +31,6 @@ namespace form_builder.Factories.Transform.UserSchema
         }
 
         public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
-            => await Task.FromResult(TransformPage(page, convertedAnswers));
+            => await Task.Run(() => TransformPage(page, convertedAnswers));
     }
 }
