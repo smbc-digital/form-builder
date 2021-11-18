@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using form_builder.Configuration;
@@ -19,7 +20,7 @@ namespace form_builder_tests.UnitTests.Providers.Analytics
         private readonly Mock<ILogger<IAnalyticsProvider>> _mockLogger = new ();
         private readonly Mock<IGateway> _mockGateway = new ();
         private readonly Mock<IOptions<GoogleAnalyticsConfiguration>> _mockGoogleAnalyticsOptions = new ();
-        private readonly GoogleAnalyticsConfiguration _mockGAConfiguration = new () {  };
+        private readonly GoogleAnalyticsConfiguration _mockGAConfiguration = new () { Events = new List<Event>{ new Event { EventType = EAnalyticsEventType.Finish } } };
 
         public GoogleAnalyticsProviderTests()
         {
@@ -46,20 +47,37 @@ namespace form_builder_tests.UnitTests.Providers.Analytics
 
             await _analyticsProvider.RaiseEventAsync(new AnalyticsEventRequest{ EventType = EAnalyticsEventType.Finish, Form = "test-form" });
 
-            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<ApplicationException>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
         }
 
         [Fact]
         public async Task RaiseEventAsync_Should_Log_Error_If_gateway_ThrowsException()
         {
-            string formName = "test-form";
-            EAnalyticsEventType eventType = EAnalyticsEventType.Finish;
             _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
                 .ThrowsAsync(new Exception("an error"));
 
-            await _analyticsProvider.RaiseEventAsync(new AnalyticsEventRequest{ EventType = eventType, Form = formName });
+            await _analyticsProvider.RaiseEventAsync(new AnalyticsEventRequest{ EventType = EAnalyticsEventType.Finish, Form = "test-form" });
 
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RaiseEventAsync_Should_Log_Error_If_No_Analaytics_Config_Found_ForEventType()
+        {
+            await _analyticsProvider.RaiseEventAsync(new AnalyticsEventRequest{ EventType = EAnalyticsEventType.Unknown, Form = "test-form" });
+
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<ApplicationException>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RaiseEventAsync_Should_Log_Error_If_AnlayticsType_Not_In_Switch_Statement_For_Building_AnalyticsEntity()
+        {
+            GoogleAnalyticsConfiguration _gaConfig = new () { Events = new List<Event>{ new Event { EventType = EAnalyticsEventType.Unknown } } };
+            _mockGoogleAnalyticsOptions.Setup(_ => _.Value).Returns(_gaConfig);
+
+            await _analyticsProvider.RaiseEventAsync(new AnalyticsEventRequest{ EventType = EAnalyticsEventType.Unknown, Form = "test-form" });
+
+            _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<ArgumentOutOfRangeException>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
         }
     }
 }

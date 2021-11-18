@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace form_builder.Configuration
 {
     public class GoogleAnalyticsConfiguration
@@ -6,5 +8,6 @@ namespace form_builder.Configuration
         public string ApiUrl { get; set; }
         public string TrackingId { get; set; }
         public string ClientId { get; set; }
+        public List<GoogleAnalyticsEvent> Events { get; set; }
     }
 }
