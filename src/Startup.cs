@@ -51,6 +51,7 @@ namespace form_builder
                 .AddGovUkServices(Configuration)
                 .AddIOptionsConfiguration(Configuration)
                 .AddUtilities()
+                .AddAnalyticsProviders()
                 .ConfigureAddressProviders()
                 .ConfigureDynamicLookDataProviders()
                 .ConfigureOrganisationProviders()
