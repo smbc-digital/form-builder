@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Providers.Analytics
         private readonly Mock<ILogger<IAnalyticsProvider>> _mockLogger = new ();
         private readonly Mock<IGateway> _mockGateway = new ();
         private readonly Mock<IOptions<GoogleAnalyticsConfiguration>> _mockGoogleAnalyticsOptions = new ();
-        private readonly GoogleAnalyticsConfiguration _mockGAConfiguration = new () { Events = new List<Event>{ new Event { EventType = EAnalyticsEventType.Finish } } };
+        private readonly GoogleAnalyticsConfiguration _mockGAConfiguration = new () { Events = new List<GoogleAnalyticsEvent>{ new GoogleAnalyticsEvent { EventType = EAnalyticsEventType.Finish.ToString() } } };
 
         public GoogleAnalyticsProviderTests()
         {
@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Providers.Analytics
         [Fact]
         public async Task RaiseEventAsync_Should_Log_Error_If_AnlayticsType_Not_In_Switch_Statement_For_Building_AnalyticsEntity()
         {
-            GoogleAnalyticsConfiguration _gaConfig = new () { Events = new List<Event>{ new Event { EventType = EAnalyticsEventType.Unknown } } };
+            GoogleAnalyticsConfiguration _gaConfig = new () { Events = new List<GoogleAnalyticsEvent>{ new GoogleAnalyticsEvent { EventType = EAnalyticsEventType.Unknown.ToString() } } };
             _mockGoogleAnalyticsOptions.Setup(_ => _.Value).Returns(_gaConfig);
 
             await _analyticsProvider.RaiseEventAsync(new AnalyticsEventRequest{ EventType = EAnalyticsEventType.Unknown, Form = "test-form" });
