@@ -7,14 +7,14 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
 {
     public class DocumentDownloadCheckTests
     {
-        private readonly DocumentDownloadButtonCheck _integrityCheck = new();
+        private readonly DocumentDownloadCheck _integrityCheck = new();
 
         [Fact]
         public void Validate_ShouldReturnInValid_IfDocumentTypeMissing()
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DocumentDownloadButton)
+                .WithType(EElementType.DocumentDownload)
                 .WithQuestionId("DocumentDownload")
                 .Build();
 
@@ -29,7 +29,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DocumentDownloadButton)
+                .WithType(EElementType.DocumentDownload)
                 .WithQuestionId("DocumentDownload")
                 .WithDocumentType(EDocumentType.Unknown)
                 .Build();
@@ -44,7 +44,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
         {
             // Arrange
             var element = new ElementBuilder()
-                .WithType(EElementType.DocumentDownloadButton)
+                .WithType(EElementType.DocumentDownload)
                 .WithQuestionId("DocumentDownload")
                 .WithDocumentType(EDocumentType.Txt)
                 .Build();

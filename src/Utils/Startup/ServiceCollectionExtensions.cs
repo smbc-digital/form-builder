@@ -335,6 +335,7 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, BaseUrlCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
@@ -362,7 +363,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, BookingElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, DateValidationsCheck>();
-            services.AddSingleton<IElementSchemaIntegrityCheck, DocumentDownloadButtonCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, DocumentDownloadCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();

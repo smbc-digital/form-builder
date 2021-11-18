@@ -4,13 +4,13 @@ using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Elements
 {
-    public class DocumentDownloadButtonCheck : IElementSchemaIntegrityCheck
+    public class DocumentDownloadCheck : IElementSchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(IElement element)
         {
             IntegrityCheckResult result = new();
 
-            if (!element.Type.Equals(EElementType.DocumentDownloadButton))
+            if (!element.Type.Equals(EElementType.DocumentDownload))
                 return result;
 
             if (element.Properties is null)

@@ -41,8 +41,6 @@ namespace form_builder.Models
 
         public List<EnvironmentAvailability> EnvironmentAvailabilities { get; set; }
 
-        public bool DocumentDownload { get; set; }
-
         public bool HasDocumentUpload => Pages.Any(_ => _.PageSlug.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH));
 
         public List<EDocumentType> DocumentType { get; set; }

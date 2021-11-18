@@ -14,23 +14,23 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
 {
-    public class DocumentDownloadButtonTests
+    public class DocumentDownloadTests
     {
         private readonly Mock<IViewRender> _mockIViewRender = new();
         private readonly Mock<IElementHelper> _mockElementHelper = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         [Fact]
-        public async Task RenderAsync_ShouldUseDefaultDocumentDownloadButtonText()
+        public async Task RenderAsync_ShouldUseDefaultDocumentDownloadText()
         {
             //Arrange
-            var callback = new DocumentDownloadButton();
+            var callback = new DocumentDownload();
             _mockIViewRender
-                .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<DocumentDownloadButton>(), It.IsAny<Dictionary<string, dynamic>>()))
-                .Callback<string, DocumentDownloadButton, Dictionary<string, dynamic>>((a, b, c) => callback = b);
+                .Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<DocumentDownload>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Callback<string, DocumentDownload, Dictionary<string, dynamic>>((a, b, c) => callback = b);
 
             var element = new ElementBuilder()
-                .WithType(EElementType.DocumentDownloadButton)
+                .WithType(EElementType.DocumentDownload)
                 .WithDocumentType(EDocumentType.Txt)
                 .Build();
 
@@ -56,7 +56,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 
             //Assert
             Assert.Equal($"Download {EDocumentType.Txt} document", callback.Properties.Text);
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "DocumentDownloadButton"), It.IsAny<DocumentDownloadButton>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "DocumentDownload"), It.IsAny<DocumentDownload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
         }
     }
 }
