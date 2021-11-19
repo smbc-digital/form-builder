@@ -44,15 +44,15 @@ namespace form_builder.Services.RetrieveExternalDataService
 
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
-            var answers = new List<Answers>();
+            List<Answers> answers = new();
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingData = await _mappingService.Map(sessionGuid, formName);
 
             foreach (var action in actions)
             {
-                var response = new HttpResponseMessage();
-                var submitSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ =>
-                    _.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
+                var submitSlug = action.Properties.PageActionSlugs
+                    .FirstOrDefault(_ => _.Environment
+                        .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
                 if (submitSlug is null)
                     throw new ApplicationException("RetrieveExternalDataService::Process, there is no PageActionSlug defined for this environment");
@@ -62,31 +62,21 @@ namespace form_builder.Services.RetrieveExternalDataService
                 if (!string.IsNullOrEmpty(submitSlug.AuthToken))
                     _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
 
-                if (entity.IsPost)
-                {
-                    response = await _gateway.PostAsync(entity.Url, mappingData.Data);
-                }
-                else
-                {
-                    response = await _gateway.GetAsync(entity.Url);
-                }
+                var response = entity.IsPost ? await _gateway.PostAsync(entity.Url, mappingData.Data) :
+                        await _gateway.GetAsync(entity.Url);
 
                 if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
 
-                if (response.Content is null)
-                    throw new ApplicationException($"RetrieveExternalDataService::Process, response content from {entity.Url} is null.");
-
-                var content = await response.Content.ReadAsStringAsync();
-                if (string.IsNullOrWhiteSpace(content))
-                    throw new ApplicationException($"RetrieveExternalDataService::Process, Gateway {entity.Url} responded with empty reference");
-
-                var answer = new Answers
+                var responseAnswer = string.Empty;
+                if (response.Content is not null)
                 {
-                    QuestionId = action.Properties.TargetQuestionId,
-                    Response = JsonConvert.DeserializeObject<string>(content)
-                };
+                    string content = await response.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(content))
+                        responseAnswer = System.Text.Json.JsonSerializer.Deserialize<string>(content);
+                }
 
+                Answers answer = new(action.Properties.TargetQuestionId, responseAnswer);
                 answers.Add(answer);
 
                 if (action.Properties.IncludeInFormSubmission)
@@ -98,7 +88,9 @@ namespace form_builder.Services.RetrieveExternalDataService
                 }
             }
 
-            mappingData.FormAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(mappingData.FormAnswers.Path, StringComparison.OrdinalIgnoreCase)).Answers.AddRange(answers);
+            mappingData.FormAnswers.Pages
+                .FirstOrDefault(_ => _.PageSlug.Equals(mappingData.FormAnswers.Path, StringComparison.OrdinalIgnoreCase))
+                .Answers.AddRange(answers);
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
         }
