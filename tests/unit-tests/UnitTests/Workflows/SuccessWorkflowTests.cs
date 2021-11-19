@@ -6,6 +6,7 @@ using form_builder.Factories.Schema;
 using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
+using form_builder.Services.AnalyticsService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Workflows.ActionsWorkflow;
@@ -22,10 +23,11 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly Mock<IPageService> _mockPageService = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
+        private readonly Mock<IAnalyticsService> _mockAnalyticsService = new();
 
         public SuccessWorkflowTests()
         {
-            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionsWorkflow.Object);
+            _workflow = new SuccessWorkflow(_mockPageService.Object, _mockSchemaFactory.Object, _mockActionsWorkflow.Object, _mockAnalyticsService.Object);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H2)
@@ -115,6 +117,16 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             _mockPageService.Verify(_ => _.FinalisePageJourney("form", EBehaviourType.SubmitForm, It.IsAny<FormSchema>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Process_ShouldCallAnalyticsService_ToRaise_Finish_Form_Event()
+        {
+            // Act
+            await _workflow.Process(EBehaviourType.SubmitForm, "form");
+
+            // Assert
+            _mockAnalyticsService.Verify(_ => _.RaiseEvent(It.Is<string>(_ => _.Equals("form")), It.Is<EAnalyticsEventType>(_ => _.Equals(EAnalyticsEventType.Finish))), Times.Once);
         }
     }
 }

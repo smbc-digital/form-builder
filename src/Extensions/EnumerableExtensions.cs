@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using form_builder.Enum;
 using form_builder.Providers.Address;
+using form_builder.Providers.Analytics;
 using form_builder.Providers.Booking;
 using form_builder.Providers.EnabledFor;
 using form_builder.Providers.FileStorage;
@@ -45,6 +46,9 @@ namespace form_builder.Extensions
            value.Single(_ => _.Type.Equals(providerName));
 
         public static IFileStorageProvider Get(this IEnumerable<IFileStorageProvider> value, string providerName) =>
+            value.Single(_ => _.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase));
+
+        public static IAnalyticsProvider Get(this IEnumerable<IAnalyticsProvider> value, string providerName) =>
             value.Single(_ => _.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase));
     }
 }
