@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,15 +66,25 @@ namespace form_builder.Services.RetrieveExternalDataService
                 var response = entity.IsPost ? await _gateway.PostAsync(entity.Url, mappingData.Data) :
                         await _gateway.GetAsync(entity.Url);
 
-                if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
-
                 var responseAnswer = string.Empty;
-                if (response.Content is not null)
+                if (response.StatusCode.Equals(HttpStatusCode.NotFound))
                 {
+                    responseAnswer = null;
+                }
+                else if (response.IsSuccessStatusCode)
+                {
+                    if (response.Content is null)
+                        throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an null content, Response: {JsonConvert.SerializeObject(response)}");
+
                     string content = await response.Content.ReadAsStringAsync();
-                    if (!string.IsNullOrEmpty(content))
-                        responseAnswer = System.Text.Json.JsonSerializer.Deserialize<string>(content);
+                    if (string.IsNullOrEmpty(content))
+                        throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an null or empty content, Response: {JsonConvert.SerializeObject(response)}");
+
+                    responseAnswer = System.Text.Json.JsonSerializer.Deserialize<string>(content);
+                }
+                else
+                {
+                    throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
                 }
 
                 Answers answer = new(action.Properties.TargetQuestionId, responseAnswer);

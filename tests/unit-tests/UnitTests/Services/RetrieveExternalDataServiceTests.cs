@@ -120,7 +120,6 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
         [InlineData("Real Data Response")]
         public async Task Process_Should_AddAnswerToFormPage_If_OKResponseIsValidStringNullOrEmpty(string response)
@@ -157,6 +156,43 @@ namespace form_builder_tests.UnitTests.Services
             var answer = page.Answers.First(answer => answer.QuestionId.Equals(questionId));
 
             Assert.True(answer is not null);
+        }
+
+        [Fact]
+        public async Task Process_Should_SetEmptyAnswerToFormPage_If_ResponseIsNotFound()
+        {
+            // Arrange
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Content = null
+                });
+
+            string questionId = "testQuestion";
+
+            List<IAction> actions = new()
+            {
+                new ActionBuilder()
+                   .WithActionType(EActionType.RetrieveExternalData)
+                   .WithPageActionSlug(new PageActionSlug
+                   {
+                       URL = "www.test.com",
+                       AuthToken = string.Empty,
+                       Environment = "local"
+                   })
+                   .WithTargetQuestionId(questionId)
+                   .Build()
+            };
+
+            // Act
+            await _service.Process(actions, new FormSchema(), "test");
+
+            // Assert
+            var page = _mappingEntity.FormAnswers.Pages.First(page => page.PageSlug.Equals("page-one"));
+            var answer = page.Answers.First(answer => answer.QuestionId.Equals(questionId));
+
+            Assert.True(answer.Response is null);
         }
 
         [Fact]
