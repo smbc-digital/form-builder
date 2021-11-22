@@ -1,32 +1,32 @@
 ﻿@model Element
 @{
-    var elements = Model.GenerateElementProperties();
-    var baseCssClasses = "govuk-input";
-    var fieldsetIncrement = Model.Properties.QuestionId.Split(':').Length > 1 ? $"-{Model.Properties.QuestionId.Split(':')[1]}" : null;
+	var elements = Model.GenerateElementProperties();
+	var baseCssClasses = "govuk-input";
+	var fieldsetIncrement = Model.Properties.QuestionId.Split(':').Length > 1 ? $"-{Model.Properties.QuestionId.Split(':')[1]}" : null;
 	var questionID = Model.QuestionId;
 
-    switch (Model.Properties.Width)
-    {
-        case ESize.Small:
-            baseCssClasses += " govuk-input--width-3";
-            break;
+	switch (Model.Properties.Width)
+	{
+		case ESize.Small:
+			baseCssClasses += " govuk-input--width-3";
+			break;
 
-        case ESize.Medium:
-            baseCssClasses += " govuk-input--width-5";
-            break;
+		case ESize.Medium:
+			baseCssClasses += " govuk-input--width-5";
+			break;
 
-        case ESize.Large:
-            baseCssClasses += " govuk-input--width-10";
-            break;
+		case ESize.Large:
+			baseCssClasses += " govuk-input--width-10";
+			break;
 
-        case ESize.ExtraLarge:
-            baseCssClasses += " govuk-input--width-20";
-            break;
-    }
+		case ESize.ExtraLarge:
+			baseCssClasses += " govuk-input--width-20";
+			break;
+	}
 
-    elements.Add("class", !Model.IsValid
-        ? $"{baseCssClasses} govuk-input--error"
-        : baseCssClasses);
+	elements.Add("class", !Model.IsValid
+		? $"{baseCssClasses} govuk-input--error"
+		: baseCssClasses);
 }
 
 <div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? " govuk-radios--conditional" : "")" data-module="govuk-radios">
