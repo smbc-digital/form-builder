@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,17 +67,17 @@ namespace form_builder.Services.RetrieveExternalDataService
                         await _gateway.GetAsync(entity.Url);
 
                 var responseAnswer = string.Empty;
-                if (response.StatusCode.Equals(404))
+                if (response.StatusCode.Equals(HttpStatusCode.NotFound))
                 {
                     responseAnswer = null;
                 }
-                else if (response.StatusCode.Equals(200))
+                else if (response.IsSuccessStatusCode)
                 {
-                    if (response.Content is not null)
+                    if (response.Content is null)
                         throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
 
                     string content = await response.Content.ReadAsStringAsync();
-                    if (!string.IsNullOrEmpty(content))
+                    if (string.IsNullOrEmpty(content))
                         throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
 
                     responseAnswer = System.Text.Json.JsonSerializer.Deserialize<string>(content);
