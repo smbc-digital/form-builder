@@ -12,7 +12,6 @@ using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Validators.IntegrityChecks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -59,19 +58,16 @@ namespace form_builder.Factories.Schema
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;
 
-            FormSchema formSchema = new();
-
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {
                 string data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}");
-
                 if (data is not null)
                 {
                     return JsonConvert.DeserializeObject<FormSchema>(data);
                 }
             }
-            
-            formSchema = await _schemaProvider.Get<FormSchema>(formKey);
+
+            FormSchema formSchema = await _schemaProvider.Get<FormSchema>(formKey);
 
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);

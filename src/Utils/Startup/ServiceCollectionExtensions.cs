@@ -95,6 +95,8 @@ using StockportGovUK.NetStandard.Gateways.VerintService;
 using form_builder.Services.PreviewService;
 using form_builder.SubmissionActions;
 using form_builder.Helpers.Cookie;
+using form_builder.Providers.Analytics;
+using form_builder.Services.AnalyticsService;
 
 namespace form_builder.Utils.Startup
 {
@@ -333,6 +335,7 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, BaseUrlCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
@@ -390,6 +393,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
             services.AddSingleton<IPreviewService, PreviewService>();
+            services.AddSingleton<IAnalyticsService, AnalyticsService>();
 
             return services;
         }
@@ -414,6 +418,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, AnswerLookupPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, BehaviourConditionsPageTransformFactory>();
 
             return services;
@@ -463,6 +468,8 @@ namespace form_builder.Utils.Startup
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
+            services.Configure<AnalyticsConfiguration>(configuration.GetSection(AnalyticsConfiguration.ConfigValue));
+            services.Configure<GoogleAnalyticsConfiguration>(configuration.GetSection(GoogleAnalyticsConfiguration.ConfigValue));
             services.Configure<S3SchemaProviderConfiguration>(configuration.GetSection(S3SchemaProviderConfiguration.ConfigValue));
 
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
@@ -536,6 +543,15 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
             services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
             services.AddTransient<IFileStorageProvider, S3FileStorageProvider>();
+
+            return services;
+        }
+
+        
+        public static IServiceCollection AddAnalyticsProviders(this IServiceCollection services)
+        {
+            services.AddTransient<IAnalyticsProvider, FakeAnalyticsProvider>();
+            services.AddTransient<IAnalyticsProvider, GoogleAnalyticsProvider>();
 
             return services;
         }
