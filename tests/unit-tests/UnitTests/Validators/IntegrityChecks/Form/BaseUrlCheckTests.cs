@@ -113,5 +113,30 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Assert
             Assert.Empty(result.Messages);
         }
+
+        
+        [Fact]
+        public void Validate_ShouldNotAddFailureMessage_ForDocuemtDownload()
+        {
+            // Arrange
+            var mockContext = new Mock<HttpContext>();
+            mockContext.Setup(_ => _.Request.Path)
+                .Returns("/document/Summary/Txt/8cf44c49-1ade-471f-87e6-b30f96478197");
+
+            _mockHttpContext.Setup(_ => _.HttpContext)
+                .Returns(mockContext.Object);
+
+            var baseUrlCheck = new BaseUrlCheck(_mockHttpContext.Object);
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form")
+                .Build();
+
+            // Act
+            var result = baseUrlCheck.Validate(schema);
+
+            // Assert
+            Assert.Empty(result.Messages);
+        }
     }
 }
