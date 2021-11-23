@@ -22,6 +22,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             }
 
             if (_httpContextAccessor.HttpContext.Request.Path.Value.StartsWith("/Preview") ||
+                _httpContextAccessor.HttpContext.Request.Path.Value.StartsWith("/document/Summary/") ||
                 _httpContextAccessor.HttpContext.Request.Path.Value.StartsWith($"/{PreviewConstants.PREVIEW_MODE_PREFIX}"))
                 return result;
 
