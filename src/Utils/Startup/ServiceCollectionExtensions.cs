@@ -335,7 +335,6 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, BaseUrlCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
