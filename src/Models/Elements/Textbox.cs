@@ -9,6 +9,7 @@ namespace form_builder.Models.Elements
 {
     public class Textbox : Element
     {
+        public bool HasPrefix => !string.IsNullOrEmpty(Properties.Prefix);
         public Textbox() => Type = EElementType.Textbox;
 
         public override Task<string> RenderAsync(IViewRender viewRender,

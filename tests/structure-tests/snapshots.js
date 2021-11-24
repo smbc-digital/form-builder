@@ -117,7 +117,16 @@ module.exports = {
   },
   "Textbox": {
     "Textbox": {
-      "1": "\n\n            <h1 class=\"govuk-label-wrapper\">\n            <label class=\"govuk-label govuk-label--l\" for=\"firstQuestion\">\n                Question label\n            </label>\n        </h1>\n\n\n    \n\n\n    \n\n    \n\n    <input autocomplete=\"given-name\" class=\"govuk-input\" id=\"firstQuestion\" maxlength=\"10\" name=\"firstQuestion\" spellcheck=\"false\" type=\"text\" value=\"\">\n"
+      "1": "\n\n            <h1 class=\"govuk-label-wrapper\">\n            <label class=\"govuk-label govuk-label--l\" for=\"firstQuestion\">\n                Question label\n            </label>\n        </h1>\n\n\n    \n\n\n    \n\n    \n\n\n    <input autocomplete=\"given-name\" class=\"govuk-input\" id=\"firstQuestion\" maxlength=\"10\" name=\"firstQuestion\" spellcheck=\"false\" type=\"text\" value=\"\">\n\n"
+    },
+    "Textbox with prefix": {
+      "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"textboxPrefix\">\n            Textbox with prefix\n        </label>\n\n\n    \n\n\n    \n\n    \n\n        <div class=\"govuk-input__wrapper\">\n        <div class=\"govuk-input__prefix\" aria-hidden=\"true\">£</div>\n\n    <input class=\"govuk-input\" id=\"textboxPrefix\" maxlength=\"200\" name=\"textboxPrefix\" spellcheck=\"true\" type=\"text\" value=\"\">\n\n        </div>\n"
+    },
+    "Textbox optional": {
+      "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"middleName\">\n            Middle name\n                <span class=\"smbc-body\">(optional)</span>\n        </label>\n\n\n    \n\n\n    \n\n    \n\n\n    <input class=\"govuk-input\" id=\"middleName\" maxlength=\"200\" name=\"middleName\" spellcheck=\"true\" type=\"text\" value=\"\">\n\n"
+    },
+    "Textbox validation": {
+      "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"emailAddress\">\n            Email address\n        </label>\n\n\n    \n\n\n        <span class=\"govuk-hint\" id=\"emailAddress-hint\">ie: someone@example.com</span>\n\n\n            <span class=\"smbc-error-message\" id=\"emailAddress-error\">\n        <span class=\"govuk-visually-hidden\">Error:</span>Check the email address and try again \n    </span>\n\n\n\n\n    <input aria-describedby=\"emailAddress-hint emailAddress-error\" class=\"govuk-input govuk-input--error\" id=\"emailAddress\" maxlength=\"200\" name=\"emailAddress\" spellcheck=\"true\" type=\"text\" value=\"\">\n\n"
     }
   },
   "TimeInput": {
