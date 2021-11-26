@@ -37,7 +37,7 @@ namespace form_builder.Extensions
                 var matchingElement = listOfElementsWhichMayContainConditionalElements.FirstOrDefault(_ =>
                     _.Properties.Options.Any(_ => !string.IsNullOrEmpty(_.ConditionalElementId) && _.ConditionalElementId.Equals(element.QuestionId)));
 
-                var matchingOption = matchingElement?.Properties.Options.FirstOrDefault(_ => _.ConditionalElementId.Equals(element.QuestionId));
+                var matchingOption = matchingElement?.Properties.Options.FirstOrDefault(_ => !string.IsNullOrEmpty(_.ConditionalElementId) && _.ConditionalElementId.Equals(element.QuestionId));
             
                 if (matchingOption is null)
                 {
