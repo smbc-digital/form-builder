@@ -32,7 +32,6 @@
         Link,
         Map,
         MultipleFileUpload,
-        Numeric,
         Organisation,
         Radio,
         Reusable,
