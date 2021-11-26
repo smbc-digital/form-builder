@@ -276,8 +276,8 @@ namespace form_builder_tests.UnitTests.Extensions
                 .WithQuestionId("question2Conditional2")
                 .WithConditionalElement(true)
                 .Build();
-            var q1option1 = new Option { ConditionalElementId = "question1Conditional", Value = "Value1" };
-            var q1option2 = new Option { Value = "Value2" };
+            var q1option1 = new Option { Value = "Value1" };
+            var q1option2 = new Option { ConditionalElementId = "question1Conditional", Value = "Value2" };
             var q2option1 = new Option { ConditionalElementId = "question2Conditional", Value = "Value1" };
             var q2option2 = new Option { ConditionalElementId = "question2Conditional2", Value = "Value2" };
             var q1ListOfOptions = new List<Option> { q1option1, q1option2 };
@@ -299,7 +299,7 @@ namespace form_builder_tests.UnitTests.Extensions
             elements.Add(element2);
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "question1", "Value1" }, 
+                { "question1", "Value2" }, 
                 { "question2", "Value1" }, 
                 { "question1Conditional", "Conditional Answer 1" }, 
                 { "question2Conditional", "Conditional Answer 2" }, 
