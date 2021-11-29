@@ -78,7 +78,10 @@ namespace form_builder.Services.RetrieveExternalDataService
 
                     string content = await response.Content.ReadAsStringAsync();
 
-                    responseAnswer = string.IsNullOrEmpty(content) ? null : System.Text.Json.JsonSerializer.Deserialize<string>(content);
+                    if (string.IsNullOrEmpty(content))
+                        throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an null or empty content, Response: {JsonConvert.SerializeObject(response)}");
+
+                    responseAnswer = System.Text.Json.JsonSerializer.Deserialize<string>(content);
                 }
                 else
                 {
