@@ -77,10 +77,8 @@ namespace form_builder.Services.RetrieveExternalDataService
                         throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an null content, Response: {JsonConvert.SerializeObject(response)}");
 
                     string content = await response.Content.ReadAsStringAsync();
-                    if (string.IsNullOrEmpty(content))
-                        throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an null or empty content, Response: {JsonConvert.SerializeObject(response)}");
 
-                    responseAnswer = System.Text.Json.JsonSerializer.Deserialize<string>(content);
+                    responseAnswer = string.IsNullOrEmpty(content) ? null : System.Text.Json.JsonSerializer.Deserialize<string>(content);                    
                 }
                 else
                 {
