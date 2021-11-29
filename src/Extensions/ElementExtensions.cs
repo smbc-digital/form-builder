@@ -22,6 +22,7 @@ namespace form_builder.Extensions
                 foreach (Option option in element.Properties.Options)
                 {
                     KeyValuePair<string, dynamic> optionValue = viewModel.FirstOrDefault(value => value.Key.Equals(element.Properties.QuestionId) && (element.Type.Equals(EElementType.Checkbox) ? value.Value.Contains(option.Value) : value.Value.Equals(option.Value)));
+
                     if (option.ConditionalElementId is not null && optionValue.Key is null)
                     {
                         viewModel.Remove(option.ConditionalElementId);
@@ -33,9 +34,12 @@ namespace form_builder.Extensions
 
             foreach (Element element in listOfConditionalElements)
             {
-                if (listOfElementsWhichMayContainConditionalElements.Any(_ =>
-                    _.Properties.Options is not null && !_.Properties.Options.Any(_ =>
-                        _.ConditionalElementId  is not null && _.ConditionalElementId.Equals(element.Properties.QuestionId))))
+                var matchingElement = listOfElementsWhichMayContainConditionalElements.FirstOrDefault(_ =>
+                    _.Properties.Options.Any(_ => !string.IsNullOrEmpty(_.ConditionalElementId) && _.ConditionalElementId.Equals(element.QuestionId)));
+
+                var matchingOption = matchingElement?.Properties.Options.FirstOrDefault(_ => !string.IsNullOrEmpty(_.ConditionalElementId) && _.ConditionalElementId.Equals(element.QuestionId));
+            
+                if (matchingOption is null)
                 {
                     if (listOfElements.Contains(element))
                     {
