@@ -67,7 +67,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                         await _gateway.GetAsync(entity.Url);
 
                 var responseAnswer = string.Empty;
-                if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+                if (response.StatusCode.Equals(HttpStatusCode.NotFound) || response.StatusCode.Equals(HttpStatusCode.NoContent))
                 {
                     responseAnswer = null;
                 }
