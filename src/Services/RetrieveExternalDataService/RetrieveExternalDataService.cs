@@ -78,7 +78,7 @@ namespace form_builder.Services.RetrieveExternalDataService
 
                     string content = await response.Content.ReadAsStringAsync();
 
-                    responseAnswer = string.IsNullOrEmpty(content) ? null : System.Text.Json.JsonSerializer.Deserialize<string>(content);                    
+                    responseAnswer = string.IsNullOrEmpty(content) ? null : System.Text.Json.JsonSerializer.Deserialize<string>(content);
                 }
                 else
                 {
