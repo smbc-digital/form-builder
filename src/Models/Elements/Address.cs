@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -70,6 +71,9 @@ namespace form_builder.Models.Elements
                     return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, formAnswers, results);
 
                 case LookUpConstants.Automatic:
+                    if (results is null)
+                        throw new ApplicationException("Address::RenderAsync: retrieved automatic address search results cannot be null");
+
                     IsSelect = true;
                     Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, AddressConstants.SEARCH_SUFFIX);
 
@@ -78,7 +82,7 @@ namespace form_builder.Models.Elements
                     ManualAddressURL = $"{environment.EnvironmentName.ToReturnUrlPrefix()}/{formSchema.BaseURL}/{page.PageSlug}/manual";
 
                     var selectedAddress = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers, AddressConstants.SELECT_SUFFIX);
-                    var searchSuffix = (bool)(results?.Count.Equals(1)) ? "address found" : "addresses found";
+                    var searchSuffix = results.Count.Equals(1) ? "address found" : "addresses found";
                     Items = new List<SelectListItem> { new SelectListItem($"{results.Count} {searchSuffix}", string.Empty) };
 
                     results.ForEach((objectResult) =>

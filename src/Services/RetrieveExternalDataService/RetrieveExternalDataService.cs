@@ -67,7 +67,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                         await _gateway.GetAsync(entity.Url);
 
                 var responseAnswer = string.Empty;
-                if (response.StatusCode.Equals(HttpStatusCode.NotFound))
+                if (response.StatusCode.Equals(HttpStatusCode.NotFound) || response.StatusCode.Equals(HttpStatusCode.NoContent))
                 {
                     responseAnswer = null;
                 }
@@ -77,6 +77,7 @@ namespace form_builder.Services.RetrieveExternalDataService
                         throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an null content, Response: {JsonConvert.SerializeObject(response)}");
 
                     string content = await response.Content.ReadAsStringAsync();
+
                     if (string.IsNullOrEmpty(content))
                         throw new ApplicationException($"RetrieveExternalDataService::Process, http request to {entity.Url} returned an null or empty content, Response: {JsonConvert.SerializeObject(response)}");
 

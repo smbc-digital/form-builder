@@ -42,7 +42,7 @@ namespace form_builder.Models.Elements
 
             if (Properties.Options.Any(_ => _.HasConditionalElement)) {
                 var fieldsetIncrement = Properties.QuestionId.Split(':').Length > 1 ? $"-{Properties.QuestionId.Split(':')[1]}" : null;
-                properties.Add("data-aria-controls", $"conditional-{i}{fieldsetIncrement}");
+                properties.Add("data-aria-controls", $"conditional-{i}{fieldsetIncrement}-{Properties.QuestionId}");
             }
 
             if (Properties.Options[i].HasHint) 
