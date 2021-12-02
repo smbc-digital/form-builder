@@ -96,6 +96,7 @@ using form_builder.Services.PreviewService;
 using form_builder.SubmissionActions;
 using form_builder.Helpers.Cookie;
 using form_builder.Providers.Analytics;
+using form_builder.Providers.Transforms.ProviderAvailabilityConfiguration;
 using form_builder.Services.AnalyticsService;
 
 namespace form_builder.Utils.Startup
@@ -444,6 +445,7 @@ namespace form_builder.Utils.Startup
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
                 services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
+                services.AddSingleton<IProviderAvailabilityConfigurationTransformDataProvider, LocalProviderAvailabilityConfigurationTransformDataProvider>();
             }
             else
             {

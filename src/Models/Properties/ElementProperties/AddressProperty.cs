@@ -20,8 +20,6 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string AddressManualLabel { get; set; } = "Enter an address";
 
-        public string AddressProvider { get; set; }
-
         public string AddressIAG { get; set; } = "You must live in Stockport.";
 
         public bool StockportPostcode { get; set; } = false;

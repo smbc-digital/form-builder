@@ -89,6 +89,10 @@ namespace form_builder_tests.UnitTests.Services
             _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(true);
 
+            _mockFormAvailabilityService
+                .Setup(_ => _.AreAllProvidersAvailable(It.IsAny<FormSchema>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
             _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
 

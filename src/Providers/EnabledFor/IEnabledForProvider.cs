@@ -7,5 +7,6 @@ namespace form_builder.Providers.EnabledFor
     {
         EEnabledFor Type { get; }
         bool IsAvailable(EnabledForBase enabledFor);
+        bool IsNotAvailable(EnabledForBase disabledFor);
     }
 }

@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         public async Task Street_ShouldCallViewRenderWithCorrectPartial_WhenStreetSelect()
         {
             //Arrange
-            var element = new Street { Properties = new BaseProperty { Text = "text", QuestionId = "street", StreetProvider = "test" } };
+            var element = new Street { Properties = new BaseProperty { Text = "text", QuestionId = "street", Provider = "test" } };
             var page = new PageBuilder()
                 .WithElement(element)
                 .Build();

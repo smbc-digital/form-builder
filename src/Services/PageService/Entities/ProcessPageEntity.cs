@@ -10,6 +10,8 @@ namespace form_builder.Services.PageService.Entities
         public Page Page { get; set; }
 
         public FormBuilderViewModel ViewModel { get; set; }
+
+        public bool IsFormUnavailable { get; set; }
     }
 
     public class ProcessPageEntity : PageEntity

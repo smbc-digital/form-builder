@@ -131,6 +131,9 @@ namespace form_builder.Services.PageService
                 return null;
             }
 
+            if (!await _formAvailabilityService.AreAllProvidersAvailable(baseForm, _environment.EnvironmentName))
+                return new ProcessPageEntity { IsFormUnavailable = true };
+
             if (string.IsNullOrEmpty(path))
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
 
@@ -214,6 +217,9 @@ namespace form_builder.Services.PageService
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
                 throw new ApplicationException($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+
+            if (!await _formAvailabilityService.AreAllProvidersAvailable(baseForm, _environment.EnvironmentName))
+                return new ProcessRequestEntity { IsFormUnavailable = true };
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
             if (sessionGuid is null)

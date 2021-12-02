@@ -149,11 +149,11 @@ namespace form_builder.Services.StreetService
             {
                 try
                 {
-                    searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
+                    searchResults = (await _streetProviders.Get(streetElement.Properties.Provider).SearchAsync(street)).ToList<object>();
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}' Exception: {e.Message}");
+                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup on Provider '{streetElement.Properties.Provider}' with searchterm '{street}' Exception: {e.Message}");
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);

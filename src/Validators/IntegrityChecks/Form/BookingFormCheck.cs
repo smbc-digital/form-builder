@@ -28,7 +28,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     .Where(element => element.Type
                         .Equals(EElementType.Booking)));
 
-            if (bookingElements.Select(element => element.Properties.BookingProvider).Distinct().Count() > 1)
+            if (bookingElements.Select(element => element.Properties.Provider).Distinct().Count() > 1)
                 result.AddFailureMessage(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER);
 
             var validatableElements = pagesWithElements.SelectMany(page => page.ValidatableElements);

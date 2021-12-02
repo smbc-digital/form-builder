@@ -151,7 +151,7 @@ namespace form_builder.Services.OrganisationService
             {
                 try
                 {
-                    searchResults = (await _organisationProviders.Get(organisationElement.Properties.OrganisationProvider).SearchAsync(organisation)).ToList<object>();
+                    searchResults = (await _organisationProviders.Get(organisationElement.Properties.Provider).SearchAsync(organisation)).ToList<object>();
                 }
                 catch (Exception e)
                 {

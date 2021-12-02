@@ -41,7 +41,7 @@ namespace form_builder.SubmissionActions
                     .GetAppointmentTypeForEnvironment(environmentName);
 
                 await _bookingProviders
-                        .Get(booking.Properties.BookingProvider)
+                        .Get(booking.Properties.Provider)
                         .Confirm(new()
                         {
                             BookingId = new Guid(bookingId),

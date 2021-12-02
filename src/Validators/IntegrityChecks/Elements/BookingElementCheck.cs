@@ -22,7 +22,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (!element.Type.Equals(EElementType.Booking))
                 return result;
 
-            if (string.IsNullOrEmpty(element.Properties.BookingProvider))
+            if (string.IsNullOrEmpty(element.Properties.Provider))
                 result.AddFailureMessage($"Booking Element Check, Booking element '{element.Properties.QuestionId}' requires a valid booking provider property.");
 
             AppointmentType appointmentTypeForEnv = element.Properties.AppointmentTypes

@@ -8,6 +8,10 @@ namespace form_builder.Controllers
         public ActionResult Index() => View();
 
         [Route("/not-found")]
-        new public ActionResult NotFound() => View();
+        public ActionResult NotFound() => View();
+
+
+        [Route("/service-unavailable")]
+        public ActionResult ServiceUnavailable() => View();
     }
 }

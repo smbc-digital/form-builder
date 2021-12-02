@@ -197,28 +197,28 @@ namespace form_builder.Builders
 
         public ElementBuilder WithAddressProvider(string value)
         {
-            _property.AddressProvider = value;
+            _property.Provider = value;
 
             return this;
         }
 
         public ElementBuilder WithStreetProvider(string value)
         {
-            _property.StreetProvider = value;
+            _property.Provider = value;
 
             return this;
         }
 
         public ElementBuilder WithOrganisationProvider(string value)
         {
-            _property.OrganisationProvider = value;
+            _property.Provider = value;
 
             return this;
         }
 
         public ElementBuilder WithBookingProvider(string value)
         {
-            _property.BookingProvider = value;
+            _property.Provider = value;
 
             return this;
         }

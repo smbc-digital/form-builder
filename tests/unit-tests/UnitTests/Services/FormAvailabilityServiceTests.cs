@@ -4,6 +4,7 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Properties.EnabledForProperties;
 using form_builder.Providers.EnabledFor;
+using form_builder.Providers.Transforms.ProviderAvailabilityConfiguration;
 using form_builder.Services.FormAvailabilityService;
 using form_builder_tests.Builders;
 using Moq;
@@ -16,6 +17,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly FormAvailabilityService _service;
         private readonly Mock<IEnabledForProvider> _mockEnabledFor = new();
         private readonly Mock<IEnumerable<IEnabledForProvider>> _mockEnabledForProviders = new();
+        private readonly Mock<IProviderAvailabilityConfigurationTransformDataProvider> _mockTransformDataProvider = new();
 
         public FormAvailabilityServicsTests()
         {
@@ -29,7 +31,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => enabledForItems.GetEnumerator());
 
-            _service = new FormAvailabilityService(_mockEnabledForProviders.Object);
+            _service = new FormAvailabilityService(_mockEnabledForProviders.Object, _mockTransformDataProvider.Object);
         }
 
         [Fact]

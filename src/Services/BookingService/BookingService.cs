@@ -102,7 +102,7 @@ namespace form_builder.Services.BookingService
                 }
             }
 
-            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.Provider);
 
             var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider, appointmentType);
 
@@ -200,7 +200,7 @@ namespace form_builder.Services.BookingService
             if (appointmentType.NeedsAppointmentIdMapping)
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
-            var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
+            var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.Provider)
                 .GetAvailability(new AvailabilityRequest
                 {
                     StartDate = requestedMonth.Date,
@@ -237,7 +237,7 @@ namespace form_builder.Services.BookingService
             var provider = formSchema.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
+                .First(element => element.Type.Equals(EElementType.Booking)).Properties.Provider;
 
             var bookingInformation = await _bookingProviders.Get(provider).GetBooking(bookingGuid);
 
@@ -273,14 +273,14 @@ namespace form_builder.Services.BookingService
             var provider = formSchema.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
+                .First(element => element.Type.Equals(EElementType.Booking)).Properties.Provider;
 
             await _bookingProviders.Get(provider).Cancel(bookingGuid);
         }
 
         private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider, AppointmentType appointmentType)
         {
-            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
+            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.Provider}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
             if (bookingNextAvailabilityCachedResponse is not null)
                 return JsonConvert.DeserializeObject<BoookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
@@ -408,7 +408,7 @@ namespace form_builder.Services.BookingService
             viewModel.Remove(reservedBookingStartTime);
             viewModel.Remove(reservedBookingEndTime);
 
-            var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
+            var result = await _bookingProviders.Get(bookingElement.Properties.Provider)
                 .Reserve(bookingRequest);
 
             viewModel.Add(reservedBookingAppointmentId, bookingRequest.AppointmentId.ToString());
@@ -422,7 +422,7 @@ namespace form_builder.Services.BookingService
 
         private async Task<string> GetReservedBookingLocation(Booking bookingElement, BookingRequest bookingRequest)
         {
-            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+            var bookingProvider = _bookingProviders.Get(bookingElement.Properties.Provider);
             var location = await bookingProvider.GetLocation(new LocationRequest
             {
                 AppointmentId = bookingRequest.AppointmentId,

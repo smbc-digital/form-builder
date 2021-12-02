@@ -273,7 +273,7 @@ namespace form_builder_tests.UnitTests.Helpers
         {
             //Arrange
             var element = new Street
-            { Properties = new BaseProperty { QuestionId = "street", StreetProvider = "test", Text = "test" } };
+            { Properties = new BaseProperty { QuestionId = "street", Provider = "test", Text = "test" } };
 
             var page = new PageBuilder()
                 .WithElement(element)

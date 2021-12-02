@@ -166,9 +166,9 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForProvider(Element element)
         {
-            if (string.IsNullOrEmpty(element.Properties.StreetProvider) && element.Type.Equals(EElementType.Street)
-                  || string.IsNullOrEmpty(element.Properties.AddressProvider) && element.Type.Equals(EElementType.Address)
-                  || string.IsNullOrEmpty(element.Properties.OrganisationProvider) && element.Type.Equals(EElementType.Organisation))
+            if (string.IsNullOrEmpty(element.Properties.Provider) && (element.Type.Equals(EElementType.Street)
+                  || element.Type.Equals(EElementType.Address)
+                  || element.Type.Equals(EElementType.Organisation)))
                 throw new Exception($"A {element.Type} Provider must be present.");
 
             return true;

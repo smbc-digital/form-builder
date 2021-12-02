@@ -10,5 +10,11 @@ namespace form_builder.Providers.EnabledFor
         private DateTime UTCTime => DateTime.UtcNow;
         public bool IsAvailable(EnabledForBase enabledFor) 
             => UTCTime > enabledFor.Properties.Start && UTCTime < enabledFor.Properties.End;
+
+        public bool IsNotAvailable(EnabledForBase disabledFor)
+        {
+            var isNotAvailable = UTCTime > disabledFor.Properties.Start && UTCTime < disabledFor.Properties.End;
+            return isNotAvailable;
+        } 
     }
 }

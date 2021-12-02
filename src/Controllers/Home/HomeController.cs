@@ -80,6 +80,9 @@ namespace form_builder.Controllers
             if (response is null)
                 return RedirectToAction("NotFound", "Error");
 
+            if (response.IsFormUnavailable)
+                return RedirectToAction("ServiceUnavailable", "Error");
+
             if (response.ShouldRedirect)
             {
                 var routeValuesDictionary = new RouteValueDictionaryBuilder()
@@ -112,6 +115,9 @@ namespace form_builder.Controllers
                 viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
 
             var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload, ModelState.IsValid);
+
+            if (currentPageResult.IsFormUnavailable)
+                return RedirectToAction("ServiceUnavailable", "Error");
 
             if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
             {
