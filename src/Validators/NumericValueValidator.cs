@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using form_builder.Constants;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
@@ -15,7 +16,7 @@ namespace form_builder.Validators
             if (string.IsNullOrEmpty(value) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
 
-            var isValid = int.TryParse(value, out int output);
+            var isValid = int.TryParse(value, SystemConstants.NUMERIC_NUMBER_STYLES, null, out int output);
             if (!isValid)
             {
                 return new ValidationResult
