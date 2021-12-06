@@ -38,7 +38,7 @@
     <div class="govuk-date-input">
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="@labelClasses" for=@dayId)>
+                <label class="@labelClasses" for=@dayId>
                     Day
                 </label>
                 @Html.TextBox(dayId, Model.Properties.Day, new { name = dayId, id = dayId, autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
@@ -47,7 +47,7 @@
 
         <div class="govuk-date-input__item">
             <div class="govuk-form-group">
-                <label class="@labelClasses" for=@monthId)>
+                <label class="@labelClasses" for=@monthId>
                     Month
                 </label>
                 @Html.TextBox(monthId, Model.Properties.Month, new { name = monthId, id = monthId, autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
