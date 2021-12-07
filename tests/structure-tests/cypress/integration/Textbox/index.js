@@ -19,4 +19,14 @@ describe('Textbox', () => {
       cy.visit('ui-textbox')
         .toMatchingDOM('govuk-form-group', 3)
     });
+
+    it('Textbox numeric', () => {
+      cy.visit('ui-textbox')
+        .toMatchingDOM('govuk-form-group', 4)
+    });
+
+    it('Textbox decimal', () => {
+      cy.visit('ui-textbox')
+        .toMatchingDOM('govuk-form-group', 5)
+    });
   });
