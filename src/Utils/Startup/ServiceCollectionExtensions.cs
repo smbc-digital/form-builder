@@ -109,6 +109,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, MultipleFileUploadElementValidator>();
             services.AddTransient<IElementValidator, NumericValueValidator>();
             services.AddTransient<IElementValidator, DecimalValueValidator>();
+            services.AddTransient<IElementValidator, MinMaxValidator>();
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
             services.AddTransient<IElementValidator, DateInputElementValidator>();

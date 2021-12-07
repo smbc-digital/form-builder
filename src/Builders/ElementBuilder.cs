@@ -537,5 +537,26 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithDecimal(bool value)
+        {
+            _property.Decimal = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithNotAnDecimalValidationMessage(string value)
+        {
+            _property.NotAnDecimalValidationMessage = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithNotAnIntegerValidationMessage(string value)
+        {
+            _property.NotAnIntegerValidationMessage = value;
+
+            return this;
+        }
     }
 }
