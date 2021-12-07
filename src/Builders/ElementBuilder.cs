@@ -558,5 +558,19 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithDecimalPlaces(int value)
+        {
+            _property.DecimalPlaces = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithDecimalPlacesValidationMessage(string value)
+        {
+            _property.DecimalPlacesValidationMessage = value;
+
+            return this;
+        }
     }
 }

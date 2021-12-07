@@ -64,7 +64,7 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string NotAnIntegerValidationMessage { get; set; } = string.Empty;
         public string NotAnDecimalValidationMessage { get; set; } = string.Empty;
-        public string DecimalSpacesValidationMessage { get; set; } = string.Empty;
+        public string DecimalPlacesValidationMessage { get; set; } = string.Empty;
         public string IAG { get; set; }
 
         public bool HideOptionalText { get; set; }

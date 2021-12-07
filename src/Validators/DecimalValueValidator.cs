@@ -26,14 +26,14 @@ namespace form_builder.Validators
                 };
             }
 
-            var correctNumberOfDecimalSpacesEntered = value.Contains(".") ? value.Split('.')[1].Length <= element.Properties.DecimalSpaces : true;
+            var correctNumberOfDecimalSpacesEntered = value.Contains(".") ? value.Split('.')[1].Length <= element.Properties.DecimalPlaces : true;
 
             if (!correctNumberOfDecimalSpacesEntered)
             {
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.DecimalSpacesValidationMessage) ? element.Properties.DecimalSpacesValidationMessage : $"{element.Properties.Label} must be to {element.Properties.DecimalSpaces} decimal places or less"
+                    Message = !string.IsNullOrEmpty(element.Properties.DecimalPlacesValidationMessage) ? element.Properties.DecimalPlacesValidationMessage : $"{element.Properties.Label} must be to {element.Properties.DecimalPlaces} decimal places or less"
                 };
             }
             
