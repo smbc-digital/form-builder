@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldReturn_CustomValidationMessage_WhenElement_NotValid_Decimal()
+        public void Validate_ShouldReturn_CustomValidationMessage_WhenElement_NotValid_Number()
         {
             var errorMessage = "Provide an integer";
             var label = "Test label";

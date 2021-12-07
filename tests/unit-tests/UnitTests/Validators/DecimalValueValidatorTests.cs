@@ -69,7 +69,7 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldReturn_CustomValidationResult_WhenElement_NotValid_Decimal()
+        public void Validate_ShouldReturn_CustomValidationMessage_WhenElement_NotValid_Decimal()
         {
             var errorMessage = "Provide an valid number";
             var label = "Test label";
@@ -82,6 +82,64 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "a123");
+
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+
+            Assert.False(result.IsValid);
+            Assert.Equal(errorMessage, result.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturn_True_ValidationResult_When_Allowed_Decimal_Places_Is_GreaterThan_Two()
+        {
+            var label = "Test label";
+            var element = new ElementBuilder()
+                .WithQuestionId("tets-id")
+                .WithDecimal(true)
+                .WithLabel(label)
+                .WithDecimalPlaces(5)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("tets-id", "10.45678");
+
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturn_ValidationMessage_When_Value_Is_Greater_Then_Allowed_Decimal_Places()
+        {
+            var label = "Test label";
+            var element = new ElementBuilder()
+                .WithQuestionId("tets-id")
+                .WithDecimal(true)
+                .WithLabel(label)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("tets-id", "10.45678");
+
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+
+            Assert.False(result.IsValid);
+            Assert.Equal($"{label} must be to 2 decimal places or less", result.Message);
+        }
+
+        public void Validate_ShouldReturn_CustomValidationMessage_When_Value_Is_Greater_Then_Allowed_Decimal_Places()
+        {
+            var label = "Test label";
+            var errorMessage = "too many decimal places";
+            var element = new ElementBuilder()
+                .WithQuestionId("tets-id")
+                .WithDecimal(true)
+                .WithLabel(label)
+                .WithDecimalPlacesValidationMessage(errorMessage)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("tets-id", "10.45678");
 
             var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
