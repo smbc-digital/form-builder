@@ -1304,5 +1304,42 @@ namespace form_builder_tests.UnitTests.Mappers
             Assert.Equal(string.Empty, result);
         }
 
+        [Theory]
+        [InlineData("1", 1)]
+        [InlineData("1,000", 1000)]
+        [InlineData("1,000.10", 1000.10)]
+        [InlineData("15.55", 15.55)]
+        public async Task GetAnswerValue_ShouldReturnDecimal_When_DecimalProperty_IsTrue(string answer, decimal expectedAnswer)
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithDecimal(true)
+                .WithQuestionId("testDecimal")
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new PageAnswers {
+                        Answers = new List<Answers> {
+                            new Answers
+                            {
+                                QuestionId = "testDecimal",
+                                Response = answer
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Act
+            var result = await _elementMapper.GetAnswerValue(element, formAnswers);
+
+            // Assert
+            Assert.IsType<Decimal>(result);
+            Assert.Equal(expectedAnswer, result);
+        }
     }
 }

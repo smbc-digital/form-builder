@@ -36,7 +36,7 @@ namespace form_builder.Validators
                     Message = !string.IsNullOrEmpty(element.Properties.DecimalSpacesValidationMessage) ? element.Properties.DecimalSpacesValidationMessage : $"{element.Properties.Label} must be to {element.Properties.DecimalSpaces} decimal places or less"
                 };
             }
-
+            
             return new ValidationResult { IsValid = true };
         }
     }
