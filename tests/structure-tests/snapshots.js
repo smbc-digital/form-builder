@@ -127,6 +127,12 @@ module.exports = {
     },
     "Textbox validation": {
       "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"emailAddress\">\n            Email address\n        </label>\n\n\n    \n\n\n        <span class=\"govuk-hint\" id=\"emailAddress-hint\">ie: someone@example.com</span>\n\n\n            <span class=\"smbc-error-message\" id=\"emailAddress-error\">\n        <span class=\"govuk-visually-hidden\">Error:</span>Check the email address and try again \n    </span>\n\n\n\n\n    <input aria-describedby=\"emailAddress-hint emailAddress-error\" class=\"govuk-input govuk-input--error\" id=\"emailAddress\" maxlength=\"200\" name=\"emailAddress\" spellcheck=\"true\" type=\"text\" value=\"\">\n\n"
+    },
+    "Textbox numeric": {
+      "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"textboxNumeric\">\n            Textbox numeric\n        </label>\n\n\n    \n\n\n    \n\n    \n\n\n    <input class=\"govuk-input\" id=\"textboxNumeric\" inputmode=\"numeric\" max=\"\" maxlength=\"200\" min=\"\" name=\"textboxNumeric\" pattern=\"[0-9]*\" spellcheck=\"true\" type=\"text\" value=\"\">\n\n"
+    },
+    "Textbox decimal": {
+      "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"textboxDecimal\">\n            Textbox decimal\n        </label>\n\n\n    \n\n\n    \n\n    \n\n\n    <input class=\"govuk-input\" id=\"textboxDecimal\" maxlength=\"200\" name=\"textboxDecimal\" spellcheck=\"true\" type=\"text\" value=\"\">\n\n"
     }
   },
   "TimeInput": {

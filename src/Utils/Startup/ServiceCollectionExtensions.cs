@@ -108,6 +108,8 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, RequiredElementValidator>();
             services.AddTransient<IElementValidator, MultipleFileUploadElementValidator>();
             services.AddTransient<IElementValidator, NumericValueValidator>();
+            services.AddTransient<IElementValidator, DecimalValueValidator>();
+            services.AddTransient<IElementValidator, MinMaxValidator>();
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
             services.AddTransient<IElementValidator, DateInputElementValidator>();
@@ -367,6 +369,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, CheckboxElementCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, TextboxElementCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 

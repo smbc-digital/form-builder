@@ -19,10 +19,14 @@ namespace form_builder.Validators
 
             if (!string.IsNullOrEmpty(value) && value.Length > element.Properties.MaxLength)
             {
+                var validationMessage = element.Properties.Decimal || element.Properties.Numeric 
+                    ? $"{element.Properties.Label} must be {element.Properties.MaxLength} digits or less"
+                     : $"{element.Properties.Label} has a maximum length of {element.Properties.MaxLength}";
+
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = $"{element.Properties.Label} has a maximum length of {element.Properties.MaxLength}"
+                    Message = validationMessage
                 };
             }
 
