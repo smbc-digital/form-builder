@@ -371,7 +371,7 @@ MigrationBackup/
 #SpecFlow Screenshots
 form-builder-tests-ui/Screenshots/
 
-src/DSL/
+src/DSL/**
 
 #cypress visual-tests
 tests/visual-tests/cypress/videos/
