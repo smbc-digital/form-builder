@@ -72,12 +72,11 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldReturn_CustomValidationMessage_WhenElement_NotValid_Decimal()
         {
             var errorMessage = "Provide an valid number";
-            var label = "Test label";
             var element = new ElementBuilder()
                 .WithQuestionId("tets-id")
                 .WithDecimal(true)
-                .WithLabel(label)
-                .WithNotAnDecimalValidationMessage(errorMessage)
+                .WithLabel("Test label")
+                .WithDecimalValidationMessage(errorMessage)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();

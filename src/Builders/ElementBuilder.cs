@@ -545,9 +545,9 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithNotAnDecimalValidationMessage(string value)
+        public ElementBuilder WithDecimalValidationMessage(string value)
         {
-            _property.NotAnDecimalValidationMessage = value;
+            _property.DecimalValidationMessage = value;
 
             return this;
         }
