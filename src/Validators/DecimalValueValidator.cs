@@ -22,7 +22,7 @@ namespace form_builder.Validators
                 return new ValidationResult
                 {
                     IsValid = false,
-                    Message = !string.IsNullOrEmpty(element.Properties.NotAnDecimalValidationMessage) ? element.Properties.NotAnDecimalValidationMessage : $"{element.Properties.Label} must be a valid number"
+                    Message = !string.IsNullOrEmpty(element.Properties.DecimalValidationMessage) ? element.Properties.DecimalValidationMessage : $"{element.Properties.Label} must be a valid number"
                 };
             }
 
