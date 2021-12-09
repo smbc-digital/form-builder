@@ -204,7 +204,7 @@ module.exports = {
   },
   "DocumentDownload": {
     "DocumentDownload": {
-      "1": "\n\n            <label class=\"govuk-label govuk-label--m\" for=\"firstQuestion\">\n            Question label\n        </label>\n\n\n    \n\n\n    \n\n    \n\n\n    <input class=\"govuk-input\" id=\"firstQuestion\" maxlength=\"10\" name=\"firstQuestion\" spellcheck=\"true\" type=\"text\" value=\"\">\n\n"
+      "1": "\n                    \n<form action=\"/ui-document-download/pagetwo\" autocomplete=\"on\" enctype=\"multipart/form-data\" method=\"post\" novalidate=\"novalidate\"><h1 class=\"govuk-heading-l\">Page two\n</h1><div>\n    <a class=\"govuk-button govuk-button--secondary\" href=\"/document/Summary/Txt/3844c7e9-0f09-414f-a5ee-0508929ec2ff\">Download Txt document</a>\n</div>\n\n<button data-prevent-double-click=\"true\" data-disable-on-click=\"true\" class=\"govuk-button \" id=\"submit\" data-module=\"govuk-button\">\n    Submit\n</button>\n\n<input id=\"Path\" name=\"Path\" type=\"hidden\" value=\"pagetwo\"></form>\n                "
     }
   }
 }

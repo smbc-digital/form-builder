@@ -1,6 +1,8 @@
 describe('DocumentDownload', () => {
     it('DocumentDownload', () => {
       cy.visit('ui-document-download')
-        .toMatchingDOM('govuk-form-group', 0)
+      .get('.govuk-input').type('test')
+      .get('.govuk-button').click()
+      .toMatchingDOM('govuk-grid-column-two-thirds', 0)
     });
   });
