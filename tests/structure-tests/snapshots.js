@@ -204,7 +204,7 @@ module.exports = {
   },
   "DocumentDownload": {
     "DocumentDownload": {
-      "1": "\n                    \n<form action=\"/ui-document-download/pageone\" autocomplete=\"on\" enctype=\"multipart/form-data\" method=\"post\" novalidate=\"novalidate\"><h1 class=\"govuk-heading-l\">Page one\n</h1><div>\n    <a class=\"govuk-button govuk-button--secondary\" href=\"/document/Summary/Txt/fa92347b-078a-413d-9068-a1c4dc078b8e\">Download Txt document</a>\n</div>\n\n<button data-prevent-double-click=\"true\" data-disable-on-click=\"true\" class=\"govuk-button \" id=\"submit\" data-module=\"govuk-button\">\n    Submit\n</button>\n\n<input id=\"Path\" name=\"Path\" type=\"hidden\" value=\"pageone\"></form>\n                "
+      "1": "\n                    \n<form action=\"/ui-document-download/pageone\" autocomplete=\"on\" enctype=\"multipart/form-data\" method=\"post\" novalidate=\"novalidate\"><h1 class=\"govuk-heading-l\">Page one\n</h1><div>\n    <a class=\"govuk-button govuk-button--secondary\" href=\"/document/Summary/Txt/97aeaa5c-8a87-4c8b-b03a-8800989c4d70\">Download Txt document</a>\n</div>\n\n<button data-prevent-double-click=\"true\" data-disable-on-click=\"true\" class=\"govuk-button \" id=\"submit\" data-module=\"govuk-button\">\n    Submit\n</button>\n\n<input id=\"Path\" name=\"Path\" type=\"hidden\" value=\"pageone\"></form>\n                "
     }
   }
 }
