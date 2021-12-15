@@ -17,9 +17,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class AddressTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new ();
-        private readonly Mock<IElementHelper> _mockElementHelper = new ();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         public AddressTests()
         {
@@ -193,7 +193,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 _mockHostingEnv.Object,
                 formAnswers,
                 null));
-            
+
 
             //Assert
             Assert.Equal($"Address::RenderAsync: retrieved automatic address search results cannot be null", result.Message);
@@ -204,7 +204,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             //Arrange
             var label = "Custom label";
-            
+
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithQuestionId("address-test")

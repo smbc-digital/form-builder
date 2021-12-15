@@ -27,7 +27,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 { "test-date", "01/01/2020" }
             };
 
-            var result =  DatePicker.GetDate(viewModel, "test-date");
+            var result = DatePicker.GetDate(viewModel, "test-date");
             Assert.True(result.HasValue);
             Assert.True(result.Value == new DateTime(2020, 1, 1));
         }
@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "test-date", "" } 
+                { "test-date", "" }
             };
 
             DateTime? result = DatePicker.GetDate(viewModel, "test-date");
@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                                 QuestionId = "test-date",
                                 Response = "01/01/2020"
                             }
-                            
+
                         }
                     }
                 }

@@ -17,7 +17,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
     {
         private readonly BookingProvider _bookingProvider;
 
-        private readonly Mock<IBookingServiceGateway> _mockBookingServiceGateway = new ();
+        private readonly Mock<IBookingServiceGateway> _mockBookingServiceGateway = new();
 
         public BookingProviderTests()
         {
@@ -274,7 +274,7 @@ namespace form_builder_tests.UnitTests.Providers.Booking
             await _bookingProvider.Cancel(Guid.NewGuid());
 
             _mockBookingServiceGateway.Verify(_ => _.Cancel(It.IsAny<string>()), Times.Once);
-        }       
+        }
 
         [Fact]
         public async Task Confirm_Should_Resolve_WhenResponse_Is_NoContent()

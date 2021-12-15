@@ -19,17 +19,17 @@ namespace form_builder_tests.UnitTests.ContentFactory
     public class PageFactoryTests
     {
         private readonly PageFactory _factory;
-        private readonly Mock<IPageHelper> _mockPageHelper = new ();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new ();
-        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new ();
-        private readonly Mock<ITagParser> _tagParser = new ();
-        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new();
+        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
+        private readonly Mock<ITagParser> _tagParser = new();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
 
         public PageFactoryTests()
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = false });
+                .Returns(new PreviewModeConfiguration { IsEnabled = false });
 
             var mockTagParsersItems = new List<ITagParser>();
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => mockTagParsersItems.GetEnumerator());
@@ -116,7 +116,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             // Arrange
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+                .Returns(new PreviewModeConfiguration { IsEnabled = true });
 
             var html = "testHtml";
             var pageUrl = "page-one";

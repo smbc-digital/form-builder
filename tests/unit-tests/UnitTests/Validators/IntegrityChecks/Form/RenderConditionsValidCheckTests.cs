@@ -154,7 +154,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Build();
 
             page2.RenderConditions = new List<Condition>();
-            
+
             var schema = new FormSchemaBuilder()
                 .WithName("test-name")
                 .WithPage(page)

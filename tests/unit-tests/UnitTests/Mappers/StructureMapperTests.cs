@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Mappers
                 .ReturnsAsync(formSchema);
 
             // Act
-            var result = (IDictionary<string, dynamic>) await _structureMapper.CreateBaseFormDataStructure("test-form");
+            var result = (IDictionary<string, dynamic>)await _structureMapper.CreateBaseFormDataStructure("test-form");
 
             // Assert
             Assert.NotNull(result["CaseReference"]);

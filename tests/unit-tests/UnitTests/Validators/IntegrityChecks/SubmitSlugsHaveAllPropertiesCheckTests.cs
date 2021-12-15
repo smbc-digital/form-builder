@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithSubmitSlug(submitSlugs)
                 .Build()
         };
-            
+
 
             // Act
             var check = new SubmitSlugsHaveAllPropertiesCheck(_mockHostingEnv.Object);
@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithSubmitSlug(submitSlugs)
                 .Build()
             };
-          
+
             // Act
             var check = new SubmitSlugsHaveAllPropertiesCheck(_mockHostingEnv.Object);
             var result = check.Validate(behaviours);
@@ -92,7 +92,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithSubmitSlug(submitSlugs)
                 .Build()
             };
-        
+
             // Act
             var check = new SubmitSlugsHaveAllPropertiesCheck(_mockHostingEnv.Object);
             var result = check.Validate(behaviours);
@@ -119,7 +119,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithSubmitSlug(submitSlugs)
                 .Build()
             };
-           
+
             // Act
             var check = new SubmitSlugsHaveAllPropertiesCheck(_mockHostingEnv.Object);
             var result = check.Validate(behaviours);

@@ -12,13 +12,15 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.Submit
 {
-    public class PowerAppsSubmitProviderTests {
+    public class PowerAppsSubmitProviderTests
+    {
 
         private readonly PowerAppsSubmitProvider _powerAppsSubmitProvider;
         private readonly Mock<IGateway> _mockGateway = new();
         private readonly MappingEntity _mappingEntity =
             new MappingEntityBuilder()
-                .WithFormAnswers(new FormAnswers {
+                .WithFormAnswers(new FormAnswers
+                {
                     Path = "page-one",
                     Pages = new List<PageAnswers>
                     {
@@ -39,7 +41,8 @@ namespace form_builder_tests.UnitTests.Providers.Submit
                 .WithData(new ExpandoObject())
                 .Build();
 
-        public PowerAppsSubmitProviderTests() {
+        public PowerAppsSubmitProviderTests()
+        {
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = System.Net.HttpStatusCode.OK });
 
@@ -47,7 +50,8 @@ namespace form_builder_tests.UnitTests.Providers.Submit
         }
 
         [Fact]
-        public async Task PostAsync_ShouldCallGateway() {
+        public async Task PostAsync_ShouldCallGateway()
+        {
             SubmitSlug submitSlug = new SubmitSlug { URL = "www.test.com", Type = "flowtoken", AuthToken = "TestToken" };
 
             await _powerAppsSubmitProvider.PostAsync(_mappingEntity, submitSlug);
@@ -56,7 +60,8 @@ namespace form_builder_tests.UnitTests.Providers.Submit
         }
 
         [Fact]
-        public async Task PostAsync_ShouldReturnResponseContent() {
+        public async Task PostAsync_ShouldReturnResponseContent()
+        {
             SubmitSlug submitSlug = new SubmitSlug { URL = "www.test.com", Type = "flowtoken", AuthToken = "TestToken" };
 
             var result = await _powerAppsSubmitProvider.PostAsync(_mappingEntity, submitSlug);

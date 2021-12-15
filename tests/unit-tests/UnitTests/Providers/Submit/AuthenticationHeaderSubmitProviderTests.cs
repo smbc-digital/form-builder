@@ -13,13 +13,15 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.Submit
 {
-    public class AuthenticationHeaderSubmitProviderTests {
+    public class AuthenticationHeaderSubmitProviderTests
+    {
 
         private readonly AuthenticationHeaderSubmitProvider _authenticationHeaderSubmitProvider;
         private readonly Mock<IGateway> _mockGateway = new();
         private readonly MappingEntity _mappingEntity =
             new MappingEntityBuilder()
-                .WithFormAnswers(new FormAnswers {
+                .WithFormAnswers(new FormAnswers
+                {
                     Path = "page-one",
                     Pages = new List<PageAnswers>
                     {
@@ -40,7 +42,8 @@ namespace form_builder_tests.UnitTests.Providers.Submit
                 .WithData(new ExpandoObject())
                 .Build();
 
-        public AuthenticationHeaderSubmitProviderTests() {
+        public AuthenticationHeaderSubmitProviderTests()
+        {
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
@@ -48,7 +51,8 @@ namespace form_builder_tests.UnitTests.Providers.Submit
         }
 
         [Fact]
-        public async Task PostAsync_ShouldCallGateway() {
+        public async Task PostAsync_ShouldCallGateway()
+        {
             SubmitSlug submitSlug = new SubmitSlug { URL = "www.test.com" };
 
             await _authenticationHeaderSubmitProvider.PostAsync(_mappingEntity, submitSlug);
@@ -57,7 +61,8 @@ namespace form_builder_tests.UnitTests.Providers.Submit
         }
 
         [Fact]
-        public async Task PostAsync_ShouldReturnResponseContent() {
+        public async Task PostAsync_ShouldReturnResponseContent()
+        {
             SubmitSlug submitSlug = new SubmitSlug { URL = "www.test.com" };
 
             var result = await _authenticationHeaderSubmitProvider.PostAsync(_mappingEntity, submitSlug);

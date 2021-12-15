@@ -41,7 +41,7 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
-            
+
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithPageSlug("success")
@@ -110,7 +110,7 @@ namespace form_builder_tests.UnitTests.Services
             // Act & Assert
             var result = await Assert.ThrowsAsync<Exception>(() =>
                 _documentSummaryService.GenerateDocument(new DocumentSummaryEntity
-                    { FormSchema = _formSchema, DocumentType = EDocumentType.Unknown, PreviousAnswers = _formAnswers }));
+                { FormSchema = _formSchema, DocumentType = EDocumentType.Unknown, PreviousAnswers = _formAnswers }));
 
             Assert.Equal("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary", result.Message);
         }

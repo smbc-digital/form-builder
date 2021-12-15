@@ -41,8 +41,8 @@ namespace form_builder_tests.UnitTests.Extensions
             elements.Add(element1);
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "testQuestion", "Value1" }, 
-                { "conditionalQuestion1", "Conditional Answer 1" }, 
+                { "testQuestion", "Value1" },
+                { "conditionalQuestion1", "Conditional Answer 1" },
                 { "conditionalQuestion2", "Conditional Answer 2" }
             };
 
@@ -104,8 +104,8 @@ namespace form_builder_tests.UnitTests.Extensions
             elements.Add(element1);
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "testQuestion", "Value1,Value2" }, 
-                { "conditionalQuestion1", "Conditional Answer 1" }, 
+                { "testQuestion", "Value1,Value2" },
+                { "conditionalQuestion1", "Conditional Answer 1" },
                 { "conditionalQuestion2", "Conditional Answer 2" }
             };
 
@@ -148,8 +148,8 @@ namespace form_builder_tests.UnitTests.Extensions
             elements.Add(element1);
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "testQuestion", "Value1" }, 
-                { "conditionalQuestion1", "Conditional Answer 1" }, 
+                { "testQuestion", "Value1" },
+                { "conditionalQuestion1", "Conditional Answer 1" },
                 { "conditionalQuestion2", "Conditional Answer 2" }
             };
 
@@ -191,8 +191,8 @@ namespace form_builder_tests.UnitTests.Extensions
             elements.Add(element1);
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "testQuestion", "" }, 
-                { "conditionalQuestion1", "Conditional Answer 1" }, 
+                { "testQuestion", "" },
+                { "conditionalQuestion1", "Conditional Answer 1" },
                 { "conditionalQuestion2", "Conditional Answer 2" }
             };
 
@@ -240,8 +240,8 @@ namespace form_builder_tests.UnitTests.Extensions
             elements.Add(element1);
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "testQuestion", "Value1, Value2" }, 
-                { "conditionalQuestion1", "Conditional Answer 1" }, 
+                { "testQuestion", "Value1, Value2" },
+                { "conditionalQuestion1", "Conditional Answer 1" },
                 { "conditionalQuestion2", "Conditional Answer 2" }
             };
 
@@ -299,10 +299,10 @@ namespace form_builder_tests.UnitTests.Extensions
             elements.Add(element2);
             var viewModel = new Dictionary<string, dynamic>
             {
-                { "question1", "Value2" }, 
-                { "question2", "Value1" }, 
-                { "question1Conditional", "Conditional Answer 1" }, 
-                { "question2Conditional", "Conditional Answer 2" }, 
+                { "question1", "Value2" },
+                { "question2", "Value1" },
+                { "question1Conditional", "Conditional Answer 1" },
+                { "question2Conditional", "Conditional Answer 2" },
                 { "question2Conditional2", "Conditional Answer 3" }
             };
 

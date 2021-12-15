@@ -14,9 +14,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class CheckboxTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new ();
-        private readonly Mock<IElementHelper> _mockElementHelper = new ();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         [Fact]
         public async Task RenderAsync_Should_Call_ElementHelper_ToCheck_If_Options_NeedToBeOrdered()
@@ -48,7 +48,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
-        public void GenerateCheckboxProperties_ShouldAddDataAttribute_ForExclusiveOption() {
+        public void GenerateCheckboxProperties_ShouldAddDataAttribute_ForExclusiveOption()
+        {
             //Arrange
             var options = new List<Option> {
                 new Option {
@@ -59,7 +60,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             };
 
             //Arrange
-            var element = (Checkbox) new ElementBuilder()
+            var element = (Checkbox)new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithOptions(options)
                 .WithQuestionId("test")

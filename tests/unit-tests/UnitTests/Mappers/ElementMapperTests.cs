@@ -22,7 +22,7 @@ namespace form_builder_tests.UnitTests.Mappers
     public class ElementMapperTests
     {
         private readonly ElementMapper _elementMapper;
-        private readonly Mock<IHashUtil> _mockHashUtil = new ();
+        private readonly Mock<IHashUtil> _mockHashUtil = new();
         private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders;
         private readonly Mock<IFileStorageProvider> _fileStorageProvider = new();
         private readonly Mock<IConfiguration> _mockConfiguration = new();

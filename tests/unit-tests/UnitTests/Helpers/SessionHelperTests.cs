@@ -7,7 +7,7 @@ namespace form_builder_tests.UnitTests.Helpers
 {
     public class SessionHelperTests
     {
-        private readonly Mock<ISessionHelper> _mockSession = new ();
+        private readonly Mock<ISessionHelper> _mockSession = new();
 
         [Fact]
         public void GetSessionGuid_ReturnsGUID()

@@ -148,7 +148,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("question")
                 .Build();
 
-            addAnotherElement.Properties.Elements = new List<IElement> {textboxElement};
+            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
 
             var page = new PageBuilder()
                 .WithElement(addAnotherElement)

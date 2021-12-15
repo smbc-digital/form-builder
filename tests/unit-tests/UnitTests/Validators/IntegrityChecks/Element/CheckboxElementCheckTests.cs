@@ -22,9 +22,9 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
                 .WithType(elementType)
                 .Build();
 
-           var result = _integrityCheck.Validate(element);
+            var result = _integrityCheck.Validate(element);
 
-           Assert.True(result.IsValid);
+            Assert.True(result.IsValid);
         }
 
         [Fact]
@@ -47,9 +47,9 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
                 .WithOptions(options)
                 .Build();
 
-           var result = _integrityCheck.Validate(element);
+            var result = _integrityCheck.Validate(element);
 
-           Assert.True(result.IsValid);
+            Assert.True(result.IsValid);
         }
 
         [Fact]
@@ -81,11 +81,11 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
                 .WithOptions(options)
                 .Build();
 
-           var result = _integrityCheck.Validate(element);
+            var result = _integrityCheck.Validate(element);
 
-           Assert.False(result.IsValid);
-           Assert.Single(result.Messages);
-           Assert.Collection<string>(result.Messages, message => Assert.Equal($"{IntegrityChecksConstants.FAILURE}Checkbox Element Check: {questionId} contains multiple options found with exclusive set to 'true', only a single one can be exclusive", message));
+            Assert.False(result.IsValid);
+            Assert.Single(result.Messages);
+            Assert.Collection<string>(result.Messages, message => Assert.Equal($"{IntegrityChecksConstants.FAILURE}Checkbox Element Check: {questionId} contains multiple options found with exclusive set to 'true', only a single one can be exclusive", message));
         }
 
         [Fact]
@@ -115,11 +115,11 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
                 .WithOptions(options)
                 .Build();
 
-           var result = _integrityCheck.Validate(element);
+            var result = _integrityCheck.Validate(element);
 
-           Assert.False(result.IsValid);
-           Assert.Single(result.Messages);
-           Assert.Collection<string>(result.Messages, message => Assert.Equal($"{IntegrityChecksConstants.FAILURE}Checkbox Element Check: You must provide a validation message when you have options which are exclsuive, Set 'ExclusiveCheckboxValidationMessage' property within element with questionId {questionId}", message));
+            Assert.False(result.IsValid);
+            Assert.Single(result.Messages);
+            Assert.Collection<string>(result.Messages, message => Assert.Equal($"{IntegrityChecksConstants.FAILURE}Checkbox Element Check: You must provide a validation message when you have options which are exclsuive, Set 'ExclusiveCheckboxValidationMessage' property within element with questionId {questionId}", message));
         }
     }
 }

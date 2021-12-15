@@ -5,7 +5,6 @@ using form_builder.Configuration;
 using form_builder.Gateways;
 using form_builder.Providers.Transforms.Lookups;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -23,7 +22,7 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
         public S3LookupTransformDataProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
-            _mockConfiguration.Setup(_ => _.Value).Returns(new S3SchemaProviderConfiguration{ S3BucketKey = "forms-storage" } );
+            _mockConfiguration.Setup(_ => _.Value).Returns(new S3SchemaProviderConfiguration { S3BucketKey = "forms-storage" });
             _s3TransformProvider = new S3LookupTransformDataProvider(_mockS3Gateway.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
         }
 
