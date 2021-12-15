@@ -27,9 +27,9 @@ namespace form_builder.Providers.ReferenceNumbers
         /// <returns></returns>
         private string GetReference(int length)
         {
-            var sb = new StringBuilder(length);
-            var random = new Random();
-
+            StringBuilder sb = new(length);
+            Random random = new();
+            for (int i = 0; i < length; i++)
             {
                 sb.Append(_validReferenceCharacters[random.Next(_validReferenceCharacters.Length)]);
             }
