@@ -37,13 +37,19 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     if (option.HasConditionalElement &&
                         !string.IsNullOrEmpty(option.ConditionalElementId) &&
                         !conditionalElements.Any(element => element.Properties.QuestionId.Equals(option.ConditionalElementId)))
-                        result.AddFailureMessage($"The provided json does not contain a conditional element for the '{option.Value}' value of element '{element.Properties.QuestionId}'");
+                    {
+                        result.AddFailureMessage(
+                            $"The provided json does not contain a conditional element for the '{option.Value}' value of element '{element.Properties.QuestionId}'");
+                    }
 
                     if (option.HasConditionalElement && !string.IsNullOrEmpty(option.ConditionalElementId) &&
                         !schema.Pages.Any(page => page.ValidatableElements.Contains(element) &&
                         page.Elements.Any(element => element.Properties.QuestionId is not null && element.Properties.QuestionId.Equals(option.ConditionalElementId) &&
                         element.Properties.isConditionalElement)))
-                        result.AddFailureMessage($"The provided json contains the conditional element for the '{option.Value}' value of element '{element.Properties.QuestionId}' on a different page to the conditional element");
+                    {
+                        result.AddFailureMessage(
+                            $"The provided json contains the conditional element for the '{option.Value}' value of element '{element.Properties.QuestionId}' on a different page to the conditional element");
+                    }
 
                     conditionalElements.Remove(conditionalElements
                         .FirstOrDefault(element => element.Properties.QuestionId.Equals(option.ConditionalElementId)));

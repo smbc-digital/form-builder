@@ -29,14 +29,26 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             foreach (var element in dateInputOutsideRangeElements)
             {
-                if (!element.Properties.OutsideRangeType.Equals(DateInputConstants.YEAR) && !element.Properties.OutsideRangeType.Equals(DateInputConstants.MONTH) && !element.Properties.OutsideRangeType.Equals(DateInputConstants.DAY))
-                    result.AddFailureMessage($"The provided json has date input element with a incorrect outside range value for '{ String.Join(", ", element.Properties.QuestionId) }'");
+                if (!element.Properties.OutsideRangeType.Equals(DateInputConstants.YEAR) &&
+                    !element.Properties.OutsideRangeType.Equals(DateInputConstants.MONTH) &&
+                    !element.Properties.OutsideRangeType.Equals(DateInputConstants.DAY))
+                {
+                    result.AddFailureMessage(
+                        "The provided json has date input element with a incorrect outside range value for " +
+                        $"'{ String.Join(", ", element.Properties.QuestionId) }'");
+                }
             }
 
             foreach (var element in dateInputWithinRangeElements)
             {
-                if (!element.Properties.WithinRangeType.Equals(DateInputConstants.YEAR) && !element.Properties.WithinRangeType.Equals(DateInputConstants.MONTH) && !element.Properties.WithinRangeType.Equals(DateInputConstants.DAY))
-                    result.AddFailureMessage($"The provided json has date input element with a incorrect within range value for '{ String.Join(", ", element.Properties.QuestionId) }'");
+                if (!element.Properties.WithinRangeType.Equals(DateInputConstants.YEAR) &&
+                    !element.Properties.WithinRangeType.Equals(DateInputConstants.MONTH) &&
+                    !element.Properties.WithinRangeType.Equals(DateInputConstants.DAY))
+                {
+                    result.AddFailureMessage(
+                        "The provided json has date input element with a incorrect within range value for " +
+                        $"'{ String.Join(", ", element.Properties.QuestionId) }'");
+                }
             }
 
             return result;

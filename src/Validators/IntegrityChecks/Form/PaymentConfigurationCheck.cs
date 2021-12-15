@@ -42,7 +42,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
 
             List<PaymentInformation> paymentInformation = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-            PaymentInformation formPaymentInformation = paymentInformation.FirstOrDefault(payment => payment.FormName.Any(_ => _.Equals(schema.BaseURL)));
+            PaymentInformation formPaymentInformation = paymentInformation
+                .FirstOrDefault(payment => payment.FormName
+                    .Any(_ => _.Equals(schema.BaseURL)));
 
             if (formPaymentInformation is null)
             {
@@ -56,7 +58,10 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             if (paymentProvider is null)
             {
-                result.AddFailureMessage($"PaymentConfiguration::No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
+                result.AddFailureMessage(
+                    "PaymentConfiguration::" +
+                    $"No payment provider configured for provider '{formPaymentInformation.PaymentProvider}'");
+
                 return result;
             }
 

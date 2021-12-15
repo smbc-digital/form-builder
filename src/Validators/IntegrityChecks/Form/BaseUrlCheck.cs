@@ -17,7 +17,11 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             if (string.IsNullOrEmpty(schema.BaseURL))
             {
-                result.AddFailureMessage($"FormSchema BaseURL Check, BaseUrl property cannot be null or empty and needs to be the same as base request URL {_httpContextAccessor.HttpContext.Request.Path}");
+                result.AddFailureMessage(
+                    "FormSchema BaseURL Check, " +
+                    "BaseUrl property cannot be null or empty and needs to be the same as: " +
+                    $"base request URL {_httpContextAccessor.HttpContext.Request.Path}");
+
                 return result;
             }
 
@@ -26,7 +30,12 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
 
             if (!_httpContextAccessor.HttpContext.Request.Path.Value.StartsWith($"/{schema.BaseURL.ToLower()}"))
-                result.AddFailureMessage($"FormSchema BaseURL Check, BaseUrl property within form schema needs to be the same as base request URL {_httpContextAccessor.HttpContext.Request.Path}");
+            {
+                result.AddFailureMessage(
+                    "FormSchema BaseURL Check, " +
+                    "BaseUrl property within form schema needs to be the same as:" +
+                    $" base request URL {_httpContextAccessor.HttpContext.Request.Path}");
+            }
 
             return result;
         }

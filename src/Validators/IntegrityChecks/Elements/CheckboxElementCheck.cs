@@ -19,10 +19,21 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 var optionsWhichAreExclusive = element.Properties.Options.Where(_ => _.Exclusive).ToList();
 
                 if (optionsWhichAreExclusive.Count > 1)
-                    result.AddFailureMessage($"Checkbox Element Check: {element.Properties.QuestionId} contains multiple options found with exclusive set to 'true', only a single one can be exclusive");
+                {
+                    result.AddFailureMessage(
+                        "Checkbox Element Check: " +
+                        $"{element.Properties.QuestionId} contains multiple options found with exclusive set to 'true', " +
+                        "only a single one can be exclusive");
+                }
 
                 if (string.IsNullOrEmpty(element.Properties.ExclusiveCheckboxValidationMessage))
-                    result.AddFailureMessage($"Checkbox Element Check: You must provide a validation message when you have options which are exclsuive, Set 'ExclusiveCheckboxValidationMessage' property within element with questionId {element.Properties.QuestionId}");
+                {
+                    result.AddFailureMessage(
+                        "Checkbox Element Check: " +
+                        "You must provide a validation message when you have options which are exclsuive, " +
+                        "Set 'ExclusiveCheckboxValidationMessage' property within element with " +
+                        $"questionId {element.Properties.QuestionId}");
+                }
             }
 
             return result;
