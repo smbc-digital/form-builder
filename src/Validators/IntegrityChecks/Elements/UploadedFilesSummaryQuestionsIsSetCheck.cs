@@ -12,7 +12,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
 
             if (!element.Type.Equals(EElementType.UploadedFilesSummary))
                 return result;
-          
+
             if (string.IsNullOrEmpty(element.Properties.Text))
                 result.AddFailureMessage("Uploaded Files Summary Question Is Set, Uploaded files summary text must not be empty.");
 

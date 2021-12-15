@@ -28,8 +28,13 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
                     if (string.IsNullOrEmpty(submitSlug.AuthToken))
                         result.AddFailureMessage($"No auth token found for SubmitSlug in environmment '{submitSlug.Environment}'");
 
-                    if (!_environment.IsEnvironment("local") && !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase) && !submitSlug.URL.StartsWith("https://"))
-                        result.AddFailureMessage($"SubmitUrl '{submitSlug.URL}' must start with https for environmment '{submitSlug.Environment}'");
+                    if (!_environment.IsEnvironment("local") &&
+                        !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase) &&
+                        !submitSlug.URL.StartsWith("https://"))
+                    {
+                        result.AddFailureMessage(
+                            $"SubmitUrl '{submitSlug.URL}' must start with https for environmment '{submitSlug.Environment}'");
+                    }
                 }
             }
 

@@ -25,17 +25,16 @@ namespace form_builder.Providers.ReferenceNumbers
         /// Setting this value to false will result in an reference only containing upper case aplhanumeric characters, this reduces the possible number of reference combinations
         /// </param>
         /// <returns></returns>
-        private string GetReference(int length) 
+        private string GetReference(int length)
         {
-            var sb = new StringBuilder(length);
-            var random = new Random();
-
-            for (int i=0; i<length; i++) 
+            StringBuilder sb = new(length);
+            Random random = new();
+            for (int i = 0; i < length; i++)
             {
                 sb.Append(_validReferenceCharacters[random.Next(_validReferenceCharacters.Length)]);
             }
 
             return sb.ToString();
-        }     
+        }
     }
 }

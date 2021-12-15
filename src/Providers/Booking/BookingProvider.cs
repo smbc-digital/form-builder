@@ -15,7 +15,7 @@ namespace form_builder.Providers.Booking
         public string ProviderName { get => "SMBC"; }
         private readonly IBookingServiceGateway _gateway;
 
-        public BookingProvider(IBookingServiceGateway gateway) => _gateway = gateway;                    
+        public BookingProvider(IBookingServiceGateway gateway) => _gateway = gateway;
 
         public async Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
         {
@@ -89,7 +89,7 @@ namespace form_builder.Providers.Booking
                 throw new ApplicationException($"BookingProvider::GetBooking, BookingServiceGateway returned not found for bookingId: {bookingId}");
 
             if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
-               throw new ApplicationException($"BookingProvider::GetBooking, BookingServiceGateway returned 400 status code, gateway received a bad request for bookingId {bookingId}, Response: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"BookingProvider::GetBooking, BookingServiceGateway returned 400 status code, gateway received a bad request for bookingId {bookingId}, Response: {JsonConvert.SerializeObject(response)}");
 
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"BookingProvider::GetBooking, Gateway returned with non success status code of {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
@@ -114,7 +114,7 @@ namespace form_builder.Providers.Booking
         public async Task Confirm(ConfirmationRequest request)
         {
             var result = await _gateway.Confirmation(request);
-            
+
             if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
                 throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
 
@@ -122,7 +122,7 @@ namespace form_builder.Providers.Booking
                 throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned 404 status code, booking with id {request.BookingId} cannot be found");
 
             if (!result.IsSuccessStatusCode)
-                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");           
+                throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway returned with non success status code of {result.StatusCode}, Response: {JsonConvert.SerializeObject(result)}");
         }
     }
 }

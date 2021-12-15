@@ -11,8 +11,8 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if ((!element.Type.Equals(EElementType.DatePicker) && 
-                !element.Type.Equals(EElementType.DateInput)) || 
+            if ((!element.Type.Equals(EElementType.DatePicker) &&
+                !element.Type.Equals(EElementType.DateInput)) ||
                 string.IsNullOrEmpty(element.Properties.IsDateBeforeAbsolute))
             {
                 return new ValidationResult { IsValid = true };
@@ -27,17 +27,18 @@ namespace form_builder.Validators
 
             if (!dateValue.HasValue)
                 return new ValidationResult { IsValid = true };
-            
+
             if (!DateTime.TryParse(element.Properties.IsDateBeforeAbsolute, out DateTime comparisonDateValue))
                 throw new FormatException("IsDateBeforeAbsoluteValidator: The comparison date format was incorrect");
 
             if (dateValue < comparisonDateValue)
                 return new ValidationResult { IsValid = true };
 
-            return new ValidationResult {
+            return new ValidationResult
+            {
                 IsValid = false,
-                Message = !string.IsNullOrEmpty(element.Properties.IsDateBeforeValidationMessage) 
-                    ? element.Properties.IsDateBeforeValidationMessage 
+                Message = !string.IsNullOrEmpty(element.Properties.IsDateBeforeValidationMessage)
+                    ? element.Properties.IsDateBeforeValidationMessage
                     : string.Format(ValidationConstants.IS_DATE_BEFORE_VALIDATOR_DEFAULT, element.Properties.IsDateBeforeAbsolute)
             };
         }

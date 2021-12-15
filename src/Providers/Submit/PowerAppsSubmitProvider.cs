@@ -6,15 +6,17 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Providers.Submit
 {
-    public class PowerAppsSubmitProvider : ISubmitProvider {
+    public class PowerAppsSubmitProvider : ISubmitProvider
+    {
         public string ProviderName => "flowtoken";
         private IGateway _gateway;
 
-        public PowerAppsSubmitProvider(IGateway gateway) {
+        public PowerAppsSubmitProvider(IGateway gateway)
+        {
             _gateway = gateway;
         }
 
-        public async Task<HttpResponseMessage> PostAsync(MappingEntity mappingEntity, SubmitSlug submitSlug) => 
+        public async Task<HttpResponseMessage> PostAsync(MappingEntity mappingEntity, SubmitSlug submitSlug) =>
             await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data, submitSlug.Type, submitSlug.AuthToken);
     }
 }

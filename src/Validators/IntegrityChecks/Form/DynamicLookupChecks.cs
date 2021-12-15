@@ -39,14 +39,20 @@ namespace form_builder.Validators.IntegrityChecks.Form
             {
                 if (element.Properties.LookupSources is null || !element.Properties.LookupSources.Any())
                 {
-                    result.AddFailureMessage($"Dynamic Lookup Check, dynamic lookup with questionId {element.Properties.QuestionId} requires a LookupSource");
+                    result.AddFailureMessage(
+                        "Dynamic Lookup Check, " +
+                        $"dynamic lookup with questionId {element.Properties.QuestionId} requires a LookupSource");
+
                     return result;
                 }
 
                 if (!element.Properties.LookupSources
                     .Any(lookup => lookup.EnvironmentName
                     .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
-                        result.AddFailureMessage($"The provided json has no Environment details for this:({_environment.EnvironmentName}) Environment");
+                {
+                    result.AddFailureMessage(
+                        $"The provided json has no Environment details for this:({_environment.EnvironmentName}) Environment");
+                }
 
                 foreach (var env in element.Properties.LookupSources)
                 {
@@ -74,7 +80,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     if (!_environment.IsEnvironment("local") &&
                          !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
                          !env.URL.StartsWith("https://"))
+                    {
                         result.AddFailureMessage($"SubmitUrl must start with https, in form.");
+                    }
                 }
             }
 

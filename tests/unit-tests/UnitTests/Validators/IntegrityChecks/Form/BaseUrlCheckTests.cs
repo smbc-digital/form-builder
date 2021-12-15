@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Assert
             Assert.NotEmpty(result.Messages);
-            Assert.Equal("FAILURE - FormSchema BaseURL Check, BaseUrl property cannot be null or empty and needs to be the same as base request URL /test-base-url", result.Messages.First());
+            Assert.Equal("FAILURE - FormSchema BaseURL Check, BaseUrl property cannot be null or empty and needs to be the same as: base request URL /test-base-url", result.Messages.First());
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Assert
             Assert.NotEmpty(result.Messages);
-            Assert.Equal("FAILURE - FormSchema BaseURL Check, BaseUrl property within form schema needs to be the same as base request URL /test-base-url", result.Messages.First());
+            Assert.Equal("FAILURE - FormSchema BaseURL Check, BaseUrl property within form schema needs to be the same as: base request URL /test-base-url", result.Messages.First());
         }
 
         [Fact]

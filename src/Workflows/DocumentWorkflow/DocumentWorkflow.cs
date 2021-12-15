@@ -31,7 +31,8 @@ namespace form_builder.Workflows.DocumentWorkflow
         {
             var previousAnswers = _pageHelper.GetSavedAnswers(id.ToString());
 
-            if (previousAnswers.FormName is null) {
+            if (previousAnswers.FormName is null)
+            {
                 var formData = _distributedCache.GetString($"document-{id.ToString()}");
 
                 if (formData is null)

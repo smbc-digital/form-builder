@@ -20,7 +20,7 @@ namespace form_builder.Helpers.PaymentHelpers
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        
+
 
         public PaymentHelper(
             IGateway gateway,

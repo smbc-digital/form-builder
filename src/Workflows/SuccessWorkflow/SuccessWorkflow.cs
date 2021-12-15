@@ -16,9 +16,9 @@ namespace form_builder.Workflows.SuccessWorkflow
         private readonly IActionsWorkflow _actionsWorkflow;
         private readonly IAnalyticsService _analyticsService;
 
-        public SuccessWorkflow(IPageService pageService, 
-            ISchemaFactory schemaFactory, 
-            IActionsWorkflow actionsWorkflow, 
+        public SuccessWorkflow(IPageService pageService,
+            ISchemaFactory schemaFactory,
+            IActionsWorkflow actionsWorkflow,
             IAnalyticsService analyticsService)
         {
             _pageService = pageService;
@@ -35,7 +35,7 @@ namespace form_builder.Workflows.SuccessWorkflow
                 await _actionsWorkflow.Process(baseForm.FormActions, baseForm, form);
 
             var result = await _pageService.FinalisePageJourney(form, behaviourType, baseForm);
-            
+
             _analyticsService.RaiseEvent(form, EAnalyticsEventType.Finish);
 
             return result;

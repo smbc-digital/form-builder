@@ -1,8 +1,8 @@
-﻿using form_builder.Enum;
+﻿using System.Collections.Generic;
+using System.Linq;
+using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace form_builder.Validators
 {

@@ -1,6 +1,6 @@
 namespace form_builder.Enum
 {
-    public enum EAnalyticsEventType 
+    public enum EAnalyticsEventType
     {
         Unknown,
         Finish

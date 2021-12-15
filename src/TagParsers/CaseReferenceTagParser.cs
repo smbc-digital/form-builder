@@ -7,7 +7,7 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers
 {
-    public class CaseReferenceTagParser : TagParser,ITagParser
+    public class CaseReferenceTagParser : TagParser, ITagParser
     {
         public CaseReferenceTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
 

@@ -22,7 +22,7 @@ namespace form_builder.Extensions
         {
             var page = new Page();
             var currentSchema = schemaPages.FindAll(_ => _.PageSlug.Equals(currentPageSlug));
-            
+
             if (!currentSchema.Any())
                 return reducedPages;
 
@@ -42,7 +42,7 @@ namespace form_builder.Extensions
 
             if (behaviour is null || string.IsNullOrEmpty(behaviour.PageSlug))
                 return reducedPages;
-            
+
             return RecursivelyReducePages(answersDictionary, schemaPages, behaviour.PageSlug, reducedPages);
         }
     }

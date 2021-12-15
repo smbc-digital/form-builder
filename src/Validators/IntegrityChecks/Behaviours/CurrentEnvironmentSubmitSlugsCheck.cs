@@ -11,8 +11,8 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
     public class CurrentEnvironmentSubmitSlugsCheck : IBehaviourSchemaIntegrityCheck
     {
         readonly IWebHostEnvironment _environment;
-        public CurrentEnvironmentSubmitSlugsCheck(IWebHostEnvironment environment) => 
-            _environment= environment;
+        public CurrentEnvironmentSubmitSlugsCheck(IWebHostEnvironment environment) =>
+            _environment = environment;
 
         public IntegrityCheckResult Validate(List<Behaviour> behaviours)
         {
@@ -20,7 +20,7 @@ namespace form_builder.Validators.IntegrityChecks.Behaviours
 
             foreach (var behaviour in behaviours)
             {
-                if (behaviour.SubmitSlugs is not null && 
+                if (behaviour.SubmitSlugs is not null &&
                     !behaviour.SubmitSlugs
                     .Any(submitSlug => submitSlug.Environment
                     .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase)))
