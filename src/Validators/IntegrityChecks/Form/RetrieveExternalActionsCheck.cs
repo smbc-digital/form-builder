@@ -38,7 +38,9 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
                 if (slug is null)
                 {
-                    result.AddFailureMessage($"Retrieve External Data Action, there is no PageActionSlug for environment '{_environment.EnvironmentName}'");
+                    result.AddFailureMessage(
+                        "Retrieve External Data Action, " +
+                        $"there is no PageActionSlug for environment '{_environment.EnvironmentName}'");
                 }
                 else
                 {
