@@ -109,13 +109,14 @@ namespace form_builder.Models
         );
 
         public void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm)
-		{
+        {
             ValidatableElements.RemoveUnusedConditionalElements(viewModel)
-                .ForEach(element => {
+                .ForEach(element =>
+                {
                     element.Validate(viewModel, validators, baseForm);
                 });
-			IsValidated = true;
-		}
+            IsValidated = true;
+        }
 
         public Behaviour GetNextPage(Dictionary<string, dynamic> viewModel)
         {

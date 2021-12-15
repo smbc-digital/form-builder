@@ -16,7 +16,7 @@ namespace form_builder.Services.AddAnotherService
         private readonly IPageHelper _pageHelper;
         private readonly IPageFactory _pageContentFactory;
 
-        public AddAnotherService(IPageHelper pageHelper, 
+        public AddAnotherService(IPageHelper pageHelper,
             IPageFactory pageContentFactory)
         {
             _pageHelper = pageHelper;
@@ -36,23 +36,23 @@ namespace form_builder.Services.AddAnotherService
             FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(guid);
             var maximumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.MaximumFieldsets;
 
-            if (dynamicCurrentPage.IsValid  || !string.IsNullOrEmpty(removeKey))
+            if (dynamicCurrentPage.IsValid || !string.IsNullOrEmpty(removeKey))
             {
                 var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
                 var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
                 if (addEmptyFieldset && currentIncrement >= maximumFieldsets)
                     throw new ApplicationException("AddAnotherService::ProcessAddAnother, maximum number of fieldsets exceeded");
-                
+
                 if (addEmptyFieldset)
                     currentIncrement++;
 
                 if (!string.IsNullOrEmpty(removeKey))
                     currentIncrement--;
-                
+
                 _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, guid, baseForm.BaseURL);
             }
-            
+
             if (!string.IsNullOrEmpty(removeKey))
             {
                 _pageHelper.RemoveFieldset(viewModel, baseForm.BaseURL, guid, path, removeKey);

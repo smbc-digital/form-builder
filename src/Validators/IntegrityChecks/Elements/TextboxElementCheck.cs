@@ -16,7 +16,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (element.Properties is null)
                 return result;
 
-            if(element.Properties.Decimal && element.Properties.Numeric)
+            if (element.Properties.Decimal && element.Properties.Numeric)
                 result.AddFailureMessage($"Textbox element {element.Properties.QuestionId} cannot have both Decimal and Numeric set to 'true', only one is allowed.");
 
             return result;

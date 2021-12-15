@@ -37,7 +37,7 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key) 
+        private static bool HasValidDateTimeAnswer(Dictionary<string, dynamic> viewModel, string key)
         {
             var yearKey = $"{key}{DateInput.YEAR_EXTENSION}";
             var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
@@ -59,7 +59,7 @@ namespace form_builder.Models.Elements
 
             return true;
         }
-        
+
         public static DateTime? GetDate(Dictionary<string, dynamic> viewModel, string key)
         {
 
@@ -67,23 +67,23 @@ namespace form_builder.Models.Elements
             var monthKey = $"{key}{DateInput.MONTH_EXTENSION}";
             var dayKey = $"{key}{DateInput.DAY_EXTENSION}";
 
-            if (!HasValidDateTimeAnswer(viewModel, key))            
+            if (!HasValidDateTimeAnswer(viewModel, key))
                 return null;
 
             string year = viewModel[yearKey];
             string month = viewModel[monthKey];
             string day = viewModel[dayKey];
-            
+
             return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day));
         }
 
         public static DateTime? GetDate(FormAnswers answers, string key)
         {
             IEnumerable<Answers> flattenedAnswers = answers.AllAnswers;
-            string year = flattenedAnswers.Single(answer => answer.QuestionId.Equals($"{key}{DateInput.YEAR_EXTENSION}")).Response; 
+            string year = flattenedAnswers.Single(answer => answer.QuestionId.Equals($"{key}{DateInput.YEAR_EXTENSION}")).Response;
             string month = flattenedAnswers.Single(answer => answer.QuestionId.Equals($"{key}{DateInput.MONTH_EXTENSION}")).Response;
             string day = flattenedAnswers.Single(answer => answer.QuestionId.Equals($"{key}{DateInput.DAY_EXTENSION}")).Response;
-            
+
             return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day));
         }
     }

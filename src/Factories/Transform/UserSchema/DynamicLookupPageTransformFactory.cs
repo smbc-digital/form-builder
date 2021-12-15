@@ -57,7 +57,7 @@ namespace form_builder.Factories.Transform.UserSchema
                 throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources");
 
             var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
-            List<Option> lookupOptions =  await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
+            List<Option> lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
 
             if (!lookupOptions.Any())
                 throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, Provider returned no options");

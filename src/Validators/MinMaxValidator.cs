@@ -17,7 +17,7 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
 
             var isValid = decimal.TryParse(value, SystemConstants.DECIMAL_NUMBER_STYLES, null, out decimal decimalOuput);
-           
+
             if (!string.IsNullOrEmpty(element.Properties.Max) && !string.IsNullOrEmpty(element.Properties.Min))
             {
                 var max = int.Parse(element.Properties.Max);

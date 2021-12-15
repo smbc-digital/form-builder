@@ -30,8 +30,9 @@ namespace form_builder.Models
         public List<PageAnswers> Pages { get; set; }
 
         [JsonIgnore]
-        public IEnumerable<Answers> AllAnswers {
-            get 
+        public IEnumerable<Answers> AllAnswers
+        {
+            get
             {
                 if (this.Pages is null)
                     return Enumerable.Empty<Answers>();

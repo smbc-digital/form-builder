@@ -5,7 +5,7 @@ namespace form_builder.Validators.IntegrityChecks
 {
     public class IntegrityCheckResult
     {
-        public  IntegrityCheckResult()
+        public IntegrityCheckResult()
         {
             IsValid = true;
             Messages = new List<string>();
@@ -18,9 +18,9 @@ namespace form_builder.Validators.IntegrityChecks
         }
 
         public bool IsValid { get; private set; }
-        public ICollection<string> Messages { get; private set; }        
+        public ICollection<string> Messages { get; private set; }
 
-        public void AddFailureMessage (string message)
+        public void AddFailureMessage(string message)
         {
             IsValid = false;
             Messages.Add($"{IntegrityChecksConstants.FAILURE}{message}");

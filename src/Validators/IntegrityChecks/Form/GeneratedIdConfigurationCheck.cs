@@ -11,7 +11,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             if (schema.GenerateReferenceNumber &&
                 (string.IsNullOrEmpty(schema.GeneratedReferenceNumberMapping) || string.IsNullOrEmpty(schema.ReferencePrefix)))
-                    result.AddFailureMessage($"Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value.");
+                result.AddFailureMessage($"Generated Id Configuration Check, 'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value.");
 
             return result;
         }

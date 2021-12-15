@@ -18,7 +18,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
         private IEnumerable<IPaymentProvider> _paymentProviders;
 
         public PaymentConfigurationCheck(
-            IWebHostEnvironment environment, 
+            IWebHostEnvironment environment,
             IEnumerable<IPaymentProvider> paymentProviders,
             IPaymentConfigurationTransformDataProvider paymentConfigProvider)
         {

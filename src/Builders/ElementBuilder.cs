@@ -20,7 +20,7 @@ namespace form_builder.Builders
         {
             var elementType = typeof(IElement).GetTypeInfo().Assembly
                 .GetTypes()
-                .FirstOrDefault(type => type.Name.Equals( _type.ToString()));
+                .FirstOrDefault(type => type.Name.Equals(_type.ToString()));
 
             var element = (Element)Activator.CreateInstance(elementType);
 
@@ -409,13 +409,13 @@ namespace form_builder.Builders
             return this;
         }
 
-        
+
         public ElementBuilder WithIsDateAfter(string value)
         {
             _property.IsDateAfter = value;
             return this;
         }
-        
+
         public ElementBuilder WithIsDateAfterAbsolute(string value)
         {
             _property.IsDateAfterAbsolute = value;
@@ -479,7 +479,7 @@ namespace form_builder.Builders
 
             return this;
         }
-        
+
         public ElementBuilder WithNestedElement(Element element)
         {
             if (_property.Elements is null)

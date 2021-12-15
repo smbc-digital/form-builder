@@ -8,14 +8,14 @@ namespace form_builder.Validators.IntegrityChecks.Form
     public class BaseUrlCheck : IFormSchemaIntegrityCheck
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public BaseUrlCheck(IHttpContextAccessor httpContextAccessor) 
+        public BaseUrlCheck(IHttpContextAccessor httpContextAccessor)
             => _httpContextAccessor = httpContextAccessor;
 
         public IntegrityCheckResult Validate(FormSchema schema)
         {
             IntegrityCheckResult result = new();
-            
-            if(string.IsNullOrEmpty(schema.BaseURL))
+
+            if (string.IsNullOrEmpty(schema.BaseURL))
             {
                 result.AddFailureMessage($"FormSchema BaseURL Check, BaseUrl property cannot be null or empty and needs to be the same as base request URL {_httpContextAccessor.HttpContext.Request.Path}");
                 return result;

@@ -46,7 +46,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 if (!element.Properties.LookupSources
                     .Any(lookup => lookup.EnvironmentName
                     .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
-                        result.AddFailureMessage($"The provided json has no Environment details for this:({_environment.EnvironmentName}) Environment");
+                    result.AddFailureMessage($"The provided json has no Environment details for this:({_environment.EnvironmentName}) Environment");
 
                 foreach (var env in element.Properties.LookupSources)
                 {

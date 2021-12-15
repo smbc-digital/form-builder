@@ -20,7 +20,7 @@ namespace form_builder.Services.FormAvailabilityService
         {
             var environmentAvailability = availability.SingleOrDefault(_ => _.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
 
-            if(environmentAvailability is not null && environmentAvailability.EnabledFor is not null && environmentAvailability.EnabledFor.Any())
+            if (environmentAvailability is not null && environmentAvailability.EnabledFor is not null && environmentAvailability.EnabledFor.Any())
                 return environmentAvailability.EnabledFor.All(_ => _enabledFor.Get(_.Type).IsAvailable(_));
 
             return environmentAvailability is null || environmentAvailability.IsAvailable;

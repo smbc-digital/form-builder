@@ -15,6 +15,7 @@ using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Factories.Transform.UserSchema;
 using form_builder.Gateways;
 using form_builder.Helpers.ActionsHelpers;
+using form_builder.Helpers.Cookie;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
@@ -26,6 +27,7 @@ using form_builder.Mappers;
 using form_builder.Mappers.Structure;
 using form_builder.Providers;
 using form_builder.Providers.Address;
+using form_builder.Providers.Analytics;
 using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
@@ -46,6 +48,7 @@ using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
+using form_builder.Services.AnalyticsService;
 using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
@@ -55,11 +58,13 @@ using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.PayService;
+using form_builder.Services.PreviewService;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.ValidateService;
+using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
 using form_builder.Utils.Hash;
@@ -92,11 +97,6 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
-using form_builder.Services.PreviewService;
-using form_builder.SubmissionActions;
-using form_builder.Helpers.Cookie;
-using form_builder.Providers.Analytics;
-using form_builder.Services.AnalyticsService;
 
 namespace form_builder.Utils.Startup
 {
@@ -549,7 +549,7 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
-        
+
         public static IServiceCollection AddAnalyticsProviders(this IServiceCollection services)
         {
             services.AddTransient<IAnalyticsProvider, FakeAnalyticsProvider>();

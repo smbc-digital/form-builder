@@ -4,7 +4,7 @@ using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Behaviours
 {
-    public class EmptyBehaviourSlugsCheck: IBehaviourSchemaIntegrityCheck
+    public class EmptyBehaviourSlugsCheck : IBehaviourSchemaIntegrityCheck
     {
         public IntegrityCheckResult Validate(List<Behaviour> behaviours)
         {

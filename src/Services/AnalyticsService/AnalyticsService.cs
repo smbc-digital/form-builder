@@ -16,14 +16,14 @@ namespace form_builder.Services.AnalyticsService
         {
             _analyticsProviders = analyticsProviders;
             _configuration = configuration;
-        } 
+        }
 
         public void RaiseEvent(string form, EAnalyticsEventType eventType)
         {
-            if(_configuration.Value.Enabled)
+            if (_configuration.Value.Enabled)
             {
                 var provider = _analyticsProviders.Get(_configuration.Value.Type);
-                provider.RaiseEventAsync(new AnalyticsEventRequest{ EventType = eventType, Form = form });
+                provider.RaiseEventAsync(new AnalyticsEventRequest { EventType = eventType, Form = form });
             }
         }
     }

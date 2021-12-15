@@ -18,7 +18,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (!regex.IsMatch(element.Properties.TargetMapping) ||
                 element.Properties.TargetMapping.EndsWith(".") ||
                 element.Properties.TargetMapping.StartsWith("."))
-                    result.AddFailureMessage($"The provided json contains invalid TargetMapping, '{element.Properties.QuestionId}' contains invalid characters");
+                result.AddFailureMessage($"The provided json contains invalid TargetMapping, '{element.Properties.QuestionId}' contains invalid characters");
 
             return result;
         }

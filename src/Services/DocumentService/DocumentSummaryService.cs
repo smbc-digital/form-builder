@@ -48,7 +48,7 @@ namespace form_builder.Services.DocumentService
 
         private async Task<byte[]> GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            
+
 
             var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
