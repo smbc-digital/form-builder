@@ -29,7 +29,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             foreach (var element in dateInputOutsideRangeElements)
             {
-                if (!element.Properties.OutsideRangeType.Equals(DateInputConstants.YEAR) && 
+                if (!element.Properties.OutsideRangeType.Equals(DateInputConstants.YEAR) &&
                     !element.Properties.OutsideRangeType.Equals(DateInputConstants.MONTH) &&
                     !element.Properties.OutsideRangeType.Equals(DateInputConstants.DAY))
                 {
