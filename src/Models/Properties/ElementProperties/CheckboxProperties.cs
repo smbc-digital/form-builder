@@ -2,7 +2,6 @@
 {
     public partial class BaseProperty
     {
-
         public string ExclusiveCheckboxValidationMessage { get; set; }
     }
 }
