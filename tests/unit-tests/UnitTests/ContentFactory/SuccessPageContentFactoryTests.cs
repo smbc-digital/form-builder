@@ -26,12 +26,12 @@ namespace form_builder_tests.UnitTests.ContentFactory
     public class SuccessPageContentFactoryTests
     {
         private readonly SuccessPageFactory _factory;
-        private readonly Mock<IPageHelper> _mockPageHelper = new ();
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new ();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new ();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new ();
-        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new ();
-        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
 
         public SuccessPageContentFactoryTests()
         {
@@ -148,7 +148,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             _mockPageContentFactory
                 .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel{ IsInPreviewMode = true });
+                .ReturnsAsync(new FormBuilderViewModel { IsInPreviewMode = true });
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
@@ -200,7 +200,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+                .Returns(new PreviewModeConfiguration { IsEnabled = true });
 
             // Arrange
             var element = new ElementBuilder()
@@ -220,7 +220,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             _mockPageContentFactory
                 .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel{ IsInPreviewMode = true });
+                .ReturnsAsync(new FormBuilderViewModel { IsInPreviewMode = true });
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
@@ -288,7 +288,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Single(pageCallback.Elements);
             Assert.Equal("booking-cancel-success", pageCallback.PageSlug);
-            Assert.Equal("You've successfully cancelled your appointment",pageCallback.BannerTitle);
+            Assert.Equal("You've successfully cancelled your appointment", pageCallback.BannerTitle);
             Assert.Equal("We've received your cancellation request", pageCallback.LeadingParagraph);
             Assert.Equal("Success", pageCallback.Title);
             Assert.True(pageCallback.HideTitle);

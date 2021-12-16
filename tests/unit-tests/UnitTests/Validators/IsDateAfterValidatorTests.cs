@@ -27,7 +27,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
                         Answers = new List<Answers> { new Answers() }
                     }
@@ -92,10 +92,10 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
-                        { 
+                        Answers = new List<Answers>
+                        {
                             new Answers
                             {
                                 QuestionId = "test-comparison-element",
@@ -131,10 +131,10 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
-                        { 
+                        Answers = new List<Answers>
+                        {
                             new Answers
                             {
                                 QuestionId = "test-comparison-element"
@@ -169,7 +169,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
                         Answers = new List<Answers>()
                     }
@@ -206,7 +206,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
                         Answers = new List<Answers>()
                     }
@@ -244,8 +244,8 @@ namespace form_builder_tests.UnitTests.Validators
                 {
                     new PageAnswers
                     {
-                        Answers = new List<Answers> 
-                        { 
+                        Answers = new List<Answers>
+                        {
                             new Answers
                             {
                                 QuestionId = "test-comparison-element",

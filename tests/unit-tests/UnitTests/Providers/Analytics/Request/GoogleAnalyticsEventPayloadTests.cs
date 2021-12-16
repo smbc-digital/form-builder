@@ -17,7 +17,7 @@ namespace form_builder_tests.UnitTests.Providers.Analytics
             var eventLabel = "EVENT_LABEL";
             var eventPayload = new GoogleAnalyticsEventPayload { ClientId = clientId, TrackingId = trackingId, EventCategory = eventCategory, EventAction = eventAction, EventLabel = eventLabel };
             var url = $"{baseUrl}?v=1&cid={clientId}&t=event&tid={trackingId}&ec={eventCategory}&ea={eventAction}&el={eventLabel}";
-            
+
             var result = eventPayload.ToString(baseUrl);
 
             Assert.Equal(url, result);

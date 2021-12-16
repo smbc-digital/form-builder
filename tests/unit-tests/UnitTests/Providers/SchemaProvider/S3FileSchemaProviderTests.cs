@@ -28,14 +28,15 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
         private readonly Mock<ILogger<ISchemaProvider>> _mockLogger = new();
         private const int _indexExpiry = 10;
-        private const string _s3SchemaFolderName =  "test-folder-name";
+        private const string _s3SchemaFolderName = "test-folder-name";
 
 
         public S3FileSchemaProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
             _mocks3SchemaConfiguration.Setup(_ => _.Value)
-                .Returns(new S3SchemaProviderConfiguration {
+                .Returns(new S3SchemaProviderConfiguration
+                {
                     S3BucketKey = "forms-storage",
                     S3BucketFolderName = _s3SchemaFolderName
                 });
@@ -76,10 +77,10 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
                     $"{schemaName}.json"
                 }));
             var result = await _s3Schema.ValidateSchemaName(schemaName);
-            
+
             Assert.True(result);
         }
-        
+
         [Theory]
         [InlineData("test-form-nam")]
         [InlineData("est-form-name")]
@@ -93,7 +94,7 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
                     $"test-form-name.json"
                 }));
             var result = await _s3Schema.ValidateSchemaName(formName);
-            
+
             Assert.False(result);
         }
 
@@ -105,10 +106,10 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
                 .Returns(string.Empty);
 
             _mockS3Gateway.Setup(_ => _.ListObjectsV2(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new ListObjectsV2Response{ S3Objects = new List<S3Object>{ new S3Object { Key = $"Int/{_s3SchemaFolderName}/testform.json" } } });
+                .ReturnsAsync(new ListObjectsV2Response { S3Objects = new List<S3Object> { new S3Object { Key = $"Int/{_s3SchemaFolderName}/testform.json" } } });
 
             var result = await _s3Schema.ValidateSchemaName(schemaName);
-            
+
             _mockS3Gateway.Verify(_ => _.ListObjectsV2(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _mockDistributedCacheWrapper.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_indexExpiry)), It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -119,10 +120,10 @@ namespace form_builder_tests.UnitTests.Providers.SchemaProvider
             var testIndexKey = $"local/{_s3SchemaFolderName}/test-form-name.json";
             var expected = "test-form-name.json";
             _mockS3Gateway.Setup(_ => _.ListObjectsV2(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new ListObjectsV2Response{ S3Objects = new List<S3Object>{ new S3Object { Key = testIndexKey } } });
+                .ReturnsAsync(new ListObjectsV2Response { S3Objects = new List<S3Object> { new S3Object { Key = testIndexKey } } });
 
             var result = await _s3Schema.IndexSchema();
-            
+
             Assert.Single(result);
             Assert.Equal(expected, result.First());
         }

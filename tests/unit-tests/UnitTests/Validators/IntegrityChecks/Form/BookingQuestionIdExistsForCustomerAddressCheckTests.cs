@@ -9,7 +9,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 {
     public class BookingQuestionIdExistsForCustomerAddressCheckTests
     {
-        
+
         [Fact]
         public void BookingQuestionIdExistsForCustomerAddressCheck_NotValid()
         {
@@ -34,11 +34,11 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             var page1 = new PageBuilder()
                 .WithElement(element)
                 .Build();
-            
+
             var page2 = new PageBuilder()
                 .WithElement(bookingElement)
                 .Build();
-            
+
             var page3 = new PageBuilder()
                 .WithElement(additionalBookingElement)
                 .Build();
@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Act
             BookingQuestionIdExistsForCustomerAddressCheck check = new();
             var result = check.Validate(schema);
-            
+
             // Assert
             Assert.False(result.IsValid);
             Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
@@ -93,7 +93,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Act
             BookingQuestionIdExistsForCustomerAddressCheck check = new();
             var result = check.Validate(schema);
-            
+
             // Assert
             Assert.True(result.IsValid);
             Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);

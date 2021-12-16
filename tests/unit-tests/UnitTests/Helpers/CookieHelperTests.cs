@@ -10,7 +10,7 @@ namespace form_builder_tests.UnitTests.Helpers
     public class CookieHelperTests
     {
         private readonly CookieHelper _helper;
-        private readonly Mock<IHttpContextAccessor> _mockHttpContext = new ();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContext = new();
         private string _CookieKey => "cookie-key";
         private string _CookieValue => "stored-cookie-value";
         public CookieHelperTests()

@@ -15,7 +15,7 @@ namespace form_builder_tests.UnitTests.Providers.EmailProvider
     public class AwsSesProviderTests
     {
         private readonly IEmailProvider _provider;
-        private readonly Mock<IAmazonSimpleEmailService> _mockEmailService = new ();
+        private readonly Mock<IAmazonSimpleEmailService> _mockEmailService = new();
 
         public AwsSesProviderTests()
         {

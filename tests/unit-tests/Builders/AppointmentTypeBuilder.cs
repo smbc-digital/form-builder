@@ -43,7 +43,7 @@ namespace form_builder_tests.Builders
 
         public AppointmentTypeBuilder WithOptionalResource(BookingResource resource)
         {
-            if(_optionalResources is null)
+            if (_optionalResources is null)
                 _optionalResources = new List<BookingResource>();
 
             _optionalResources.Add(resource);

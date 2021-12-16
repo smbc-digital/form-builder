@@ -18,7 +18,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 { $"test-date{DateInput.DAY_EXTENSION}", "01" }
             };
 
-            DateTime? result =  DateInput.GetDate(viewModel, "test-date");
+            DateTime? result = DateInput.GetDate(viewModel, "test-date");
             Assert.True(result.HasValue);
             Assert.True(result.Value == new DateTime(2020, 1, 1));
         }
@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             var viewModel = new Dictionary<string, dynamic>();
             DateTime? result = DateInput.GetDate(viewModel, "test-date");
-            
+
             Assert.False(result.HasValue);
         }
 
@@ -75,7 +75,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 }
             };
 
-            DateTime? result =  DateInput.GetDate(formAnswers, "test-date");
+            DateTime? result = DateInput.GetDate(formAnswers, "test-date");
             Assert.True(result.HasValue);
             Assert.True(result.Value == new DateTime(2020, 1, 1));
         }

@@ -15,9 +15,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class LinkTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new ();
-        private readonly Mock<IElementHelper> _mockElementHelper = new ();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         public LinkTests()
         {

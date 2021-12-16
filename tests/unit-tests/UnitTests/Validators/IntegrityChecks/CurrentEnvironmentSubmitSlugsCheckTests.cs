@@ -13,7 +13,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
     public class CurrentEnvironmentSubmitSlugsCheckTests
     {
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
-        
+
         public CurrentEnvironmentSubmitSlugsCheckTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName)

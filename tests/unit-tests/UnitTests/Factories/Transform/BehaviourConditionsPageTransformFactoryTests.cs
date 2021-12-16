@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Enum;
@@ -21,7 +20,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .WithConditionType(ECondition.PaymentAmountEqualTo)
                 .WithComparisonValue("0")
                 .Build();
-            
+
             var behaviour = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.GoToPage)
                 .WithCondition(condition)

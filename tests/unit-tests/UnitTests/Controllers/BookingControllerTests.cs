@@ -23,9 +23,9 @@ namespace form_builder_tests.UnitTests.Controllers
     {
         private readonly BookingController _bookingController;
 
-        private readonly Mock<IBookingService> _bookingService = new ();
-        private readonly Mock<IPageService> _pageService = new ();
-        private readonly Mock<ISchemaFactory> _schemaFactory = new ();
+        private readonly Mock<IBookingService> _bookingService = new();
+        private readonly Mock<IPageService> _pageService = new();
+        private readonly Mock<ISchemaFactory> _schemaFactory = new();
 
         public BookingControllerTests()
         {

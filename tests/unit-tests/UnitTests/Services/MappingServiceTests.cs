@@ -794,7 +794,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
                 .WithCustomerAddressId("address")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -842,7 +842,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -883,7 +883,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -920,7 +920,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = bookingGuid, Environment = "local" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = bookingGuid, Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object> {
@@ -934,7 +934,7 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.Equal("MappingService::GetCustomerDetails, Booking request form data for form base-url does not contain required customer object", result.Message);
         }
-        
+
         [Fact]
         public void MapAppointmentId_Should_Replace_EmptyGuid_With_AnswerValueAppointmentIdFromKey()
         {
@@ -987,7 +987,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object>();
@@ -1019,7 +1019,7 @@ namespace form_builder_tests.UnitTests.Services
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
                 .WithQuestionId("booking")
-                .WithAppointmentType(new AppointmentType{ AppointmentId = Guid.NewGuid(), Environment = "local" })
+                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.NewGuid(), Environment = "local" })
                 .Build();
 
             var viewModel = new Dictionary<string, object>();

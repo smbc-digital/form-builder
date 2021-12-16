@@ -1,12 +1,14 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Validators;
-using System.Collections.Generic;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators {
-    public class ExclusiveCheckboxValidatorTests {
+namespace form_builder_tests.UnitTests.Validators
+{
+    public class ExclusiveCheckboxValidatorTests
+    {
 
         private readonly ExclusiveCheckboxValidator _exclusiveCheckboxValidator = new ExclusiveCheckboxValidator();
 
@@ -14,7 +16,8 @@ namespace form_builder_tests.UnitTests.Validators {
         [InlineData(EElementType.DateInput)]
         [InlineData(EElementType.Textbox)]
         [InlineData(EElementType.Textarea)]
-        public void Validate_ShouldReturnTrue_WhenElementIsNot_Checkbox(EElementType type) {
+        public void Validate_ShouldReturnTrue_WhenElementIsNot_Checkbox(EElementType type)
+        {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(type)
@@ -29,7 +32,8 @@ namespace form_builder_tests.UnitTests.Validators {
 
 
         [Fact]
-        public void Validate_ShouldReturnTrue_WhenNoAnswerProvided() {
+        public void Validate_ShouldReturnTrue_WhenNoAnswerProvided()
+        {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
@@ -46,7 +50,8 @@ namespace form_builder_tests.UnitTests.Validators {
         }
 
         [Fact]
-        public void Validate_ShouldReturnTrue_WhenSingleAnswerProvided() {
+        public void Validate_ShouldReturnTrue_WhenSingleAnswerProvided()
+        {
             // Arrange
             var questionId = "testElement";
             var element = new ElementBuilder()
@@ -65,7 +70,8 @@ namespace form_builder_tests.UnitTests.Validators {
         }
 
         [Fact]
-        public void Validate_ShouldReturnTrue_WhenExclusiveOptionNotProvided() {
+        public void Validate_ShouldReturnTrue_WhenExclusiveOptionNotProvided()
+        {
             // Arrange
             var questionId = "testElement";
             var options = new List<Option>();
@@ -88,7 +94,8 @@ namespace form_builder_tests.UnitTests.Validators {
         }
 
         [Fact]
-        public void Validate_ShouldReturnFalse_WhenExclusiveAndNonExclusiveOptionIsChecked() {
+        public void Validate_ShouldReturnFalse_WhenExclusiveAndNonExclusiveOptionIsChecked()
+        {
             // Arrange
             var questionId = "testElement";
             var options = new List<Option>();

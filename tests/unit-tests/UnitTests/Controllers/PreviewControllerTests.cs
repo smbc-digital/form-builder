@@ -14,7 +14,7 @@ namespace form_builder_tests.UnitTests.Controllers
     public class PreviewControllerTests
     {
         private readonly PreviewController _controller;
-        private readonly Mock<IPreviewService> _previewService = new ();
+        private readonly Mock<IPreviewService> _previewService = new();
 
         public PreviewControllerTests()
         {
@@ -41,7 +41,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _previewService
                 .Setup(_ => _.VerifyPreviewRequest(It.IsAny<List<CustomFormFile>>()))
-                .ReturnsAsync(new ProcessPreviewRequestEntity{ PreviewFormKey = previewKey, Page = page, UseGeneratedViewModel = false });
+                .ReturnsAsync(new ProcessPreviewRequestEntity { PreviewFormKey = previewKey, Page = page, UseGeneratedViewModel = false });
 
             var result = await _controller.IndexPost(new List<CustomFormFile>());
 
@@ -61,7 +61,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _previewService
                 .Setup(_ => _.VerifyPreviewRequest(It.IsAny<List<CustomFormFile>>()))
-                .ReturnsAsync(new ProcessPreviewRequestEntity{ PreviewFormKey = previewKey, Page = page, UseGeneratedViewModel = true });
+                .ReturnsAsync(new ProcessPreviewRequestEntity { PreviewFormKey = previewKey, Page = page, UseGeneratedViewModel = true });
 
             var result = await _controller.IndexPost(new List<CustomFormFile>());
 

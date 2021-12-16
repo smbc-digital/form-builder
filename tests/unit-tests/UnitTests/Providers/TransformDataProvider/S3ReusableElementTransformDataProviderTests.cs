@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Providers.TransformDataProvider
         public S3ReusableElementTransformDataProviderTests()
         {
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
-            _mockConfiguration.Setup(_ => _.Value).Returns(new S3SchemaProviderConfiguration{ S3BucketKey = "forms-storage" } );
+            _mockConfiguration.Setup(_ => _.Value).Returns(new S3SchemaProviderConfiguration { S3BucketKey = "forms-storage" });
             _s3TransformProvider = new S3ReusableElementTransformDataProvider(_mockS3Gateway.Object, _mockLogger.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
         }
 

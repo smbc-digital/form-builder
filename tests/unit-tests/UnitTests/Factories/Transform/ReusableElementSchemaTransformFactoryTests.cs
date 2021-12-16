@@ -17,7 +17,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 {
     public class ReusableElementSchemaTransformFactoryTests
     {
-        private readonly Mock<IReusableElementTransformDataProvider> _transformDataProvider = new ();
+        private readonly Mock<IReusableElementTransformDataProvider> _transformDataProvider = new();
         public ReusableElementSchemaTransformFactory ReusableElementSchemaTransformFactory;
 
         public ReusableElementSchemaTransformFactoryTests()

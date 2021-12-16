@@ -19,9 +19,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class SummaryTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new ();
-        private readonly Mock<IElementHelper> _mockElementHelper = new ();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         [Fact]
         public async Task RenderAsync_ShouldCall_ViewRender_ToRenderSummaryView()
@@ -63,7 +63,8 @@ namespace form_builder_tests.UnitTests.Models.Elements
         {
             //Arrange
             var callback = new SummarySectionsViewModel();
-            var section = new Section {
+            var section = new Section
+            {
                 Title = "title",
                 Pages = new List<string> {
                     "page-one"
@@ -91,10 +92,10 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var formAnswers = new FormAnswers();
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()))
-                .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x,y,z) => callback = y);
+                .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x, y, z) => callback = y);
 
             _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
-                .ReturnsAsync(new List<PageSummary>{new PageSummary { PageSummaryId = "page-one", PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }});
+                .ReturnsAsync(new List<PageSummary> { new PageSummary { PageSummaryId = "page-one", PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } } });
 
             //Act
             await element.RenderAsync(
@@ -169,7 +170,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithPage(summaryPage)
                 .Build();
 
-            var formAnswers = new FormAnswers { FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}-addAnother", 1} } };
+            var formAnswers = new FormAnswers { FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}-addAnother", 1 } } };
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()))
                 .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x, y, z) => callback = y);
@@ -177,7 +178,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new List<PageSummary>
                 {
-                    new PageSummary { PageSummaryId = "add-another", PageSlug = "add-another", Answers = new Dictionary<string, string> {{"question", "answer"}} }, 
+                    new PageSummary { PageSummaryId = "add-another", PageSlug = "add-another", Answers = new Dictionary<string, string> {{"question", "answer"}} },
                     new PageSummary { PageSummaryId = "add-another-addAnother-1", PageSlug = "add-another", Answers = new Dictionary<string, string> { { "question", "answer" } } },
                     new PageSummary { PageSummaryId = "page-one", PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
                 });
@@ -226,7 +227,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             var formAnswers = new FormAnswers();
 
             _mockIViewRender.Setup(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()))
-                .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x,y,z) => callback = y);
+                .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x, y, z) => callback = y);
 
             //Act
             await element.RenderAsync(

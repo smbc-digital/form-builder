@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
     public class CivicaPayProviderTests
     {
         private readonly IPaymentProvider _civicaPayProvider;
-        private readonly Mock<ICivicaPayGateway> _mockCivicaPayGateway = new ();
+        private readonly Mock<ICivicaPayGateway> _mockCivicaPayGateway = new();
         private readonly Mock<IOptions<CivicaPaymentConfiguration>> _civicaPayConfig = new();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
                 .Returns(new HostString("www.test.com"));
 
             _mockCivicaPayGateway.Setup(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()))
-                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { IsSuccessStatusCode = true, StatusCode = HttpStatusCode.OK, ResponseContent = new CreateImmediateBasketResponse { BasketReference = "testRef", BasketToken = "testBasketToken", Success="true" } });
+                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { IsSuccessStatusCode = true, StatusCode = HttpStatusCode.OK, ResponseContent = new CreateImmediateBasketResponse { BasketReference = "testRef", BasketToken = "testBasketToken", Success = "true" } });
 
             _civicaPayConfig.Setup(_ => _.Value).Returns(new CivicaPaymentConfiguration { CustomerId = "testId", ApiPassword = "test" });
 
@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         {
             var caseRef = "caseRef";
 
-            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] {"form"}, Settings = new Settings() });
+            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() });
 
             _mockCivicaPayGateway.Verify(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()), Times.Once);
             _mockCivicaPayGateway.Verify(_ => _.GetPaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(x => x == caseRef)), Times.Once);
@@ -61,7 +61,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
             _mockCivicaPayGateway.Setup(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()))
                 .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { StatusCode = HttpStatusCode.InternalServerError });
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] {"form"}, Settings = new Settings() }));
+            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }));
 
             Assert.StartsWith("CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code InternalServerError, HttpResponse: ", result.Message);
         }
@@ -70,14 +70,14 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         public async Task GeneratePaymentUrl_ShouldThrowException_WhenCivicaResponse_IsNotSuccessful()
         {
             _mockCivicaPayGateway.Setup(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()))
-                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> 
-                    { 
-                        StatusCode = HttpStatusCode.OK,
-                        IsSuccessStatusCode = true,
-                        ResponseContent = new CreateImmediateBasketResponse { Success = "false" }
-                    });
+                .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccessStatusCode = true,
+                    ResponseContent = new CreateImmediateBasketResponse { Success = "false" }
+                });
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] {"form"}, Settings = new Settings() }));
+            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }));
 
             Assert.StartsWith("CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response", result.Message);
         }
@@ -88,7 +88,7 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
             _mockCivicaPayGateway.Setup(_ => _.GetPaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("12345");
 
-            var result = await _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] {"form"}, Settings = new Settings() });
+            var result = await _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() });
 
             Assert.IsType<string>(result);
             Assert.NotNull(result);
