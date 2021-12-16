@@ -425,9 +425,13 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
+
+
             if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
+                services.AddSingleton<ISchemaProvider, YamlSchemaProvider>();
+
             }
             else
             {
