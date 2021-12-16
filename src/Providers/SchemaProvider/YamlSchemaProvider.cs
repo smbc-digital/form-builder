@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Models;
+using Newtonsoft.Json;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace form_builder.Providers.SchemaProvider
 {
@@ -12,22 +13,32 @@ namespace form_builder.Providers.SchemaProvider
     {
         public T Get<T>(string schemaName)
         {
-            var baseForm = System.IO.File.ReadAllText($@".\DSL\Yaml\{schemaName}.yml");
+            var baseForm = File.ReadAllText($@".\DSL\Yaml\{schemaName}.yml");
 
-            var deserializer = new DeserializerBuilder().Build();
+            var jsonObject = YmlToJson(baseForm);
 
-            return deserializer.Deserialize<T>(baseForm);
+            return JsonConvert.DeserializeObject<T>(jsonObject);
         }
 
         public FormSchema Get(string schemaName) => Get<FormSchema>(schemaName);
 
         async Task<T> ISchemaProvider.Get<T>(string schemaName)
         {
-            var baseForm = System.IO.File.ReadAllText($@".\DSL\Yaml\{schemaName}.yml");
+            var baseForm = File.ReadAllText($@".\DSL\Yaml\{schemaName}.yml");
 
-            var deserializer = new DeserializerBuilder().Build();
+            var jsonObject = YmlToJson(baseForm);
 
-            return await Task.FromResult(deserializer.Deserialize<T>(baseForm));
+            return await Task.FromResult(JsonConvert.DeserializeObject<T>(jsonObject));
+        }
+
+        private string YmlToJson(string baseForm)
+        {
+            var yamlObject = new Deserializer().Deserialize(new StringReader(baseForm));
+            
+            JsonSerializer js = new();
+            StringWriter jsonObject = new();
+            js.Serialize(jsonObject, yamlObject);
+            return jsonObject.ToString();
         }
 
         public Task<List<string>> IndexSchema() => Task.FromResult(System.IO.Directory.GetFiles($@".\DSL\Yaml").ToList());
