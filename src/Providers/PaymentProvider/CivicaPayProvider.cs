@@ -58,7 +58,13 @@ namespace form_builder.Providers.PaymentProvider
                             CallingAppTranReference = reference,
                             ServicePayItemDesc = paymentInformation.Settings.Description
                         },
-                        AddressDetails = new AddressDetail()
+                        AddressDetails = new AddressDetail
+                        {
+                            HouseNo = "1",
+                            Street = "test street",
+                            Town = "test town",
+                            Postcode = "sk1 4dy"
+                        }
                     }
                 }
             };

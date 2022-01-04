@@ -3,14 +3,15 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:60864/",
-      "sslPort": 44329
+      "applicationUrl": "http://localhost:60865/",
+      "sslPort": 44328
     }
   },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
+      "launchUrl": "order-a-recycling-bin",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }
