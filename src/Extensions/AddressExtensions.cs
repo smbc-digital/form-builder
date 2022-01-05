@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
 
 namespace form_builder.Extensions
 {
@@ -24,6 +25,21 @@ namespace form_builder.Extensions
 
             result += splitAddress[splitAddress.Length - 1].ToUpper();
             return result;
+        }
+
+        public static AddressDetail ConvertStringToObject(this string address)
+        {
+            var addressDetails = address.Split(',');
+
+            return new AddressDetail()
+            {
+                HouseNo = addressDetails[0].Split(' ')[0].Trim(),
+                Street = $"{addressDetails[0].Split(' ')[1].Trim()} {addressDetails[0].Split(' ')[2].Trim()}",
+                Area = addressDetails[1].Trim(),
+                Town = addressDetails[2].Trim(),
+                County = addressDetails[3].Trim(),
+                Postcode = addressDetails[4].Trim(),
+            };
         }
     }
 }

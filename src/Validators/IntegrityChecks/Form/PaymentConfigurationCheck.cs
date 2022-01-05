@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -97,6 +98,27 @@ namespace form_builder.Validators.IntegrityChecks.Form
             {
                 result.AddFailureMessage("PaymentConfiguration::If ServicePayNarrative is used, ServicePayReference cannot be empty");
                 return result;
+            }
+
+            if (schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Address)) &&
+                string.IsNullOrEmpty(formPaymentInformation.Settings.AddressReference)))
+            {
+                result.AddFailureMessage("PaymentConfiguration::AddressReference must be provided");
+                return result;
+            }
+
+            if (!string.IsNullOrEmpty(formPaymentInformation.Settings.AddressReference))
+            {
+                var questionId = formPaymentInformation.Settings.AddressReference
+                                .Replace("{{QUESTION:", String.Empty)
+                                .Replace("}}", String.Empty);
+
+                if (!schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Address) &&
+                element.Properties.QuestionId.Equals(questionId))))
+                {
+                    result.AddFailureMessage("PaymentConfiguration::AddressReference QuestionId must be provided on Address element");
+                    return result;
+                }
             }
 
             return result;
