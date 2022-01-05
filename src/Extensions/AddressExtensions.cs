@@ -39,7 +39,7 @@ namespace form_builder.Extensions
                 Area = addressDetails[1].Trim(),
                 Town = addressDetails[2].Trim(),
                 County = addressDetails[3].Trim(),
-                Postcode = addressDetails[4].Trim(),
+                Postcode = addressDetails[4].Trim()
             };
         }
 
