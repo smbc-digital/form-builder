@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Enum;
+using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Providers.PaymentProvider;
 using form_builder.Providers.Transforms.PaymentConfiguration;
@@ -107,19 +108,13 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
             }
 
-            if (!string.IsNullOrEmpty(formPaymentInformation.Settings.AddressReference))
-            {
-                var questionId = formPaymentInformation.Settings.AddressReference
-                                .Replace("{{QUESTION:", String.Empty)
-                                .Replace("}}", String.Empty);
-
-                if (!schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Address) &&
-                element.Properties.QuestionId.Equals(questionId))))
-                {
-                    result.AddFailureMessage("PaymentConfiguration::AddressReference QuestionId must be provided on Address element");
-                    return result;
-                }
-            }
+           if (!string.IsNullOrEmpty(formPaymentInformation.Settings.AddressReference) &&
+                !schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Address) &&
+                element.Properties.QuestionId.Equals(formPaymentInformation.Settings.AddressReference.RemoveTagParsingFromQuestionId()))))
+           {
+               result.AddFailureMessage("PaymentConfiguration::AddressReference QuestionId must be provided on Address element");
+               return result;
+           }
 
             return result;
         }

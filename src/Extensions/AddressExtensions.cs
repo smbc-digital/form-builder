@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
 
@@ -41,5 +42,8 @@ namespace form_builder.Extensions
                 Postcode = addressDetails[4].Trim(),
             };
         }
+
+        public static string RemoveTagParsingFromQuestionId(this string questionId) =>
+             questionId.Replace("{{QUESTION:", String.Empty).Replace("}}", String.Empty);   
     }
 }
