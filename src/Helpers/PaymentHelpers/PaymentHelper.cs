@@ -51,8 +51,7 @@ namespace form_builder.Helpers.PaymentHelpers
                 throw new Exception($"PayService:: No payment information found for {form}");
 
             if (!string.IsNullOrEmpty(formPaymentConfig.Settings.AddressReference))
-                formPaymentConfig.Settings.AddressReference = formPaymentConfig.Settings.AddressReference
-                    .Insert(formPaymentConfig.Settings.AddressReference.Length -2, AddressConstants.DESCRIPTION_SUFFIX);
+                formPaymentConfig.Settings.AddressReference = formPaymentConfig.Settings.AddressReference.Insert(formPaymentConfig.Settings.AddressReference.Length -2, AddressConstants.DESCRIPTION_SUFFIX);
 
             if (string.IsNullOrEmpty(formPaymentConfig.Settings.Amount))
                 formPaymentConfig.Settings.Amount = await GetPaymentAmountAsync(mappingEntity, formPaymentConfig);
