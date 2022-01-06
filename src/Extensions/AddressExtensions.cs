@@ -43,7 +43,12 @@ namespace form_builder.Extensions
             };
         }
 
-        public static string RemoveTagParsingFromQuestionId(this string questionId) =>
-             questionId.Replace("{{QUESTION:", String.Empty).Replace("}}", String.Empty);   
+        public static string RemoveTagParsingFromQuestionId(this string questionId)
+        {
+            if (string.IsNullOrEmpty(questionId))
+                return string.Empty;
+
+             return questionId.Replace("{{QUESTION:", String.Empty).Replace("}}", String.Empty);   
+        }
     }
 }

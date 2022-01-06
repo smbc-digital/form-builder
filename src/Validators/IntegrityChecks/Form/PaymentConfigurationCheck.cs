@@ -101,14 +101,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 return result;
             }
 
-            if (schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Address)) &&
-                string.IsNullOrEmpty(formPaymentInformation.Settings.AddressReference)))
-            {
-                result.AddFailureMessage("PaymentConfiguration::AddressReference must be provided");
-                return result;
-            }
-
-           if (!string.IsNullOrEmpty(formPaymentInformation.Settings.AddressReference) &&
+            if (!string.IsNullOrEmpty(formPaymentInformation.Settings.AddressReference) &&
                 !schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Address) &&
                 element.Properties.QuestionId.Equals(formPaymentInformation.Settings.AddressReference.RemoveTagParsingFromQuestionId()))))
            {
