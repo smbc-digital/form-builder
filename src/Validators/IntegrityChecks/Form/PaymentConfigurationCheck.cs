@@ -105,7 +105,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 !schema.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Address) &&
                 element.Properties.QuestionId.Equals(formPaymentInformation.Settings.AddressReference.RemoveTagParsingFromQuestionId()))))
            {
-               result.AddFailureMessage("PaymentConfiguration::AddressReference QuestionId must be provided on Address element");
+               result.AddFailureMessage("PaymentConfiguration::AddressReference QuestionId on Address element must match with AddressReference in payment-config");
                return result;
            }
 
