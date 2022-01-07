@@ -30,17 +30,26 @@ namespace form_builder.Extensions
 
         public static AddressDetail ConvertStringToObject(this string address)
         {
-            var addressDetails = address.Split(',');
-
-            return new AddressDetail()
+            var addressFields = address.Split(',');
+            var isHouseNumber = int.TryParse(addressFields[0].Split(' ')[0], out _);
+            var addressDetails = new AddressDetail
             {
-                HouseNo = addressDetails[0].Split(' ')[0].Trim(),
-                Street = $"{addressDetails[0].Split(' ')[1].Trim()} {addressDetails[0].Split(' ')[2].Trim()}",
-                Area = addressDetails[1].Trim(),
-                Town = addressDetails[2].Trim(),
-                County = addressDetails[3].Trim(),
-                Postcode = addressDetails[4].Trim()
+                Town = addressFields[^2].Trim(),
+                Postcode = addressFields[^1].Trim()
             };
+
+            if (isHouseNumber)
+            {
+                addressDetails.HouseNo = addressFields[0].Split(' ')[0].Trim();
+                addressDetails.Street = $"{addressFields[0].Split(' ')[1].Trim()} {addressFields[0].Split(' ')[2].Trim()}";
+            }
+            else
+            {
+                addressDetails.Street = addressFields[0].Trim();
+
+            }
+
+            return addressDetails;
         }
 
         public static string RemoveTagParsingFromQuestionId(this string questionId)
@@ -48,7 +57,7 @@ namespace form_builder.Extensions
             if (string.IsNullOrEmpty(questionId))
                 return string.Empty;
 
-             return questionId.Replace("{{QUESTION:", String.Empty).Replace("}}", String.Empty);   
+            return questionId.Replace("{{QUESTION:", String.Empty).Replace("}}", String.Empty);   
         }
     }
 }

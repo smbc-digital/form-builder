@@ -7,6 +7,7 @@ namespace form_builder.Configuration
         public string[] FormName { get; set; }
         public string PaymentProvider { get; set; }
         public Settings Settings { get; set; }
+
         public bool IsServicePay() => !string.IsNullOrEmpty(Settings.ServicePayReference);
     }
 
