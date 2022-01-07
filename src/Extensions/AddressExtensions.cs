@@ -41,7 +41,7 @@ namespace form_builder.Extensions
             if (isHouseNumber)
             {
                 addressDetails.HouseNo = addressFields[0].Split(' ')[0].Trim();
-                addressDetails.Street = $"{addressFields[0].Split(' ')[1].Trim()} {addressFields[0].Split(' ')[2].Trim()}";
+                addressDetails.Street = string.Join(" ", addressFields[0].Split(' ')[1..]);
             }
             else
             {
