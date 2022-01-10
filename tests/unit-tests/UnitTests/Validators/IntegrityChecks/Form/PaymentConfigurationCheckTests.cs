@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Assert
             Assert.False(result.IsValid);
-            
+            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
         [Fact]
