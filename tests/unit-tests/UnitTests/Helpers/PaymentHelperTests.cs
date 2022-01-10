@@ -39,7 +39,8 @@ namespace form_builder_tests.UnitTests.Helpers
                         PaymentProvider = "testPaymentProvider",
                         Settings = new Settings
                         {
-                            Amount = "12.65"
+                            Amount = "12.65",
+                            AddressReference = "{{addressReference}}"
                         }
                     },
                     new()
@@ -197,5 +198,16 @@ namespace form_builder_tests.UnitTests.Helpers
             // Assert
             Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
         }
+
+        [Fact]
+        public async Task GetFormPaymentInformation_ShouldAddSuffixToAddress()
+        {
+            // Act
+            var result = await _paymentHelper.GetFormPaymentInformation("testForm");
+
+            // Assert
+            Assert.Equal("{{addressReference-address-description}}", result.Settings.AddressReference);
+        }
     }
 }
+
