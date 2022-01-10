@@ -64,9 +64,7 @@ namespace form_builder.Providers.PaymentProvider
                         {
                             HouseNo = address.HouseNo,
                             Street = address.Street,
-                            Area = address.Area,
                             Town = address.Town,
-                            County = address.County,
                             Postcode = address.Postcode
                         }
                     }

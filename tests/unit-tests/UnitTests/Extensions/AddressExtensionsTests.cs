@@ -16,38 +16,38 @@ namespace form_builder_tests.UnitTests.Extensions
             Assert.Equal(expectedResult, result);
         }
 
-        [Theory]
-        [InlineData("{{QUESTION:addressReference}}", "addressReference")]
-        [InlineData("{{QUESTION:addressFromQuestionId}}", "addressFromQuestionId")]
-        public void RemoveTagParsing_Should_RemoveBrackets_FromQuestionId(string address, string expectedResult)
+        [Fact]
+        public void RemoveTagParsing_Should_RemoveBrackets_FromQuestionId()
         {
+            var address = "{{QUESTION:addressReference}}";
             var result = address.RemoveTagParsingFromQuestionId();
 
-            Assert.Equal(expectedResult, result);
+            Assert.Equal("addressReference", result);
         }
 
-        [Theory]
+        [Fact]
         [InlineData("1 London Road, Manchester, M12 4DR")]
-        public void ConvertStringToObject_Should_ReturnHouseNo_IfBeginsWithNumber(string address)
+        public void ConvertStringToObject_Should_ReturnHouseNo_IfBeginsWithNumber()
         {
+            var address = "1 London Road, Manchester, M12 4DR";
             var result = address.ConvertStringToObject();
 
-            Assert.Equal(result.HouseNo, "1");
-            Assert.Equal(result.Street, "London Road");
-            Assert.Equal(result.Town, "Manchester");
-            Assert.Equal(result.Postcode, "M12 4DR");
+            Assert.Equal("1", result.HouseNo);
+            Assert.Equal("London Road", result.Street);
+            Assert.Equal("Manchester", result.Town);
+            Assert.Equal("M12 4DR", result.Postcode);
         }
 
-        [Theory]
-        [InlineData("Flat 10 Boddingtons London Road, Manchester, M12 4DR")]
-        public void ConvertStringToObject_Should_ReturnStreet_IfBeginsWithWord(string address)
+        [Fact]
+        public void ConvertStringToObject_Should_ReturnStreet_IfBeginsWithWord()
         {
+            var address = "Flat 10 Boddingtons London Road, Manchester, M12 4DR";
             var result = address.ConvertStringToObject();
 
-            Assert.Equal(result.Street, "Flat 10 Boddingtons London Road");
-            Assert.Equal(result.Town, "Manchester");
-            Assert.Equal(result.Postcode, "M12 4DR");
-            Assert.True(result.HouseNo is null);
+            Assert.Equal("Flat 10 Boddingtons London Road", result.Street);
+            Assert.Equal("Manchester", result.Town);
+            Assert.Equal("M12 4DR", result.Postcode);
+            Assert.Null(result.HouseNo);
         }
     }
 }

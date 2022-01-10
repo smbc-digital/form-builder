@@ -46,7 +46,6 @@ namespace form_builder.Extensions
             else
             {
                 addressDetails.Street = addressFields[0].Trim();
-
             }
 
             return addressDetails;
