@@ -14,6 +14,7 @@ namespace form_builder.Configuration
     public class Settings
     {
         public string AccountReference { get; set; }
+        public string AddressReference { get; set; }
         public string ServicePayReference { get; set; }
         public string ServicePayNarrative { get; set; }
         public string Amount { get; set; }

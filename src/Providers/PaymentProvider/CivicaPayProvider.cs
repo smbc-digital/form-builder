@@ -36,6 +36,8 @@ namespace form_builder.Providers.PaymentProvider
             if (string.IsNullOrEmpty(reference))
                 throw new PaymentFailureException("CivicaPayProvider::No valid reference");
 
+            var address = !string.IsNullOrEmpty(paymentInformation.Settings.AddressReference) ? paymentInformation.Settings.AddressReference.ConvertStringToObject() : new AddressDetail();
+
             CreateImmediateBasketRequest basket = new()
             {
                 CallingAppIdentifier = "Basket",
@@ -58,7 +60,13 @@ namespace form_builder.Providers.PaymentProvider
                             CallingAppTranReference = reference,
                             ServicePayItemDesc = paymentInformation.Settings.Description
                         },
-                        AddressDetails = new AddressDetail()
+                        AddressDetails = new AddressDetail
+                        {
+                            HouseNo = address.HouseNo,
+                            Street = address.Street,
+                            Town = address.Town,
+                            Postcode = address.Postcode
+                        }
                     }
                 }
             };
