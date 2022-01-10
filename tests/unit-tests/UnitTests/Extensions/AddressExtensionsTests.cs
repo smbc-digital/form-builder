@@ -26,7 +26,6 @@ namespace form_builder_tests.UnitTests.Extensions
         }
 
         [Fact]
-        [InlineData("1 London Road, Manchester, M12 4DR")]
         public void ConvertStringToObject_Should_ReturnHouseNo_IfBeginsWithNumber()
         {
             var address = "1 London Road, Manchester, M12 4DR";
