@@ -41,7 +41,7 @@ namespace form_builder_tests.UnitTests.Validators
             ValidationResult result = _isDateAfterAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
             // Assert
-            Assert.True(result.IsValid);            
+            Assert.True(result.IsValid);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-date", "01/01/2021");
-            
+
             // Act
             ValidationResult result = _isDateAfterAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
@@ -106,7 +106,7 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
         }
 
-                [Fact]
+        [Fact]
         public void Validate_ShouldReturnNotValidWhenDatePickerIsOnBoundaryCondition()
         {
             // Arrange
@@ -125,7 +125,7 @@ namespace form_builder_tests.UnitTests.Validators
             // Assert
             Assert.False(result.IsValid);
         }
-        
+
         [Fact]
         public void Validate_ShouldReturnNotValidWhenDateInputIsNotValid()
         {
@@ -161,7 +161,7 @@ namespace form_builder_tests.UnitTests.Validators
             viewModel.Add("test-date", "01/01/2020");
 
             // Act/Asset
-            Assert.Throws<FormatException>(()=> _isDateAfterAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema()));
+            Assert.Throws<FormatException>(() => _isDateAfterAbsoluteValidator.Validate(element, viewModel, new form_builder.Models.FormSchema()));
         }
     }
 }

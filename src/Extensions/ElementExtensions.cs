@@ -38,7 +38,7 @@ namespace form_builder.Extensions
                     _.Properties.Options.Any(_ => !string.IsNullOrEmpty(_.ConditionalElementId) && _.ConditionalElementId.Equals(element.QuestionId)));
 
                 var matchingOption = matchingElement?.Properties.Options.FirstOrDefault(_ => !string.IsNullOrEmpty(_.ConditionalElementId) && _.ConditionalElementId.Equals(element.QuestionId));
-            
+
                 if (matchingOption is null)
                 {
                     if (listOfElements.Contains(element))

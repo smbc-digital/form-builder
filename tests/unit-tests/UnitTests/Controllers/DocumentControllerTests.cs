@@ -14,8 +14,8 @@ namespace form_builder_tests.UnitTests.Controllers
     public class DocumentControllerTests
     {
         private readonly DocumentController _controller;
-        private readonly Mock<ILogger<DocumentController>> _mockLogger = new ();
-        private readonly Mock<IDocumentWorkflow> _mockDocumentWorkflow = new ();
+        private readonly Mock<ILogger<DocumentController>> _mockLogger = new();
+        private readonly Mock<IDocumentWorkflow> _mockDocumentWorkflow = new();
 
         public DocumentControllerTests()
         {

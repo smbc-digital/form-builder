@@ -26,9 +26,9 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         public DynamicLookupPageTransformFactoryTests()
         {
             _fakeLookupProvider.Setup(_ => _.ProviderName).Returns("fake");
-            
+
             _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<Option> {new Option()});
+                .ReturnsAsync(new List<Option> { new Option() });
 
             _mockLookupProviders = new List<ILookupProvider>
             {
@@ -38,10 +38,10 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             _mockActionHelper
                 .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new RequestEntity
-                    {
-                        IsPost = false,
-                        Url = "waste=waste"
-                    });
+                {
+                    IsPost = false,
+                    Url = "waste=waste"
+                });
             _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
             _dynamicLookupPageTransformFactory = new DynamicLookupPageTransformFactory(_mockActionHelper.Object,

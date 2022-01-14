@@ -83,6 +83,9 @@ namespace form_builder.Mappers
                     if (element.Properties.Decimal)
                         return GetDecimalElementValue(key, formAnswers);
 
+                    if (element.Properties.Decimal)
+                        return GetDecimalElementValue(key, formAnswers);
+
                     var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                        .Where(_ => _.QuestionId.Equals(key))
                        .ToList()

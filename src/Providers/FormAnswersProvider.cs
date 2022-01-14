@@ -23,7 +23,7 @@ namespace form_builder.Providers
             string cachedAnswers = _distributedCache.GetString(sessionGuid);
             return cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
-                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);    
+                : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
         }
     }
 }

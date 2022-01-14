@@ -231,7 +231,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -277,7 +277,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -299,7 +299,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -314,7 +314,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError });
 
             // Act
-            await Assert.ThrowsAsync<PaymentDeclinedException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            await Assert.ThrowsAsync<PaymentDeclinedException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
 
             // Assert
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
@@ -328,7 +328,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -343,7 +343,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.InternalServerError });
 
             // Act
-            await Assert.ThrowsAsync<PaymentFailureException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            await Assert.ThrowsAsync<PaymentFailureException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
 
             // Assert
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
@@ -358,7 +358,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -375,7 +375,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<PostPaymentUpdateRequest>()), Times.Once);
         }
-        
+
         [Fact]
         public async Task ProcessPaymentResponse_ShouldNotLog_Error_If_CallbackIsSuccessfull_OnFailure()
         {
@@ -384,7 +384,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -396,7 +396,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new PaymentFailureException("error"));
 
             // Act
-            await Assert.ThrowsAsync<PaymentFailureException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            await Assert.ThrowsAsync<PaymentFailureException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
 
             // Assert
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
@@ -411,7 +411,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -423,7 +423,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new PaymentDeclinedException("error"));
 
             // Act
-            await Assert.ThrowsAsync<PaymentDeclinedException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            await Assert.ThrowsAsync<PaymentDeclinedException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
 
             // Assert
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
@@ -439,7 +439,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -466,7 +466,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -481,7 +481,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new PaymentFailureException("error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<PaymentFailureException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            await Assert.ThrowsAsync<PaymentFailureException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<PostPaymentUpdateRequest>()), Times.Once);
         }
@@ -494,7 +494,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -509,7 +509,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new PaymentDeclinedException("error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<PaymentDeclinedException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", "reference"));
+            await Assert.ThrowsAsync<PaymentDeclinedException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<PostPaymentUpdateRequest>()), Times.Once);
         }
@@ -524,7 +524,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -539,7 +539,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new PaymentDeclinedException("error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<PaymentDeclinedException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", reference));
+            await Assert.ThrowsAsync<PaymentDeclinedException>(() => _service.ProcessPaymentResponse("testForm", "12345", reference));
             Assert.Equal(reference, callbackModel.Reference);
             Assert.Equal(EPaymentStatus.Declined, callbackModel.PaymentStatus);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
@@ -555,7 +555,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"
@@ -570,7 +570,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new PaymentFailureException("error"));
 
             // Act & Assert
-            await Assert.ThrowsAsync<PaymentFailureException>(() =>  _service.ProcessPaymentResponse("testForm", "12345", reference));
+            await Assert.ThrowsAsync<PaymentFailureException>(() => _service.ProcessPaymentResponse("testForm", "12345", reference));
             Assert.Equal(reference, callbackModel.Reference);
             Assert.Equal(EPaymentStatus.Failure, callbackModel.PaymentStatus);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
@@ -586,7 +586,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
                 .ReturnsAsync(new PaymentInformation
                 {
-                    PaymentProvider = "testPaymentProvider", 
+                    PaymentProvider = "testPaymentProvider",
                     Settings = new Settings
                     {
                         Amount = "10"

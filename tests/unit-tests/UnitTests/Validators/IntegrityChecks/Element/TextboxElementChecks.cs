@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
 
             // Act & Assert
             var result = _integrityCheck.Validate(element);
-            
+
             Assert.True(result.IsValid);
         }
 
@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
 
             // Act & Assert
             var result = _integrityCheck.Validate(element);
-            
+
             Assert.True(result.IsValid);
         }
 
@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
 
             // Act & Assert
             var result = _integrityCheck.Validate(element);
-            
+
             Assert.False(result.IsValid);
         }
     }

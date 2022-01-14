@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
-using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Extensions;
 using form_builder.Helpers.PageHelpers;
@@ -42,7 +40,7 @@ namespace form_builder.Services.PayService
             IMappingService mappingService,
             IWebHostEnvironment hostingEnvironment,
             IPageHelper pageHelper,
-            IPaymentHelper paymentHelper, 
+            IPaymentHelper paymentHelper,
             IEnumerable<ITagParser> tagParsers)
         {
             _gateway = gateway;
@@ -72,7 +70,7 @@ namespace form_builder.Services.PayService
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
-                throw new Exception($"PayService:: No mapping entity found for {form}");
+                throw new Exception($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)} No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form);
@@ -81,7 +79,7 @@ namespace form_builder.Services.PayService
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             if (string.IsNullOrWhiteSpace(postUrl.CallbackUrl))
-                throw new ArgumentException("PayService::ProcessPaymentResponse, Callback url has not been specified");
+                throw new ArgumentException($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, Callback url has not been specified");
 
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             try
@@ -92,43 +90,52 @@ namespace form_builder.Services.PayService
             catch (PaymentDeclinedException)
             {
                 await HandleCallback(EPaymentStatus.Declined, reference, postUrl.CallbackUrl);
-                throw new PaymentDeclinedException("PayService::ProcessPaymentResponse, PaymentProvider declined payment");
+                throw new PaymentDeclinedException(
+                    $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
+                    $"{paymentProvider.ProviderName} {EPaymentStatus.Declined} payment");
             }
             catch (PaymentFailureException)
             {
                 await HandleCallback(EPaymentStatus.Failure, reference, postUrl.CallbackUrl);
-                throw new PaymentFailureException("PayService::ProcessPaymentResponse, PaymentProvider failed payment");
+                throw new PaymentFailureException(
+                    $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
+                    $"{paymentProvider.ProviderName} {EPaymentStatus.Failure} payment");
             }
 
-             _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
+            _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
             return reference;
         }
 
         private async Task HandleCallback(EPaymentStatus paymentStatus, string reference, string callbackUrl)
         {
-            try {
-                var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest{ Reference = reference, PaymentStatus = paymentStatus });
-
-                LogErrorIfCallbackFails(result, reference, EPaymentCallbackStatus.Failure);
-            } catch(Exception e){
-                _logger.LogError($"PayService::HandleCallback, Payment callback to url {callbackUrl} failed. Payment status was {paymentStatus}, failed with Exception: {e.Message}, Payment reference {reference}");
+            try
+            {
+                var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });
+                if (!result.IsSuccessStatusCode)
+                    _logger.LogError(
+                        $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
+                        $"Payment callback for {paymentStatus} failed with statuscode: {result.StatusCode}, " +
+                        $"Payment reference {reference}, Response: {JsonConvert.SerializeObject(result)}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(
+                    $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
+                    $"Payment callback to url {callbackUrl} failed. " +
+                    $"Payment status was {paymentStatus}, " +
+                    $"failed with Exception: {e.Message}, Payment reference {reference}");
             }
         }
 
         private IPaymentProvider GetFormPaymentProvider(PaymentInformation paymentInfo)
         {
             var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName.Equals(paymentInfo.PaymentProvider));
-
             if (paymentProvider is null)
-                throw new Exception($"PayService::GetFormPaymentProvider, No payment provider configured for {paymentInfo.PaymentProvider}");
+                throw new Exception(
+                    $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
+                    $"No payment provider configured for {paymentInfo.PaymentProvider}");
 
             return paymentProvider;
-        }
-
-        private void LogErrorIfCallbackFails(HttpResponseMessage callbackResponse, string reference, EPaymentCallbackStatus callbackType) 
-        {
-            if(!callbackResponse.IsSuccessStatusCode)
-                _logger.LogError($"PayService::ProcessPaymentResponse, Payment callback for {callbackType} failed with statuscode: {callbackResponse.StatusCode}, Payment reference {reference}, Response: {JsonConvert.SerializeObject(callbackResponse)}");
         }
     }
 }

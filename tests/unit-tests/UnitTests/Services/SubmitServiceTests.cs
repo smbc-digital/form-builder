@@ -20,7 +20,6 @@ using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
@@ -65,10 +64,11 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockSchemaFactory
                 .Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(new FormSchema {
+                .ReturnsAsync(new FormSchema
+                {
                     GenerateReferenceNumber = false
                 });
-        
+
             _mockReferenceNumberProvider
                 .Setup(_ => _.GetReference(It.IsAny<string>(), It.IsAny<int>()))
                 .Returns("TEST123456");
@@ -86,13 +86,13 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             _service = new SubmitService(
-                _mockGateway.Object, 
-                _mockPageHelper.Object, 
-                _mockEnvironment.Object, 
-                _mockIOptions.Object, 
-                _mockDistributedCache.Object, 
-                _mockSchemaFactory.Object, 
-                _mockReferenceNumberProvider.Object, 
+                _mockGateway.Object,
+                _mockPageHelper.Object,
+                _mockEnvironment.Object,
+                _mockIOptions.Object,
+                _mockDistributedCache.Object,
+                _mockSchemaFactory.Object,
+                _mockReferenceNumberProvider.Object,
                 _submitProviders,
                 _mockPaymentHelper.Object,
                 _mockPostSubmissionAction.Object,
@@ -263,7 +263,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task PreProcessSubmission_ShouldCallGateway_CreateReferenceAndSave()
         {
             // Arrange
-            var schema = new FormSchemaBuilder()            
+            var schema = new FormSchemaBuilder()
                 .WithGeneratedReference("CaseReference", "TEST")
                 .Build();
 
@@ -314,7 +314,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var callbackValue = new ExpandoObject() as IDictionary<string, object>;
 
-            var schema = new FormSchemaBuilder()            
+            var schema = new FormSchemaBuilder()
                 .WithGeneratedReference("CaseReference", "TEST")
                 .Build();
 
@@ -324,7 +324,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textarea)
                 .Build();
 
-            var submitSlug = new SubmitSlug{ AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
             var formData = new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithSubmitSlug(submitSlug)
@@ -352,12 +352,14 @@ namespace form_builder_tests.UnitTests.Services
                 })
                 .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
 
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers {    
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
+            {
                 CaseReference = "TEST123456",
                 AdditionalFormData = new Dictionary<string, object>()
                 {
                     { "CaseReference", "TEST123456" }
-                }});
+                }
+            });
 
             _mockDistributedCache
                 .Setup(_ => _.GetString(It.IsAny<string>())).Returns(json);
@@ -402,7 +404,8 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockSubmitProvider
                 .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
-                .ReturnsAsync(new HttpResponseMessage {
+                .ReturnsAsync(new HttpResponseMessage
+                {
                     StatusCode = HttpStatusCode.InternalServerError
                 });
 

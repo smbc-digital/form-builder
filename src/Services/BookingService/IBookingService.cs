@@ -28,7 +28,7 @@ namespace form_builder.Services.BookingService
 
         Task<CancelledAppointmentInformation> ValidateCancellationRequest(
             string formName,
-            Guid bookingGuid, 
+            Guid bookingGuid,
             string hash);
 
         Task Cancel(

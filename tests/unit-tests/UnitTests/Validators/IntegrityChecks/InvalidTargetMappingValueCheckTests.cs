@@ -25,7 +25,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act
             InvalidTargetMappingValueCheck check = new();
             var result = check.Validate(element);
-            
+
             // Assert
             Assert.False(result.IsValid);
             Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
@@ -46,7 +46,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
             // Act
             InvalidTargetMappingValueCheck check = new();
             var result = check.Validate(element);
-            
+
             // Assert
             Assert.True(result.IsValid);
             Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);

@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Act
             var result = await check.ValidateAsync(schema);
-            
+
             // Assert
             Assert.False(result.IsValid);
         }
@@ -107,9 +107,9 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation { 
-                        FormName = new[] {"test-name"}, 
-                        PaymentProvider = "testProvider", 
+                    new PaymentInformation {
+                        FormName = new[] {"test-name"},
+                        PaymentProvider = "testProvider",
                         Settings = new Settings
                         {
                             Amount = "10",
@@ -214,7 +214,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Act
             var result = await check.ValidateAsync(schema);
-            
+
             // Assert
             Assert.True(result.IsValid);
         }
@@ -229,8 +229,8 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 {
                     new PaymentInformation
                     {
-                        FormName = new[] {"test-name"}, 
-                        PaymentProvider = "testProvider", 
+                        FormName = new[] {"test-name"},
+                        PaymentProvider = "testProvider",
                         Settings = new Settings
                         {
                             CalculationSlug = new SubmitSlug
@@ -263,7 +263,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Act
             var result = await check.ValidateAsync(schema);
-            
+
             // Assert
             Assert.True(result.IsValid);
         }
@@ -276,10 +276,10 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .Setup(_ => _.Get<List<PaymentInformation>>())
                 .ReturnsAsync(new List<PaymentInformation>
                 {
-                    new PaymentInformation 
-                    { 
-                        FormName = new[] {"test-name"}, 
-                        PaymentProvider = "testProvider", 
+                    new PaymentInformation
+                    {
+                        FormName = new[] {"test-name"},
+                        PaymentProvider = "testProvider",
                         Settings = new Settings
                         {
                             CalculationSlug = new SubmitSlug
@@ -312,7 +312,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Act
             var result = await check.ValidateAsync(schema);
-            
+
             // Assert
             Assert.True(result.IsValid);
         }
@@ -327,7 +327,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 {
                     new PaymentInformation
                     {
-                        FormName = new[] {"test-name"}, 
+                        FormName = new[] {"test-name"},
                         PaymentProvider = "testProvider",
                         Settings = new Settings
                         {
@@ -362,7 +362,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
 
             // Act
             var result = await check.ValidateAsync(schema);
-            
+
             // Assert
             Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
             Assert.False(result.IsValid);
@@ -391,16 +391,117 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .WithPage(page)
                 .WithName("test-form-with-incorrect-provider")
                 .WithBaseUrl("test-form-with-incorrect-provider")
-                .Build();     
+                .Build();
 
             var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
 
             // Act
             var result = await check.ValidateAsync(schema);
-            
+
             // Assert
             Assert.False(result.IsValid);
             Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+        }
+        [Fact]
+        public async Task PaymentConfigurationCheck_IsInValid_WhenQuestionIdNotFound_InForm_ForAddressReference()
+        {
+            // Arrange
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation
+                    {
+                        FormName = new[] {"test-name"},
+                        PaymentProvider = "testProvider",
+                        Settings = new Settings
+                        {
+                            Amount = "10",
+                            AddressReference = "addressReference"
+                        }
+                    }
+                });
+
+            _mockHostingEnv.Setup(_ => _.EnvironmentName)
+                .Returns("non-local");
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var addressElement = new AddressBuilder()
+                .WithQuestionId("test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithElement(addressElement)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithName("test-name")
+                .WithBaseUrl("test-name")
+                .Build();
+
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
+
+            // Act
+            var result = await check.ValidateAsync(schema);
+
+            // Assert
+            Assert.Collection<string>(result.Messages, message => Assert.Contains("PaymentConfiguration::AddressReference QuestionId on Address element must match with AddressReference in payment-config", message));
+        }
+
+        [Fact]
+        public async Task PaymentConfigurationCheck_IsValid_ForAddressReference_When_QuestionIdMatches()
+        {
+            // Arrange
+            _mockPaymentConfigProvider
+                .Setup(_ => _.Get<List<PaymentInformation>>())
+                .ReturnsAsync(new List<PaymentInformation>
+                {
+                    new PaymentInformation
+                    {
+                        FormName = new[] {"test-name"},
+                        PaymentProvider = "testProvider",
+                        Settings = new Settings
+                        {
+                            Amount = "10",
+                            AddressReference = "addressReference"
+                        }
+                    }
+                });
+
+            _mockHostingEnv.Setup(_ => _.EnvironmentName)
+                .Returns("non-local");
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndPay)
+                .Build();
+
+            var addressElement = new AddressBuilder()
+                .WithQuestionId("addressReference")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithElement(addressElement)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithName("test-name")
+                .WithBaseUrl("test-name")
+                .Build();
+
+            var check = new PaymentConfigurationCheck(_mockHostingEnv.Object, _mockPaymentProviders.Object, _mockPaymentConfigProvider.Object);
+
+            // Act
+            var result = await check.ValidateAsync(schema);
+
+            // Assert
+            Assert.True(result.IsValid);
         }
     }
 }

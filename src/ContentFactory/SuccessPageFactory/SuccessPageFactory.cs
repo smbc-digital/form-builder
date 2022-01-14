@@ -25,10 +25,10 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IWebHostEnvironment _environment;
         private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
-        
+
         public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory,
             ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<PreviewModeConfiguration> previewModeConfiguration, 
+            IOptions<PreviewModeConfiguration> previewModeConfiguration,
             IWebHostEnvironment environment)
         {
             _pageHelper = pageHelper;

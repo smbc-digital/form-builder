@@ -12,8 +12,8 @@ namespace form_builder.Workflows.SubmitWorkflow
         private readonly IMappingService _mappingService;
         private readonly ISessionHelper _sessionHelper;
 
-        public SubmitWorkflow(ISubmitService submitService, 
-            IMappingService mappingService, 
+        public SubmitWorkflow(ISubmitService submitService,
+            IMappingService mappingService,
             ISessionHelper sessionHelper)
         {
             _submitService = submitService;

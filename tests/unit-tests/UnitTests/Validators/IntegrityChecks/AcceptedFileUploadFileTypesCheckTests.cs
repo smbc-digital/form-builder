@@ -55,7 +55,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
         [InlineData(".png", ".pdf")]
         [InlineData(".pdf", ".jpg")]
         [InlineData(".jpg", ".jpge")]
-        [InlineData(".docx",".doc")]
+        [InlineData(".docx", ".doc")]
         [InlineData(".doc", ".png")]
         public void AcceptedFileUploadFileTypesCheck_IsValid_WhenFileTypeAreValid(string mimeType1, string mimeType2)
         {

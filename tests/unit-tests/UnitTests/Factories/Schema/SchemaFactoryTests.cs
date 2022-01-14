@@ -15,7 +15,6 @@ using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Validators.IntegrityChecks;
 using form_builder_tests.Builders;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -26,14 +25,14 @@ namespace form_builder_tests.UnitTests.Factories.Schema
     public class SchemaFactoryTests
     {
         private readonly SchemaFactory _schemaFactory;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new ();
-        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new ();
-        private readonly Mock<ILookupSchemaTransformFactory> _mockLookupSchemaFactory = new ();
-        private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new ();
-        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new ();
-        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new ();
-        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
-        private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new ();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new();
+        private readonly Mock<ILookupSchemaTransformFactory> _mockLookupSchemaFactory = new();
+        private readonly Mock<IReusableElementSchemaTransformFactory> _mockReusableElementSchemaFactory = new();
+        private readonly Mock<IOptions<DistributedCacheConfiguration>> _mockDistributedCacheConfiguration = new();
+        private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationConfiguration = new();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
+        private readonly Mock<IFormSchemaIntegrityValidator> _mockFormSchemaIntegrityValidator = new();
         private readonly Mock<IEnumerable<IUserPageTransformFactory>> _mockUserPageFactories = new();
         private readonly Mock<IUserPageTransformFactory> _mockUserPageFactory = new();
 
@@ -89,9 +88,9 @@ namespace form_builder_tests.UnitTests.Factories.Schema
                 .Setup(_ => _.Validate(It.IsAny<FormSchema>()));
 
             _schemaFactory = new SchemaFactory(
-                _mockDistributedCache.Object, 
-                _mockSchemaProvider.Object, 
-                _mockLookupSchemaFactory.Object, 
+                _mockDistributedCache.Object,
+                _mockSchemaProvider.Object,
+                _mockLookupSchemaFactory.Object,
                 _mockReusableElementSchemaFactory.Object,
                 _mockDistributedCacheConfiguration.Object,
                 _mockDistributedCacheExpirationConfiguration.Object,
@@ -295,7 +294,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+                .Returns(new PreviewModeConfiguration { IsEnabled = true });
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _schemaFactory.Build(PreviewConstants.PREVIEW_MODE_PREFIX));
 
@@ -310,11 +309,11 @@ namespace form_builder_tests.UnitTests.Factories.Schema
         {
             _mockDistributedCache
             .Setup(_ => _.GetString(It.IsAny<string>()))
-                .Returns(JsonConvert.SerializeObject(new FormSchema{ Pages = new List<Page>(), BaseURL = PreviewConstants.PREVIEW_MODE_PREFIX }));
+                .Returns(JsonConvert.SerializeObject(new FormSchema { Pages = new List<Page>(), BaseURL = PreviewConstants.PREVIEW_MODE_PREFIX }));
 
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+                .Returns(new PreviewModeConfiguration { IsEnabled = true });
 
             var result = await _schemaFactory.Build(PreviewConstants.PREVIEW_MODE_PREFIX);
 

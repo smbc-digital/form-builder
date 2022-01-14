@@ -4,7 +4,7 @@ using Xunit;
 namespace form_builder_tests.UnitTests.Configuration
 {
     public class PaymentInformationConfigurationTests
-    { 
+    {
         [Fact]
         public void IsServicePay_ShouldReturnTrue_IfServicePayReferenceIsSet()
         {

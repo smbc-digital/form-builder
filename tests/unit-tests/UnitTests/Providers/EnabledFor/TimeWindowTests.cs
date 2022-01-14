@@ -15,7 +15,7 @@ namespace form_builder_tests.UnitTests.Providers.EnabledFor
         {
             var model = new EnabledForBase
             {
-                Properties = new EnabledForProperties 
+                Properties = new EnabledForProperties
                 {
                     Start = DateTime.Now.AddDays(-1),
                     End = DateTime.Now.AddDays(+1)
@@ -30,13 +30,13 @@ namespace form_builder_tests.UnitTests.Providers.EnabledFor
         {
             var model = new EnabledForBase
             {
-                Properties = new EnabledForProperties 
+                Properties = new EnabledForProperties
                 {
                     Start = DateTime.Now.AddDays(-2),
                     End = DateTime.Now.AddDays(-1)
                 }
             };
-            
+
             Assert.False(_timeWindow.IsAvailable(model));
         }
 
@@ -45,13 +45,13 @@ namespace form_builder_tests.UnitTests.Providers.EnabledFor
         {
             var model = new EnabledForBase
             {
-                Properties = new EnabledForProperties 
+                Properties = new EnabledForProperties
                 {
                     Start = DateTime.Now.AddDays(+1),
                     End = DateTime.Now.AddDays(+2)
                 }
             };
-            
+
             Assert.False(_timeWindow.IsAvailable(model));
         }
     }

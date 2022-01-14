@@ -19,10 +19,20 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     .ForEach(page => page.IncomingValues.ForEach(incomingValue =>
                         {
                             if (incomingValue.HttpActionType.Equals(EHttpActionType.Unknown))
-                                result.AddFailureMessage($"Incoming Form DataValues Check, EHttpActionType cannot be unknown, set to Get or Post for incoming value '{incomingValue.Name}' on page '{page.Title}'.");
+                            {
+                                result.AddFailureMessage(
+                                    "Incoming Form DataValues Check, " +
+                                    "EHttpActionType cannot be unknown, " +
+                                    $"set to Get or Post for incoming value '{incomingValue.Name}' on page '{page.Title}'.");
+                            }
 
-                            if (string.IsNullOrEmpty(incomingValue.QuestionId) || string.IsNullOrEmpty(incomingValue.Name))
-                                result.AddFailureMessage($"Incoming Form DataValues Check, QuestionId or Name cannot be empty on page '{page.Title}'.");
+                            if (string.IsNullOrEmpty(incomingValue.QuestionId) ||
+                                string.IsNullOrEmpty(incomingValue.Name))
+                            {
+                                result.AddFailureMessage(
+                                    "Incoming Form DataValues Check, " +
+                                    $"QuestionId or Name cannot be empty on page '{page.Title}'.");
+                            }
                         }
                     ));
             }

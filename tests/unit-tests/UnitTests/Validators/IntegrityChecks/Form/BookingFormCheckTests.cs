@@ -168,7 +168,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             // Assert
             Assert.True(result.IsValid);
             Assert.Empty(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
-       }
+        }
 
         [Fact]
         public void BookingFormCheck_IsValid_If_FormSchema_Contains_Multiple_BookingElements_But_Same_Provider()
@@ -229,10 +229,10 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         public void BookingFormCheck_Should_Return_Failure_Message_If_FormSchema_Contains_Multiple_BookingProviders()
         {
             // Arrange
-             var customerFirstName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.firstname")
-                .Build();
+            var customerFirstName = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithTargetMapping("customer.firstname")
+               .Build();
 
             var customerLastName = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -339,4 +339,4 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             Assert.Contains(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER, failureMessages.First());
         }
     }
-}     
+}

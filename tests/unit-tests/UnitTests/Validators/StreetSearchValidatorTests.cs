@@ -1,18 +1,20 @@
 ﻿using System.Collections.Generic;
 using form_builder.Builders;
-using form_builder.Enum;
 using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
-    public class StreetSearchValidatorTests {
+    public class StreetSearchValidatorTests
+    {
 
         private readonly StreetSearchValidator _streetSearchValidator = new StreetSearchValidator();
 
         [Fact]
-        public void Validate_ShouldReturnTrue_WhenDoesNotStreetSearch() {
+        public void Validate_ShouldReturnTrue_WhenDoesNotStreetSearch()
+        {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.Street)
@@ -28,7 +30,8 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldValidateStreet_WhenStreetSupplied() {
+        public void Validate_ShouldValidateStreet_WhenStreetSupplied()
+        {
             // Arrange
             var element = new ElementBuilder()
                 .WithQuestionId("teststreet")
@@ -46,7 +49,8 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldNotValidateStreet_WhenInvalidStreetSupplied() { 
+        public void Validate_ShouldNotValidateStreet_WhenInvalidStreetSupplied()
+        {
             // Arrange
             var element = new ElementBuilder()
                 .WithQuestionId("teststreet")

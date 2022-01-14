@@ -36,7 +36,7 @@ namespace form_builder.Factories.Schema
             IOptions<DistributedCacheConfiguration> distributedCacheConfiguration,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
-            IFormSchemaIntegrityValidator formSchemaIntegrityValidator, 
+            IFormSchemaIntegrityValidator formSchemaIntegrityValidator,
             IEnumerable<IUserPageTransformFactory> userPageTransformFactories)
         {
             _distributedCache = distributedCache;
@@ -52,7 +52,7 @@ namespace form_builder.Factories.Schema
 
         public async Task<FormSchema> Build(string formKey)
         {
-            if(_previewModeConfiguration.Value.IsEnabled && formKey.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))
+            if (_previewModeConfiguration.Value.IsEnabled && formKey.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))
                 return await InPreviewMode(formKey);
 
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)

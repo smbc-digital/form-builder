@@ -9,7 +9,7 @@ namespace form_builder_tests.UnitTests.Utils.Hash
     public class HashUtilTests
     {
         private readonly HashUtil _hashUtil;
-        private readonly Mock<IOptions<HashConfiguration>> _mockHashConfiguration = new ();
+        private readonly Mock<IOptions<HashConfiguration>> _mockHashConfiguration = new();
 
         private const string TEST_SALTED_HASH = "acc1bb7b60a1cdcf4032c85bf779b69ccb846825447baeb9dd644a60eb5c5ca9";
 
