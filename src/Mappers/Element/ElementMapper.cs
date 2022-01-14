@@ -79,6 +79,9 @@ namespace form_builder.Mappers
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);
+                    
+                    if (element.Properties.Decimal)
+                        return GetDecimalElementValue(key, formAnswers);
 
                     if (element.Properties.Decimal)
                         return GetDecimalElementValue(key, formAnswers);
