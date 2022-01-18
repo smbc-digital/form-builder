@@ -33,7 +33,13 @@ namespace form_builder.Models.Elements
 
         public virtual string ErrorId => $"{QuestionId}-error";
 
-        public bool DisplayAriaDescribedby => DisplayHint || !IsValid;
+        public virtual string Warning => Properties.Warning;
+
+        public virtual string WarningID => $"{QuestionId}-warning";
+
+        public virtual bool DisplayWarning => !string.IsNullOrEmpty(Properties.Warning.Trim());
+
+        public bool DisplayAriaDescribedby => DisplayWarning || DisplayHint || !IsValid;
 
         public bool IsValid => validationResult.IsValid;
 
@@ -79,9 +85,11 @@ namespace form_builder.Models.Elements
         private string CreateDescribedByAttributeValue(string key)
         {
             var describedBy = new List<string>();
-            if (DisplayHint)
+            if (DisplayWarning)
+                describedBy.Add(WarningID);
+            else if (DisplayHint)
                 describedBy.Add(HintId);
-
+    
             if (!IsValid)
                 describedBy.Add(ErrorId);
 

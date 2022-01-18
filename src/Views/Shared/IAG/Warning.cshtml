@@ -1,0 +1,10 @@
+@if (Model.DisplayWarning && !string.IsNullOrEmpty(Model.Warning))
+{
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @Html.Raw(Model.Warning)
+        </strong>
+    </div>
+}

@@ -47,6 +47,30 @@ namespace form_builder_tests.UnitTests.Models
             // Assert
             Assert.False(element.DisplayAriaDescribedby);
         }
+        
+        [Fact]
+        public void DisplayAriaDescribedby_ShouldReturnFalse_WhenPropertiesWarning_IsEmpty()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithWarning(string.Empty)
+                .Build();
+
+            // Assert
+            Assert.False(element.DisplayAriaDescribedby);
+        }
+
+        [Fact]
+        public void DisplayAriaDescribedby_ShouldReturnTrue_WhenPropertiesWarning_NotEmpty()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithWarning("non-empty")
+                .Build();
+
+            // Assert
+            Assert.True(element.DisplayAriaDescribedby);
+        }
 
         [Theory]
         [InlineData(EElementType.Textarea)]
