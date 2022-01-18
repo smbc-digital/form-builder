@@ -572,5 +572,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithWarning(string value)
+        {
+            _property.Warning = value;
+
+            return this;
+        }
     }
 }

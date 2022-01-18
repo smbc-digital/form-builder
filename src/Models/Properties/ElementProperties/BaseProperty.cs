@@ -74,5 +74,7 @@ namespace form_builder.Models.Properties.ElementProperties
         public bool OrderOptionsAlphabetically { get; set; } = false;
 
         public string SummaryLabel { get; set; } = string.Empty;
+
+        public string Warning { get; set; } = string.Empty;
     }
 }
