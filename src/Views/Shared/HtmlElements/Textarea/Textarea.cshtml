@@ -12,7 +12,7 @@
         <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
             <partial name="LabelH1" />
 
-            <partial name="Warning" />
+            <partial name="WarningText" />
 
             <partial name="InsetText" model="Model.Properties.IAG" />
 
@@ -33,7 +33,7 @@ else
     <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
         <partial name="LabelH1" />
 
-        <partial name="Warning" />
+        <partial name="WarningText" />
 
         <partial name="InsetText" model="Model.Properties.IAG" />
 
