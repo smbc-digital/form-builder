@@ -579,5 +579,26 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder OptionalIf(string value)
+        {
+            _property.OptionalIf = value;
+
+            return this;
+        }
+
+        public ElementBuilder OptionalIfValue(string value)
+        {
+            _property.OptionalIfValue = value;
+
+            return this;
+        }
+
+        public ElementBuilder OptionalIfNotValue(string value)
+        {
+            _property.OptionalIfNotValue = value;
+
+            return this;
+        }
     }
 }
