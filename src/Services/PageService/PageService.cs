@@ -160,12 +160,15 @@ namespace form_builder.Services.PageService
 
             if (optionalifElement.Any())
             {
-                var formanswer = convertedAnswers.AllAnswers.Select(_ => _.Response);
+                var formanswers = convertedAnswers.AllAnswers.Select(_ => _.Response);
+                var formquestions = convertedAnswers.AllAnswers.Select(_ => _.QuestionId);
 
                 foreach (var e in optionalifElement)
                 {
-                    var elementToFind = e.Properties.OptionalIf;
-                    //var elementToFindValue = formanswer.Where(_ => _.)
+                    var questionToFind = e.Properties.OptionalIf;
+                    var answerToFind = e.Properties.OptionalIfValue;
+                    if(formanswers.Contains(answerToFind) && formquestions.Contains(questionToFind))
+                        e.Properties.Optional = true;
                 }
             }
 
