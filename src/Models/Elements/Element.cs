@@ -114,7 +114,7 @@ namespace form_builder.Models.Elements
             FormAnswers formAnswers,
             List<object> results = null) => viewRender.RenderAsync(Type.ToString(), this, null);
 
-        private bool DisplayOptional => Properties.Optional || Properties.OptionalIf == Properties.OptionalIfValue || Properties.OptionalIf == Properties.OptionalIfNotValue;
+        private bool DisplayOptional => Properties.Optional;
 
         public virtual string GetLabelText(string pageTitle) => $"{(string.IsNullOrEmpty(Properties.SummaryLabel) ? Properties.Label : Properties.SummaryLabel)}{GetIsOptionalLabelText()}";
 
