@@ -580,21 +580,21 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder OptionalIf(string value)
+        public ElementBuilder WithOptionalIf(string value)
         {
             _property.OptionalIf = value;
 
             return this;
         }
 
-        public ElementBuilder OptionalIfValue(string value)
+        public ElementBuilder WithOptionalIfValue(string value)
         {
             _property.OptionalIfValue = value;
 
             return this;
         }
 
-        public ElementBuilder OptionalIfNotValue(string value)
+        public ElementBuilder WithOptionalIfNotValue(string value)
         {
             _property.OptionalIfNotValue = value;
 

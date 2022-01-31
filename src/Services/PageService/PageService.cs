@@ -156,22 +156,6 @@ namespace form_builder.Services.PageService
             if (!string.IsNullOrEmpty(formData))
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
-            var optionalifElement = page.Elements.Where(x => !string.IsNullOrEmpty(x.Properties.OptionalIfValue));
-
-            if (optionalifElement.Any())
-            {
-                foreach (var e in optionalifElement)
-                {
-                    var userChoice = convertedAnswers.AllAnswers
-                        .Where(x => x.QuestionId == e.Properties.OptionalIf)
-                        .Select(x => x.Response)
-                        .FirstOrDefault();
-
-                    if (userChoice.ToString() == e.Properties.OptionalIfValue)                    
-                        e.Properties.Optional = true;                    
-                }
-            }
-
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Summary)))
             {
                 var journeyPages = baseForm.GetReducedPages(convertedAnswers);
