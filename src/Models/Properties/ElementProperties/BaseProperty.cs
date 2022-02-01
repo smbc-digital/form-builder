@@ -77,7 +77,7 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string Warning { get; set; } = string.Empty;
 
-        public string OptionalIf { get; set; } = string.Empty;
+        public string OptionalIfQuestionId { get; set; } = string.Empty;
 
         public string OptionalIfValue { get; set; } = string.Empty;
 

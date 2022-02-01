@@ -36,7 +36,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var textboxWithOptionalIf = new ElementBuilder()
                 .WithQuestionId("textboxWithOptionalIf")
                 .WithType(EElementType.Textbox)
-                .WithOptionalIf("textbox")
+                .WithOptionalIfQuestionId("textbox")
                 .WithOptionalIfValue("test")
                 .WithOptional(false)
                 .Build();
@@ -44,7 +44,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var textboxWithOptionalNotIf = new ElementBuilder()
                 .WithQuestionId("textboxWithOptionalNotIf")
                 .WithType(EElementType.Textbox)
-                .WithOptionalIf("textbox")
+                .WithOptionalIfQuestionId("textbox")
                 .WithOptionalIfNotValue("test2")
                 .WithOptional(false)
                 .Build();

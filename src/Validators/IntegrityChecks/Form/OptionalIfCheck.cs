@@ -13,25 +13,25 @@ namespace form_builder.Validators.IntegrityChecks.Form
             IntegrityCheckResult result = new();
             List<string> questionIds = new();
 
-            List<IElement> optionalIfProperties = schema.Pages
+            List<IElement> elementsWithOptionalIfQuestionId = schema.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf))
+                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIfQuestionId))
                 .ToList();
 
-            List<IElement> optionalIfNotValueProperties = schema.Pages
-                .Where(page => page.Elements is not null)
-                .SelectMany(page => page.Elements)
-                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue))
-                .ToList();
-
-            List<IElement> optionalIfValueProperties = schema.Pages
+            List<IElement> elementsWithOptionalIfValue = schema.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
                 .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIfValue))
                 .ToList();
 
-            if (optionalIfProperties.Count.Equals(0) && optionalIfValueProperties.Count.Equals(0) && optionalIfNotValueProperties.Count.Equals(0))
+            List<IElement> elementsWithOptionalIfNotValue = schema.Pages
+                .Where(page => page.Elements is not null)
+                .SelectMany(page => page.Elements)
+                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue))
+                .ToList();
+
+            if (elementsWithOptionalIfQuestionId.Count.Equals(0) && elementsWithOptionalIfValue.Count.Equals(0) && elementsWithOptionalIfNotValue.Count.Equals(0))
                 return result;
 
             foreach (var page in schema.Pages)
@@ -52,25 +52,25 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 }
             }
 
-            foreach (var element in optionalIfProperties)
+            foreach (var element in elementsWithOptionalIfQuestionId)
             {
-                if (!questionIds.Contains(element.Properties.OptionalIf))
+                if (!questionIds.Contains(element.Properties.OptionalIfQuestionId))
                     result.AddFailureMessage(
-                           $"The provided json does not contain an OptionalIf that matches to a QuestionId' QuestionId: '{element.Properties.QuestionId}'");
+                           $"The provided json does not contain an OptionalIfQuestionId that matches to a QuestionId' QuestionId: '{element.Properties.QuestionId}'");
             }
 
-            foreach (var element in optionalIfValueProperties)
+            foreach (var element in elementsWithOptionalIfValue)
             {
-                if (string.IsNullOrEmpty(element.Properties.OptionalIf))
+                if (string.IsNullOrEmpty(element.Properties.OptionalIfQuestionId))
                     result.AddFailureMessage(
-                           $"The provided json has an OptionalIfValue with no OptionalIf to compare it to: QuestionID: '{element.Properties.QuestionId}'");
+                           $"The provided json has an OptionalIfValue with no OptionalIfQuestionId to compare it to: QuestionID: '{element.Properties.QuestionId}'");
             }
 
-            foreach (var element in optionalIfNotValueProperties)
+            foreach (var element in elementsWithOptionalIfNotValue)
             {
-                if (string.IsNullOrEmpty(element.Properties.OptionalIf))
+                if (string.IsNullOrEmpty(element.Properties.OptionalIfQuestionId))
                     result.AddFailureMessage(
-                           $"The provided json has an OptionalIfNotValue with no OptionalIf to compare it to: QuestionID: '{element.Properties.QuestionId}'");
+                           $"The provided json has an OptionalIfNotValue with no OptionalIfQuestionId to compare it to: QuestionID: '{element.Properties.QuestionId}'");
             }
 
             return result;

@@ -1,6 +1,6 @@
-using form_builder.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Models;
 
 namespace form_builder.Factories.Transform.UserSchema
 {
@@ -8,21 +8,24 @@ namespace form_builder.Factories.Transform.UserSchema
     {
         public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
         {
-            var optionalifElement = page.Elements.Where(_ => !string.IsNullOrEmpty(_.Properties.OptionalIfValue) || !string.IsNullOrEmpty(_.Properties.OptionalIfNotValue));
+            var optionalIfElements = page.Elements
+                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIfValue) 
+                || !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue));
 
-            if (optionalifElement.Any())
+            if (optionalIfElements.Any())
             {
-                foreach (var e in optionalifElement)
+                foreach (var element in optionalIfElements)
                 {
                     var userChoice = convertedAnswers.AllAnswers
-                        .Where(x => x.QuestionId == e.Properties.OptionalIf)
-                        .Select(x => x.Response)
-                        .FirstOrDefault();
+                        .Where(answer => answer.QuestionId.Equals(element.Properties.OptionalIfQuestionId))
+                        .FirstOrDefault(answer => answer.Response);
 
                     if (userChoice is not null)
                     {
-                        if (userChoice.ToString() == e.Properties.OptionalIfValue || !string.IsNullOrEmpty(e.Properties.OptionalIfNotValue) && !(userChoice.ToString() == e.Properties.OptionalIfNotValue))
-                            e.Properties.Optional = true;
+                        if (userChoice.ToString().Equals(element.Properties.OptionalIfValue) 
+                            || !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue) 
+                            && !(userChoice.ToString().Equals(element.Properties.OptionalIfNotValue)))
+                            element.Properties.Optional = true;
                     }                                       
                 }
             } 

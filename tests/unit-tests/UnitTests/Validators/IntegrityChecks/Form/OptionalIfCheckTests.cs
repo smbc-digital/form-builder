@@ -22,7 +22,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             var textboxWithOptionalIf = new ElementBuilder()
                  .WithQuestionId("textboxWithOptionalIf")
                  .WithType(EElementType.Textbox)
-                 .WithOptionalIf("textbox")
+                 .WithOptionalIfQuestionId("textbox")
                  .WithOptionalIfValue("test")
                  .WithOptionalIfNotValue("test")
                  .WithOptional(false)
@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             var textboxWithOptionalIf = new ElementBuilder()
                  .WithQuestionId("textboxWithOptionalIf")
                  .WithType(EElementType.Textbox)
-                 .WithOptionalIf("test2")
+                 .WithOptionalIfQuestionId("test2")
                  .WithOptionalIfValue("test")
                  .WithOptional(false)
                  .Build();
