@@ -18,13 +18,13 @@ namespace form_builder.Factories.Transform.UserSchema
                 {
                     var userChoice = convertedAnswers.AllAnswers
                         .Where(answer => answer.QuestionId.Equals(element.Properties.OptionalIfQuestionId))
-                        .FirstOrDefault(answer => answer.Response);
+                        .FirstOrDefault();
 
                     if (userChoice is not null)
                     {
-                        if (userChoice.ToString().Equals(element.Properties.OptionalIfValue) 
+                        if (userChoice.Response.ToString().Equals(element.Properties.OptionalIfValue) 
                             || !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue) 
-                            && !(userChoice.ToString().Equals(element.Properties.OptionalIfNotValue)))
+                            && !(userChoice.Response.ToString().Equals(element.Properties.OptionalIfNotValue)))
                             element.Properties.Optional = true;
                     }                                       
                 }
