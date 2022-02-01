@@ -19,8 +19,11 @@ namespace form_builder.Factories.Transform.UserSchema
                         .Select(x => x.Response)
                         .FirstOrDefault();
 
-                    if (userChoice.ToString() == e.Properties.OptionalIfValue || !(userChoice.ToString() == e.Properties.OptionalIfNotValue))                  
-                        e.Properties.Optional = true;                    
+                    if (userChoice is not null)
+                    {
+                        if (userChoice.ToString() == e.Properties.OptionalIfValue || !(userChoice.ToString() == e.Properties.OptionalIfNotValue))
+                            e.Properties.Optional = true;
+                    }                                       
                 }
             } 
 

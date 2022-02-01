@@ -40,23 +40,21 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 {
                     questionIds.Add(element.Properties.QuestionId);
 
-                    if (!(string.IsNullOrEmpty(element.Properties.OptionalIfValue)) && (!(string.IsNullOrEmpty(element.Properties.OptionalIfNotValue))))
+                    if (!string.IsNullOrEmpty(element.Properties.OptionalIfValue) && !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue))
                         result.AddFailureMessage(
                             $"The provided json has an element with both an OptionalIfValue and OptionalIfNotValue' QuestionId: '{element.Properties.QuestionId}'");
 
                     if (element.Properties.Elements is not null && element.Properties.Elements.Count > 0)
                     {
-                        foreach (var nestedElement in element.Properties.Elements)
-                        {
-                            questionIds.Add(nestedElement.Properties.QuestionId);
-                        }
+                        foreach (var nestedElement in element.Properties.Elements)                        
+                            questionIds.Add(nestedElement.Properties.QuestionId);                        
                     }
                 }
             }
 
             foreach (var element in optionalIfProperties)
             {
-                if (!(questionIds.Contains(element.Properties.OptionalIf)))
+                if (!questionIds.Contains(element.Properties.OptionalIf))
                     result.AddFailureMessage(
                            $"The provided json does not contain an OptionalIf that matches to a QuestionId' QuestionId: '{element.Properties.QuestionId}'");
             }
