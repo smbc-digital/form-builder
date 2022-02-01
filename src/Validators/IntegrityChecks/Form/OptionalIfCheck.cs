@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
@@ -14,7 +12,6 @@ namespace form_builder.Validators.IntegrityChecks.Form
         {
             IntegrityCheckResult result = new();
             List<string> questionIds = new();
-            List<string> formAnswers = new();
 
             List<IElement> optionalIfProperties = schema.Pages
                 .Where(page => page.Elements is not null)
@@ -33,7 +30,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .SelectMany(page => page.Elements)
                 .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIfValue))
                 .ToList();
-            
+
             if (optionalIfProperties.Count.Equals(0) && optionalIfValueProperties.Count.Equals(0) && optionalIfNotValueProperties.Count.Equals(0))
                 return result;
 
@@ -42,42 +39,40 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 foreach (var element in page.ValidatableElements)
                 {
                     questionIds.Add(element.Properties.QuestionId);
-                    formAnswers.Add(element.Properties.Value);
 
-                    if(!(string.IsNullOrEmpty(element.Properties.OptionalIfValue)) && (!(string.IsNullOrEmpty(element.Properties.OptionalIfNotValue))))
+                    if (!(string.IsNullOrEmpty(element.Properties.OptionalIfValue)) && (!(string.IsNullOrEmpty(element.Properties.OptionalIfNotValue))))
                         result.AddFailureMessage(
-                            $"The provided json has an element with both a OptionalIfValue and OptionalIfNotValue' QuestionId: '{element.Properties.QuestionId}'");
+                            $"The provided json has an element with both an OptionalIfValue and OptionalIfNotValue' QuestionId: '{element.Properties.QuestionId}'");
 
                     if (element.Properties.Elements is not null && element.Properties.Elements.Count > 0)
                     {
                         foreach (var nestedElement in element.Properties.Elements)
                         {
                             questionIds.Add(nestedElement.Properties.QuestionId);
-                            formAnswers.Add(nestedElement.Properties.Value);
                         }
                     }
                 }
             }
 
-            foreach(var element in optionalIfProperties)
+            foreach (var element in optionalIfProperties)
             {
-                if(!(questionIds.Contains(element.Properties.OptionalIf)))
-                     result.AddFailureMessage(
-                            $"The provided json does not contain an OptionalIf that matches to a QuestionId' QuestionId: '{element.Properties.QuestionId}'");
+                if (!(questionIds.Contains(element.Properties.OptionalIf)))
+                    result.AddFailureMessage(
+                           $"The provided json does not contain an OptionalIf that matches to a QuestionId' QuestionId: '{element.Properties.QuestionId}'");
             }
-            
-            foreach(var element in optionalIfValueProperties)
+
+            foreach (var element in optionalIfValueProperties)
             {
-                if(string.IsNullOrEmpty(element.Properties.OptionalIf))
-                     result.AddFailureMessage(
-                            $"The provided json has an OptionalIfValue with no OptionalIf to compare it to: QuestionID: '{element.Properties.QuestionId}'");
+                if (string.IsNullOrEmpty(element.Properties.OptionalIf))
+                    result.AddFailureMessage(
+                           $"The provided json has an OptionalIfValue with no OptionalIf to compare it to: QuestionID: '{element.Properties.QuestionId}'");
             }
-            
-            foreach(var element in optionalIfNotValueProperties)
+
+            foreach (var element in optionalIfNotValueProperties)
             {
-                if(string.IsNullOrEmpty(element.Properties.OptionalIf))
-                     result.AddFailureMessage(
-                            $"The provided json has an OptionalIfNotValue with no OptionalIf to compare it to: QuestionID: '{element.Properties.QuestionId}'");
+                if (string.IsNullOrEmpty(element.Properties.OptionalIf))
+                    result.AddFailureMessage(
+                           $"The provided json has an OptionalIfNotValue with no OptionalIf to compare it to: QuestionID: '{element.Properties.QuestionId}'");
             }
 
             return result;
