@@ -21,7 +21,7 @@ namespace form_builder.Factories.Transform.UserSchema
 
                     if (userChoice is not null)
                     {
-                        if (userChoice.ToString() == e.Properties.OptionalIfValue || !(userChoice.ToString() == e.Properties.OptionalIfNotValue))
+                        if (userChoice.ToString() == e.Properties.OptionalIfValue || !string.IsNullOrEmpty(e.Properties.OptionalIfNotValue) && !(userChoice.ToString() == e.Properties.OptionalIfNotValue))
                             e.Properties.Optional = true;
                     }                                       
                 }
