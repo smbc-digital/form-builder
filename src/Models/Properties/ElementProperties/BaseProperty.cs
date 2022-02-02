@@ -76,11 +76,5 @@ namespace form_builder.Models.Properties.ElementProperties
         public string SummaryLabel { get; set; } = string.Empty;
 
         public string Warning { get; set; } = string.Empty;
-
-        public string OptionalIfQuestionId { get; set; } = string.Empty;
-
-        public string OptionalIfValue { get; set; } = string.Empty;
-
-        public string OptionalIfNotValue { get; set; } = string.Empty;
     }
 }
