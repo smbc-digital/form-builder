@@ -579,5 +579,14 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithOptionalIf(string questionId, string comparisonValue, ECondition conditionType)
+        {
+            _property.OptionalIf.QuestionId = questionId;
+            _property.OptionalIf.ComparisonValue = comparisonValue;
+            _property.OptionalIf.ConditionType = conditionType;
+
+            return this;
+        }
     }
 }

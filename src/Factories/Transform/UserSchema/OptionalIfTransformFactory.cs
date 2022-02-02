@@ -11,7 +11,7 @@ namespace form_builder.Factories.Transform.UserSchema
     {
         public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
         { 
-            IEnumerable<IElement> elements = page.Elements
+            IEnumerable<IElement> elements = page.ValidatableElements
                 .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf?.QuestionId));
 
             if (!elements.Any())
@@ -23,8 +23,13 @@ namespace form_builder.Factories.Transform.UserSchema
                     .FirstOrDefault(answer => answer.QuestionId
                     .Equals(element.Properties.OptionalIf.QuestionId));
 
+                var questionsAnswers = new Dictionary<string, dynamic>
+                {
+                    { userChoice.QuestionId, userChoice.Response }
+                };
+
                 var conditionValidator = new ConditionValidator();
-                element.Properties.Optional = conditionValidator.IsValid(element.Properties.OptionalIf, convertedAnswers.AdditionalFormData);
+                element.Properties.Optional = conditionValidator.IsValid(element.Properties.OptionalIf, questionsAnswers);
             }                                    
 
             return await Task.FromResult(page);

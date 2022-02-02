@@ -12,61 +12,48 @@ namespace form_builder.Validators.IntegrityChecks.Form
         {
             IntegrityCheckResult result = new();
             List<string> questionIds = new();
-            
-            List<IElement> elementsWithOptionalIfQuestionId = schema.Pages
+
+            List<IElement> elementsWithOptionalIfInJSON = schema.Pages
                 .Where(page => page.Elements is not null)
                 .SelectMany(page => page.Elements)
-                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId))
+                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId) || !string.IsNullOrEmpty(element.Properties.OptionalIf.ComparisonValue) || !element.Properties.OptionalIf.ConditionType.Equals(Enum.ECondition.Undefined))
                 .ToList();
 
-            List<IElement> elementsWithOptionalIfComparisonValue = schema.Pages
-                .Where(page => page.Elements is not null)
-                .SelectMany(page => page.Elements)
-                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf.ComparisonValue))
-                .ToList();
-
-            if (elementsWithOptionalIfQuestionId.Count.Equals(0))
+            if (elementsWithOptionalIfInJSON.Count.Equals(0))
               return result;
 
-            //TODOjordan after lunch - whys it null, why wont it work, maybe its the validators, unit tests, stu
-            // foreach (var page in schema.Pages)
-            // {
-            //   foreach (var element in page.ValidatableElements)
-            //   {
-            //       questionIds.Add(element.Properties.QuestionId);
+            foreach (var page in schema.Pages)
+            {
+                foreach (var element in page.ValidatableElements)
+                {
+                    questionIds.Add(element.Properties.QuestionId);
 
-            //       if (!string.IsNullOrEmpty(element.Properties.OptionalIfValue) && !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue))
-            //           result.AddFailureMessage(
-            //               $"The provided json has an element with both an OptionalIfValue and OptionalIfNotValue' QuestionId: '{element.Properties.QuestionId}'");
+                    if (element.Properties.Elements is not null && element.Properties.Elements.Count > 0)
+                    {
+                        foreach (var nestedElement in element.Properties.Elements)
+                            questionIds.Add(nestedElement.Properties.QuestionId);
+                    }
+                }
+            }
 
-            //       if (element.Properties.Elements is not null && element.Properties.Elements.Count > 0)
-            //       {
-            //           foreach (var nestedElement in element.Properties.Elements)                        
-            //               questionIds.Add(nestedElement.Properties.QuestionId);                        
-            //       }
-            //   }
-            // }
+            foreach (var element in elementsWithOptionalIfInJSON)
+            {
+                if(string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId))
+                    result.AddFailureMessage(
+                           $"The provided json has an OptionalIf that does not contain a QuestionId. Error on: '{element.Properties.QuestionId}'");
 
-            // foreach (var element in elementsWithOptionalIfQuestionId)
-            // {
-            //   if (!questionIds.Contains(element.Properties.OptionalIfQuestionId))
-            //       result.AddFailureMessage(
-            //              $"The provided json does not contain an OptionalIfQuestionId that matches to a QuestionId' QuestionId: '{element.Properties.QuestionId}'");
-            // }
+                if (string.IsNullOrEmpty(element.Properties.OptionalIf.ComparisonValue))
+                    result.AddFailureMessage(
+                           $"The provided json has an OptionalIf that does not contain a ComparisonValue. Error on: '{element.Properties.QuestionId}'");
 
-            // foreach (var element in elementsWithOptionalIfValue)
-            // {
-            //   if (string.IsNullOrEmpty(element.Properties.OptionalIfQuestionId))
-            //       result.AddFailureMessage(
-            //              $"The provided json has an OptionalIfValue with no OptionalIfQuestionId to compare it to: QuestionID: '{element.Properties.QuestionId}'");
-            // }
+                if (element.Properties.OptionalIf.ConditionType.Equals(Enum.ECondition.Undefined))
+                    result.AddFailureMessage(
+                           $"The provided json contains an OptionalIf that does not contain a ConditionType. Error on: '{element.Properties.QuestionId}'");
 
-            // foreach (var element in elementsWithOptionalIfNotValue)
-            // {
-            //   if (string.IsNullOrEmpty(element.Properties.OptionalIfQuestionId))
-            //       result.AddFailureMessage(
-            //              $"The provided json has an OptionalIfNotValue with no OptionalIfQuestionId to compare it to: QuestionID: '{element.Properties.QuestionId}'");
-            // }
+                if (!string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId) && !questionIds.Contains(element.Properties.OptionalIf.QuestionId))
+                    result.AddFailureMessage(
+                           $"The provided json contains an OptionalIf that does not match to a QuestionId in the form. Error on: '{element.Properties.QuestionId}'");
+            }
 
             return result;
         }
