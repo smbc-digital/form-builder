@@ -579,26 +579,5 @@ namespace form_builder.Builders
 
             return this;
         }
-
-        public ElementBuilder WithOptionalIfQuestionId(string value)
-        {
-            _property.OptionalIfQuestionId = value;
-
-            return this;
-        }
-
-        public ElementBuilder WithOptionalIfValue(string value)
-        {
-            _property.OptionalIfValue = value;
-
-            return this;
-        }
-
-        public ElementBuilder WithOptionalIfNotValue(string value)
-        {
-            _property.OptionalIfNotValue = value;
-
-            return this;
-        }
     }
 }

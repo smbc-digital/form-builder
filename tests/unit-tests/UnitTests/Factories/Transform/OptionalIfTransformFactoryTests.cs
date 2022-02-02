@@ -31,40 +31,40 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             }
         };
 
-        public OptionalIfTransformFactoryTests()
-        {
-            var textboxWithOptionalIf = new ElementBuilder()
-                .WithQuestionId("textboxWithOptionalIf")
-                .WithType(EElementType.Textbox)
-                .WithOptionalIfQuestionId("textbox")
-                .WithOptionalIfValue("test")
-                .WithOptional(false)
-                .Build();
+        //public OptionalIfTransformFactoryTests()
+        //{
+        //    var textboxWithOptionalIf = new ElementBuilder()
+        //        .WithQuestionId("textboxWithOptionalIf")
+        //        .WithType(EElementType.Textbox)
+        //        .WithOptionalIfQuestionId("textbox")
+        //        .WithOptionalIfValue("test")
+        //        .WithOptional(false)
+        //        .Build();
 
-            var textboxWithOptionalNotIf = new ElementBuilder()
-                .WithQuestionId("textboxWithOptionalNotIf")
-                .WithType(EElementType.Textbox)
-                .WithOptionalIfQuestionId("textbox")
-                .WithOptionalIfNotValue("test2")
-                .WithOptional(false)
-                .Build();
+        //    var textboxWithOptionalNotIf = new ElementBuilder()
+        //        .WithQuestionId("textboxWithOptionalNotIf")
+        //        .WithType(EElementType.Textbox)
+        //        .WithOptionalIfQuestionId("textbox")
+        //        .WithOptionalIfNotValue("test2")
+        //        .WithOptional(false)
+        //        .Build();
 
-            var textbox = new ElementBuilder()
-                .WithQuestionId("textbox")
-                .WithType(EElementType.Textbox)
-                .WithValue("test")
-                .WithOptional(false)
-                .Build();
+        //    var textbox = new ElementBuilder()
+        //        .WithQuestionId("textbox")
+        //        .WithType(EElementType.Textbox)
+        //        .WithValue("test")
+        //        .WithOptional(false)
+        //        .Build();
 
-            _page = new PageBuilder()
-                .WithPageSlug("people")
-                .WithElement(textboxWithOptionalIf)
-                .WithElement(textboxWithOptionalNotIf)
-                .WithElement(textbox)
-                .Build();
+        //    _page = new PageBuilder()
+        //        .WithPageSlug("people")
+        //        .WithElement(textboxWithOptionalIf)
+        //        .WithElement(textboxWithOptionalNotIf)
+        //        .WithElement(textbox)
+        //        .Build();
 
-            _transformFactory = new OptionalIfTransformFactory();
-        }
+        //    _transformFactory = new OptionalIfTransformFactory();
+        //}
 
         [Fact]
         public async Task Transform_ShouldReturnOptional_WithOptionalIfOnPage()

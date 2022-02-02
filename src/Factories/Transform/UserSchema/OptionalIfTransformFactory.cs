@@ -1,34 +1,31 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Conditions;
 using form_builder.Models;
+using form_builder.Models.Elements;
 
 namespace form_builder.Factories.Transform.UserSchema
 {
     public class OptionalIfTransformFactory : IUserPageTransformFactory
     {
         public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
-        {
-            var optionalIfElements = page.Elements
-                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIfValue) 
-                || !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue));
+        { 
+            IEnumerable<IElement> elements = page.Elements
+                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf?.QuestionId));
 
-            if (optionalIfElements.Any())
+            if (!elements.Any())
+                return await Task.FromResult(page);
+
+            foreach (IElement element in elements)
             {
-                foreach (var element in optionalIfElements)
-                {
-                    var userChoice = convertedAnswers.AllAnswers
-                        .Where(answer => answer.QuestionId.Equals(element.Properties.OptionalIfQuestionId))
-                        .FirstOrDefault();
+                var userChoice = convertedAnswers.AllAnswers
+                    .FirstOrDefault(answer => answer.QuestionId
+                    .Equals(element.Properties.OptionalIf.QuestionId));
 
-                    if (userChoice is not null)
-                    {
-                        if (userChoice.Response.ToString().Equals(element.Properties.OptionalIfValue) 
-                            || !string.IsNullOrEmpty(element.Properties.OptionalIfNotValue) 
-                            && !(userChoice.Response.ToString().Equals(element.Properties.OptionalIfNotValue)))
-                            element.Properties.Optional = true;
-                    }                                       
-                }
-            } 
+                var conditionValidator = new ConditionValidator();
+                element.Properties.Optional = conditionValidator.IsValid(element.Properties.OptionalIf, convertedAnswers.AdditionalFormData);
+            }                                    
 
             return await Task.FromResult(page);
         }
