@@ -353,6 +353,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, OptionalIfCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
@@ -421,6 +422,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, AnswerLookupPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, OptionalIfTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, BehaviourConditionsPageTransformFactory>();
 
             return services;
