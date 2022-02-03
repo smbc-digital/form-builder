@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
@@ -18,7 +19,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 .SelectMany(page => page.ValidatableElements)
                 .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId) ||
                 !string.IsNullOrEmpty(element.Properties.OptionalIf.ComparisonValue) ||
-                !element.Properties.OptionalIf.ConditionType.Equals(Enum.ECondition.Undefined));
+                !element.Properties.OptionalIf.ConditionType.Equals(ECondition.Undefined));
 
             if (!elements.Any())
                 return result;
@@ -47,7 +48,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     result.AddFailureMessage(
                            $"The provided json has an OptionalIf that does not contain a ComparisonValue. Error on: '{element.Properties.QuestionId}'");
 
-                if (element.Properties.OptionalIf.ConditionType.Equals(Enum.ECondition.Undefined))
+                if (element.Properties.OptionalIf.ConditionType.Equals(ECondition.Undefined))
                     result.AddFailureMessage(
                            $"The provided json contains an OptionalIf that does not contain a ConditionType. Error on: '{element.Properties.QuestionId}'");
 

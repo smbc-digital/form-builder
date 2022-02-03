@@ -20,10 +20,9 @@ namespace form_builder.Factories.Transform.UserSchema
             foreach (IElement element in elements)
             {
                 Answers answers = convertedAnswers.AllAnswers
-                    .FirstOrDefault(answer => answer.QuestionId
-                    .Equals(element.Properties.OptionalIf.QuestionId));
+                    .FirstOrDefault(answer => answer.QuestionId.Equals(element.Properties.OptionalIf.QuestionId));
 
-                var questionsAnswers = new Dictionary<string, dynamic>
+                Dictionary<string, dynamic> questionsAnswers = new()
                 {
                     { answers.QuestionId, answers.Response }
                 };
