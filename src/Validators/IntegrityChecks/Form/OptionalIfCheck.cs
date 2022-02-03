@@ -13,14 +13,15 @@ namespace form_builder.Validators.IntegrityChecks.Form
             IntegrityCheckResult result = new();
             List<string> questionIds = new();
 
-            List<IElement> elementsWithOptionalIfInJSON = schema.Pages
-                .Where(page => page.Elements is not null)
-                .SelectMany(page => page.Elements)
-                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId) || !string.IsNullOrEmpty(element.Properties.OptionalIf.ComparisonValue) || !element.Properties.OptionalIf.ConditionType.Equals(Enum.ECondition.Undefined))
-                .ToList();
+            IEnumerable<IElement> elements = schema.Pages
+                .Where(page => page.ValidatableElements is not null)
+                .SelectMany(page => page.ValidatableElements)
+                .Where(element => !string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId) ||
+                !string.IsNullOrEmpty(element.Properties.OptionalIf.ComparisonValue) ||
+                !element.Properties.OptionalIf.ConditionType.Equals(Enum.ECondition.Undefined));
 
-            if (elementsWithOptionalIfInJSON.Count.Equals(0))
-              return result;
+            if (!elements.Any())
+                return result;
 
             foreach (var page in schema.Pages)
             {
@@ -36,7 +37,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 }
             }
 
-            foreach (var element in elementsWithOptionalIfInJSON)
+            foreach (var element in elements)
             {
                 if(string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId))
                     result.AddFailureMessage(
