@@ -176,6 +176,9 @@ namespace form_builder.Services.MappingService
             if (!string.IsNullOrEmpty(formAnswers.PaymentAmount))
                 data = AddNonQuestionAnswers(data, new Dictionary<string, object> { { formSchema.PaymentAmountMapping, formAnswers.PaymentAmount } });
 
+            if (!string.IsNullOrEmpty(formAnswers.CaseReference))
+                data = AddNonQuestionAnswers(data, new Dictionary<string, object> { { "CaseReference", formAnswers.CaseReference } });
+
             return data;
         }
 

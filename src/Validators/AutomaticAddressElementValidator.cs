@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
@@ -9,7 +10,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            if (!element.Type.Equals(Enum.EElementType.Address))
+            if (!element.Type.Equals(EElementType.Address))
                 return new ValidationResult { IsValid = true };
 
             var addressElement = (Address)element;
