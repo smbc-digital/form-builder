@@ -255,7 +255,8 @@ namespace form_builder.Helpers.ElementHelpers
             if (formAnswers.FormData.Any()) {
                 var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
                 return formAnswers.FormData.ContainsKey(formDataIncrementKey)
-                    ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 0;
+                    ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString())
+                    : 0;
             }
 
             return 0;
