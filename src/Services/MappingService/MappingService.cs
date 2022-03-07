@@ -228,9 +228,10 @@ namespace form_builder.Services.MappingService
 
         private async Task<IDictionary<string, dynamic>> CheckAndCreateForAddAnother(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
         {
+            if (!formAnswers.FormData.Any() || !formAnswers.FormData.ContainsKey($"{AddAnotherConstants.IncrementKeyPrefix}{element.Properties.QuestionId}"))
+                return obj;
+            
             var savedIncrementValue = formAnswers.FormData[$"{AddAnotherConstants.IncrementKeyPrefix}{element.Properties.QuestionId}"].ToString();
-            if (string.IsNullOrEmpty(savedIncrementValue))
-                throw new ApplicationException($"MappingService::CheckAndCreateForAddAnother, Fieldset increment value not found in FormData in saved answers for questionId {element.Properties.QuestionId}");
 
             var numberOfIncrements = int.Parse(savedIncrementValue);
             var answers = new List<IDictionary<string, dynamic>>();
