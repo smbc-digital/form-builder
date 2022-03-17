@@ -20,7 +20,7 @@ namespace form_builder.Builders
         {
             var elementType = typeof(IElement).GetTypeInfo().Assembly
                 .GetTypes()
-                .FirstOrDefault(type => type.Name.Equals( _type.ToString()));
+                .FirstOrDefault(type => type.Name.Equals(_type.ToString()));
 
             var element = (Element)Activator.CreateInstance(elementType);
 
@@ -409,13 +409,13 @@ namespace form_builder.Builders
             return this;
         }
 
-        
+
         public ElementBuilder WithIsDateAfter(string value)
         {
             _property.IsDateAfter = value;
             return this;
         }
-        
+
         public ElementBuilder WithIsDateAfterAbsolute(string value)
         {
             _property.IsDateAfterAbsolute = value;
@@ -479,7 +479,7 @@ namespace form_builder.Builders
 
             return this;
         }
-        
+
         public ElementBuilder WithNestedElement(Element element)
         {
             if (_property.Elements is null)
@@ -534,6 +534,57 @@ namespace form_builder.Builders
         public ElementBuilder WithWithinRange(string value)
         {
             _property.WithinRange = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithDecimal(bool value)
+        {
+            _property.Decimal = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithDecimalValidationMessage(string value)
+        {
+            _property.DecimalValidationMessage = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithNotAnIntegerValidationMessage(string value)
+        {
+            _property.NotAnIntegerValidationMessage = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithDecimalPlaces(int value)
+        {
+            _property.DecimalPlaces = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithDecimalPlacesValidationMessage(string value)
+        {
+            _property.DecimalPlacesValidationMessage = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithWarning(string value)
+        {
+            _property.Warning = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithOptionalIf(string questionId, string comparisonValue, ECondition conditionType)
+        {
+            _property.OptionalIf.QuestionId = questionId;
+            _property.OptionalIf.ComparisonValue = comparisonValue;
+            _property.OptionalIf.ConditionType = conditionType;
 
             return this;
         }

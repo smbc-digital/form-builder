@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
@@ -16,9 +17,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class AddressTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new ();
-        private readonly Mock<IElementHelper> _mockElementHelper = new ();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         public AddressTests()
         {
@@ -26,7 +27,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
-        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
+        public async Task RenderAsync_ShouldCallViewRenderWithCorrectPartial_WhenAddressSearch()
         {
             //Arrange
             var element = new AddressBuilder()
@@ -60,7 +61,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
-        public async Task GenerateHtml_ShouldCallViewRenderWithCorrectPartial_WhenAddressSelect()
+        public async Task RenderAsync_ShouldCallViewRenderWithCorrectPartial_WhenAddressSelect()
         {
             //Arrange
             var element = new AddressBuilder()
@@ -103,7 +104,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
-        public async Task Address_ShouldGenerateValidUrl_ForAddressSelect()
+        public async Task RenderAsync_ShouldGenerateValidUrl_ForAddressSelect()
         {
             //Arrange
             var callback = new Address();
@@ -156,10 +157,54 @@ namespace form_builder_tests.UnitTests.Models.Elements
         }
 
         [Fact]
+        public async Task RenderAsync_ShouldThrow_ForAddressSelect_IfResultsIsNull()
+        {
+            //Arrange
+            var element = new AddressBuilder()
+                .WithPropertyText("test")
+                .WithQuestionId("address-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {LookUpConstants.SubPathViewModelKey,
+                    LookUpConstants.Automatic}
+            };
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .WithBaseUrl("test")
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            //Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => element.RenderAsync(_mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                page,
+                schema,
+                _mockHostingEnv.Object,
+                formAnswers,
+                null));
+
+
+            //Assert
+            Assert.Equal($"Address::RenderAsync: retrieved automatic address search results cannot be null", result.Message);
+        }
+
+        [Fact]
         public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_IsDefined()
         {
-            var label = "Custom label";
             //Arrange
+            var label = "Custom label";
+
             var element = new ElementBuilder()
                 .WithType(EElementType.Address)
                 .WithQuestionId("address-test")

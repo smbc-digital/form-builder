@@ -7,24 +7,27 @@
 <div class="govuk-checkboxes" data-module="govuk-checkboxes">
     @for (var i = 0; i < Model.Properties.Options.Count; i++)
     {
-        @if (Model.Properties.Options[i].HasDivider) {
+        @if (Model.Properties.Options[i].HasDivider) 
+        {
             <div class="govuk-checkboxes__divider">@Model.Properties.Options[i].Divider</div>
         }
-<div class="govuk-checkboxes__item">
-    @Html.TextBox(Model.QuestionId, Model.Properties.Options[i].Value, Model.GenerateCheckboxProperties(i))
 
-    <label class="govuk-label govuk-checkboxes__label" for="@Model.GetListItemId(i)">
-        @Model.Properties.Options[i].Text
-    </label>
+        <div class="govuk-checkboxes__item">
+            @Html.TextBox(Model.QuestionId, Model.Properties.Options[i].Value, Model.GenerateCheckboxProperties(i))
 
-    @if (Model.Properties.Options[i].HasHint) {
-        <div class="govuk-hint govuk-checkboxes__hint" id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Hint</div>
-    }
-</div>
+            <label class="govuk-label govuk-checkboxes__label" for="@Model.GetListItemId(i)">
+                @Model.Properties.Options[i].Text
+            </label>
+
+            @if (Model.Properties.Options[i].HasHint) 
+            {
+                <div class="govuk-hint govuk-checkboxes__hint" id="@Model.GetListItemHintId(i)">@Model.Properties.Options[i].Hint</div>
+            }
+        </div>
 
         @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId))
         {
-            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-@i@fieldsetIncrement">
+            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-@i@fieldsetIncrement-@Model.Properties.QuestionId">
                 @SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT@Model.Properties.Options[i].ConditionalElementId
             </div>
         }

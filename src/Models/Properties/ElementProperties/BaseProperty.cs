@@ -63,7 +63,8 @@ namespace form_builder.Models.Properties.ElementProperties
         public bool Spellcheck { get; set; } = true;
 
         public string NotAnIntegerValidationMessage { get; set; } = string.Empty;
-
+        public string DecimalValidationMessage { get; set; } = string.Empty;
+        public string DecimalPlacesValidationMessage { get; set; } = string.Empty;
         public string IAG { get; set; }
 
         public bool HideOptionalText { get; set; }
@@ -72,6 +73,8 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public bool OrderOptionsAlphabetically { get; set; } = false;
 
-        public string SummaryLabel {get;set;} = string.Empty;
+        public string SummaryLabel { get; set; } = string.Empty;
+
+        public string Warning { get; set; } = string.Empty;
     }
 }

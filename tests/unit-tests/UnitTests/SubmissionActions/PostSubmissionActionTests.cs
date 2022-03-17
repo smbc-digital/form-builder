@@ -1,16 +1,15 @@
-﻿using form_builder.Builders;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Threading.Tasks;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Providers.Booking;
 using form_builder.SubmissionActions;
 using form_builder_tests.Builders;
-using Microsoft.Extensions.Logging;
 using Moq;
 using StockportGovUK.NetStandard.Models.Booking.Request;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.SubmissionActions
@@ -21,7 +20,7 @@ namespace form_builder_tests.UnitTests.SubmissionActions
         private readonly PostSubmissionAction _postSubmissionAction;
         private readonly IEnumerable<IBookingProvider> _bookingProviders;
 
-        const string bookingProvider = "testBookingProvider";       
+        const string bookingProvider = "testBookingProvider";
 
         public PostSubmissionActionTests()
         {
@@ -57,7 +56,7 @@ namespace form_builder_tests.UnitTests.SubmissionActions
             {
                 Path = "booking-confirm",
                 Pages = new List<PageAnswers>
-                {                    
+                {
                     new PageAnswers
                     {
                         Answers = new List<Answers>

@@ -10,7 +10,7 @@ namespace form_builder_tests.UnitTests.Gateway
 {
     public class S3GatewayTests
     {
-        private readonly Mock<IAmazonS3> _mockS3Client = new ();
+        private readonly Mock<IAmazonS3> _mockS3Client = new();
         private readonly S3Gateway _s3Gateway;
 
         public S3GatewayTests()

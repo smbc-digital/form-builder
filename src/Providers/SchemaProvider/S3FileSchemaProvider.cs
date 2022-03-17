@@ -12,7 +12,6 @@ using form_builder.Gateways;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -81,7 +80,7 @@ namespace form_builder.Providers.SchemaProvider
                 return new List<string>();
             }
 
-            ListObjectsV2Response result = new ();
+            ListObjectsV2Response result = new();
             string bucketSearchPrefix = $"{_environment.EnvironmentName.ToS3EnvPrefix()}/{_s3SchemaConfiguration.S3BucketFolderName}/";
             try
             {

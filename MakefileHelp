@@ -1,3 +1,0 @@
-Project automation targets:
-   ui-test: runs project ui tests
-   ui-test-feature: runs specified feature e.g. make FEATURE=organisation ui-test-feature

@@ -69,7 +69,7 @@ namespace form_builder.Services.SubmitService
 
             if (baseForm.SavePaymentAmount)
                 _pageHelper.SavePaymentAmount(sessionGuid, _paymentHelper.GetFormPaymentInformation(baseForm.BaseURL).Result.Settings.Amount, baseForm.PaymentAmountMapping);
-                
+
         }
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
@@ -83,7 +83,7 @@ namespace form_builder.Services.SubmitService
             }
 
             if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
-                 await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
+                await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
 
             var submissionReference = _submissionServiceConfiguration.FakeSubmission
                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)

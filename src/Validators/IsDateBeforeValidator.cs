@@ -17,8 +17,8 @@ namespace form_builder.Validators
 
         public ValidationResult Validate(Element currentElement, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
-            IElement comparisonElement  = baseForm.GetElement(currentElement.Properties.IsDateBefore);
-            
+            IElement comparisonElement = baseForm.GetElement(currentElement.Properties.IsDateBefore);
+
             if (!IsValidatorRelevant(currentElement, comparisonElement))
                 return new ValidationResult { IsValid = true };
 
@@ -36,16 +36,17 @@ namespace form_builder.Validators
             if (!comparisonElementValue.HasValue)
                 return new ValidationResult { IsValid = true };
 
-            if (currentElementValue < comparisonElementValue) 
+            if (currentElementValue < comparisonElementValue)
                 return new ValidationResult { IsValid = true };
 
             if (currentElement.Properties.IsDateEqualityAllowed && currentElementValue.Equals(comparisonElementValue))
                 return new ValidationResult { IsValid = true };
 
-            return new ValidationResult {
+            return new ValidationResult
+            {
                 IsValid = false,
-                Message = !string.IsNullOrEmpty(currentElement.Properties.IsDateBeforeValidationMessage) 
-                    ? currentElement.Properties.IsDateBeforeValidationMessage 
+                Message = !string.IsNullOrEmpty(currentElement.Properties.IsDateBeforeValidationMessage)
+                    ? currentElement.Properties.IsDateBeforeValidationMessage
                     : string.Format(ValidationConstants.IS_DATE_AFTER_VALIDATOR_DEFAULT, currentElement.Properties.IsDateBefore)
             };
         }
@@ -54,7 +55,7 @@ namespace form_builder.Validators
         {
             if (!element.Type.Equals(EElementType.DatePicker) && !element.Type.Equals(EElementType.DateInput))
                 return false;
-            
+
             if (comparisonElement is null)
                 return false;
 
@@ -65,10 +66,10 @@ namespace form_builder.Validators
                 return false;
 
             return true;
-        }        
-        
+        }
+
         private DateTime? GetElementValue(IElement element, Dictionary<string, dynamic> viewModel)
-        {   
+        {
             if (element.Type.Equals(EElementType.DatePicker))
                 return DatePicker.GetDate(viewModel, element.Properties.QuestionId);
 
@@ -78,8 +79,8 @@ namespace form_builder.Validators
             return new DateTime();
         }
 
-        private DateTime? GetElementValue(IElement element,  FormAnswers formAnswers)
-        {            
+        private DateTime? GetElementValue(IElement element, FormAnswers formAnswers)
+        {
             if (element.Type.Equals(EElementType.DatePicker))
                 return DatePicker.GetDate(formAnswers, element.Properties.QuestionId);
 

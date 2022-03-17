@@ -1,7 +1,7 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
-using System.Collections.Generic;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators

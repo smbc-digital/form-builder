@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Validators
             _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
         }
 
-        
+
 
         [Fact]
         public void Validate_Returns_Valid_IfElemenType_IsNot_DateInputOrDatePicker()
@@ -56,17 +56,17 @@ namespace form_builder_tests.UnitTests.Validators
             // Assert
             Assert.True(result.IsValid);
         }
-        
+
         [Fact]
         public void Validate_ShouldReturn_Valid_IfComparisonElement_IsNullOrEmpty()
         {
             var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
             // Act
-            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, null, SchemaWithElement(new Element { Properties = new BaseProperty() } ));
+            ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, null, SchemaWithElement(new Element { Properties = new BaseProperty() }));
 
             // Assert
-            Assert.True(result.IsValid);        
+            Assert.True(result.IsValid);
         }
 
         [Fact]
@@ -87,10 +87,10 @@ namespace form_builder_tests.UnitTests.Validators
             // Assert
             Assert.True(result.IsValid);
         }
-        
+
         [Fact]
         public void Validate_ShouldReturn_Valid_IfElement_DoesNotHaveAValue()
-        {   
+        {
             //Arrange
             var formAnswers = new FormAnswers
             {
@@ -126,12 +126,12 @@ namespace form_builder_tests.UnitTests.Validators
             ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
-            Assert.True(result.IsValid);        
+            Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldReturn_Valid_IfComparisonElement_DoesNotHaveAValue()
-        {   
+        {
             //Arrange
             var formAnswers = new FormAnswers
             {
@@ -165,12 +165,12 @@ namespace form_builder_tests.UnitTests.Validators
             ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
-            Assert.True(result.IsValid);        
+            Assert.True(result.IsValid);
         }
 
         [Fact]
         public void Validate_ShouldReturn_Valid_IfElement_IsValid_OnSamePageSubmission()
-        {   
+        {
             var formAnswers = new FormAnswers
             {
                 Pages = new List<PageAnswers>
@@ -202,7 +202,7 @@ namespace form_builder_tests.UnitTests.Validators
             ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
-            Assert.True(result.IsValid);        
+            Assert.True(result.IsValid);
         }
 
         [Fact]
@@ -240,7 +240,7 @@ namespace form_builder_tests.UnitTests.Validators
             ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
-            Assert.False(result.IsValid);        
+            Assert.False(result.IsValid);
         }
 
         [Fact]
@@ -281,7 +281,7 @@ namespace form_builder_tests.UnitTests.Validators
             ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
-            Assert.True(result.IsValid);        
+            Assert.True(result.IsValid);
         }
 
         [Fact]
@@ -292,9 +292,9 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers 
+                    new PageAnswers
                     {
-                        Answers = new List<Answers> 
+                        Answers = new List<Answers>
                         {
                             new Answers
                             {
@@ -322,15 +322,15 @@ namespace form_builder_tests.UnitTests.Validators
             ValidationResult result = isDateBeforeValidator.Validate(datePickerelement, viewModel, SchemaWithDatePickerElement);
 
             // Assert
-            Assert.False(result.IsValid);        
+            Assert.False(result.IsValid);
         }
 
-        private FormSchema SchemaWithElement(IElement element) => 
+        private FormSchema SchemaWithElement(IElement element) =>
             new FormSchema
             {
                 Pages = new List<Page>
                 {
-                    new Page 
+                    new Page
                     {
                         Elements = new List<IElement>
                         {
@@ -340,10 +340,10 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-        private FormSchema SchemaWithDatePickerElement => 
+        private FormSchema SchemaWithDatePickerElement =>
             SchemaWithElement(new DatePicker
-                {
-                    Properties = new BaseProperty { QuestionId = "test-comparison-element" }
-                });
+            {
+                Properties = new BaseProperty { QuestionId = "test-comparison-element" }
+            });
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -59,11 +60,7 @@ namespace form_builder_tests.UnitTests.Services
                         {
                             Answers = new List<Answers>
                             {
-                                new()
-                                {
-                                    Response = "testResponse",
-                                    QuestionId = "testQuestionId"
-                                }
+                                new("testResponse", "testQuestionId")
                             },
                             PageSlug = "page-one"
                         }
@@ -120,6 +117,82 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.Empty(_mappingEntity.FormAnswers.AdditionalFormData);
             Assert.False(_mappingEntity.FormAnswers.AdditionalFormData.ContainsKey("targetId"));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("Real Data Response")]
+        public async Task Process_Should_AddAnswerToFormPage_If_OKResponseIsValidStringNullOrEmpty(string response)
+        {
+            // Arrange
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = response is null ? null : new StringContent(System.Text.Json.JsonSerializer.Serialize(response))
+                });
+
+            string questionId = "testQuestion";
+
+            List<IAction> actions = new()
+            {
+                new ActionBuilder()
+                   .WithActionType(EActionType.RetrieveExternalData)
+                   .WithPageActionSlug(new PageActionSlug
+                   {
+                       URL = "www.test.com",
+                       AuthToken = string.Empty,
+                       Environment = "local"
+                   })
+                   .WithTargetQuestionId(questionId)
+                   .Build()
+            };
+
+            // Act
+            await _service.Process(actions, new FormSchema(), "test");
+
+            // Assert
+            var page = _mappingEntity.FormAnswers.Pages.First(page => page.PageSlug.Equals("page-one"));
+            var answer = page.Answers.First(answer => answer.QuestionId.Equals(questionId));
+
+            Assert.True(answer is not null);
+        }
+
+        [Fact]
+        public async Task Process_Should_SetEmptyAnswerToFormPage_If_ResponseIsNotFound()
+        {
+            // Arrange
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Content = null
+                });
+
+            string questionId = "testQuestion";
+
+            List<IAction> actions = new()
+            {
+                new ActionBuilder()
+                   .WithActionType(EActionType.RetrieveExternalData)
+                   .WithPageActionSlug(new PageActionSlug
+                   {
+                       URL = "www.test.com",
+                       AuthToken = string.Empty,
+                       Environment = "local"
+                   })
+                   .WithTargetQuestionId(questionId)
+                   .Build()
+            };
+
+            // Act
+            await _service.Process(actions, new FormSchema(), "test");
+
+            // Assert
+            var page = _mappingEntity.FormAnswers.Pages.First(page => page.PageSlug.Equals("page-one"));
+            var answer = page.Answers.First(answer => answer.QuestionId.Equals(questionId));
+
+            Assert.True(answer.Response is null);
         }
 
         [Fact]
@@ -243,64 +316,6 @@ namespace form_builder_tests.UnitTests.Services
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, null, "test"));
             Assert.Contains("RetrieveExternalDataService::Process, http request to www.test.com/testResponse returned an unsuccessful status code, Response: ", result.Message);
-        }
-
-        [Fact]
-        public async Task Process_ShouldThrowApplicationException_IfResponseContentNull()
-        {
-            // Arrange
-            var actions = new List<IAction>
-            {
-                new ActionBuilder()
-                    .WithPageActionSlug(new PageActionSlug
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        AuthToken = string.Empty,
-                        Environment = "local"
-                    })
-                    .WithTargetQuestionId("targetId")
-                    .Build()
-            };
-
-            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = null
-                });
-
-            // Act & Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, null, "test"));
-            Assert.Equal("RetrieveExternalDataService::Process, Gateway www.test.com/testResponse responded with empty reference", result.Message);
-        }
-
-        [Fact]
-        public async Task Process_ShouldThrowApplicationException_IfResponseContentEmpty()
-        {
-            // Arrange
-            var actions = new List<IAction>
-            {
-                new ActionBuilder()
-                    .WithPageActionSlug(new PageActionSlug
-                    {
-                        URL = "www.test.com/{{testQuestionId}}",
-                        AuthToken = string.Empty,
-                        Environment = "local"
-                    })
-                    .WithTargetQuestionId("targetId")
-                    .Build()
-            };
-
-            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(string.Empty)
-                });
-
-            // Act & Assert
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.Process(actions, null, "test"));
-            Assert.Equal("RetrieveExternalDataService::Process, Gateway www.test.com/testResponse responded with empty reference", result.Message);
         }
 
         [Fact]

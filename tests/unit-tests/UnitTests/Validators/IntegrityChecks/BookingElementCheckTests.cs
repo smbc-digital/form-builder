@@ -54,7 +54,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 appointmentType.OptionalResources = new List<BookingResource>
                 {
                     new ()
-                    { 
+                    {
                         Quantity = optionalResourceQuantity,
                         ResourceId = optionalResourceId
                     }

@@ -42,5 +42,25 @@ namespace form_builder_tests.UnitTests.Validators
             var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
             Assert.True(result.IsValid);
         }
+
+        [Fact]
+        public void Validate_ShouldReturn_False_ValidationResult_WhenGreater_Than_MaxLength()
+        {
+            var label = "Test label";
+            var element = new ElementBuilder()
+                .WithQuestionId("test-id")
+                .WithNumeric(true)
+                .WithLabel(label)
+                .WithMaxLength(7)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("test-id", "12345678");
+
+            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+
+            Assert.False(result.IsValid);
+            Assert.Equal($"{label} must be 7 digits or less", result.Message);
+        }
     }
 }

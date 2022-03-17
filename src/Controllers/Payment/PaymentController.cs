@@ -87,7 +87,7 @@ namespace form_builder.Controllers.Payment
 
             var paymentFailureViewModel = new PaymentFailureViewModel
             {
-                FormName = form,
+                FormName = data.BaseForm.FormName,
                 PageTitle = "Failure",
                 Reference = reference,
                 PaymentUrl = url,
@@ -106,7 +106,7 @@ namespace form_builder.Controllers.Payment
             var url = await _payService.ProcessPayment(data, form, "payment", reference, sessionGuid);
             var paymentDeclinedViewModel = new PaymentFailureViewModel
             {
-                FormName = form,
+                FormName = data.BaseForm.FormName,
                 PageTitle = "Declined",
                 Reference = reference,
                 PaymentUrl = url,

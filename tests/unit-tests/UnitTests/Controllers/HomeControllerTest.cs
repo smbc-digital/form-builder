@@ -30,13 +30,13 @@ namespace form_builder_tests.UnitTests.Controllers
     public class HomeControllerTest
     {
         private readonly HomeController _homeController;
-        private readonly Mock<IPageService> _pageService = new ();
-        private readonly Mock<ISubmitWorkflow> _submitWorkflow = new ();
-        private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new ();
-        private readonly Mock<IFileUploadService> _mockFileUploadService = new ();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
-        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new ();
-        private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new ();
+        private readonly Mock<IPageService> _pageService = new();
+        private readonly Mock<ISubmitWorkflow> _submitWorkflow = new();
+        private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new();
+        private readonly Mock<IFileUploadService> _mockFileUploadService = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
+        private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new();
         private readonly Mock<IStructureMapper> _mockStructureMapper = new();
         private readonly Mock<IOptions<DataStructureConfiguration>> _mockDataStructureConfiguration = new();
 

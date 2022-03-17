@@ -79,6 +79,12 @@ namespace form_builder.Mappers
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);
+                    
+                    if (element.Properties.Decimal)
+                        return GetDecimalElementValue(key, formAnswers);
+
+                    if (element.Properties.Decimal)
+                        return GetDecimalElementValue(key, formAnswers);
 
                     var value = formAnswers.Pages.SelectMany(_ => _.Answers)
                        .Where(_ => _.QuestionId.Equals(key))
@@ -353,8 +359,21 @@ namespace form_builder.Mappers
             if (value is null || string.IsNullOrEmpty(value.Response))
                 return null;
 
-            return int.Parse(value.Response);
+            return int.Parse(value.Response, SystemConstants.NUMERIC_NUMBER_STYLES, null);
         }
+
+        private decimal? GetDecimalElementValue(string key, FormAnswers formAnswers)
+        {
+            var value = formAnswers.Pages
+                .SelectMany(_ => _.Answers)
+                .FirstOrDefault(_ => _.QuestionId.Equals(key));
+
+            if (value is null || string.IsNullOrEmpty(value.Response))
+                return null;
+
+            return decimal.Parse(value.Response, SystemConstants.DECIMAL_NUMBER_STYLES, null);
+        }
+
         private DateTime? GetDatePickerElementValue(string key, FormAnswers formAnswers)
         {
             var value = formAnswers.Pages

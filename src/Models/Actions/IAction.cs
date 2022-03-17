@@ -18,7 +18,7 @@ namespace form_builder.Models.Actions
         EActionType Type { get; set; }
 
         BaseActionProperty Properties { get; set; }
-        
+
         Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers);
 
         Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers);

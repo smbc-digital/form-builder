@@ -31,7 +31,8 @@ namespace form_builder.Models.Elements
             return viewRender.RenderAsync(Type.ToString(), this);
         }
 
-        public Dictionary<string, dynamic> GenerateCheckboxProperties(int i) {
+        public Dictionary<string, dynamic> GenerateCheckboxProperties(int i)
+        {
             var properties = new Dictionary<string, dynamic>
             {
                 { "class", "govuk-checkboxes__input" },
@@ -40,20 +41,21 @@ namespace form_builder.Models.Elements
                 { "value", Properties.Options[i].Value},
             };
 
-            if (Properties.Options.Any(_ => _.HasConditionalElement)) {
+            if (Properties.Options.Any(_ => _.HasConditionalElement))
+            {
                 var fieldsetIncrement = Properties.QuestionId.Split(':').Length > 1 ? $"-{Properties.QuestionId.Split(':')[1]}" : null;
-                properties.Add("data-aria-controls", $"conditional-{i}{fieldsetIncrement}");
+                properties.Add("data-aria-controls", $"conditional-{i}{fieldsetIncrement}-{Properties.QuestionId}");
             }
 
-            if (Properties.Options[i].HasHint) 
-                properties.Add("aria-describedby", GetListItemHintId(i));      
+            if (Properties.Options[i].HasHint)
+                properties.Add("aria-describedby", GetListItemHintId(i));
 
-            if (Properties.Options[i].Exclusive) 
+            if (Properties.Options[i].Exclusive)
                 properties.Add("data-behaviour", "exclusive");
 
-            if (Properties.Checked || Properties.Value.Contains(Properties.Options[i].Value)) 
+            if (Properties.Checked || Properties.Value.Contains(Properties.Options[i].Value))
                 properties.Add("checked", "true");
-            
+
             return properties;
         }
     }

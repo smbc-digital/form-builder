@@ -12,7 +12,7 @@ namespace form_builder_tests.UnitTests.Providers.Lookup
     public class LookupProviderTests
     {
         private readonly JsonLookupProvider _lookupProvider;
-        private readonly Mock<IGateway> _mockGateway = new ();
+        private readonly Mock<IGateway> _mockGateway = new();
 
         public LookupProviderTests() => _lookupProvider = new JsonLookupProvider(_mockGateway.Object);
 
@@ -42,7 +42,7 @@ namespace form_builder_tests.UnitTests.Providers.Lookup
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = httpStatusCode });
 
             //Act & Assert
-            var exception = await Record.ExceptionAsync(() =>  _lookupProvider.GetAsync(It.IsAny<string>(), It.IsAny<string>()));
+            var exception = await Record.ExceptionAsync(() => _lookupProvider.GetAsync(It.IsAny<string>(), It.IsAny<string>()));
             Assert.Null(exception);
         }
     }

@@ -178,8 +178,8 @@ namespace form_builder.Providers.Booking
                 {
                     Date = new DateTime(2021, 4, 13),
                     CanCustomerCancel = false,
-                    StartTime = new TimeSpan(1,1,1),
-                    EndTime = new TimeSpan(2,1, 1)
+                    StartTime = new TimeSpan(1, 1, 1),
+                    EndTime = new TimeSpan(2, 1, 1)
                 });
             }
 
@@ -194,7 +194,7 @@ namespace form_builder.Providers.Booking
 
         public async Task Cancel(Guid bookingId)
         {
-            if(bookingId.Equals(Guid.Parse(BOOKING_WITH_ERROR_ON_CANCEL)))
+            if (bookingId.Equals(Guid.Parse(BOOKING_WITH_ERROR_ON_CANCEL)))
                 throw new Exception("FakeBookingProvider::Cancel, Booking faked with fake exception");
 
             _ = await Task.FromResult("");

@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = _restrictCurrentDateValidator.Validate(element, null,new form_builder.Models.FormSchema());
+            var result = _restrictCurrentDateValidator.Validate(element, null, new form_builder.Models.FormSchema());
 
             // Assert
             Assert.True(result.IsValid);

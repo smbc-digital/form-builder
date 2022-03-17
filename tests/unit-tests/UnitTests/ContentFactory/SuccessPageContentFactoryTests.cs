@@ -26,12 +26,12 @@ namespace form_builder_tests.UnitTests.ContentFactory
     public class SuccessPageContentFactoryTests
     {
         private readonly SuccessPageFactory _factory;
-        private readonly Mock<IPageHelper> _mockPageHelper = new ();
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new ();
-        private readonly Mock<ISessionHelper> _mockSessionHelper = new ();
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new ();
-        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new ();
-        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new ();
+        private readonly Mock<IPageHelper> _mockPageHelper = new();
+        private readonly Mock<IPageFactory> _mockPageContentFactory = new();
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+        private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
+        private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
 
         public SuccessPageContentFactoryTests()
         {
@@ -127,51 +127,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
             Assert.Equal(EElementType.H2, callBack.Elements[0].Type);
         }
 
-        [Theory]
-        [InlineData(EBehaviourType.SubmitAndPay)]
-        [InlineData(EBehaviourType.SubmitForm)]
-        public async Task Build_Should_AddDocumentDownloadButton_WhenDocumentDownloadEnabled(EBehaviourType behaviourType)
-        {
-            // Arrange
-            var callBack = new Page();
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.H2)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("success")
-                .Build();
-
-            var formSchema = new FormSchemaBuilder()
-                .WithDocumentDownload(true)
-                .WithDocumentType(EDocumentType.Txt)
-                .WithFirstPageSlug("page-one")
-                .WithBaseUrl("base-test")
-                .WithPage(page)
-                .Build();
-
-            _mockPageContentFactory
-                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel())
-                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, List<object>>((a, b, c, d, e, f) => callBack = a);
-
-            _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
-                .Returns(formSchema.Pages.FirstOrDefault());
-
-            // Act 
-            var result = await _factory.Build(string.Empty, formSchema, string.Empty, new FormAnswers(), behaviourType);
-
-            // Assert
-            Assert.Equal("Success", result.ViewName);
-            _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
-            Assert.Equal(2, callBack.Elements.Count);
-            Assert.Equal(EElementType.DocumentDownload, callBack.Elements[1].Type);
-            Assert.Equal($"Download {EDocumentType.Txt} document", callBack.Elements[1].Properties.Label);
-        }
-
         [Fact]
         public async Task Build_Should_Set_IsInPreviewMode_ToTrue()
         {
@@ -193,7 +148,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             _mockPageContentFactory
                 .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel{ IsInPreviewMode = true });
+                .ReturnsAsync(new FormBuilderViewModel { IsInPreviewMode = true });
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
@@ -245,7 +200,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+                .Returns(new PreviewModeConfiguration { IsEnabled = true });
 
             // Arrange
             var element = new ElementBuilder()
@@ -265,7 +220,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             _mockPageContentFactory
                 .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel{ IsInPreviewMode = true });
+                .ReturnsAsync(new FormBuilderViewModel { IsInPreviewMode = true });
 
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
@@ -333,7 +288,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Single(pageCallback.Elements);
             Assert.Equal("booking-cancel-success", pageCallback.PageSlug);
-            Assert.Equal("You've successfully cancelled your appointment",pageCallback.BannerTitle);
+            Assert.Equal("You've successfully cancelled your appointment", pageCallback.BannerTitle);
             Assert.Equal("We've received your cancellation request", pageCallback.LeadingParagraph);
             Assert.Equal("Success", pageCallback.Title);
             Assert.True(pageCallback.HideTitle);

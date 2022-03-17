@@ -1,24 +1,24 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Builders;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Models;
-using form_builder.ViewModels;
-using form_builder.Validators;
-using form_builder.Services.PageService.Entities;
-using System.Linq;
-using form_builder.Services.FileUploadService;
-using form_builder.Providers.StorageProvider;
 using form_builder.Configuration;
-using System;
+using form_builder.Constants;
+using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Extensions;
-using Microsoft.Extensions.Options;
 using form_builder.Factories.Schema;
-using Newtonsoft.Json;
-using form_builder.Constants;
-using Microsoft.Extensions.Caching.Distributed;
 using form_builder.Helpers.Cookie;
+using form_builder.Models;
+using form_builder.Providers.StorageProvider;
+using form_builder.Services.FileUploadService;
+using form_builder.Services.PageService.Entities;
+using form_builder.Validators;
+using form_builder.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace form_builder.Services.PreviewService
 {
@@ -158,7 +158,7 @@ namespace form_builder.Services.PreviewService
                 .WithHideBackButton(true)
                 .Build();
         }
-        
+
         private Page PreviewErrorPage(string errorMessage, string errorSource)
         {
             var warning = new ElementBuilder()
@@ -166,7 +166,7 @@ namespace form_builder.Services.PreviewService
                 .WithPropertyText("The provided file is not valid.")
                 .Build();
 
-            if(errorSource.Equals(LibConstants.NEWTONSOFT_LIBRARY_NAME))
+            if (errorSource.Equals(LibConstants.NEWTONSOFT_LIBRARY_NAME))
                 errorMessage = $"The provided file is not valid JSON data format. Check the provided file JSON data strcuture. {SystemConstants.NEW_LINE_CHARACTER} {errorMessage}";
 
             string[] errorMessages = errorMessage.Split(SystemConstants.NEW_LINE_CHARACTER);

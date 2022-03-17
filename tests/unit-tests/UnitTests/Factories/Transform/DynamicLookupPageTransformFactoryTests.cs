@@ -9,7 +9,6 @@ using form_builder.Models;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
 using form_builder.Services.RetrieveExternalDataService.Entities;
-using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
@@ -27,9 +26,9 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         public DynamicLookupPageTransformFactoryTests()
         {
             _fakeLookupProvider.Setup(_ => _.ProviderName).Returns("fake");
-            
+
             _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<Option> {new Option()});
+                .ReturnsAsync(new List<Option> { new Option() });
 
             _mockLookupProviders = new List<ILookupProvider>
             {
@@ -39,10 +38,10 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             _mockActionHelper
                 .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns(new RequestEntity
-                    {
-                        IsPost = false,
-                        Url = "waste=waste"
-                    });
+                {
+                    IsPost = false,
+                    Url = "waste=waste"
+                });
             _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
             _dynamicLookupPageTransformFactory = new DynamicLookupPageTransformFactory(_mockActionHelper.Object,

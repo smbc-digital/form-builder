@@ -1,70 +1,71 @@
 ﻿@model Element
 @{
-    var elements = Model.GenerateElementProperties();
-    var baseCssClasses = "govuk-input";
-    var fieldsetIncrement = Model.Properties.QuestionId.Split(':').Length > 1 ? $"-{Model.Properties.QuestionId.Split(':')[1]}" : null;
+	var elements = Model.GenerateElementProperties();
+	var baseCssClasses = "govuk-input";
+	var fieldsetIncrement = Model.Properties.QuestionId.Split(':').Length > 1 ? $"-{Model.Properties.QuestionId.Split(':')[1]}" : null;
+	var questionID = Model.QuestionId;
 
-    switch (Model.Properties.Width)
-    {
-        case ESize.Small:
-            baseCssClasses += " govuk-input--width-3";
-            break;
+	switch (Model.Properties.Width)
+	{
+		case ESize.Small:
+			baseCssClasses += " govuk-input--width-3";
+			break;
 
-        case ESize.Medium:
-            baseCssClasses += " govuk-input--width-5";
-            break;
+		case ESize.Medium:
+			baseCssClasses += " govuk-input--width-5";
+			break;
 
-        case ESize.Large:
-            baseCssClasses += " govuk-input--width-10";
-            break;
+		case ESize.Large:
+			baseCssClasses += " govuk-input--width-10";
+			break;
 
-        case ESize.ExtraLarge:
-            baseCssClasses += " govuk-input--width-20";
-            break;
-    }
+		case ESize.ExtraLarge:
+			baseCssClasses += " govuk-input--width-20";
+			break;
+	}
 
-    elements.Add("class", !Model.IsValid
-        ? $"{baseCssClasses} govuk-input--error"
-        : baseCssClasses);
+	elements.Add("class", !Model.IsValid
+		? $"{baseCssClasses} govuk-input--error"
+		: baseCssClasses);
 }
 
 <div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? " govuk-radios--conditional" : "")" data-module="govuk-radios">
-    @for (var i = 0; i < Model.Properties.Options.Count; i++)
-    {
-        var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
+	@for (var i = 0; i < Model.Properties.Options.Count; i++)
+	{
+		var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
 
-        @if (Model.Properties.Options[i].HasDivider)
-        {
-            <div class="govuk-radios__divider">@Model.Properties.Options[i].Divider</div>
-        }
+		@if (Model.Properties.Options[i].HasDivider)
+		{
+			<div class="govuk-radios__divider">@Model.Properties.Options[i].Divider</div>
+		}
 
-        <div class="govuk-radios__item">
-            <input class="govuk-radios__input"
-                   type="radio"
-                   value="@Model.Properties.Options[i].Value"
-                   name="@Model.QuestionId"
-                   id="@Model.GetListItemId(i)"
-                   @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
-                   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty)
-                   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}{fieldsetIncrement}" : string.Empty) />
+		<div class="govuk-radios__item">
+			<input class="govuk-radios__input"
+				   type="radio"
+				   value="@Model.Properties.Options[i].Value"
+				   name="@Model.QuestionId"
+				   id="@Model.GetListItemId(i)"
+				   @(Model.Properties.Options[i].HasHint ? $"aria-describedby={Model.GetListItemHintId(i)}" : string.Empty)
+				   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty)
+				   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}{fieldsetIncrement}-{questionID}" : string.Empty) />
 
-            <label class="govuk-label govuk-radios__label @strongLabel"
-                   for="@Model.GetListItemId(i)">
-                @Html.Raw(Model.Properties.Options[i].Text)
-            </label>
+			<label class="govuk-label govuk-radios__label @strongLabel"
+				   for="@Model.GetListItemId(i)">
+				@Html.Raw(Model.Properties.Options[i].Text)
+			</label>
 
-            @if (Model.Properties.Options[i].HasHint)
-            {
-                <span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
-            }
+			@if (Model.Properties.Options[i].HasHint)
+			{
+				<span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
+			}
 
-        </div>
+		</div>
 
-        @if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId))
-        {
-            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i@fieldsetIncrement">
-                @SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT@Model.Properties.Options[i].ConditionalElementId
-            </div>
-        }
-    }
+		@if (!string.IsNullOrEmpty(Model.Properties.Options[i].ConditionalElementId))
+		{
+			<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-@i-@fieldsetIncrement@questionID">
+				@SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT@Model.Properties.Options[i].ConditionalElementId
+			</div>
+		}
+	}
 </div>

@@ -188,7 +188,7 @@ namespace form_builder.Services.BookingService
 
             var cachedAnswers = _distributedCache.GetString(guid);
 
-            if(cachedAnswers is null)
+            if (cachedAnswers is null)
                 throw new ApplicationException("BookingService::ProcessMonthRequest, Session data is null");
 
             var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
@@ -390,13 +390,13 @@ namespace form_builder.Services.BookingService
                 var currentSelectedDate = (string)viewModel[currentlySelectedBookingDate];
                 var currentSelectedStartTime = (string)viewModel[currentlySelectedBookingStartTime];
                 var currentSelectedEndTime = (string)viewModel[currentlySelectedBookingEndTime];
-                var previouslyReservedAppointmentId = (string) viewModel[reservedBookingAppointmentId];
+                var previouslyReservedAppointmentId = (string)viewModel[reservedBookingAppointmentId];
                 var previouslyReservedAppointmentDate = (string)viewModel[reservedBookingDate];
                 var previouslyReservedAppointmentStartTime = (string)viewModel[reservedBookingStartTime];
                 var previouslyReservedAppointmentEndTime = (string)viewModel[reservedBookingEndTime];
 
-                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate) 
-                        && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime) 
+                if (currentSelectedDate.Equals(previouslyReservedAppointmentDate)
+                        && currentSelectedStartTime.Equals(previouslyReservedAppointmentStartTime)
                         && currentSelectedEndTime.Equals(previouslyReservedAppointmentEndTime)
                         && currentSelectedAppointmentId.Equals(previouslyReservedAppointmentId))
                     return Guid.Parse(viewModel[reservedBookingId]);

@@ -1,9 +1,9 @@
-﻿using form_builder.Constants;
+﻿using System;
+using System.Collections.Generic;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
-using System;
-using System.Collections.Generic;
 
 namespace form_builder.Validators
 {

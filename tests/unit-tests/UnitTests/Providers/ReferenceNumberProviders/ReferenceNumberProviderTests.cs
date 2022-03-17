@@ -13,11 +13,12 @@ namespace form_builder_tests.UnitTests.Providers.ReferenceNumberProviders
 
         private const string PREFIX = "TEST";
 
-        public ReferenceNumberProviderTests() 
+        public ReferenceNumberProviderTests()
         {
             _mockFormConfiguration
                 .Setup(options => options.Value)
-                .Returns(new FormConfiguration{
+                .Returns(new FormConfiguration
+                {
                     ValidReferenceCharacters = "abc123456789"
                 });
 

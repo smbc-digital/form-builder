@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             _mockPaymentHelper
                 .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
-                .ReturnsAsync(new PaymentInformation { Settings = new Settings { Amount = "10.00"} });
+                .ReturnsAsync(new PaymentInformation { Settings = new Settings { Amount = "10.00" } });
 
             _tagParser = new PaymentAmountTagParser(_mockFormatters.Object, _mockPaymentHelper.Object);
         }
@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswer);
 
-            Assert.Equal("10.00",result.Elements.First().Properties.Text);
+            Assert.Equal("10.00", result.Elements.First().Properties.Text);
             Assert.Equal("10.00", result.LeadingParagraph);
             Assert.Equal("10.00", result.Behaviours.FirstOrDefault().Conditions.FirstOrDefault().QuestionId);
         }

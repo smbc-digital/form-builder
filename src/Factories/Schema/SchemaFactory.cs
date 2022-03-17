@@ -12,7 +12,6 @@ using form_builder.Models;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Providers.StorageProvider;
 using form_builder.Validators.IntegrityChecks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -37,7 +36,7 @@ namespace form_builder.Factories.Schema
             IOptions<DistributedCacheConfiguration> distributedCacheConfiguration,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
-            IFormSchemaIntegrityValidator formSchemaIntegrityValidator, 
+            IFormSchemaIntegrityValidator formSchemaIntegrityValidator,
             IEnumerable<IUserPageTransformFactory> userPageTransformFactories)
         {
             _distributedCache = distributedCache;
@@ -53,25 +52,22 @@ namespace form_builder.Factories.Schema
 
         public async Task<FormSchema> Build(string formKey)
         {
-            if(_previewModeConfiguration.Value.IsEnabled && formKey.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))
+            if (_previewModeConfiguration.Value.IsEnabled && formKey.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))
                 return await InPreviewMode(formKey);
 
             if (!_schemaProvider.ValidateSchemaName(formKey).Result)
                 return null;
 
-            FormSchema formSchema = new();
-
             if (_distributedCacheConfiguration.UseDistributedCache && _distributedCacheExpirationConfiguration.FormJson > 0)
             {
                 string data = _distributedCache.GetString($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{formKey}");
-
                 if (data is not null)
                 {
                     return JsonConvert.DeserializeObject<FormSchema>(data);
                 }
             }
-            
-            formSchema = await _schemaProvider.Get<FormSchema>(formKey);
+
+            FormSchema formSchema = await _schemaProvider.Get<FormSchema>(formKey);
 
             formSchema = await _reusableElementSchemaFactory.Transform(formSchema);
             formSchema = _lookupSchemaFactory.Transform(formSchema);

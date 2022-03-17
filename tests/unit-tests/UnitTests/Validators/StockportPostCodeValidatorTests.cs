@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Act
             var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-            
+
             // Assert
             Assert.False(result.IsValid);
         }

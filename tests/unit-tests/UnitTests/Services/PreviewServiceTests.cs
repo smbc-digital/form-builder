@@ -38,7 +38,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = true });
+                .Returns(new PreviewModeConfiguration { IsEnabled = true });
 
             _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = false });
+                .Returns(new PreviewModeConfiguration { IsEnabled = false });
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.GetPreviewPage());
 
@@ -85,9 +85,9 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public void ExitPreviewMode_ShouldThrow_Exception_When_PreviewMode_IsDisabled()
         {
-             _mockPreviewModeConfiguration
-                .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = false });
+            _mockPreviewModeConfiguration
+               .Setup(_ => _.Value)
+               .Returns(new PreviewModeConfiguration { IsEnabled = false });
 
             var result = Assert.Throws<ApplicationException>(() => _service.ExitPreviewMode());
 
@@ -118,7 +118,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
-                .Returns(new PreviewModeConfiguration{ IsEnabled = false });
+                .Returns(new PreviewModeConfiguration { IsEnabled = false });
 
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.VerifyPreviewRequest(new List<CustomFormFile>()));
 
@@ -129,7 +129,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task VerifyPreviewRequest_ShouldRetuenView_WhenRequest_IsNotValid()
         {
             var result = await _service.VerifyPreviewRequest(new List<CustomFormFile>());
-            
+
             Assert.IsType<ProcessPreviewRequestEntity>(result);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
@@ -150,10 +150,10 @@ namespace form_builder_tests.UnitTests.Services
                 .ThrowsAsync(new ApplicationException());
 
             _fileUploadService.Setup(_ => _.AddFiles(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
-                .Returns(new Dictionary<string, dynamic>{ { "file", new List<DocumentModel> { new DocumentModel{ Content = "" }} } });
+                .Returns(new Dictionary<string, dynamic> { { "file", new List<DocumentModel> { new DocumentModel { Content = "" } } } });
 
             var result = await _service.VerifyPreviewRequest(model);
-            
+
             var entity = Assert.IsType<ProcessPreviewRequestEntity>(result);
             Assert.True(entity.UseGeneratedViewModel);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
@@ -165,10 +165,10 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task VerifyPreviewRequest_ShouldReturnErrorPage_When_Uploaded_Schama_Is_Not_Valid_AndAdd_MesseageWhen_ExceptionType_Is_From_Newtonsoft()
         {
-            Page callbackPage = new ();
+            Page callbackPage = new();
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel())
-                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, object>((a,b,c,d,e,f) => callbackPage = a);
+                .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, object>((a, b, c, d, e, f) => callbackPage = a);
 
             _testValidator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = true });
@@ -179,13 +179,13 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ThrowsAsync(new ApplicationException{ Source = LibConstants.NEWTONSOFT_LIBRARY_NAME });
+                .ThrowsAsync(new ApplicationException { Source = LibConstants.NEWTONSOFT_LIBRARY_NAME });
 
             _fileUploadService.Setup(_ => _.AddFiles(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
-                .Returns(new Dictionary<string, dynamic>{ { "file", new List<DocumentModel> { new DocumentModel{ Content = "" }} } });
+                .Returns(new Dictionary<string, dynamic> { { "file", new List<DocumentModel> { new DocumentModel { Content = "" } } } });
 
             var result = await _service.VerifyPreviewRequest(model);
-            
+
             var entity = Assert.IsType<ProcessPreviewRequestEntity>(result);
             Assert.True(entity.UseGeneratedViewModel);
             Assert.Equal(3, callbackPage.Elements.Count);
@@ -207,13 +207,13 @@ namespace form_builder_tests.UnitTests.Services
             };
 
             _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(new FormSchema{ Pages = new List<Page>() });
+                .ReturnsAsync(new FormSchema { Pages = new List<Page>() });
 
             _fileUploadService.Setup(_ => _.AddFiles(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>()))
-                .Returns(new Dictionary<string, dynamic>{ { "file", new List<DocumentModel> { new DocumentModel{ Content = "" }} } });
+                .Returns(new Dictionary<string, dynamic> { { "file", new List<DocumentModel> { new DocumentModel { Content = "" } } } });
 
             var result = await _service.VerifyPreviewRequest(model);
-            
+
             var entity = Assert.IsType<ProcessPreviewRequestEntity>(result);
             Assert.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX, entity.PreviewFormKey);
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);

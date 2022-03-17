@@ -8,23 +8,18 @@
 ## Table of Contents
 - [Requirements & Prereqs](#requirements-&-prereqs)
 - [Wiki](https://github.com/smbc-digital/form-builder/wiki)
-- [Validators](#validators)
+- [Validators](https://github.com/smbc-digital/form-builder/wiki/Validators)
 - [Address/Street/Organisation Providers](#address-providers)
 - [Payment Providers](#payment-providers)
 - [Storage Providers](#storage-providers)
 - [Running High Availability](#running-high-availability)
 - [Structure Tests](#structure-tests)
-- [UI Tests](#ui-Tests)
 - [Preview](#preview)
 - [Data Structure Preview](#data-structure-preview)
 
 # Requirements & Prereqs
 - dotnet core 3.1
 - GPG key added to collaborators
-
-# Validators
-
-Comming Soon...
 
 # Providers
 ## Address Providers
@@ -217,3 +212,21 @@ Preview allows you to view and validate a form without the need of uploading it 
 ## Data Structure Preview
   
 Data Structure Preview allows you to view the data structure that will be submitted to the form Service. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Preview-data-structure)
+
+## Analytics
+  
+Analytic events can be enabled within appsettings.json `Analytics` config section, by default this is GA but can be extended by creating your own `IAnalyticsProvider`
+
+```json
+{
+  "Analytics": {
+    "Enabled": true,
+    "Type": "GA"
+  }
+}
+```
+
+`IAnalyticsProvider` is provided to enable integration with different analytics providers. The interface requires a ProviderName and a RaiseEventAsync method.
+
+
+Analaytics event on successful form submission can be raised in the configured Analytics provider. More info on this feature can be found [here](https://github.com/smbc-digital/form-builder/wiki/Analaytics)

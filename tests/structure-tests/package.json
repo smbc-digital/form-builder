@@ -13,7 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@cypress/snapshot": "^2.1.7",
-    "cypress": "^7.1.0"
+    "cypress": "^7.7.0"
   },
   "repository": {
     "type": "git",

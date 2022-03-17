@@ -18,7 +18,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
         private readonly DynamicLookupCheck _integrityCheck;
 
-        public DynamicLookupCheckTests() => 
+        public DynamicLookupCheckTests() =>
             _integrityCheck = new DynamicLookupCheck(_mockHostingEnv.Object, new List<ILookupProvider>());
 
         [Theory]

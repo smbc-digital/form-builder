@@ -1,6 +1,6 @@
 describe('Footer', () => {
     it('Footer', () => {
-      cy.visit('ui-button')
+      cy.visit('ui-footer')
         .toMatchingDOM('smbc-footer')
     });
   });

@@ -672,12 +672,12 @@ namespace form_builder_tests.UnitTests.Helpers
                     new FormAnswers
                     {
                         Pages = new List<PageAnswers>
-                        { 
+                        {
                             new PageAnswers
                             {
                                 PageSlug = "page-one",
-                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }} 
-                            }    
+                                Answers = new List<Answers> { new Answers { QuestionId = "question", Response = "test answer" }}
+                            }
                         },
                     }));
 
@@ -917,7 +917,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void GetAddAnotherNumberOfFieldsets_ShouldThrowApplicationException_WhenFormDataDoesnotContainKey()
+        public void GetAddAnotherNumberOfFieldsets_ShouldReturnZero_WhenFormDataDoesnotContainKey()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -942,8 +942,8 @@ namespace form_builder_tests.UnitTests.Helpers
                 },
             };
 
-            var result = Assert.Throws<ApplicationException>(() => _elementHelper.GetAddAnotherNumberOfFieldsets(element, formAnswers));
-            Assert.Equal($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {AddAnotherConstants.IncrementKeyPrefix}test-id", result.Message);
+            var result = _elementHelper.GetAddAnotherNumberOfFieldsets(element, formAnswers);
+            Assert.Equal(0, result);
         }
     }
 }

@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldReturnCustomValidationResult_WhenElementNotValidNumber()
+        public void Validate_ShouldReturn_CustomValidationMessage_WhenElement_NotValid_Number()
         {
             var errorMessage = "Provide an integer";
             var label = "Test label";
@@ -67,9 +67,8 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("tets-id")
                 .WithNumeric(true)
                 .WithLabel(label)
+                .WithNotAnIntegerValidationMessage(errorMessage)
                 .Build();
-
-            element.Properties.NotAnIntegerValidationMessage = errorMessage;
 
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("tets-id", "a123");
@@ -78,87 +77,6 @@ namespace form_builder_tests.UnitTests.Validators
 
             Assert.False(result.IsValid);
             Assert.Equal(errorMessage, result.Message);
-        }
-
-        [Fact]
-        public void Validate_ShouldReturnFalseValidationResult_WhenValueGreaterThanMax()
-        {
-            var label = "Test label";
-            var element = new ElementBuilder()
-                .WithQuestionId("tets-id")
-                .WithNumeric(true)
-                .WithLabel(label)
-                .WithMax("20")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("tets-id", "123");
-
-            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            Assert.False(result.IsValid);
-            Assert.Equal($"{label} must be less than or equal to 20", result.Message);
-        }
-
-        [Fact]
-        public void Validate_ShouldReturnFalseValidationResult_WhenValueLessThanMin()
-        {
-            var label = "Test label";
-            var element = new ElementBuilder()
-                .WithQuestionId("tets-id")
-                .WithNumeric(true)
-                .WithLabel(label)
-                .WithMin("20")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("tets-id", "12");
-
-            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            Assert.False(result.IsValid);
-            Assert.Equal($"{label} must be greater than or equal to 20", result.Message);
-        }
-
-        [Fact]
-        public void Validate_ShouldReturnFalseValidationResult_WhenOutOfRange()
-        {
-            var label = "Test label";
-            var element = new ElementBuilder()
-                .WithQuestionId("tets-id")
-                .WithNumeric(true)
-                .WithLabel(label)
-                .WithMax("20")
-                .WithMin("10")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("tets-id", "7");
-
-            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            Assert.False(result.IsValid);
-            Assert.Equal($"{label} must be between 10 and 20 inclusive", result.Message);
-        }
-
-        [Fact]
-        public void Validate_ShouldReturnFalseValidationResult_WhenGreaterThanMaxLength()
-        {
-            var label = "Test label";
-            var element = new ElementBuilder()
-                .WithQuestionId("test-id")
-                .WithNumeric(true)
-                .WithLabel(label)
-                .WithMaxLength(7)
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("test-id", "12345678");
-
-            var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            Assert.False(result.IsValid);
-            Assert.Equal($"{label} must be 7 digits or less", result.Message);
         }
     }
 }

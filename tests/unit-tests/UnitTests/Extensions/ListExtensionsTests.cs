@@ -15,7 +15,7 @@ namespace form_builder_tests.UnitTests.Extensions
             var id = Guid.NewGuid();
             var testList = new List<AppointmentType>
             {
-                new AppointmentType 
+                new AppointmentType
                 {
                     Environment = "local",
                     AppointmentId = id,
@@ -26,7 +26,7 @@ namespace form_builder_tests.UnitTests.Extensions
             };
             var result = testList.GetAppointmentTypeForEnvironment("uitest");
 
-            
+
             Assert.NotNull(result);
             Assert.Equal(id, result.AppointmentId);
             Assert.Single(result.OptionalResources);

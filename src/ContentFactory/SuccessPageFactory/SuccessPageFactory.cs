@@ -25,10 +25,10 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IWebHostEnvironment _environment;
         private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
-        
+
         public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory,
             ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache,
-            IOptions<PreviewModeConfiguration> previewModeConfiguration, 
+            IOptions<PreviewModeConfiguration> previewModeConfiguration,
             IWebHostEnvironment environment)
         {
             _pageHelper = pageHelper;
@@ -65,24 +65,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                     StartPageUrl = baseForm.StartPageUrl,
                     IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX)
                 };
-            }
-
-            if (baseForm.DocumentDownload)
-            {
-                var sourceBase = "/document/Summary";
-                baseForm.DocumentType.ForEach(docType =>
-                {
-                    var element = new ElementBuilder()
-                        .WithType(EElementType.DocumentDownload)
-                        .WithLabel($"Download {docType} document")
-                        .WithSource($"{sourceBase}/{docType}/{sessionGuid}")
-                        .WithDocumentType(docType)
-                        .Build();
-
-                    page.Elements.Add(element);
-                });
-                var successIndex = baseForm.Pages.IndexOf(page);
-                baseForm.Pages[successIndex] = page;
             }
 
             var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid, formAnswers);

@@ -6,7 +6,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class TextAreaTests
     {
-        
+
         [Theory]
         [InlineData(50, "5")]
         [InlineData(200, "5")]

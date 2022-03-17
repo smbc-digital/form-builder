@@ -15,6 +15,7 @@ using form_builder.Factories.Transform.ReusableElements;
 using form_builder.Factories.Transform.UserSchema;
 using form_builder.Gateways;
 using form_builder.Helpers.ActionsHelpers;
+using form_builder.Helpers.Cookie;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.IncomingDataHelper;
@@ -26,6 +27,7 @@ using form_builder.Mappers;
 using form_builder.Mappers.Structure;
 using form_builder.Providers;
 using form_builder.Providers.Address;
+using form_builder.Providers.Analytics;
 using form_builder.Providers.Booking;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Providers.DocumentCreation.Generic;
@@ -46,6 +48,7 @@ using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
+using form_builder.Services.AnalyticsService;
 using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
@@ -55,11 +58,13 @@ using form_builder.Services.MappingService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService;
 using form_builder.Services.PayService;
+using form_builder.Services.PreviewService;
 using form_builder.Services.RetrieveExternalDataService;
 using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.ValidateService;
+using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
 using form_builder.Utils.Hash;
@@ -92,9 +97,6 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
-using form_builder.Services.PreviewService;
-using form_builder.SubmissionActions;
-using form_builder.Helpers.Cookie;
 
 namespace form_builder.Utils.Startup
 {
@@ -106,6 +108,8 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, RequiredElementValidator>();
             services.AddTransient<IElementValidator, MultipleFileUploadElementValidator>();
             services.AddTransient<IElementValidator, NumericValueValidator>();
+            services.AddTransient<IElementValidator, DecimalValueValidator>();
+            services.AddTransient<IElementValidator, MinMaxValidator>();
             services.AddTransient<IElementValidator, AutomaticAddressElementValidator>();
             services.AddTransient<IElementValidator, ManualAddressValidator>();
             services.AddTransient<IElementValidator, DateInputElementValidator>();
@@ -220,7 +224,7 @@ namespace form_builder.Utils.Startup
 
             return services;
         }
-        
+
         public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
@@ -290,7 +294,8 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
-        public static IServiceCollection ConfigureSubmitProviders(this IServiceCollection services) {
+        public static IServiceCollection ConfigureSubmitProviders(this IServiceCollection services)
+        {
             services.AddSingleton<ISubmitProvider, AuthenticationHeaderSubmitProvider>();
             services.AddSingleton<ISubmitProvider, PowerAppsSubmitProvider>();
 
@@ -335,7 +340,6 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, DocumentDownloadCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
@@ -348,7 +352,8 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();            
+            services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, OptionalIfCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
@@ -360,10 +365,12 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, AddressNoManualTextIsSetCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, BookingElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, DateValidationsCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, DocumentDownloadCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidQuestionCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, InvalidTargetMappingValueCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, CheckboxElementCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, TextboxElementCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 
@@ -389,6 +396,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<ITemplatedEmailService, TemplatedEmailService>();
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
             services.AddSingleton<IPreviewService, PreviewService>();
+            services.AddSingleton<IAnalyticsService, AnalyticsService>();
 
             return services;
         }
@@ -413,6 +421,8 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IReusableElementSchemaTransformFactory, ReusableElementSchemaTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, AddAnotherPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, DynamicLookupPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, AnswerLookupPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, OptionalIfTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, BehaviourConditionsPageTransformFactory>();
 
             return services;
@@ -462,6 +472,8 @@ namespace form_builder.Utils.Startup
             services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
+            services.Configure<AnalyticsConfiguration>(configuration.GetSection(AnalyticsConfiguration.ConfigValue));
+            services.Configure<GoogleAnalyticsConfiguration>(configuration.GetSection(GoogleAnalyticsConfiguration.ConfigValue));
             services.Configure<S3SchemaProviderConfiguration>(configuration.GetSection(S3SchemaProviderConfiguration.ConfigValue));
 
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
@@ -535,6 +547,15 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IFileStorageProvider, RedisFileStorageProvider>();
             services.AddTransient<IFileStorageProvider, InMemoryStorageProvider>();
             services.AddTransient<IFileStorageProvider, S3FileStorageProvider>();
+
+            return services;
+        }
+
+
+        public static IServiceCollection AddAnalyticsProviders(this IServiceCollection services)
+        {
+            services.AddTransient<IAnalyticsProvider, FakeAnalyticsProvider>();
+            services.AddTransient<IAnalyticsProvider, GoogleAnalyticsProvider>();
 
             return services;
         }

@@ -26,7 +26,7 @@ namespace form_builder.Mappers.Structure
             var elements = formSchema.Pages.SelectMany(_ => _.ValidatableElements).ToList();
 
             dataStructure = elements
-                .Aggregate(dataStructure, (current, element) => 
+                .Aggregate(dataStructure, (current, element) =>
                     RecursiveObjectCreate(string.IsNullOrEmpty(element.Properties.TargetMapping) ? element.Properties.QuestionId : element.Properties.TargetMapping, element, current));
 
             foreach (var page in formSchema.Pages)
@@ -34,7 +34,7 @@ namespace form_builder.Mappers.Structure
                 if (page.HasIncomingValues)
                 {
                     dataStructure = page.IncomingValues
-                        .Aggregate(dataStructure, (current, incomingValue) => 
+                        .Aggregate(dataStructure, (current, incomingValue) =>
                             RecursiveObjectCreate(incomingValue.QuestionId, null, current));
                 }
 
@@ -42,7 +42,7 @@ namespace form_builder.Mappers.Structure
                 {
                     dataStructure = page.PageActions
                         .Where(_ => _.Type.Equals(EActionType.RetrieveExternalData))
-                        .Aggregate(dataStructure, (current, action) => 
+                        .Aggregate(dataStructure, (current, action) =>
                             RecursiveObjectCreate(action.Properties.TargetQuestionId, null, current));
                 }
             }
@@ -89,8 +89,8 @@ namespace form_builder.Mappers.Structure
             var fieldsetStructure = new Dictionary<string, dynamic>();
 
             fieldsetStructure = element.Properties.Elements
-                .Aggregate(fieldsetStructure, (current, nestedElement) => 
-                    (Dictionary<string, dynamic>) RecursiveObjectCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping)
+                .Aggregate(fieldsetStructure, (current, nestedElement) =>
+                    (Dictionary<string, dynamic>)RecursiveObjectCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping)
                         ? nestedElement.Properties.QuestionId
                         : nestedElement.Properties.TargetMapping, nestedElement, current));
 

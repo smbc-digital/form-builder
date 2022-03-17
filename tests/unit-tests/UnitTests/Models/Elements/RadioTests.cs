@@ -14,9 +14,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
 {
     public class RadioTests
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new ();
-        private readonly Mock<IElementHelper> _mockElementHelper = new ();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new ();
+        private readonly Mock<IViewRender> _mockIViewRender = new();
+        private readonly Mock<IElementHelper> _mockElementHelper = new();
+        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
 
         [Fact]
         public async Task RenderAsync_Should_Call_ElementHelper_ToCheck_If_Options_NeedToBeOrdered()
