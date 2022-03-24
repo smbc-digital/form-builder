@@ -173,7 +173,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
-            _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+            _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
             _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
             Assert.Null(result);
         }
