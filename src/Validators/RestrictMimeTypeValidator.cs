@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -39,7 +40,7 @@ namespace form_builder.Validators
                 if (unknownFileTypes.Any())
                     invalidFiles.AddRange(unknownFileTypes.ToList());
 
-                invalidFiles.AddRange(availableFileTypes.Where(_ => !allowedFileTypes.Contains($".{_.FileType.Extension}")).ToList());
+                invalidFiles.AddRange(availableFileTypes.Where(_ => !allowedFileTypes.Contains($".{_.FileType.Extension}") || !allowedFileTypes.Contains(Path.GetExtension(_.File.FileName))).ToList());
                 if (!invalidFiles.Any())
                     return new ValidationResult { IsValid = true };
             }
