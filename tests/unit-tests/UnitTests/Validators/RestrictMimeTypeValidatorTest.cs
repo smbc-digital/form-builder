@@ -139,7 +139,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var documentModel = new List<DocumentModel> { new DocumentModel { FileSize = 16, Content = base64EncodedImage } };
+            var documentModel = new List<DocumentModel> { new DocumentModel { FileSize = 16, Content = base64EncodedImage, FileName = "test.jpg" } };
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", documentModel);
 
             // Act
@@ -160,7 +160,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var documentModel = new List<DocumentModel> { new DocumentModel { FileSize = 16, Content = base64EncodedImage } };
+            var documentModel = new List<DocumentModel> { new DocumentModel { FileSize = 16, Content = base64EncodedImage, FileName = "test.jpg" } };
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", documentModel);
 
             // Act
@@ -181,7 +181,12 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            var documentModel = new List<DocumentModel> { new DocumentModel { FileSize = 16, Content = base64EncodedImage }, new DocumentModel { FileSize = 16, Content = base64EncodedImage } };
+            var documentModel = new List<DocumentModel> 
+            { 
+                new DocumentModel { FileSize = 16, Content = base64EncodedImage, FileName = "test.jpg" },
+                new DocumentModel { FileSize = 16, Content = base64EncodedImage, FileName = "test.jpg" } 
+            };
+
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", documentModel);
 
             // Act
@@ -332,7 +337,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var viewModel = new Dictionary<string, dynamic>();
             var docs = new List<DocumentModel>();
-            docs.Add(new DocumentModel { FileSize = 16, Content = base64EncodedImage });
+            docs.Add(new DocumentModel { FileSize = 16, Content = base64EncodedImage, FileName = "test.jpg" });
             docs.Add(new DocumentModel { FileSize = 2, Content = base64EncodedInvalidMimeType, FileName = fileName });
             viewModel.Add($"fileUpload{FileUploadConstants.SUFFIX}", docs);
 
