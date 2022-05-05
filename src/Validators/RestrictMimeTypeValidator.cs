@@ -40,7 +40,7 @@ namespace form_builder.Validators
                 if (unknownFileTypes.Any())
                     invalidFiles.AddRange(unknownFileTypes.ToList());
 
-                invalidFiles.AddRange(availableFileTypes.Where(_ => !allowedFileTypes.Contains($".{_.FileType.Extension}") || !allowedFileTypes.Contains(Path.GetExtension(_.File.FileName))).ToList());
+                invalidFiles.AddRange(availableFileTypes.Where(_ => !allowedFileTypes.Contains($".{_.FileType.Extension}") || !allowedFileTypes.Contains(Path.GetExtension(_.File.FileName.ToLower()))).ToList());
                 if (!invalidFiles.Any())
                     return new ValidationResult { IsValid = true };
             }
