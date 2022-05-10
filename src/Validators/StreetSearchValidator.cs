@@ -26,7 +26,6 @@ namespace form_builder.Validators
             var isValid = true;
             var message = string.Empty;
 
-
             if (!StreetConstants.STREET_REGEX.Match(value).Success)
             {
                 isValid = false;
@@ -38,13 +37,6 @@ namespace form_builder.Validators
                 isValid = false;
                 message = ValidationConstants.STREET_INCORRECT_LENGTH;
             }
-            
-            if (!StreetConstants.STREET_LENGTH_REGEX.Match(value).Success)
-            {
-                isValid = false;
-                message = ValidationConstants.STREET_INCORRECT_LENGTH;
-            }
-
 
             return new ValidationResult
             {
