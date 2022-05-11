@@ -87,5 +87,25 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal(ValidationConstants.STREET_INCORRECT_LENGTH, result.Message);
         }
+
+        [Fact]
+        public void Validate_ShouldNotValidateStreet_WhenIncorrectLengtStreetSupplied()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithQuestionId("teststreet")
+                .WithType(EElementType.Street)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add("teststreet", "So");
+
+            // Act
+            var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal("Street name must be 3 characters or more", result.Message);
+        }
     }
 }
