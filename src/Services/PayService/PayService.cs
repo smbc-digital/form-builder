@@ -14,6 +14,7 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.FormBuilder;
@@ -30,6 +31,7 @@ namespace form_builder.Services.PayService
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IPageHelper _pageHelper;
         private readonly IPaymentHelper _paymentHelper;
+        private readonly PaymentConfiguration _paymentConfiguration;
         private readonly IEnumerable<ITagParser> _tagParsers;
 
         public PayService(
@@ -41,6 +43,7 @@ namespace form_builder.Services.PayService
             IWebHostEnvironment hostingEnvironment,
             IPageHelper pageHelper,
             IPaymentHelper paymentHelper,
+            IOptions<PaymentConfiguration> paymentConfiguration,
             IEnumerable<ITagParser> tagParsers)
         {
             _gateway = gateway;
@@ -51,6 +54,7 @@ namespace form_builder.Services.PayService
             _hostingEnvironment = hostingEnvironment;
             _pageHelper = pageHelper;
             _paymentHelper = paymentHelper;
+            _paymentConfiguration = paymentConfiguration.Value;
             _tagParsers = tagParsers;
         }
 
@@ -129,7 +133,19 @@ namespace form_builder.Services.PayService
 
         private IPaymentProvider GetFormPaymentProvider(PaymentInformation paymentInfo)
         {
-            var paymentProvider = _paymentProviders.FirstOrDefault(_ => _.ProviderName.Equals(paymentInfo.PaymentProvider));
+            if(!_paymentProviders.Any())
+                throw new Exception(
+                    $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
+                    $"No payment providers are configured");
+
+            
+            if(_paymentConfiguration.FakePayment && _paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
+                return _paymentProviders
+                            .FirstOrDefault(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName));
+            
+            var paymentProvider = _paymentProviders
+                                    .FirstOrDefault(_ => _.ProviderName.Equals(paymentInfo.PaymentProvider));
+                                    
             if (paymentProvider is null)
                 throw new Exception(
                     $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +

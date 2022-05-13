@@ -59,7 +59,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.Value)
                 .Returns(new SubmissionServiceConfiguration
                 {
-                    FakePaymentSubmission = false
+                    FakeSubmission = false
                 });
 
             _mockSchemaFactory

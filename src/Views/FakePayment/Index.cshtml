@@ -1,0 +1,22 @@
+﻿@model FakePaymentViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["DisplayBreadcrumbs"] = false;
+    ViewData["PreviewMode"] = false;
+}
+
+<h1 class="govuk-heading-l">Fake payment provider</h1>
+<p class="smbc-body">
+    This is a fake payment page, it's intended to be used as part of the test process only.
+</p>
+
+<p class="smbc-body">
+    The requested payment value is <strong>£@Model.Amount</strong> and the reference number <strong>@Model.Reference</strong> was provided.
+</p>
+
+<p class="smbc-body">
+    Select required a payment result.
+</p>
+
+<a class="govuk-button" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00000">Payment Success</a> <a class="govuk-button govuk-button--secondary" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00001">Payment Declined</a> <a class="govuk-button govuk-button--warning" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00099">Payment Failure</a>
