@@ -108,9 +108,11 @@ Specify which organisation provider to use.
 ```
 ## Payment Providers
 
-`IPaymentProvider` is provided to enable integration with different payment systems, at the moment this assumes that you are redirected to an external payment provider where a payment is taken and then redirect back to the forms application to continue form processing.
+`IPaymentProvider` is provided to enable integration with different payment systems, this assumes that you are redirected to an external payment provider where a payment is taken and then redirected back to the forms application to continue form processing.
   
 The payment provider enables this on the method `IPaymentProvider.GeneratePaymentUrl` which carries out any pre-payment actions, such as setting up payment/baskets etc. and the returns the URL to which form builder should direct the user.
+  
+The payment provider also abstracts the detail of understanding the payment response using the `IPaymentProvider.VerifyPaymentResponse` method. The payment provider return nothing (if payment success) or throw an exception of type `PaymentDeclinedException` or `PaymentFailurexception` depending on the payment repsponse.
   
 ### A note about workflow
 In order to maintain auditability and tracking the payments work flow enables an initial submission pre-payment, typically used to setup cases etc. and a further callback post payment to update cases, bookings etc. relecting the result of the payment process.
