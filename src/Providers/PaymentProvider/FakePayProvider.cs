@@ -12,7 +12,6 @@ namespace form_builder.Providers.PaymentProvider
     public class FakePayProvider : IPaymentProvider
     {
         public string ProviderName => "Fake";
-        
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _environment;
 

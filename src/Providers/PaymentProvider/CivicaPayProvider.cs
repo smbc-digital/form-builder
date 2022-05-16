@@ -82,7 +82,6 @@ namespace form_builder.Providers.PaymentProvider
 
             if (!string.IsNullOrEmpty(paymentInformation.Settings.Email))
                 basket.PaymentItems[0].PaymentDetails.EmailAddress = paymentInformation.Settings.Email;
-                
 
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 

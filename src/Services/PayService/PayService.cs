@@ -137,7 +137,6 @@ namespace form_builder.Services.PayService
                 throw new Exception(
                     $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
                     $"No payment providers are configured");
-
             
             if(_paymentConfiguration.FakePayment && _paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
                 return _paymentProviders
