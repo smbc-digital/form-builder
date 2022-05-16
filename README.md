@@ -108,7 +108,46 @@ Specify which organisation provider to use.
 ```
 ## Payment Providers
 
-Comming Soon...
+`IPaymentProvider` is provided to enable integration with different payment systems, at the moment this assumes that you are redirected to an external payment provider where a payment is taken and then redirect back to the forms application to continue form processing.
+  
+The payment provider enables this on the method `IPaymentProvider.GeneratePaymentUrl` which carries out any pre-payment actions, such as setting up payment/baskets etc. and the returns the URL to which form builder should direct the user.
+  
+### A note about workflow
+In order to maintain auditability and tracking the payments work flow enables an initial submission pre-payment, typically used to setup cases etc. and a further callback post payment to update cases, bookings etc. relecting the result of the payment process.
+ 
+Regsitering a payment provider for use
+
+```c#
+services.AddSingleton<IPaymentProvider, FakePaymentProvider>();
+services.AddSingleton<IPaymentProvider, MyRealPaymentProvider>();
+return services;
+```
+
+Specify which organisation provider to use.
+
+```json
+  {
+    "formName": [ "my-payment-form" ],
+    "PaymentProvider": "MyRealPay",
+    "settings": {
+      "accountReference": "our-account-reference",
+      "addressReference": "{{QUESTION:Address}}",
+      "name": "{{QUESTION:firstName}} {{QUESTION:lastName}}",
+      "email": "{{QUESTION:email}}",
+      "catalogueId": "our-catalog-id",
+      ...
+    }
+```
+  
+### Fake payment provider
+ 
+In order to enable a faster testing process of forms and formbuilder capability `FakePaymentProvider` has been created. This functionality is turned off by default and should never be turned on in a production environment as it will effect every payment regardless of specified payment provider.
+  
+Fake payment will act exactly the same as any other payment provider in terms of input and output - but will allow the Tester/QA to specift the desired payment response (Success, Declined, Failure)
+  
+To turn fake payment on set the following value in the relevant environment configuration.
+ 
+```"PaymentConfiguration:FakePayment": true```
 
 ## Storage Providers
 
