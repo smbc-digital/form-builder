@@ -115,7 +115,7 @@ The payment provider enables this on the method `IPaymentProvider.GeneratePaymen
 The payment provider also abstracts the detail of understanding the payment response using the `IPaymentProvider.VerifyPaymentResponse` method. The payment provider return nothing (if payment success) or throw an exception of type `PaymentDeclinedException` or `PaymentFailurexception` depending on the payment repsponse.
   
 ### A note about workflow
-In order to maintain auditability and tracking the payments work flow enables an initial submission pre-payment, typically used to setup cases etc. and a further callback post payment to update cases, bookings etc. relecting the result of the payment process.
+In order to maintain auditability and tracking the payments work flow enables an initial submission pre-payment, typically used to setup cases etc. and a further callback post payment to update cases, bookings etc. reflecting the result of the payment process.
  
 Regsitering a payment provider for use
 
