@@ -11,6 +11,7 @@ using form_builder.Models.Properties.ActionProperties;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
+using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
@@ -254,7 +255,16 @@ namespace form_builder_tests.UnitTests.Controllers
                 .Build();
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessRequestEntity { Page = page, ViewName = "Search", UseGeneratedViewModel = true });
+                .ReturnsAsync(new ProcessRequestEntity
+                {
+                    Page = page,
+                    ViewName = "Search",
+                    UseGeneratedViewModel = true,
+                    ViewModel = new FormBuilderViewModel
+                    {
+                        PageTitle = "test"
+                    }
+                });
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())

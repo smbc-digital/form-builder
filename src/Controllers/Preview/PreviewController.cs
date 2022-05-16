@@ -23,7 +23,10 @@ namespace form_builder.Controllers
             var currentPageResult = await _previewService.VerifyPreviewRequest(fileUpload);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
+            {
+                currentPageResult.ViewModel.PageTitle = currentPageResult.ViewModel.PageTitle.Insert(0, "Error: ");
                 return View("Index", currentPageResult.ViewModel);
+            }
 
             return Redirect($"{currentPageResult.PreviewFormKey}");
         }

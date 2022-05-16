@@ -119,7 +119,10 @@ namespace form_builder.Controllers
             }
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
+            {
+                currentPageResult.ViewModel.PageTitle = currentPageResult.ViewModel.PageTitle.Insert(0, "Error: ");
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
+            }
 
             if (currentPageResult.Page.HasPageActionsPostValues)
                 await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form);
