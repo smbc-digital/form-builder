@@ -17,6 +17,8 @@ namespace form_builder.Configuration
         public string AddressReference { get; set; }
         public string ServicePayReference { get; set; }
         public string ServicePayNarrative { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
         public string Amount { get; set; }
         public string CatalogueId { get; set; }
         public string Description { get; set; }

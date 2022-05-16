@@ -115,5 +115,28 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
 
             Assert.Equal($"CivicaPayProvider::Payment failed with response code: {responseCode}", result.Message);
         }
+
+        [Fact]
+        public async Task GeneratePaymentUrl_ShouldCallCivicaPayGateway_AndPass_Name_IfSpecified()
+        {
+            var caseRef = "caseRef";
+
+            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings{ Name = "Test Name"} });
+
+            _mockCivicaPayGateway.Verify(_ => _.CreateImmediateBasketAsync(It.Is<CreateImmediateBasketRequest>(_ => _.PaymentItems[0].AddressDetails.Name.Equals("Test Name"))));
+        }
+
+        [Fact]
+        public async Task GeneratePaymentUrl_ShouldCallCivicaPayGateway_AndPass_Email_IfSpecified()
+        {
+            var caseRef = "caseRef";
+
+            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings{ Email = "test@stockport.gov.uk"} });
+
+            _mockCivicaPayGateway.Verify(_ => _.CreateImmediateBasketAsync(It.Is<CreateImmediateBasketRequest>(_ => _.PaymentItems[0].PaymentDetails.EmailAddress.Equals("test@stockport.gov.uk"))));
+        }
     }
+
 }
+
+

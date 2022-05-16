@@ -77,6 +77,12 @@ namespace form_builder.Providers.PaymentProvider
                 basket.PaymentItems[0].PaymentDetails.ServicePayNarrative = paymentInformation.Settings.ServicePayNarrative;
             }
 
+            if (!string.IsNullOrEmpty(paymentInformation.Settings.Name))
+                basket.PaymentItems[0].AddressDetails.Name = paymentInformation.Settings.Name;
+
+            if (!string.IsNullOrEmpty(paymentInformation.Settings.Email))
+                basket.PaymentItems[0].PaymentDetails.EmailAddress = paymentInformation.Settings.Email;
+
             var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
 
             if (!civicaResponse.IsSuccessStatusCode)
