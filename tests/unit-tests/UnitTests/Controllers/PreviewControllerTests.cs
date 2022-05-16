@@ -5,6 +5,7 @@ using form_builder.Controllers;
 using form_builder.Models;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.PreviewService;
+using form_builder.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -51,7 +52,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task IndexPost_ShouldReturn_View_IfUseGeneratedViewModel_IsTrue()
+        public async Task IndexPost_ShouldReturn_View_IfUseGeneratedViewModel_IsTrue_AndPrepend_ErrorToPageTitle()
         {
             var previewKey = "key-123456";
             var page = new PageBuilder()
@@ -61,12 +62,15 @@ namespace form_builder_tests.UnitTests.Controllers
 
             _previewService
                 .Setup(_ => _.VerifyPreviewRequest(It.IsAny<List<CustomFormFile>>()))
-                .ReturnsAsync(new ProcessPreviewRequestEntity { PreviewFormKey = previewKey, Page = page, UseGeneratedViewModel = true });
+                .ReturnsAsync(new ProcessPreviewRequestEntity { PreviewFormKey = previewKey, Page = page, UseGeneratedViewModel = true, ViewModel = new FormBuilderViewModel { PageTitle = "test" } });
 
             var result = await _controller.IndexPost(new List<CustomFormFile>());
 
             _previewService.Verify(_ => _.VerifyPreviewRequest(It.IsAny<List<CustomFormFile>>()), Times.Once);
-            Assert.IsType<ViewResult>(result);
+
+            var viewModel = Assert.IsType<ViewResult>(result).Model as FormBuilderViewModel;
+
+            Assert.Equal("Error: test", viewModel.PageTitle);
         }
 
         [Fact]
