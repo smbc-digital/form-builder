@@ -1,22 +1,34 @@
 ﻿@model FakePaymentViewModel
 @{
-    ViewData["Title"] = Model.FormName;
-    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["Title"] = "Fake payment Proccessing";
+    ViewData["PageTitle"] = "Fake payment Proccessing";
     ViewData["DisplayBreadcrumbs"] = false;
     ViewData["PreviewMode"] = false;
 }
 
-<h1 class="govuk-heading-l">Fake payment provider</h1>
+<h1 class="govuk-heading-l">Fake payment processing</h1>
+
 <p class="smbc-body">
     This is a fake payment page, it's intended to be used as part of the test process only.
 </p>
 
-<p class="smbc-body">
-    The requested payment value is <strong>£@Model.Amount</strong> and the reference number <strong>@Model.Reference</strong> was provided.
-</p>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Requesting Form</dt>
+        <dd class="govuk-summary-list__value">@Model.FormName</dd>                
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Reference Number</dt>
+        <dd class="govuk-summary-list__value">@Model.Reference</dd>                
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Amount</dt>
+        <dd class="govuk-summary-list__value">@Model.Amount</dd>                
+    </div>
+</dl>
 
-<p class="smbc-body">
-    Select required a payment result.
-</p>
+<h2 class="govuk-heading-s">
+    Select a payment result
+</h2>
 
 <a class="govuk-button" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00000">Payment Success</a> <a class="govuk-button govuk-button--secondary" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00001">Payment Declined</a> <a class="govuk-button govuk-button--warning" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00099">Payment Failure</a>
