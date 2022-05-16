@@ -23,15 +23,11 @@ namespace form_builder.Controllers.Payment
 
         [HttpGet]
         [Route("{form}/{path}/fake-payment")]
-        public IActionResult Index([FromRoute]string form, [FromRoute]string path, [FromQuery]string reference, [FromQuery]string amount) =>
-            _paymentConfiguration.FakePayment 
-                ? View(new FakePaymentViewModel 
-                    {
-                        PaymentEndpointBaseUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
-                        Reference = reference,
-                        Amount = amount,
-                        FormName = form
-                    }) 
-            : new NotFoundResult();
+        public IActionResult Index([FromRoute]string form, [FromRoute]string path, [FromQuery]string reference, [FromQuery]string amount) 
+        {
+            return _paymentConfiguration.FakePayment 
+                ? View(new FakePaymentViewModel($"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response", reference, amount, form))
+                : new NotFoundResult();
+        }
     }
 }

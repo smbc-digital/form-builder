@@ -133,12 +133,12 @@ namespace form_builder.Services.PayService
 
         private IPaymentProvider GetFormPaymentProvider(PaymentInformation paymentInfo)
         {
-            if(!_paymentProviders.Any())
+            if (!_paymentProviders.Any())
                 throw new Exception(
                     $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
                     $"No payment providers are configured");
             
-            if(_paymentConfiguration.FakePayment && _paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
+            if (_paymentConfiguration.FakePayment && _paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
                 return _paymentProviders
                             .FirstOrDefault(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName));
             
