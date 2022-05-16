@@ -252,10 +252,14 @@ namespace form_builder.Helpers.ElementHelpers
 
         public int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers)
         {
-            var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
-            return formAnswers.FormData.ContainsKey(formDataIncrementKey)
-                ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString())
-                : throw new ApplicationException($"ElementHelper::GetCurrentAddAnotherIncrement, FormData key not found for {formDataIncrementKey}");
+            if (formAnswers.FormData.Any()) {
+                var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
+                return formAnswers.FormData.ContainsKey(formDataIncrementKey)
+                    ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString())
+                    : 0;
+            }
+
+            return 0;
         }
 
         public async Task<Dictionary<string, string>> GenerateSummaryAnswers(List<IElement> formSchemaQuestions, Page page, FormAnswers formAnswers, bool ignoreDynamicallyGeneratedElements)
