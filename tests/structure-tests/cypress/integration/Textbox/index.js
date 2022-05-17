@@ -20,13 +20,18 @@ describe('Textbox', () => {
         .toMatchingDOM('govuk-form-group', 3)
     });
 
-    it('Textbox numeric', () => {
+    it('Textbox with suffix', () => {
       cy.visit('ui-textbox')
         .toMatchingDOM('govuk-form-group', 4)
     });
 
-    it('Textbox decimal', () => {
+    it('Textbox numeric', () => {
       cy.visit('ui-textbox')
         .toMatchingDOM('govuk-form-group', 5)
+    });
+
+    it('Textbox decimal', () => {
+      cy.visit('ui-textbox')
+        .toMatchingDOM('govuk-form-group', 6)
     });
   });
