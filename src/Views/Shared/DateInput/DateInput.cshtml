@@ -43,7 +43,7 @@
                 <label class="@labelClasses" for=@dayId>
                     Day
                 </label>
-                @Html.TextBox(dayId, Model.Properties.Day, new { name = dayId, id = dayId, autocomplete = "bday-day", maxlength = "2", type = "number", @class = inputClassesShort })
+                @Html.TextBox(dayId, Model.Properties.Day, new { name = dayId, id = dayId, autocomplete = "bday-day", maxlength = "2", type = "number", inputmode = "numeric", @class = inputClassesShort })
             </div>
         </div>
 
@@ -52,7 +52,7 @@
                 <label class="@labelClasses" for=@monthId>
                     Month
                 </label>
-                @Html.TextBox(monthId, Model.Properties.Month, new { name = monthId, id = monthId, autocomplete = "bday-month", maxlength = "2", type = "number", @class = inputClassesShort })
+                @Html.TextBox(monthId, Model.Properties.Month, new { name = monthId, id = monthId, autocomplete = "bday-month", maxlength = "2", type = "number", inputmode = "numeric", @class = inputClassesShort })
             </div>
         </div>
 
@@ -61,7 +61,7 @@
                 <label class="@labelClasses" for=@yearId>
                     Year
                 </label>
-                @Html.TextBox(yearId, Model.Properties.Year, new { name = yearId, id = yearId, autocomplete = "bday-year", maxlength = "4", type = "number", @class = inputClassesLong, max = maxYear })
+                @Html.TextBox(yearId, Model.Properties.Year, new { name = yearId, id = yearId, autocomplete = "bday-year", maxlength = "4", type = "number", inputmode = "numeric", @class = inputClassesLong, max = maxYear })
             </div>
         </div>
     </div>
