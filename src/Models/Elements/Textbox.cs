@@ -49,6 +49,16 @@ namespace form_builder.Models.Elements
                 properties.Add("pattern", "[0-9]*");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
+                properties.Add("type","number");
+            }
+
+            if (Properties.Decimal)
+            {
+                properties.Add("inputmode", "numeric");
+                properties.Add("pattern", "[0-9.]*");
+                properties.Add("max", Properties.Max);
+                properties.Add("min", Properties.Min);
+                properties.Add("type", "number");
             }
 
             if (DisplayAriaDescribedby)
