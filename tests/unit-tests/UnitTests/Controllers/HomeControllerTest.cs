@@ -239,7 +239,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Index_Post_ShouldReturnView_WhenPageIsInvalid_AndPrependError_ToPageTitle()
+        public async Task Index_Post_ShouldReturnView_WhenPageIsInvalid()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -259,11 +259,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 {
                     Page = page,
                     ViewName = "Search",
-                    UseGeneratedViewModel = true,
-                    ViewModel = new FormBuilderViewModel
-                    {
-                        PageTitle = "test"
-                    }
+                    UseGeneratedViewModel = true
                 });
 
             var viewModel = new ViewModelBuilder()
@@ -276,10 +272,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            var viewModelResult = viewResult.Model as FormBuilderViewModel;
-
             Assert.Equal("Search", viewResult.ViewName);
-            Assert.Equal("Error: test", viewModelResult.PageTitle);
         }
 
         [Fact]
