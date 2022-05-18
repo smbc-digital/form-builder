@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Services.PreviewService;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +25,12 @@ namespace form_builder.Controllers
             var currentPageResult = await _previewService.VerifyPreviewRequest(fileUpload);
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
+            {
+                if (!currentPageResult.Page.IsValid)
+                    currentPageResult.ViewModel.PageTitle = currentPageResult.ViewModel.PageTitle.ToStringWithPrefix(PageTitleConstants.VALIDATION_ERROR_PREFIX);
+
                 return View("Index", currentPageResult.ViewModel);
+            }
 
             return Redirect($"{currentPageResult.PreviewFormKey}");
         }
