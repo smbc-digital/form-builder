@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using form_builder.Constants;
+using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Services.PreviewService;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +26,9 @@ namespace form_builder.Controllers
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
             {
-                currentPageResult.ViewModel.PageTitle = currentPageResult.ViewModel.PageTitle.Insert(0, "Error: ");
+                if (!currentPageResult.Page.IsValid)
+                    currentPageResult.ViewModel.PageTitle = currentPageResult.ViewModel.PageTitle.ToStringWithPrefix(PageTitleConstants.VALIDATION_ERROR_PREFIX);
+
                 return View("Index", currentPageResult.ViewModel);
             }
 
