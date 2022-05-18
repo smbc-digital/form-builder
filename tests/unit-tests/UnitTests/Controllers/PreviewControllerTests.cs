@@ -66,7 +66,6 @@ namespace form_builder_tests.UnitTests.Controllers
             var result = await _controller.IndexPost(new List<CustomFormFile>());
 
             _previewService.Verify(_ => _.VerifyPreviewRequest(It.IsAny<List<CustomFormFile>>()), Times.Once);
-
             Assert.IsType<ViewResult>(result);
         }
 
