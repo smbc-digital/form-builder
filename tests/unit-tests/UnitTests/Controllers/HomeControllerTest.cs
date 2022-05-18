@@ -255,12 +255,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .Build();
 
             _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
-                .ReturnsAsync(new ProcessRequestEntity
-                {
-                    Page = page,
-                    ViewName = "Search",
-                    UseGeneratedViewModel = true
-                });
+                .ReturnsAsync(new ProcessRequestEntity { Page = page, ViewName = "Search", UseGeneratedViewModel = true });
 
             var viewModel = new ViewModelBuilder()
                 .WithEntry("Guid", Guid.NewGuid().ToString())
