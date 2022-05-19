@@ -57,7 +57,7 @@ namespace form_builder
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()
                 .ConfigureSubmitProviders()
-                .ConfigurePaymentProviders()
+                .ConfigurePaymentProviders(HostingEnvironment)
                 .ConfigureBookingProviders()
                 .ConfigureEmailTemplateProviders()
                 .ConfigureDocumentCreationProviders()

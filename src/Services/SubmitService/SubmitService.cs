@@ -123,11 +123,8 @@ namespace form_builder.Services.SubmitService
 
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            if (_submissionServiceConfiguration.FakePaymentSubmission)
-            {
-                _pageHelper.SaveCaseReference(sessionGuid, "123456");
-                return "123456";
-            }
+            if (_submissionServiceConfiguration.FakeSubmission)
+                return ProcessFakeSubmission(mappingEntity, form, sessionGuid, string.Empty);
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
 

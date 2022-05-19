@@ -4,6 +4,5 @@ namespace form_builder.Configuration
     {
         public const string ConfigValue = "SubmissionServiceConfiguration";
         public bool FakeSubmission { get; set; } = false;
-        public bool FakePaymentSubmission { get; set; } = false;
     }
 }
