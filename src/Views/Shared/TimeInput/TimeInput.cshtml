@@ -35,7 +35,7 @@
                 <label class="@labelClasses" for=@Model.GetCustomItemId("hours")>
                     Hours
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength = "2", type = "number", inputmode = "numeric", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" }):
+                @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength = "2", type = "number", inputmode = "numeric", pattern = @"[0-9]*", min = "1", max = "12", style = "width:3em" }):
             </div>
         </div>
         <div class="smbc-time-input__divider"></div>
@@ -44,7 +44,7 @@
                 <label class="@labelClasses" for=@Model.GetCustomItemId("minutes")>
                     Minutes
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("minutes"), Model.Properties.Minutes, new { @class = inputClasses, maxLength = "2", type = "number", inputmode = "numeric", pattern = "[0-9]*", min = "1", max = "12", style = "width:3em" })
+                @Html.TextBox(Model.GetCustomItemId("minutes"), Model.Properties.Minutes, new { @class = inputClasses, maxLength = "2", type = "number", inputmode = "numeric", pattern = @"[0-9]*", min = "1", max = "12", style = "width:3em" })
             </div>
         </div>
 

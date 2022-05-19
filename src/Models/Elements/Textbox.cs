@@ -46,7 +46,7 @@ namespace form_builder.Models.Elements
             if (Properties.Numeric)
             {
                 properties.Add("inputmode", "numeric");
-                properties.Add("pattern", "[0-9]*");
+                properties.Add("pattern", @"[0-9]*");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
                 properties.Add("type","number");
@@ -54,8 +54,8 @@ namespace form_builder.Models.Elements
 
             if (Properties.Decimal)
             {
-                properties.Add("inputmode", "numeric");
-                properties.Add("pattern", "[0-9.]*");
+                properties.Add("inputmode", "decimal");
+                properties.Add("pattern", @"[0-9.-]*");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
                 properties.Add("type", "number");
