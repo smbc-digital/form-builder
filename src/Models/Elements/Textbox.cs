@@ -47,7 +47,7 @@ namespace form_builder.Models.Elements
                 properties.Add("pattern", @"[0-9]*");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
-                properties.Add("type","number");
+                properties.Add("type","text");
             }
 
             if (Properties.Decimal)
@@ -56,7 +56,7 @@ namespace form_builder.Models.Elements
                 properties.Add("pattern", @"[0-9.-]*");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
-                properties.Add("type", "number");
+                properties.Add("type", "text");
             }
 
             if (DisplayAriaDescribedby)
