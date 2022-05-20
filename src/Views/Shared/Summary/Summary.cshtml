@@ -3,13 +3,12 @@
 @foreach (var summarySection in Model.Sections)
 {
     @if(summarySection.ContainsPages)
-    {   var marginBottom = "govuk-!-margin-bottom-6";
+    {  
+        var marginBottom = summarySection.DisplaySectionHeading? "govuk-!-margin-bottom-9" : "govuk-!-margin-bottom-6";
         @if(summarySection.DisplaySectionHeading)
         {
             <h2 class="govuk-heading-m">@summarySection.Title</h2>
-            marginBottom = "govuk-!-margin-bottom-9";
         }
-
         <dl class="govuk-summary-list @marginBottom">
             @foreach (var pageSummary in summarySection.Pages)
             {
