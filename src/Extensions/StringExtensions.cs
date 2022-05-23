@@ -59,5 +59,7 @@ namespace form_builder.Extensions
         }
 
         public static string ToBookingRequestedMonthUrl(this string form, string page) => $"/booking/{form}/{page}/month";
+
+        public static string ToStringWithPrefix(this string value, string prefix) => $"{prefix}{value}";
     }
 }
