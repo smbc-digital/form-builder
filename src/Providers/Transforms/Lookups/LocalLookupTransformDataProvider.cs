@@ -13,8 +13,8 @@ namespace form_builder.Providers.Transforms.Lookups
         public LocalLookupTransformDataProvider(IOptions<LocalFileConfiguration> localFileConfig)
         {
             _localFileConfig = localFileConfig.Value;
-            if(!string.IsNullOrEmpty(_localFileConfig.LookupBaseUrl))
-                _fileBaseFolder = _localFileConfig.LookupBaseUrl;
+            if(!string.IsNullOrEmpty(_localFileConfig.LookupBase))
+                _fileBaseFolder = _localFileConfig.LookupBase;
         }
         
         public async Task<T> Get<T>(string name)

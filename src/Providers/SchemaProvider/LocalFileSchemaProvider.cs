@@ -12,13 +12,13 @@ namespace form_builder.Providers.SchemaProvider
     public class LocalFileSchemaProvider : ISchemaProvider
     {
         private readonly string _fileBaseFolder = $@".\DSL";
-        private readonly LocalFileConfiguration _localSchemaOptions;
+        private readonly LocalFileConfiguration _localFileConfig;
 
-        public LocalFileSchemaProvider(IOptions<LocalFileConfiguration> localSchemaOptions)
+        public LocalFileSchemaProvider(IOptions<LocalFileConfiguration> localFileConfig)
         {
-            _localSchemaOptions = localSchemaOptions.Value;
-            if(!string.IsNullOrEmpty(_localSchemaOptions.SchemaBaseUrl))
-                _fileBaseFolder = _localSchemaOptions.SchemaBaseUrl;
+            _localFileConfig = localFileConfig.Value;
+            if(!string.IsNullOrEmpty(_localFileConfig.SchemaBase))
+                _fileBaseFolder = _localFileConfig.SchemaBase;
         }
 
         public T Get<T>(string schemaName)
