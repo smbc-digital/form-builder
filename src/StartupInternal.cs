@@ -16,13 +16,13 @@ using StockportGovUK.AspNetCore.Middleware.App;
 namespace form_builder
 {
     [ExcludeFromCodeCoverage]
-    public class Startup
+    public class StartupInternal
     {
         public IConfiguration Configuration { get; }
 
         public IWebHostEnvironment HostingEnvironment { get; }
 
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public StartupInternal(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
             HostingEnvironment = env;
@@ -41,11 +41,11 @@ namespace form_builder
                 .AddValidators()
                 .AddTagParsers()
                 .AddReferenceNumberProvider()
-                .AddStorageProvider(Configuration)
-                .AddFileStorageProvider(Configuration)
-                .AddSchemaProviders(HostingEnvironment)
-                .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"])
-                .AddSesEmailConfiguration(Configuration.GetSection("Ses")["Accesskey"], Configuration.GetSection("Ses")["Secretkey"])
+                .AddStorageProvider(Configuration) 
+                .AddFileStorageProvider(Configuration) 
+                .AddLocalSchemaProviders() //This would need some work as local files should not be onboard the application - but stored somewhere else locally
+                .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"]) //Not sure this will be required
+                .AddSesEmailConfiguration(Configuration.GetSection("Ses")["Accesskey"], Configuration.GetSection("Ses")["Secretkey"]) //Not sure this will be required
                 .AddGateways(Configuration)
                 .AddGovUkServices(Configuration)
                 .AddIOptionsConfiguration(Configuration)
@@ -73,14 +73,14 @@ namespace form_builder
                 .AddFactories()
                 .AddAntiforgery(_ =>
                     {
-                        _.Cookie.Name = ".formbuilder.antiforgery.v2";
+                        _.Cookie.Name = ".formbuilder.internal.antiforgery.v2";
                         _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                     })
                 .AddSession(_ =>
                 {
                     _.IdleTimeout = TimeSpan.FromMinutes(30);
                     _.Cookie.Path = "/";
-                    _.Cookie.Name = ".formbuilder.v2";
+                    _.Cookie.Name = ".formbuilder.internal.v2";
                     _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 });
 
@@ -95,7 +95,7 @@ namespace form_builder
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
+            if (env.IsEnvironment("int"))
             {
                 app.UseDeveloperExceptionPage();
             }

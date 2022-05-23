@@ -431,35 +431,24 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
-        public static IServiceCollection AddSchemaProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
+        public static IServiceCollection AddSchemaProviders(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
-            {
-                services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
-            }
-            else
-            {
-                services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
-            }
-
+            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))            
+                return services.AddLocalSchemaProviders();
+            
+            services.AddSingleton<ISchemaProvider, S3FileSchemaProvider>();
+            services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
+            services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
+            services.AddSingleton<IPaymentConfigurationTransformDataProvider, S3PaymentConfigurationTransformDataProvider>();
             return services;
         }
 
-        public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
+        public static IServiceCollection AddLocalSchemaProviders(this IServiceCollection services)
         {
-            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
-            {
-                services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
-                services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
-                services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
-            }
-            else
-            {
-                services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
-                services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
-                services.AddSingleton<IPaymentConfigurationTransformDataProvider, S3PaymentConfigurationTransformDataProvider>();
-            }
-
+            services.AddSingleton<ISchemaProvider, LocalFileSchemaProvider>();
+            services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
+            services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
+            services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
             return services;
         }
 
