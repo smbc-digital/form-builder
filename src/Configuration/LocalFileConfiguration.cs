@@ -6,5 +6,7 @@ namespace form_builder.Configuration
         public string SchemaBase { get; set; }
         public string LookupBase { get; set; }
         public string ReusableElementTransformBase { get; set; }
+        public string LocalPaymentConfigurationTransformBase  { get; set; }
+
     }
 }
