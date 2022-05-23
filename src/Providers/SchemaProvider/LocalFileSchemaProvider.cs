@@ -17,7 +17,8 @@ namespace form_builder.Providers.SchemaProvider
         public LocalFileSchemaProvider(IOptions<LocalFileConfiguration> localSchemaOptions)
         {
             _localSchemaOptions = localSchemaOptions.Value;
-            _fileBaseFolder = _localSchemaOptions.SchemaBaseUrl;
+            if(!string.IsNullOrEmpty(_localSchemaOptions.SchemaBaseUrl))
+                _fileBaseFolder = _localSchemaOptions.SchemaBaseUrl;
         }
 
         public T Get<T>(string schemaName)
