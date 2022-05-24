@@ -1,13 +1,21 @@
 @model SummarySectionsViewModel
 
-@foreach (var summarySection in Model.Sections)
+@for(int i = 0; i <  Model.Sections.Count(); i++)
 {
+    var summarySection = Model.Sections[i];
     @if(summarySection.ContainsPages)
-    {  
-        var marginBottom = summarySection.DisplaySectionHeading? "govuk-!-margin-bottom-9" : "govuk-!-margin-bottom-6";
-        @if(summarySection.DisplaySectionHeading)
+    {
+        var marginBottom = "govuk-!-margin-bottom-6";
+
+        @if(i+1 < Model.Sections.Count()  && Model.Sections[i+1].DisplaySectionHeading)
+        {
+         marginBottom = "govuk-!-margin-bottom-9";
+        }
+
+        @if(summarySection.DisplaySectionHeading )
         {
             <h2 class="govuk-heading-m">@summarySection.Title</h2>
+            marginBottom = "govuk-!-margin-bottom-9";
         }
         <dl class="govuk-summary-list @marginBottom">
             @foreach (var pageSummary in summarySection.Pages)
@@ -17,7 +25,6 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">@answer.Key</dt>
                         <dd class="govuk-summary-list__value">@Html.Raw(answer.Value)</dd>
-
                         @if (Model.AllowEditing){
                             <dd class="govuk-summary-list__actions">
                                 <a class="govuk-link" href="@pageSummary.PageSlug">Change <span class="govuk-visually-hidden">@answer.Key</span></a>
