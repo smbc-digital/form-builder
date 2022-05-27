@@ -128,8 +128,6 @@ namespace form_builder.Models.Elements
                 });
             }
 
-
-
             foreach (var element in addAnotherElements)
             {
                 int numberOfFieldsets = elementHelper.GetAddAnotherNumberOfFieldsets(element, formAnswers);
