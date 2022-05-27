@@ -316,5 +316,85 @@ namespace form_builder_tests.UnitTests.Models.Elements
             Assert.Single(callback.Sections.Where(_ => _.Pages.Any(_ => _.PageSummaryId.Equals("add-another-addAnother-1"))));
             Assert.Equal(2, callback.Sections.Count(_ => _.Pages.Any(_ => _.PageSlug.Equals("add-another"))));
         }
+
+        [Fact]
+        public async Task RenderAsync_ShouldCall_ViewRender_WithCorrect_ViewModel_ForSummaryWithout_Sections_And_AddAnotherSkipped()
+        {
+            //Arrange
+            var callback = new SummarySectionsViewModel();
+
+            var textboxElementOne = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("question")
+                .Build();
+
+            var pageOne = new PageBuilder()
+                .WithPageSlug("page-one")
+                .WithElement(textboxElementOne)
+                .Build();
+
+            var textboxElementTwo = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("name")
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithType(EElementType.AddAnother)
+                .WithQuestionId("addAnother")
+                .WithNestedElement(textboxElementTwo)
+                .Build();
+
+            var summaryElement = new ElementBuilder()
+                .WithType(EElementType.Summary)
+                .Build();
+
+            var addAnotherPage = new PageBuilder()
+                .WithPageSlug("add-another")
+                .WithElement(addAnotherElement)
+                .Build();
+
+            var summaryPage = new PageBuilder()
+                .WithPageSlug("summary")
+                .WithElement(summaryElement)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+
+            var schema = new FormSchemaBuilder()
+                .WithName("form-name")
+                .WithPage(pageOne)
+                .WithPage(addAnotherPage)
+                .WithPage(summaryPage)
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            _mockIViewRender.Setup(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()))
+                .Callback<string, SummarySectionsViewModel, Dictionary<string, object>>((x, y, z) => callback = y);
+
+            _mockElementHelper.Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<string>(), It.IsAny<FormSchema>()))
+                .ReturnsAsync(new List<PageSummary>
+                {
+                    new PageSummary { PageSummaryId = "page-one", PageSlug = "page-one", Answers = new Dictionary<string, string> { { "question", "answer" } } }
+                });
+
+            _mockElementHelper.Setup(_ => _.GetAddAnotherNumberOfFieldsets(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).Returns(0);
+
+            //Act
+            await summaryElement.RenderAsync(
+                _mockIViewRender.Object,
+                _mockElementHelper.Object,
+                string.Empty,
+                viewModel,
+                summaryPage,
+                schema,
+                _mockHostingEnv.Object,
+                formAnswers);
+
+            //Assert
+            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+            Assert.Single(callback.Sections);
+            Assert.Empty(callback.Sections.Where(_ => _.Pages.Any(_ => _.PageSummaryId.Contains("add-another"))));
+        }
     }
 }
