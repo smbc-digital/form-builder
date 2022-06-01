@@ -12,15 +12,15 @@ namespace form_builder
     [ExcludeFromCodeCoverage]
     public class Program
     {
+
+        static string _formBuilderEnvironment = Environment.GetEnvironmentVariable("FORMBUILDER_ENVIRONMENT");
+
         public static IConfiguration Configuration { 
             get
-            {
-                // This would allow the publication of this too a different environment with by setting "FORMBUILDER_ENVIRONMENT=internal"
-                var formBuilderEnvironment = Environment.GetEnvironmentVariable("FORMBUILDER_ENVIRONMENT");
-                
-                var appsettingPrefix = string.IsNullOrEmpty(formBuilderEnvironment) 
+            {               
+                var appsettingPrefix = string.IsNullOrEmpty(_formBuilderEnvironment) 
                         ? $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}"
-                        : $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.{formBuilderEnvironment}";
+                        : $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.{_formBuilderEnvironment.ToLower()}";
 
                 return new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
@@ -44,11 +44,12 @@ namespace form_builder
         }
 
         public static IHost BuildHost(string[] args) {
-            var formBuilderEnvironment = Environment.GetEnvironmentVariable("FORMBUILDER_ENVIRONMENT");
-            var startupType = string.IsNullOrEmpty(formBuilderEnvironment) 
+            var startupType = string.IsNullOrEmpty(_formBuilderEnvironment) 
                                 ? "form_builder.Startup"
-                                : $"form_builder.Startup{Environment.GetEnvironmentVariable("FORMBUILDER_ENVIRONMENT")}";
+                                : $"form_builder.Startup{_formBuilderEnvironment}";
 
+            Log.Logger.Debug($"Using Environment: {_formBuilderEnvironment}");
+            Log.Logger.Debug($"Using Environment: {startupType}");
 
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>

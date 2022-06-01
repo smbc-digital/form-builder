@@ -476,7 +476,6 @@ namespace form_builder.Utils.Startup
             services.Configure<StylesheetConfiguration>(stylesheetConfig => stylesheetConfig.Stylesheet = configuration.GetValue<string>(StylesheetConfiguration.ConfigValue));
             services.Configure<JavascriptConfiguration>(javascriptConfig => javascriptConfig.Javascript = configuration.GetValue<string>(JavascriptConfiguration.ConfigValue));
             
-
             return services;
         }
 
