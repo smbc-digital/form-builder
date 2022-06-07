@@ -169,6 +169,61 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task ProcessAddAnother_ShouldSetIncrementToZero_And_SaveFormDataIncrement_WhenOptionalAddAnotherLeftEmpty()
+        {
+            // Arrange
+            var formAnswers = new FormAnswers
+            {
+                FormData = new Dictionary<string, object>
+                {
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}person", 0 }
+                }
+            };
+
+            _mockPageHelper
+                .Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
+                .Returns(formAnswers);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {
+                    "question:0:", null
+                }
+            };
+
+            var addAnotherElement = new ElementBuilder()
+                .WithType(EElementType.AddAnother)
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .Build();
+
+            var textboxElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithLabel("Name")
+                .WithQuestionId("question")
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
+
+            var page = new PageBuilder()
+                .WithElement(addAnotherElement)
+                .WithValidatedModel(true)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var baseSchema = new FormSchemaBuilder()
+                .WithPage(page)
+                .WithBaseUrl("form")
+                .Build();
+
+            // Act
+            await _addAnotherService.ProcessAddAnother(viewModel, page, baseSchema, Guid.NewGuid().ToString(), "page-one");
+
+            // Assert
+            _mockPageHelper.Verify(_ => _.SaveFormData($"{AddAnotherConstants.IncrementKeyPrefix}person", 0, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
         public async Task ProcessAddAnother_ShouldDecreaseIncrement_And_SaveFormDataIncrement_WhenViewModelIsValid_And_AddRemovingFieldset()
         {
             // Arrange
