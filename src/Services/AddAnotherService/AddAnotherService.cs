@@ -51,12 +51,12 @@ namespace form_builder.Services.AddAnotherService
                 if (!string.IsNullOrEmpty(removeKey))
                     currentIncrement--;
 
-                if (currentIncrement.Equals(1) && addAnotherElement.Properties.Elements.All(
-                        subElement => subElement.Properties.Optional && 
-                        string.IsNullOrEmpty(viewModel[$"{subElement.Properties.QuestionId}:{currentIncrement}:"])))
-                {
+                var isOptionalAndEmpty = addAnotherElement.Properties.Elements.All(
+                    subElement => subElement.Properties.Optional &&
+                                  string.IsNullOrEmpty(viewModel[$"{subElement.Properties.QuestionId}:{currentIncrement}:"]));
+
+                if (currentIncrement.Equals(1) && isOptionalAndEmpty)
                     currentIncrement = 0;
-                }
 
                 _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, guid, baseForm.BaseURL);
             }
