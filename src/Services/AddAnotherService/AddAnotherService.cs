@@ -38,7 +38,8 @@ namespace form_builder.Services.AddAnotherService
 
             if (dynamicCurrentPage.IsValid || !string.IsNullOrEmpty(removeKey))
             {
-                var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.QuestionId}";
+                var addAnotherElement = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
+                var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
                 var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
 
                 if (addEmptyFieldset && currentIncrement >= maximumFieldsets)
@@ -49,6 +50,13 @@ namespace form_builder.Services.AddAnotherService
 
                 if (!string.IsNullOrEmpty(removeKey))
                     currentIncrement--;
+
+                var isOptionalAndEmpty = addAnotherElement.Properties.Elements.All(
+                    subElement => subElement.Properties.Optional &&
+                                  string.IsNullOrEmpty(viewModel[$"{subElement.Properties.QuestionId}:{currentIncrement}:"]));
+
+                if (currentIncrement.Equals(1) && isOptionalAndEmpty)
+                    currentIncrement = 0;
 
                 _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, guid, baseForm.BaseURL);
             }
