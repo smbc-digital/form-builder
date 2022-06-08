@@ -51,14 +51,29 @@ namespace form_builder.Services.AddAnotherService
                 if (!string.IsNullOrEmpty(removeKey))
                     currentIncrement--;
 
-                var isOptionalAndEmpty = addAnotherElement.Properties.Elements.All(
-                    subElement => subElement.Properties.Optional &&
-                                  string.IsNullOrEmpty(viewModel[$"{subElement.Properties.QuestionId}:{currentIncrement}:"]));
+                if (!addEmptyFieldset && 
+                    string.IsNullOrEmpty(removeKey) && 
+                    addAnotherElement.Properties.Elements.All(subElement => subElement.Properties.Optional))
+                {
+                    var allOptionalElementsEmpty = true;
+                    for (int i = 1; i <= currentIncrement; i++)
+                    {
+                        allOptionalElementsEmpty = addAnotherElement.Properties.Elements.All(
+                            subElement => string.IsNullOrEmpty(viewModel[$"{subElement.Properties.QuestionId}:{i}:"]));
 
-                if (currentIncrement.Equals(1) && isOptionalAndEmpty)
-                    currentIncrement = 0;
+                        if (!allOptionalElementsEmpty)
+                            break;
+                    }
 
-                _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, guid, baseForm.BaseURL);
+                    if (allOptionalElementsEmpty)
+                        _pageHelper.RemoveFormData(formDataIncrementKey, guid, baseForm.BaseURL);
+                    else
+                        _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, guid, baseForm.BaseURL);
+                }
+                else
+                {
+                    _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, guid, baseForm.BaseURL);
+                }
             }
 
             if (!string.IsNullOrEmpty(removeKey))

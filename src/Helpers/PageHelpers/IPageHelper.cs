@@ -23,6 +23,8 @@ namespace form_builder.Helpers.PageHelpers
 
         void SaveFormData(string key, object value, string guid, string formName);
 
+        void RemoveFormData(string key, string guid, string formName);
+
         void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid);
 
         List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);

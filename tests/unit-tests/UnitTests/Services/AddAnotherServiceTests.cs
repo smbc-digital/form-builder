@@ -169,14 +169,14 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessAddAnother_ShouldSetIncrementToZero_And_SaveFormDataIncrement_WhenOptionalAddAnotherLeftEmpty()
+        public async Task ProcessAddAnother_ShouldRemoveFormData_WhenOptionalAddAnotherLeftEmpty()
         {
             // Arrange
             var formAnswers = new FormAnswers
             {
                 FormData = new Dictionary<string, object>
                 {
-                    { $"{AddAnotherConstants.IncrementKeyPrefix}person", 0 }
+                    { $"{AddAnotherConstants.IncrementKeyPrefix}person", 3 }
                 }
             };
 
@@ -187,7 +187,13 @@ namespace form_builder_tests.UnitTests.Services
             var viewModel = new Dictionary<string, dynamic>
             {
                 {
-                    "question:0:", null
+                    "question:1:", null
+                },
+                {
+                    "question:2:", null
+                },
+                {
+                    "question:3:", null
                 }
             };
 
@@ -201,6 +207,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithType(EElementType.Textbox)
                 .WithLabel("Name")
                 .WithQuestionId("question")
+                .WithOptional(true)
                 .Build();
 
             addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
@@ -220,7 +227,7 @@ namespace form_builder_tests.UnitTests.Services
             await _addAnotherService.ProcessAddAnother(viewModel, page, baseSchema, Guid.NewGuid().ToString(), "page-one");
 
             // Assert
-            _mockPageHelper.Verify(_ => _.SaveFormData($"{AddAnotherConstants.IncrementKeyPrefix}person", 0, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.RemoveFormData($"{AddAnotherConstants.IncrementKeyPrefix}person",It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
