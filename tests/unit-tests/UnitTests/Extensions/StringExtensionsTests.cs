@@ -65,5 +65,18 @@ namespace form_builder_tests.UnitTests.Extensions
             var result = formName.ToBookingRequestedMonthUrl("pageone");
             Assert.Equal("/booking/test-form/pageone/month", result);
         }
+
+        [Theory]
+        [InlineData("world", "hello", "helloworld")]
+        [InlineData("HeLlO", "WoRlD", "WoRlDHeLlO")]
+        [InlineData("Test Title", "Error: ", "Error: Test Title")]
+        public void ToStringWithPrefix_ShouldReturnOriginalString_WithPrefixAtStart(string originalString, string prefix, string expectedResult)
+        {
+            // Act
+            var result = originalString.ToStringWithPrefix(prefix);
+
+            // Assert
+            Assert.Equal(expectedResult, result);
+        }
     }
 }

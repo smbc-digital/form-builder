@@ -245,6 +245,17 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
+        public void RemoveFormData(string key, string guid, string formName)
+        {
+            var convertedAnswers = GetSavedAnswers(guid);
+
+            if (convertedAnswers.FormData.ContainsKey(key))
+                convertedAnswers.FormData.Remove(key);
+
+            convertedAnswers.FormName = formName;
+            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+        }
+
         public void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid)
         {
             if (!values.Any())

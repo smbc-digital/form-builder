@@ -1350,5 +1350,32 @@ namespace form_builder_tests.UnitTests.Helpers
             _mockDistributedCache.Verify(_ => _.GetString(sessionGuid), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(sessionGuid, It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public void RemoveFormData_ShouldRemoveFormDataForKey()
+        {
+            // Arrange
+            var callbackCacheProvider = string.Empty;
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>(),
+                FormData = new Dictionary<string, object> { {"key", 1} }
+            });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
+            _mockDistributedCache
+                .Setup(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
+
+            // Act
+            _pageHelper.RemoveFormData("key", "guid", "form-name");
+            var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+
+            // Assert
+            Assert.False(callbackModel.FormData.ContainsKey("key"));
+        }
     }
 }

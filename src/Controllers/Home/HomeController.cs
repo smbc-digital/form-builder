@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using form_builder.Attributes;
 using form_builder.Builders;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Mappers.Structure;
@@ -119,7 +120,12 @@ namespace form_builder.Controllers
             }
 
             if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
+            {
+                if (!currentPageResult.Page.IsValid)
+                    currentPageResult.ViewModel.PageTitle = currentPageResult.ViewModel.PageTitle.ToStringWithPrefix(PageTitleConstants.VALIDATION_ERROR_PREFIX);
+
                 return View(currentPageResult.ViewName, currentPageResult.ViewModel);
+            }
 
             if (currentPageResult.Page.HasPageActionsPostValues)
                 await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form);
