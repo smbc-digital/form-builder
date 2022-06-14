@@ -7,6 +7,7 @@
 
 ## Table of Contents
 - [Requirements & Prereqs](#requirements-&-prereqs)
+- [Environments](#environments)
 - [Wiki](https://github.com/smbc-digital/form-builder/wiki)
 - [Validators](https://github.com/smbc-digital/form-builder/wiki/Validators)
 - [Address/Street/Organisation Providers](#address-providers)
@@ -20,6 +21,55 @@
 # Requirements & Prereqs
 - dotnet core 3.1
 - GPG key added to collaborators
+
+# Environments
+
+Which environment and configuration is used depends on the value of the `ASPNETCORE_ENVIURONMENT` environment variable.
+
+For example if set to `int` then by convention the following configuration files are required and will be loaded.
+
+* config/appsettings.json
+* config/appsettings.int.json
+* config/secrets/appsettings.secrets.json
+* config/secrets/appsettings.int.secrets.json
+
+Additionally if you need to deploy multiple different versions but using the same environment can specify and additional `FORMBUILDER_ENVIRONMENT` environment variable
+
+For example if `ASPNETCORE_ENVIRONMENT` set to `int` and `FORMBUILDER_ENVIRONMENT` set to `Internal` then by convention the following configuration files are required and will be loaded.
+
+* config/appsettings.json
+* config/appsettings.int.internal.json
+* config/secrets/appsettings.secrets.json
+* config/secrets/appsettings.int.internal.secrets.json
+
+## How this effects Forms 
+
+The `FORMBUILDER_ENVIRONMENT` variable is not currently used in the form defenitions - so the submit behaviour below would be valid for any deployment with an `ASPNETCORE_ENVIRONMENT` of `Int`
+
+```
+ "Behaviours": [
+        {
+          "conditions": [],
+          "behaviourType": "SubmitForm",
+          "SubmitSlugs": [
+            {
+              "Environment": "Int",
+              "URL": "{my-target-url}",
+              "AuthToken": "int-authtoken"
+            }
+          ]
+        }
+      ]
+```
+# Startup
+
+By default when the application starts it will use `Startup.cs` to define the applications behaviour and dependecies based on configuration.
+
+There are some scenarios, where different configurations need to be deployed to different environments, and as such we might want to define a seperate startup with different behaviours and dependencies. For example we might want to specify we use local file SchemaProvider as opposed to S3 for an internal deployment. 
+
+This is done based on the `FORMBUILDER_ENVIRONMENT` envinroment variable. If specified the application will by convention attempt to use `Startup{FORMBUILDER_ENVIRONMENT}.cs`.
+
+For example if `FORMBUILDER_ENVIRONMENT` set to `Internal` the file `StartupInternal.cs` must be present and will be used to define application behaviour and dependencies.
 
 # Providers
 ## Address Providers
