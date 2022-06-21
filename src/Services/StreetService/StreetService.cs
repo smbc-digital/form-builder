@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using form_builder.Constants;
@@ -11,6 +12,7 @@ using form_builder.Models;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.PageService.Entities;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace form_builder.Services.StreetService
@@ -23,17 +25,21 @@ namespace form_builder.Services.StreetService
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IStreetProvider> _streetProviders;
         private readonly IPageFactory _pageFactory;
+        private readonly ILogger<StreetService> _logger;
+
 
         public StreetService(
             IDistributedCacheWrapper distributedCache,
             IEnumerable<IStreetProvider> streetProviders,
             IPageHelper pageHelper,
-            IPageFactory pageFactory)
+            IPageFactory pageFactory,
+            ILogger<StreetService> logger)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _streetProviders = streetProviders;
             _pageFactory = pageFactory;
+            _logger = logger;
         }
 
         public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string guid, string path)
@@ -149,7 +155,11 @@ namespace form_builder.Services.StreetService
             {
                 try
                 {
+                    _logger.LogWarning($"StreetService::ProccessInitialStreet: processing street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}'");
+                    var stopwatch = Stopwatch.StartNew();
                     searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
+                    stopwatch.Stop();
+                    _logger.LogWarning($"StreetService::ProccessInitialStreet: finished processing street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}', {stopwatch.Elapsed.TotalSeconds} seconds.");
                 }
                 catch (Exception e)
                 {
