@@ -10,6 +10,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Services.StreetService;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Enums;
@@ -25,6 +26,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IStreetProvider> _streetProvider = new();
         private IEnumerable<IStreetProvider> _streetProviders;
         private readonly Mock<IPageFactory> _mockPageContentFactory = new();
+        private readonly Mock<ILogger<StreetService>> _mockLogger = new();
 
         public StreetServiceTests()
         {
@@ -34,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
                 _streetProvider.Object
             };
 
-            _service = new StreetService(_distributedCache.Object, _streetProviders, _pageHelper.Object, _mockPageContentFactory.Object);
+            _service = new StreetService(_distributedCache.Object, _streetProviders, _pageHelper.Object, _mockPageContentFactory.Object, _mockLogger.Object);
         }
 
         [Fact]
