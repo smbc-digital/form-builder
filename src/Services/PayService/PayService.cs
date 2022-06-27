@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.FormBuilder;
+using StockportGovUK.NetStandard.Models.Civica.Pay.Notifications;
 
 namespace form_builder.Services.PayService
 {
@@ -137,20 +138,34 @@ namespace form_builder.Services.PayService
                 throw new Exception(
                     $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
                     $"No payment providers are configured");
-            
+
             if (_paymentConfiguration.FakePayment && _paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
                 return _paymentProviders
                             .FirstOrDefault(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName));
-            
+
             var paymentProvider = _paymentProviders
                                     .FirstOrDefault(_ => _.ProviderName.Equals(paymentInfo.PaymentProvider));
-                                    
+
             if (paymentProvider is null)
                 throw new Exception(
                     $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
                     $"No payment provider configured for {paymentInfo.PaymentProvider}");
 
             return paymentProvider;
+        }
+
+        public async Task<string> LogPayment(string form, NotificationMessage notification)
+        {
+            if (notification.RequestStatus.ToLower() != "accepted")
+            {
+                _logger.LogError($"Error with civica payment {notification.BasketReference} error: {notification.RequestStatus} form: {form}");
+            }
+            else
+            {
+                _logger.LogInformation($"Payment successeful: {notification.BasketReference} form: {form}");
+            }
+
+            return notification.BasketReference;
         }
     }
 }

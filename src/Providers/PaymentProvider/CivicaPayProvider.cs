@@ -44,7 +44,7 @@ namespace form_builder.Providers.PaymentProvider
                 CustomerID = _paymentConfig.CustomerId,
                 ApiPassword = _paymentConfig.ApiPassword,
                 ReturnURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
-                NotifyURL = string.Empty,
+                NotifyURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-notification",,
                 CallingAppTranReference = reference,
                 PaymentItems = new List<PaymentItem>
                 {

@@ -85,6 +85,8 @@ namespace form_builder
                     _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 });
 
+            services.AddMvc().AddXmlSerializerFormatters().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
             services
                 .AddMvc()
                 .AddMvcOptions(options =>

@@ -7,6 +7,7 @@ using form_builder.Services.PayService;
 using form_builder.ViewModels;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Mvc;
+using StockportGovUK.NetStandard.Models.Civica.Pay.Notifications;
 
 namespace form_builder.Controllers.Payment
 {
@@ -115,5 +116,17 @@ namespace form_builder.Controllers.Payment
 
             return View("./Declined", paymentDeclinedViewModel);
         }
+
+
+        [HttpPost]
+        [Route("{form}/payment-notification")]
+        [IgnoreAntiforgeryToken]
+        [Consumes("application/xml")]
+        public async Task<string> PaymentNotification(string form ,[FromBody] NotificationMessage notification)
+        {
+            string reference = await _payService.LogPayment(form, notification);
+            return reference;
+        }
+
     }
 }
