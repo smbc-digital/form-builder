@@ -125,7 +125,7 @@ namespace form_builder.Controllers.Payment
         public async Task<string> PaymentNotification(string form ,[FromBody] NotificationMessage notification)
         {
             string reference = await _payService.LogPayment(form, notification);
-            return reference;
+            return $"{form}: {reference}";
         }
 
     }
