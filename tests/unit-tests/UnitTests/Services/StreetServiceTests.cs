@@ -23,13 +23,12 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
         private readonly Mock<IPageHelper> _pageHelper = new();
         private readonly Mock<IStreetProvider> _streetProvider = new();
-        private IEnumerable<IStreetProvider> _streetProviders;
         private readonly Mock<IPageFactory> _mockPageContentFactory = new();
 
         public StreetServiceTests()
         {
             _streetProvider.Setup(_ => _.ProviderName).Returns("Fake");
-            _streetProviders = new List<IStreetProvider>
+            var _streetProviders = new List<IStreetProvider>
             {
                 _streetProvider.Object
             };
@@ -300,7 +299,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessStreet(viewModel, page, schema, "", "page-one"));
             _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup on Provider '{fakeStreetProvider}' with searchterm 'streetname' Exception:", result.Message);
+            Assert.StartsWith($"StreetService::ProcessInitialStreet: An exception has occurred while attempting to perform street lookup on Provider '{fakeStreetProvider}' with searchterm 'streetname' Exception:", result.Message);
         }
     }
 }

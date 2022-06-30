@@ -31,4 +31,6 @@
     Select a payment result
 </h2>
 
-<a class="govuk-button" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00000">Payment Success</a> <a class="govuk-button govuk-button--secondary" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00001">Payment Declined</a> <a class="govuk-button govuk-button--warning" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00099">Payment Failure</a>
+<a class="govuk-button" id="fake-payment-success" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00000">Payment Success</a> 
+<a class="govuk-button govuk-button--secondary" id="fake-payment-declined" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00001">Payment Declined</a> 
+<a class="govuk-button govuk-button--warning" id="fake-payment-failure" href="@Model.PaymentEndpointBaseUrl?callingAppTxnRef=@Model.Reference&responseCode=00099">Payment Failure</a>

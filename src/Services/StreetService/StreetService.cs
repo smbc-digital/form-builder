@@ -24,6 +24,7 @@ namespace form_builder.Services.StreetService
         private readonly IEnumerable<IStreetProvider> _streetProviders;
         private readonly IPageFactory _pageFactory;
 
+
         public StreetService(
             IDistributedCacheWrapper distributedCache,
             IEnumerable<IStreetProvider> streetProviders,
@@ -153,7 +154,7 @@ namespace form_builder.Services.StreetService
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"StreetService::ProccessInitialStreet: An exception has occured while attempting to perform street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}' Exception: {e.Message}");
+                    throw new ApplicationException($"StreetService::ProcessInitialStreet: An exception has occurred while attempting to perform street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}' Exception: {e.Message}");
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
