@@ -122,9 +122,9 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/payment-notification")]
         [IgnoreAntiforgeryToken]
         [Consumes("application/xml")]
-        public async Task<string> PaymentNotification(string form ,[FromBody] NotificationMessage notification)
+        public string PaymentNotification(string form ,[FromBody] NotificationMessage notification)
         {
-            string reference = await _payService.LogPayment(form, notification);
+            string reference =  _payService.LogPayment(form, notification);
             return $"{form}: {reference}";
         }
 

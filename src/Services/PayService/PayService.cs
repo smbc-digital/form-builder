@@ -154,11 +154,11 @@ namespace form_builder.Services.PayService
             return paymentProvider;
         }
 
-        public async Task<string> LogPayment(string form, NotificationMessage notification)
+        public string LogPayment(string form, NotificationMessage notification)
         {
             if (notification.RequestStatus.ToLower() != "accepted")
             {
-                _logger.LogError($"Error with civica payment {notification.BasketReference} error: {notification.RequestStatus} form: {form}");
+                _logger.LogError($"Error with civica payment: {notification.BasketReference} error: {notification.RequestStatus} form: {form}");
             }
             else
             {
