@@ -56,6 +56,14 @@ namespace form_builder.Controllers.Payment
                     reference = callingAppTxnRef
                 });
             }
+            catch (PaymentCallbackException)
+            {
+                return RedirectToAction("CallbackFailure", new
+                {
+                    form,
+                    reference = callingAppTxnRef
+                });
+            }
         }
 
         [HttpGet]
@@ -117,16 +125,34 @@ namespace form_builder.Controllers.Payment
             return View("./Declined", paymentDeclinedViewModel);
         }
 
-
         [HttpPost]
         [Route("{form}/payment-notification")]
         [IgnoreAntiforgeryToken]
-        [Consumes("application/xml")]
+        [Consumes("text/xml")]
         public string PaymentNotification(string form ,[FromBody] NotificationMessage notification)
         {
             string reference =  _payService.LogPayment(form, notification);
             return $"{form}: {reference}";
         }
 
+
+        [HttpGet]
+        [Route("{form}/callback-failure")]
+        public async Task<IActionResult> CallbackFailure(string form, [FromQuery] string reference)
+        {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var data = await _mappingService.Map(sessionGuid, form);
+
+            var callbackFailureViewModel = new CallbackFailureViewModel
+            {
+                FormName = data.BaseForm.FormName,
+                PageTitle = "Error",
+                Reference = reference,
+                StartPageUrl = data.BaseForm.StartPageUrl,
+                CallbackFailureContactNumber = data.BaseForm.CallbackFailureContactNumber
+            };
+
+            return View("./CallbackFailure", callbackFailureViewModel);
+        }
     }
 }

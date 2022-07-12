@@ -23,6 +23,8 @@ namespace form_builder_tests.Builders
         private List<IAction> _formActions = new();
         private List<EnvironmentAvailability> _environmentAvailability = new();
         private List<Breadcrumb> _breadcrumbs = new();
+        private bool _processPaymentCallbackResponse = false;
+        private string _callbackFailureContactNumber = "01611111111";
 
         public FormSchema Build() => new FormSchema
         {
@@ -41,7 +43,9 @@ namespace form_builder_tests.Builders
             GeneratedReferenceNumberMapping = _generatedReferenceNumberMapping,
             BreadCrumbs = _breadcrumbs,
             SavePaymentAmount = _savePaymentAmount,
-            PaymentAmountMapping = _paymentAmountMapping
+            PaymentAmountMapping = _paymentAmountMapping,
+            ProcessPaymentCallbackResponse = _processPaymentCallbackResponse,
+            CallbackFailureContactNumber = _callbackFailureContactNumber
         };
 
         public FormSchemaBuilder WithBaseUrl(string baseUrl)
@@ -144,6 +148,13 @@ namespace form_builder_tests.Builders
         {
             _savePaymentAmount = true;
             _paymentAmountMapping = mapping;
+
+            return this;
+        }
+
+        public FormSchemaBuilder WithProcessPaymentCallbackResponse()
+        {
+            _processPaymentCallbackResponse = true;
 
             return this;
         }
