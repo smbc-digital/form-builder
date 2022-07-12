@@ -128,7 +128,7 @@ namespace form_builder.Controllers.Payment
         [HttpPost]
         [Route("{form}/payment-notification")]
         [IgnoreAntiforgeryToken]
-        [Consumes("text/xml")]
+        [Consumes("application/xml")]
         public string PaymentNotification(string form ,[FromBody] NotificationMessage notification)
         {
             string reference =  _payService.LogPayment(form, notification);
