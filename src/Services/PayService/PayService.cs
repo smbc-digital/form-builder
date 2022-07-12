@@ -127,12 +127,10 @@ namespace form_builder.Services.PayService
             {
                 var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });
                 if (!result.IsSuccessStatusCode)
-                {
                     _logger.LogError(
                         $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
                         $"Payment callback for {paymentStatus} failed with statuscode: {result.StatusCode}, " +
                         $"Payment reference {reference}, Response: {JsonConvert.SerializeObject(result)}");
-                }
 
                 return result;
             }

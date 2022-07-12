@@ -44,29 +44,39 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ITagParser> _tagParser = new();
         private readonly Mock<IOptions<PaymentConfiguration>> _mockPaymentConfiguration = new();
 
-        
-
-
         public PayServiceTests()
         {
-            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
-            _mockPageHelper.Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
+            _mockPageHelper
+                .Setup(_ => _.GetSavedAnswers(It.IsAny<string>()))
                 .Returns(new FormAnswers());
 
-            _tagParser.Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            _tagParser
+                .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns("{\"PaymentProvider\":\"testPaymentProvider\",\"Settings\":{\"CalculationSlug\":{\"Environment\":null,\"URL\":\"url\",\"Type\":\"AuthHeader\",\"AuthToken\":\"TestToken\",\"CallbackUrl\":null}}}");
+            
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
-            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
-            _paymentProvider.Setup(_ => _.ProviderName).Returns("testPaymentProvider");
+            
+            _mockTagParsers
+                .Setup(m => m.GetEnumerator())
+                .Returns(() => tagParserItems.GetEnumerator());
+            
+            _paymentProvider
+                .Setup(_ => _.ProviderName)
+                .Returns("testPaymentProvider");
+            
             _paymentProvider
                 .Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<PaymentInformation>()))
                 .ReturnsAsync("url");
 
-
-            _fakePaymentProvider.Setup(_ => _.ProviderName).Returns("Fake");
+            _fakePaymentProvider
+                .Setup(_ => _.ProviderName)
+                .Returns("Fake");
+            
             _fakePaymentProvider
                 .Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<PaymentInformation>()))
@@ -106,29 +116,45 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object, _fakePaymentProvider.Object };
-            _mockPaymentProviders.Setup(m => m.GetEnumerator()).Returns(() => paymentProviderItems.GetEnumerator());
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
+            
+            _mockPaymentProviders
+                .Setup(m => m.GetEnumerator())
+                .Returns(() => paymentProviderItems.GetEnumerator());
+
+            _mockSessionHelper
+                .Setup(_ => _.GetSessionGuid())
+                .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
+
+            _mockMappingService
+                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
                 .ReturnsAsync(mappingEntity);
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "nonexistanceform"))
+
+            _mockMappingService
+                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "nonexistanceform"))
                 .ReturnsAsync(mappingEntity);
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "complexCalculationForm"))
+
+            _mockMappingService
+                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "complexCalculationForm"))
                 .ReturnsAsync(mappingEntity);
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testFormWithNoValidPayment"))
+
+            _mockMappingService
+                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testFormWithNoValidPayment"))
                 .ReturnsAsync(mappingEntity);
-            _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
-            _mockPaymentConfiguration.Setup(_ => _.Value).Returns(
-                new PaymentConfiguration
-                {
-                    FakePayment = false
-                });
-                
+
+            _mockHostingEnvironment
+                .Setup(_ => _.EnvironmentName)
+                .Returns("local");
+
+            _mockPaymentConfiguration
+                .Setup(_ => _.Value)
+                .Returns(
+                    new PaymentConfiguration
+                    {
+                        FakePayment = false
+                    });
 
             _service = new PayService(_mockPaymentProviders.Object, _mockLogger.Object, _mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object,
                 _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentHelper.Object, _mockPaymentConfiguration.Object,  _mockTagParsers.Object);
-
-
-
         }
 
         private static MappingEntity GetMappingEntityData()
@@ -399,7 +425,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPaymentResponse_ShouldNotLog_Error_If_CallbackIsSuccessfull_OnFailure()
+        public async Task ProcessPaymentResponse_ShouldNotLog_Error_If_CallbackIsSuccessful_OnFailure()
         {
             // Arrange
             _mockPaymentHelper
@@ -426,7 +452,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPaymentResponse_ShouldNotLog_Error_If_CallbackIsSuccessfull_OnDeclined()
+        public async Task ProcessPaymentResponse_ShouldNotLog_Error_If_CallbackIsSuccessful_OnDeclined()
         {
             // Arrange
             _mockPaymentHelper
@@ -453,7 +479,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPaymentResponse_ShouldLogError_AndNotFail_IfCallback_ThrowsException_OnSuccess()
+        public async Task ProcessPaymentResponse_ShouldLogError_AndNotFail_IfCallback_ThrowsException_OnSuccess_IfProcessPaymentCallbackFalse()
         {
             // Arrange
             var reference = "12345abc";
@@ -469,7 +495,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
-                .ThrowsAsync(new Exception("An error has occured"));
+                .ThrowsAsync(new Exception("An error has occurred"));
 
             // Act
             var result = await _service.ProcessPaymentResponse("testForm", "12345", reference);
@@ -534,6 +560,36 @@ namespace form_builder_tests.UnitTests.Services
             await Assert.ThrowsAsync<PaymentDeclinedException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
             _mockLogger.Verify(_ => _.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<PostPaymentUpdateRequest>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPaymentResponse_Should_ThrowPaymentCallbackException_IfCallbackFails_AndProcessPaymentCallbackResponseTrue()
+        {
+            // Arrange
+            var mappingEntity = GetMappingEntityData();
+            mappingEntity.BaseForm.ProcessPaymentCallbackResponse = true;
+
+            _mockMappingService
+                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
+                .ReturnsAsync(mappingEntity);
+
+            _mockPaymentHelper
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .ReturnsAsync(new PaymentInformation
+                {
+                    PaymentProvider = "testPaymentProvider",
+                    Settings = new Settings
+                    {
+                        Amount = "10"
+                    }
+                });
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.FailedDependency });
+
+            // Act & Assert
+            await Assert.ThrowsAsync<PaymentCallbackException>(() => _service.ProcessPaymentResponse("testForm", "12345", "reference"));
         }
 
         [Fact]

@@ -11,7 +11,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             IntegrityCheckResult result = new();
 
             if (schema.ProcessPaymentCallbackResponse && string.IsNullOrEmpty(schema.CallbackFailureContactNumber))
-                result.AddFailureMessage($"Contact Centre Number Valid Check, ContactCentreNumber cannot be null or empty if ProcessPaymentCallbackResponse is true");
+                result.AddFailureMessage("Callback Failure Contact Number Valid Check, CallbackFailureContactNumber cannot be null or empty if ProcessPaymentCallbackResponse is true");
 
             return result;
         }
