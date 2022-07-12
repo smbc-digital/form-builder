@@ -31,6 +31,10 @@ namespace form_builder.Models
 
         public string PaymentAmountMapping { get; set; } = "paymentAmount";
 
+        public bool ProcessPaymentCallbackResponse { get; set; }
+
+        public string CallbackFailureContactNumber { get; set; }
+
         public string ReferencePrefix { get; set; }
 
         public List<Breadcrumb> BreadCrumbs { get; set; }
