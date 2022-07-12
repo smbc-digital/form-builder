@@ -44,8 +44,8 @@ namespace form_builder.Providers.PaymentProvider
                 CustomerID = _paymentConfig.CustomerId,
                 ApiPassword = _paymentConfig.ApiPassword,
                 ReturnURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
-                NotifyURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}/{form}/payment-notification",
-                CallingAppTranReference = reference,
+                NotifyURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/payment-notification",
+                CallingAppTranReference = reference, 
                 PaymentItems = new List<PaymentItem>
                 {
                     new PaymentItem
@@ -70,6 +70,8 @@ namespace form_builder.Providers.PaymentProvider
                     }
                 }
             };
+
+            _logger.LogError(basket.NotifyURL);
 
             if (paymentInformation.IsServicePay())
             {
