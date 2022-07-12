@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
@@ -89,7 +91,12 @@ namespace form_builder.Services.PayService
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
-                await HandleCallback(EPaymentStatus.Success, reference, postUrl.CallbackUrl);
+                HttpResponseMessage callbackResponse = await HandleCallback(EPaymentStatus.Success, reference, postUrl.CallbackUrl);
+
+                if (mappingEntity.BaseForm.ProcessPaymentCallbackResponse && !callbackResponse.IsSuccessStatusCode)
+                    throw new PaymentCallbackException(
+                        $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
+                        $"Callback failed for case {reference}: {callbackResponse.ReasonPhrase}");
             }
             catch (PaymentDeclinedException)
             {
@@ -105,21 +112,29 @@ namespace form_builder.Services.PayService
                     $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
                     $"{paymentProvider.ProviderName} {EPaymentStatus.Failure} payment");
             }
+            catch (PaymentCallbackException ex)
+            {
+                throw new PaymentCallbackException(ex.Message);
+            }
 
             _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
             return reference;
         }
 
-        private async Task HandleCallback(EPaymentStatus paymentStatus, string reference, string callbackUrl)
+        private async Task<HttpResponseMessage> HandleCallback(EPaymentStatus paymentStatus, string reference, string callbackUrl)
         {
             try
             {
                 var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });
                 if (!result.IsSuccessStatusCode)
+                {
                     _logger.LogError(
                         $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
                         $"Payment callback for {paymentStatus} failed with statuscode: {result.StatusCode}, " +
                         $"Payment reference {reference}, Response: {JsonConvert.SerializeObject(result)}");
+                }
+
+                return result;
             }
             catch (Exception e)
             {
@@ -128,6 +143,8 @@ namespace form_builder.Services.PayService
                     $"Payment callback to url {callbackUrl} failed. " +
                     $"Payment status was {paymentStatus}, " +
                     $"failed with Exception: {e.Message}, Payment reference {reference}");
+
+                return new HttpResponseMessage(HttpStatusCode.FailedDependency);
             }
         }
 

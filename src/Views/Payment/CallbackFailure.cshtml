@@ -1,0 +1,17 @@
+﻿@model CallbackFailureViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
+    ViewData["PreviewMode"] = Model.IsInPreviewMode;
+}
+
+<h1 class="govuk-heading-l">We’re sorry, there was a problem</h1>
+<p class="smbc-body">
+    Your payment has been taken from your account. Please contact us on <strong>@Model.CallbackFailureContactNumber</strong> with the reference <strong>@Model.Reference</strong>.
+</p>
+
+<a class="govuk-button" href="https://www.stockport.gov.uk">Go to the homepage</a>
