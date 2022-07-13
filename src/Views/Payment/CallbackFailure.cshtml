@@ -1,0 +1,21 @@
+﻿@model CallbackFailureViewModel
+@{
+    ViewData["Title"] = Model.FormName;
+    ViewData["PageTitle"] = Model.PageTitle;
+    ViewData["FeedbackForm"] = Model.FeedbackForm;
+    ViewData["FeedbackPhase"] = Model.FeedbackPhase;
+    ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
+    ViewData["Breadcrumbs"] = Model.BreadCrumbs;
+    ViewData["PreviewMode"] = Model.IsInPreviewMode;
+}
+
+<h1 class="govuk-heading-l">We’re sorry, there was a problem</h1>
+<p class="smbc-body">
+    The payment has been taken from your account but your appointment was not confirmed.
+</p>
+
+<p class="smbc-body">
+    You must ring us on <strong>@Model.CallbackFailureContactNumber</strong> and quote your reference number <strong>@Model.Reference</strong> to confirm your appointment. If you do not call us we cannot guarantee your appointment will go ahead.
+</p>
+
+<a class="govuk-button" href="https://www.stockport.gov.uk">Go to the homepage</a>
