@@ -177,7 +177,7 @@ namespace form_builder.Services.PayService
             }
             else
             {
-                _logger.LogInformation($"Payment successeful: {notification.BasketReference} form: {form}");
+                _logger.LogInformation($"Payment successful: {notification.BasketReference} form: {form}");
             }
 
             return notification.BasketReference;
