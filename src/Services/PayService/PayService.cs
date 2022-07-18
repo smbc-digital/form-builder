@@ -69,7 +69,7 @@ namespace form_builder.Services.PayService
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
+            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation, formData.FormAnswers.AllAnswers.ToList());
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)

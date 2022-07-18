@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
 using form_builder.Extensions;
+using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -20,7 +22,7 @@ namespace form_builder.Providers.PaymentProvider
             _httpContextAccessor = httpContextAccessor;
             _environment = environment;
         }
-        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
+        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation, List<Answers> formAnswers)
         {
             string url = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/fake-payment?reference={reference}&amount={paymentInformation.Settings.Amount}";
             return url;

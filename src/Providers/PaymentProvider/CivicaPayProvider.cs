@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Exceptions;
 using form_builder.Extensions;
+using form_builder.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -31,13 +33,37 @@ namespace form_builder.Providers.PaymentProvider
             _environment = environment;
             _logger = logger;
         }
-        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
+        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation,List<Answers> formAnswers)
         {
             if (string.IsNullOrEmpty(reference))
                 throw new PaymentFailureException("CivicaPayProvider::No valid reference");
 
-            var address = !string.IsNullOrEmpty(paymentInformation.Settings.AddressReference) ? paymentInformation.Settings.AddressReference.ConvertStringToObject() : new AddressDetail();
+            AddressDetail address = new();
 
+            if (!string.IsNullOrEmpty(paymentInformation.Settings.AddressReference))
+            {
+                if (paymentInformation.Settings.AddressReference.Contains(AddressConstants.DESCRIPTION_SUFFIX))
+                {
+                    address = paymentInformation.Settings.AddressReference.ConvertStringToObject();
+                }
+                else
+                {
+                    if (paymentInformation.Settings.AddressReference.Contains("yourAddress-ManualPostcode"))
+                    {
+                        foreach (var answer in formAnswers)
+                        {
+                            if (answer.QuestionId.Contains("yourAddress-AddressLine1"))
+                                address.Street = answer.Response;
+
+                            if (answer.QuestionId.Contains("yourAddress-AddressTown"))
+                                address.Town = answer.Response;
+
+                            if (answer.QuestionId.Contains("yourAddress-ManualPostcode"))
+                                address.Postcode = answer.Response;
+                        }
+                    }
+                }
+            }
             CreateImmediateBasketRequest basket = new()
             {
                 CallingAppIdentifier = "Basket",
