@@ -442,6 +442,7 @@ namespace form_builder.Builders
             return this;
         }
 
+<<<<<<< HEAD
         public ElementBuilder WithSummaryLabel(string value)
         {
             _property.SummaryLabel = value;
@@ -585,6 +586,13 @@ namespace form_builder.Builders
             _property.OptionalIf.QuestionId = questionId;
             _property.OptionalIf.ComparisonValue = comparisonValue;
             _property.OptionalIf.ConditionType = conditionType;
+
+            return this;
+        }
+
+        public ElementBuilder WithValidatePostcode(bool validate)
+        {
+            _property.ValidatePostcode = validate;
 
             return this;
         }

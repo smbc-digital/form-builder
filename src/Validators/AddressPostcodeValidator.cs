@@ -19,6 +19,14 @@ namespace form_builder.Validators
             if (!viewModel.ContainsKey(addressElement.AddressSearchQuestionId))
                 return new ValidationResult { IsValid = true };
 
+            if (element.Properties.ValidatePostcode != true)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            };
+
             if (string.IsNullOrEmpty(viewModel[addressElement.AddressSearchQuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
 

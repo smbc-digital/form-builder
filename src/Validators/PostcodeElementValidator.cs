@@ -8,9 +8,14 @@ namespace form_builder.Validators
     public class PostcodeElementValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
-        {
-            if (!element.Properties.Postcode)
-                return new ValidationResult { IsValid = true };
+        {                        
+            if (element.Properties.Postcode != true)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            }
 
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
