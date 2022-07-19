@@ -20,12 +20,7 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
 
             if (element.Properties.ValidatePostcode != true)
-            {
-                return new ValidationResult
-                {
-                    IsValid = true
-                };
-            };
+                return new ValidationResult { IsValid = true };
 
             if (string.IsNullOrEmpty(viewModel[addressElement.AddressSearchQuestionId]) && element.Properties.Optional)
                 return new ValidationResult { IsValid = true };
