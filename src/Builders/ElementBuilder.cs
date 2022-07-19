@@ -442,7 +442,6 @@ namespace form_builder.Builders
             return this;
         }
 
-<<<<<<< HEAD
         public ElementBuilder WithSummaryLabel(string value)
         {
             _property.SummaryLabel = value;
