@@ -29,6 +29,14 @@ namespace form_builder.Validators
                 };
             }
 
+            if (element.Properties.ValidatePostcode != true)
+            {
+                return new ValidationResult
+                {
+                    IsValid = true
+                };
+            };
+
             if (string.IsNullOrEmpty(viewModel[addressElement.AddressSearchQuestionId]) && element.Properties.Optional)
             {
                 return new ValidationResult

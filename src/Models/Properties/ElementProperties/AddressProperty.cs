@@ -26,6 +26,8 @@
 
         public bool? StockportPostcode { get; set; }
 
+        public bool ValidatePostcode { get; set; } = true;
+
         public bool DisplayNoResultsIAG { get; set; } = false;
 
         public bool Disabled { get; set; } = false;
