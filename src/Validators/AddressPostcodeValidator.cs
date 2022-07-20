@@ -12,26 +12,26 @@ namespace form_builder.Validators
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (!element.Type.Equals(EElementType.Address) || (element.Type.Equals(EElementType.Address) && !viewModel.IsInitial()))
-                return new ValidationResult { IsValid = true };
+                return new ValidationResult(true);
 
             var addressElement = (Address)element;
 
             if (!viewModel.ContainsKey(addressElement.AddressSearchQuestionId))
-                return new ValidationResult { IsValid = true };
+                return new ValidationResult(true);
+
+            if (!element.Properties.ValidatePostcode)
+                return new ValidationResult(true);
 
             if (string.IsNullOrEmpty(viewModel[addressElement.AddressSearchQuestionId]) && element.Properties.Optional)
-                return new ValidationResult { IsValid = true };
+                return new ValidationResult(true);
 
-            var value = viewModel[addressElement.AddressSearchQuestionId];
-            var isValid = true;
-            if (!AddressConstants.POSTCODE_REGEX.Match(value).Success)
-                isValid = false;
+            var isValid = AddressConstants.POSTCODE_REGEX
+                            .Match(viewModel[addressElement.AddressSearchQuestionId])
+                            .Success;
 
-            return new ValidationResult
-            {
-                IsValid = isValid,
-                Message = isValid ? string.Empty : ValidationConstants.POSTCODE_INCORRECT_FORMAT
-            };
+            return new ValidationResult(isValid, isValid 
+                                                    ? string.Empty 
+                                                    : ValidationConstants.POSTCODE_INCORRECT_FORMAT);
         }
     }
 }
