@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.Services
             
             _paymentProvider
                 .Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>(), It.IsAny<PaymentInformation>()))
+                    It.IsAny<string>(), It.IsAny<PaymentInformation>(), It.IsAny<List<Answers>>()))
                 .ReturnsAsync("url");
 
             _fakePaymentProvider
@@ -79,7 +79,7 @@ namespace form_builder_tests.UnitTests.Services
             
             _fakePaymentProvider
                 .Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>(), It.IsAny<PaymentInformation>()))
+                    It.IsAny<string>(), It.IsAny<PaymentInformation>(), It.IsAny<List<Answers>>()))
                 .ReturnsAsync("url");
 
             var submitSlug = new SubmitSlug
@@ -251,7 +251,7 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             _paymentProvider.Verify(
                 _ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>(), It.IsAny<PaymentInformation>()), Times.Once);
+                    It.IsAny<string>(), It.IsAny<PaymentInformation>(), It.IsAny<List<Answers>>()), Times.Once);
             Assert.IsType<string>(result);
         }
 
@@ -694,7 +694,7 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             _fakePaymentProvider.Verify(
                 _ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>(), It.IsAny<PaymentInformation>()), Times.Once);
+                    It.IsAny<string>(), It.IsAny<PaymentInformation>(), It.IsAny<List<Answers>>()), Times.Once);
                     
             Assert.IsType<string>(result);
         }
