@@ -588,5 +588,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithValidatePostcode(bool validate)
+        {
+            _property.ValidatePostcode = validate;
+
+            return this;
+        }
     }
 }

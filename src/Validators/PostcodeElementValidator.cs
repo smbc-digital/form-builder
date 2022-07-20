@@ -8,26 +8,23 @@ namespace form_builder.Validators
     public class PostcodeElementValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
-        {
+        {                        
             if (!element.Properties.Postcode)
-                return new ValidationResult { IsValid = true };
+                return new ValidationResult(true);
 
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
-                return new ValidationResult { IsValid = true };
+                return new ValidationResult(true);
 
             if (!viewModel.ContainsKey(element.Properties.QuestionId))
-                return new ValidationResult { IsValid = true };
+                return new ValidationResult(true);
 
-            var value = viewModel[element.Properties.QuestionId];
-            var isValid = true;
-            if (!AddressConstants.POSTCODE_REGEX.Match(value).Success)
-                isValid = false;
+            var isValid = AddressConstants.POSTCODE_REGEX
+                                            .Match(viewModel[element.Properties.QuestionId])
+                                            .Success;
 
-            return new ValidationResult
-            {
-                IsValid = isValid,
-                Message = isValid ? string.Empty : ValidationConstants.POSTCODE_INCORRECT_FORMAT
-            };
+            return new ValidationResult(isValid, isValid 
+                                                    ? string.Empty 
+                                                    : ValidationConstants.POSTCODE_INCORRECT_FORMAT);
         }
     }
 }
