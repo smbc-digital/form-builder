@@ -9,7 +9,7 @@ namespace form_builder.Validators
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {                        
-            if (element.Properties.Postcode != true)
+            if (!element.Properties.Postcode)
                 return new ValidationResult(true);
 
             if (string.IsNullOrEmpty(viewModel[element.Properties.QuestionId]) && element.Properties.Optional)
@@ -18,10 +18,13 @@ namespace form_builder.Validators
             if (!viewModel.ContainsKey(element.Properties.QuestionId))
                 return new ValidationResult(true);
 
-            var value = viewModel[element.Properties.QuestionId];
-            var isValid = AddressConstants.POSTCODE_REGEX.Match(value).Success;
+            var isValid = AddressConstants.POSTCODE_REGEX
+                                            .Match(viewModel[element.Properties.QuestionId])
+                                            .Success;
 
-            return new ValidationResult(isValid, isValid ? string.Empty : ValidationConstants.POSTCODE_INCORRECT_FORMAT);
+            return new ValidationResult(isValid, isValid 
+                                                    ? string.Empty 
+                                                    : ValidationConstants.POSTCODE_INCORRECT_FORMAT);
         }
     }
 }
