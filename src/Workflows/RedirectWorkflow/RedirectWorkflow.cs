@@ -28,7 +28,7 @@ namespace form_builder.Workflows.RedirectWorkflow {
             var data = await _mappingService.Map(sessionGuid, form);
             var reference = await _submitService.RedirectSubmission(data, form, sessionGuid);
 
-            return reference; //Or redirect to url
+            return reference;
         }
     }
 }
