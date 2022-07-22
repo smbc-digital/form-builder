@@ -15,6 +15,7 @@ using form_builder.Services.PageService;
 using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
+using form_builder.Workflows.RedirectWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +28,7 @@ namespace form_builder.Controllers
     {
         private readonly IPageService _pageService;
         private readonly ISubmitWorkflow _submitWorkflow;
+        private readonly IRedirectWorkflow _redirectWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
         private readonly IActionsWorkflow _actionsWorkflow;
         private readonly ISuccessWorkflow _successWorkflow;
@@ -38,6 +40,7 @@ namespace form_builder.Controllers
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
             IPaymentWorkflow paymentWorkflow,
+            IRedirectWorkflow redirectWorkflow,
             IFileUploadService fileUploadService,
             IWebHostEnvironment hostingEnvironment,
             IActionsWorkflow actionsWorkflow,
@@ -47,6 +50,7 @@ namespace form_builder.Controllers
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
+            _redirectWorkflow = redirectWorkflow;
             _paymentWorkflow = paymentWorkflow;
             _fileUploadService = fileUploadService;
             _hostingEnvironment = hostingEnvironment;
@@ -152,6 +156,10 @@ namespace form_builder.Controllers
                 case EBehaviourType.SubmitAndPay:
                     var result = await _paymentWorkflow.Submit(form, path);
                     return Redirect(result);
+
+                case EBehaviourType.SubmitAndRedirect:
+                    var redirectUrl = await _redirectWorkflow.Submit(form, path);
+                    return Redirect(redirectUrl);
 
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");

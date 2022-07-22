@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
+using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
@@ -35,6 +36,7 @@ namespace form_builder.Services.SubmitService
         private readonly IPaymentHelper _paymentHelper;
         private readonly IPostSubmissionAction _postSubmissionAction;
         private readonly IEnumerable<ITagParser> _tagParsers;
+        private readonly IActionHelper _actionHelper;
 
         public SubmitService(
             IGateway gateway,
@@ -46,7 +48,9 @@ namespace form_builder.Services.SubmitService
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
             IPaymentHelper paymentHelper,
-            IPostSubmissionAction postSubmissionAction, IEnumerable<ITagParser> tagParsers)
+            IPostSubmissionAction postSubmissionAction, 
+            IEnumerable<ITagParser> tagParsers,
+            IActionHelper actionHelper)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -59,6 +63,7 @@ namespace form_builder.Services.SubmitService
             _paymentHelper = paymentHelper;
             _postSubmissionAction = postSubmissionAction;
             _tagParsers = tagParsers;
+            _actionHelper = actionHelper;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -165,6 +170,58 @@ namespace form_builder.Services.SubmitService
             }
 
             throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+        }
+
+        public async Task<string> RedirectSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
+        {
+            if (_submissionServiceConfiguration.FakeSubmission)
+                return ProcessFakeSubmission(mappingEntity, form, sessionGuid, string.Empty);
+
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
+
+            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+
+            var redirectEntity = _actionHelper.GenerateUrl(postUrl.RedirectUrl, mappingEntity.FormAnswers);
+
+            if (string.IsNullOrEmpty(postUrl.URL))
+            {
+                throw new ApplicationException($"SubmitService::RedirectSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
+            }
+
+            if (string.IsNullOrEmpty(redirectEntity.Url))
+            {
+                throw new ApplicationException($"SubmitService::RedirectSubmission, No redirect URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
+            }
+
+            if (string.IsNullOrWhiteSpace(postUrl.AuthToken))
+            {
+                _gateway.ChangeAuthenticationHeader(string.Empty);
+            }
+            else
+            {
+                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+            }
+
+            var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+            }
+
+            if (response.Content is not null)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    throw new ApplicationException($"SubmitService::RedirectSubmission, Gateway {postUrl.URL} responded with empty reference");
+                }
+
+                return $"{redirectEntity.Url}{(redirectEntity.Url.Contains('?') ? '&' : '?')}reference=${JsonConvert.DeserializeObject<string>(content)}";
+            }
+
+            throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
         }
     }
 }

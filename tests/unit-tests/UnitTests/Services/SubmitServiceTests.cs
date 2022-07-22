@@ -8,6 +8,7 @@ using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Factories.Schema;
+using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
@@ -15,6 +16,7 @@ using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
+using form_builder.Services.RetrieveExternalDataService.Entities;
 using form_builder.Services.SubmitService;
 using form_builder.SubmissionActions;
 using form_builder.TagParsers;
@@ -43,6 +45,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
         private readonly Mock<ITagParser> _tagParser = new();
+        private readonly Mock<IActionHelper> _mockActionHelper = new();
 
         public SubmitServiceTests()
         {
@@ -96,7 +99,8 @@ namespace form_builder_tests.UnitTests.Services
                 _submitProviders,
                 _mockPaymentHelper.Object,
                 _mockPostSubmissionAction.Object,
-                _mockTagParsers.Object);
+                _mockTagParsers.Object,
+                _mockActionHelper.Object);
         }
 
         [Fact]
@@ -651,6 +655,205 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             _mockPostSubmissionAction.Verify(_ => _.ConfirmResult(It.IsAny<MappingEntity>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RedirectSubmission_ShouldCallGateway_AndReturn_Reference()
+        {
+            // Arrange
+            var guid = Guid.NewGuid();
+
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com", RedirectUrl = "www.redirect.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithPageSlug("testUrl")
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("\"1234456\"")
+                });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            _mockActionHelper
+                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Returns(new RequestEntity
+                {
+                    IsPost = true,
+                    Url = "www.redirect.com"
+                });
+
+            // Act
+            var result = await _service.RedirectSubmission((new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }), "form", guid.ToString());
+
+            // Assert
+            Assert.IsType<string>(result);
+
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()));
+        }
+
+        [Fact]
+        public async Task RedirectSubmission_ShouldThrowApplicationException_WhenNotOkResponse()
+        {
+            // Arrange
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com", RedirectUrl = "www.redirect.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .WithPageSlug("testUrl")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            _mockActionHelper
+                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Returns(new RequestEntity
+                {
+                    IsPost = true,
+                    Url = "www.redirect.com"
+                });
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.RedirectSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+
+            // Assert
+            Assert.StartsWith("SubmitService::RedirectSubmission, An exception has occurred while attempting to call ", result.Message);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RedirectSubmission_ShouldThrowApplicationException_WhenGatewayResponseContent_IsEmpty()
+        {
+            // Arrange
+            var postUrl = "www.post.url";
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com", RedirectUrl = "www.redirect.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .WithPageSlug(postUrl)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("")
+                });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            _mockActionHelper
+                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Returns(new RequestEntity
+                {
+                    IsPost = true,
+                    Url = "www.redirect.com"
+                });
+
+            // Act
+            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.RedirectSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
+
+            // Assert
+            Assert.StartsWith("SubmitService::RedirectSubmission, Gateway", result.Message);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task RedirectSubmission_ShouldCallGenerateUrl()
+        {
+            // Arrange
+            var postUrl = "www.post.url";
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com", RedirectUrl = "www.redirect.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .WithPageSlug(postUrl)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockGateway
+                .Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent("\"1234456\"")
+                });
+
+            _mockPageHelper
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Returns(page);
+
+            _mockActionHelper
+                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Returns(new RequestEntity
+                {
+                    IsPost = true,
+                    Url = "www.redirect.com"
+                });
+
+            // Act
+            var result = await _service.RedirectSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "");
+
+            // Assert
+            _mockActionHelper.Verify(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
         }
     }
 }

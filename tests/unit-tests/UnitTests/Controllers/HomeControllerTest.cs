@@ -13,6 +13,7 @@ using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
+using form_builder.Workflows.RedirectWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using form_builder_tests.Builders;
@@ -33,6 +34,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IPageService> _pageService = new();
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new();
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new();
+        private readonly Mock<IRedirectWorkflow> _redirectWorkflow = new();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
         private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
@@ -61,6 +63,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _pageService.Object,
                 _submitWorkflow.Object,
                 _paymentWorkflow.Object,
+                _redirectWorkflow.Object,
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
@@ -519,6 +522,44 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
+        public async Task Index_ShouldRedirectToUrlWhen_SubmitAndRedirect()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithQuestionId("test")
+               .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndRedirect)
+                .WithPageSlug("url")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            var viewModel = new ViewModelBuilder()
+                .WithEntry("Guid", Guid.NewGuid().ToString())
+                .WithEntry("test", "test")
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).ReturnsAsync(new Behaviour { BehaviourType = EBehaviourType.SubmitAndRedirect });
+            _redirectWorkflow.Setup(_ => _.Submit(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("https://www.return.url");
+            // Act
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
+
+            // Assert
+            Assert.IsType<RedirectResult>(result);
+        }
+
+        [Fact]
         public async Task Index_ShouldAddFileUploadToViewModel_WhenSupplied()
         {
             // Arrange
@@ -684,6 +725,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _pageService.Object,
                 _submitWorkflow.Object,
                 _paymentWorkflow.Object,
+                _redirectWorkflow.Object,
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,

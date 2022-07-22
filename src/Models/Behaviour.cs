@@ -28,5 +28,7 @@ namespace form_builder.Models
         public string AuthToken { get; set; }
 
         public string CallbackUrl { get; set; }
+
+        public string RedirectUrl { get; set; }
     }
 }
