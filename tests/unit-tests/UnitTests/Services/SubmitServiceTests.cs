@@ -45,7 +45,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
         private readonly Mock<ITagParser> _tagParser = new();
-        private readonly Mock<IActionHelper> _mockActionHelper = new();
 
         public SubmitServiceTests()
         {
@@ -99,8 +98,7 @@ namespace form_builder_tests.UnitTests.Services
                 _submitProviders,
                 _mockPaymentHelper.Object,
                 _mockPostSubmissionAction.Object,
-                _mockTagParsers.Object,
-                _mockActionHelper.Object);
+                _mockTagParsers.Object);
         }
 
         [Fact]
@@ -692,20 +690,10 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            _mockActionHelper
-                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new RequestEntity
-                {
-                    IsPost = true,
-                    Url = "www.redirect.com"
-                });
-
             // Act
-            var result = await _service.RedirectSubmission((new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }), "form", guid.ToString());
+            await _service.RedirectSubmission((new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }), "form", guid.ToString());
 
             // Assert
-            Assert.IsType<string>(result);
-
             _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()));
         }
 
@@ -740,14 +728,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockPageHelper
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
-
-            _mockActionHelper
-                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new RequestEntity
-                {
-                    IsPost = true,
-                    Url = "www.redirect.com"
-                });
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.RedirectSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
@@ -790,14 +770,6 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            _mockActionHelper
-                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new RequestEntity
-                {
-                    IsPost = true,
-                    Url = "www.redirect.com"
-                });
-
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.RedirectSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", ""));
 
@@ -806,7 +778,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task RedirectSubmission_ShouldCallGenerateUrl()
+        public async Task RedirectSubmission_TagParser_ShouldCallParseString()
         {
             // Arrange
             var postUrl = "www.post.url";
@@ -839,19 +811,11 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
                 .Returns(page);
 
-            _mockActionHelper
-                .Setup(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns(new RequestEntity
-                {
-                    IsPost = true,
-                    Url = "www.redirect.com"
-                });
-
             // Act
             var result = await _service.RedirectSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "");
 
             // Assert
-            _mockActionHelper.Verify(_ => _.GenerateUrl(It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
+            _tagParser.Verify(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
         }
     }
 }

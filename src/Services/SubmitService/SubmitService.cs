@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
-using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Models;
@@ -36,7 +35,6 @@ namespace form_builder.Services.SubmitService
         private readonly IPaymentHelper _paymentHelper;
         private readonly IPostSubmissionAction _postSubmissionAction;
         private readonly IEnumerable<ITagParser> _tagParsers;
-        private readonly IActionHelper _actionHelper;
 
         public SubmitService(
             IGateway gateway,
@@ -49,8 +47,7 @@ namespace form_builder.Services.SubmitService
             IEnumerable<ISubmitProvider> submitProviders,
             IPaymentHelper paymentHelper,
             IPostSubmissionAction postSubmissionAction, 
-            IEnumerable<ITagParser> tagParsers,
-            IActionHelper actionHelper)
+            IEnumerable<ITagParser> tagParsers)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -63,7 +60,6 @@ namespace form_builder.Services.SubmitService
             _paymentHelper = paymentHelper;
             _postSubmissionAction = postSubmissionAction;
             _tagParsers = tagParsers;
-            _actionHelper = actionHelper;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -165,12 +161,10 @@ namespace form_builder.Services.SubmitService
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
-            var redirectEntity = _actionHelper.GenerateUrl(postUrl.RedirectUrl, mappingEntity.FormAnswers);
-
             if (string.IsNullOrEmpty(postUrl.URL))
                 throw new ApplicationException($"SubmitService::RedirectSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
 
-            if (string.IsNullOrEmpty(redirectEntity.Url))
+            if (string.IsNullOrEmpty(postUrl.RedirectUrl))
                 throw new ApplicationException($"SubmitService::RedirectSubmission, No redirect URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
 
             _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
@@ -201,7 +195,8 @@ namespace form_builder.Services.SubmitService
                 }
             }
 
-            return $"{redirectEntity.Url}{(redirectEntity.Url.Contains('?') ? '&' : '?')}reference={JsonConvert.DeserializeObject<string>(content)}";
+            mappingEntity.FormAnswers.CaseReference = JsonConvert.DeserializeObject<string>(content);
+            return _tagParsers.Aggregate(postUrl.RedirectUrl, (current, tagParser) => tagParser.ParseString(current, mappingEntity.FormAnswers));
         }
     }
 }
