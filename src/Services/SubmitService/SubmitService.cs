@@ -174,9 +174,6 @@ namespace form_builder.Services.SubmitService
 
         public async Task<string> RedirectSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            if (_submissionServiceConfiguration.FakeSubmission)
-                return ProcessFakeSubmission(mappingEntity, form, sessionGuid, string.Empty);
-
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
@@ -202,26 +199,37 @@ namespace form_builder.Services.SubmitService
                 _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             }
 
-            var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+            string content;
 
-            if (!response.IsSuccessStatusCode)
+            if (_submissionServiceConfiguration.FakeSubmission)
             {
-                throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                content = ProcessFakeSubmission(mappingEntity, form, sessionGuid, string.Empty);
             }
-
-            if (response.Content is not null)
+            else
             {
-                var content = await response.Content.ReadAsStringAsync();
+                var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
 
-                if (string.IsNullOrWhiteSpace(content))
+                if (!response.IsSuccessStatusCode)
                 {
-                    throw new ApplicationException($"SubmitService::RedirectSubmission, Gateway {postUrl.URL} responded with empty reference");
+                    throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
                 }
 
-                return $"{redirectEntity.Url}{(redirectEntity.Url.Contains('?') ? '&' : '?')}reference=${JsonConvert.DeserializeObject<string>(content)}";
+                if (response.Content is not null)
+                {
+                    content = await response.Content.ReadAsStringAsync();
+
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        throw new ApplicationException($"SubmitService::RedirectSubmission, Gateway {postUrl.URL} responded with empty reference");
+                    }
+                }
+                else
+                {
+                    throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+                }
             }
 
-            throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+            return $"{redirectEntity.Url}{(redirectEntity.Url.Contains('?') ? '&' : '?')}reference={JsonConvert.DeserializeObject<string>(content)}";
         }
     }
 }
