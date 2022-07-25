@@ -46,7 +46,7 @@ namespace form_builder.Services.SubmitService
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
             IPaymentHelper paymentHelper,
-            IPostSubmissionAction postSubmissionAction, 
+            IPostSubmissionAction postSubmissionAction,
             IEnumerable<ITagParser> tagParsers)
         {
             _gateway = gateway;
@@ -132,7 +132,7 @@ namespace form_builder.Services.SubmitService
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
             if (string.IsNullOrEmpty(postUrl.URL))
-                throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: { form }, ENVIRONMENT: { _environment.EnvironmentName }");
+                throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
 
             _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
 
@@ -182,17 +182,10 @@ namespace form_builder.Services.SubmitService
                 if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
 
-                if (response.Content is not null)
-                {
-                    content = await response.Content.ReadAsStringAsync();
+                content = await response.Content.ReadAsStringAsync();
 
-                    if (string.IsNullOrWhiteSpace(content))
-                        throw new ApplicationException($"SubmitService::RedirectSubmission, Gateway {postUrl.URL} responded with empty reference");
-                }
-                else
-                {
-                    throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occurred when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-                }
+                if (string.IsNullOrWhiteSpace(content))
+                    throw new ApplicationException($"SubmitService::RedirectSubmission, Gateway {postUrl.URL} responded with empty reference");
             }
 
             mappingEntity.FormAnswers.CaseReference = JsonConvert.DeserializeObject<string>(content);
