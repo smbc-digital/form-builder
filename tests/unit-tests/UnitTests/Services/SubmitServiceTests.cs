@@ -754,7 +754,6 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.StartsWith("SubmitService::RedirectSubmission, An exception has occurred while attempting to call ", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
         [Fact]
@@ -804,7 +803,6 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             Assert.StartsWith("SubmitService::RedirectSubmission, Gateway", result.Message);
-            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
         }
 
         [Fact]

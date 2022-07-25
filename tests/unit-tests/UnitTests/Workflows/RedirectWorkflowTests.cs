@@ -35,7 +35,7 @@ namespace form_builder_tests.UnitTests.Workflows
         }
 
         [Fact]
-        public async Task Submit_ShouldCallMapping_SubmitService()
+        public async Task Submit_ShouldCallMappingService_WhenSessionGuidIsSupplied()
         {
             // Arrange
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
@@ -45,6 +45,18 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Submit_ShouldCallSubmitService_WhenSessionGuidIsSupplied()
+        {
+            // Arrange
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
+
+            // Act
+            await _workflow.Submit("form", "page");
+
+            // Assert
             _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }

@@ -26,9 +26,9 @@ namespace form_builder.Workflows.RedirectWorkflow {
                 throw new ApplicationException("A Session GUID was not provided.");
 
             var data = await _mappingService.Map(sessionGuid, form);
-            var reference = await _submitService.RedirectSubmission(data, form, sessionGuid);
+            var redirectUrl = await _submitService.RedirectSubmission(data, form, sessionGuid);
 
-            return reference;
+            return redirectUrl;
         }
     }
 }
