@@ -99,9 +99,12 @@ namespace form_builder.Services.RetrieveExternalDataService
                 }
             }
 
-            mappingData.FormAnswers.Pages
-                .FirstOrDefault(_ => _.PageSlug.Equals(mappingData.FormAnswers.Path, StringComparison.OrdinalIgnoreCase))
-                .Answers.AddRange(answers);
+            if (mappingData.FormAnswers.Pages.Any())
+            {
+                mappingData.FormAnswers.Pages
+                    .First(_ => _.PageSlug.Equals(mappingData.FormAnswers.Path, StringComparison.OrdinalIgnoreCase))
+                    .Answers.AddRange(answers);
+            }
 
             await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
         }
