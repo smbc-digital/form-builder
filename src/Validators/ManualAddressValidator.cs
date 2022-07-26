@@ -33,22 +33,26 @@ namespace form_builder.Validators
                 : null;
 
             var addressPostcodeMessage = string.Empty;
-            var addressPostcodeValid = true;
+            var addressPostcodeValid = true;    
 
             if (string.IsNullOrEmpty(valueAddressPostcode))
             {
                 addressPostcodeMessage = ValidationConstants.POSTCODE_EMPTY;
                 addressPostcodeValid = false;
             }
-            else if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode)
+
+            if (element.Properties.ValidatePostcode)
             {
-                addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
-                addressPostcodeValid = false;
-            }
-            else if (!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
-            {
-                addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
-                addressPostcodeValid = false;
+                if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.IsMatch(valueAddressPostcode) && element.Properties.StockportPostcode)
+                {
+                    addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
+                    addressPostcodeValid = false;
+                }
+                else 
+                {
+                    addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
+                    addressPostcodeValid = false;
+                }
             }
 
             var isValid = addressLine1Valid && addressTownValid && addressPostcodeValid;
