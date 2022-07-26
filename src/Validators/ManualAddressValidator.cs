@@ -48,12 +48,15 @@ namespace form_builder.Validators
                     addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                     addressPostcodeValid = false;
                 }
-                else 
+                else if(!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
                 {
                     addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                     addressPostcodeValid = false;
                 }
             }
+                
+
+            
 
             var isValid = addressLine1Valid && addressTownValid && addressPostcodeValid;
 
