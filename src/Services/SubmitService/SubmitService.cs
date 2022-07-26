@@ -46,7 +46,8 @@ namespace form_builder.Services.SubmitService
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
             IPaymentHelper paymentHelper,
-            IPostSubmissionAction postSubmissionAction, IEnumerable<ITagParser> tagParsers)
+            IPostSubmissionAction postSubmissionAction,
+            IEnumerable<ITagParser> tagParsers)
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -131,40 +132,64 @@ namespace form_builder.Services.SubmitService
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
             if (string.IsNullOrEmpty(postUrl.URL))
-            {
-                throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: { form }, ENVIRONMENT: { _environment.EnvironmentName }");
-            }
+                throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
 
-            if (string.IsNullOrWhiteSpace(postUrl.AuthToken))
-            {
-                _gateway.ChangeAuthenticationHeader(string.Empty);
-            }
-            else
-            {
-                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-            }
+            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
 
             var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
 
             if (!response.IsSuccessStatusCode)
-            {
                 throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
-            }
 
             if (response.Content is not null)
             {
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (string.IsNullOrWhiteSpace(content))
-                {
                     throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl.URL} responded with empty reference");
-                }
 
                 _pageHelper.SaveCaseReference(sessionGuid, JsonConvert.DeserializeObject<string>(content));
                 return JsonConvert.DeserializeObject<string>(content);
             }
 
-            throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occured when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+            throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+        }
+
+        public async Task<string> RedirectSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
+        {
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
+
+            var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+
+            if (string.IsNullOrEmpty(postUrl.URL))
+                throw new ApplicationException($"SubmitService::RedirectSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
+
+            if (string.IsNullOrEmpty(postUrl.RedirectUrl))
+                throw new ApplicationException($"SubmitService::RedirectSubmission, No redirect URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
+
+            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
+
+            string content;
+
+            if (_submissionServiceConfiguration.FakeSubmission)
+            {
+                content = ProcessFakeSubmission(mappingEntity, form, sessionGuid, string.Empty);
+            }
+            else
+            {
+                var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+
+                if (!response.IsSuccessStatusCode)
+                    throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
+
+                content = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrWhiteSpace(content))
+                    throw new ApplicationException($"SubmitService::RedirectSubmission, Gateway {postUrl.URL} responded with empty reference");
+            }
+
+            mappingEntity.FormAnswers.CaseReference = JsonConvert.DeserializeObject<string>(content);
+            return _tagParsers.Aggregate(postUrl.RedirectUrl, (current, tagParser) => tagParser.ParseString(current, mappingEntity.FormAnswers));
         }
     }
 }

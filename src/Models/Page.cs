@@ -166,8 +166,12 @@ namespace form_builder.Models
             SubmitSlug submitBehaviour = new();
 
             var pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
+
             if (pageSubmitBehaviours.Count.Equals(0))
                 pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitAndPay);
+
+            if (pageSubmitBehaviours.Count.Equals(0))
+                pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitAndRedirect);
 
             if (Behaviours.Count > 1)
             {

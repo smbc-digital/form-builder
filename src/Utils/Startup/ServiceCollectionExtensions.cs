@@ -76,6 +76,7 @@ using form_builder.Validators.IntegrityChecks.Form;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder.Workflows.DocumentWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
+using form_builder.Workflows.RedirectWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Builder;
@@ -409,6 +410,7 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<ISubmitWorkflow, SubmitWorkflow>();
             services.AddSingleton<IPaymentWorkflow, PaymentWorkflow>();
+            services.AddSingleton<IRedirectWorkflow, RedirectWorkflow>();
             services.AddSingleton<IDocumentWorkflow, DocumentWorkflow>();
             services.AddSingleton<IActionsWorkflow, ActionsWorkflow>();
             services.AddSingleton<ISuccessWorkflow, SuccessWorkflow>();
