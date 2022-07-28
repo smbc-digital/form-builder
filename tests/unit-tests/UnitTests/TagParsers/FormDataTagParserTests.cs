@@ -140,6 +140,58 @@ namespace form_builder_tests.UnitTests.TagParsers
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
+        [Fact]
+        public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
+        {
+            var expectedString = "this value testfirstname should be replaced with name question";
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithHint("this value {{FORMDATA:firstname}} should be replaced with name question")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "firstname", "testfirstname"}
+                }
+            };
+
+            var result = await _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
+        }
+
+        [Fact]
+        public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingMultipleValues()
+        {
+            var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.Textbox)
+               .WithHint("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "firstname", "testfirstname"},
+                    { "lastname", "testlastname"}
+                }
+            };
+
+            var result = await _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
+        }
 
         [Fact]
         public async Task Parse_ShouldCallFormatter_WhenProvided()
