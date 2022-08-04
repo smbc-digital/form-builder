@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
@@ -49,8 +50,13 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         public async Task GeneratePaymentUrl_ShouldCallCivicaPayGateway()
         {
             var caseRef = "caseRef";
+            var manualAddress = new List<Answers>();
 
-            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }, new List<Answers>());
+            manualAddress.Add(new Answers("yourAddress-AddressLine1", "8 test road"));
+            manualAddress.Add(new Answers("yourAddress-AddressTown", "Stockport"));
+            manualAddress.Add(new Answers("yourAddress-ManualPostcode", "SK1 1Az"));
+
+            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }, manualAddress);
 
             _mockCivicaPayGateway.Verify(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()), Times.Once);
             _mockCivicaPayGateway.Verify(_ => _.GetPaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.Is<string>(x => x == caseRef)), Times.Once);
@@ -63,7 +69,13 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
             _mockCivicaPayGateway.Setup(_ => _.CreateImmediateBasketAsync(It.IsAny<CreateImmediateBasketRequest>()))
                 .ReturnsAsync(new HttpResponse<CreateImmediateBasketResponse> { StatusCode = HttpStatusCode.InternalServerError });
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() },  new List<Answers>()));
+            var manualAddress = new List<Answers>();
+
+            manualAddress.Add(new Answers("yourAddress-AddressLine1", "8 test road"));
+            manualAddress.Add(new Answers("yourAddress-AddressTown", "Stockport"));
+            manualAddress.Add(new Answers("yourAddress-ManualPostcode", "SK1 1Az"));
+
+            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }, manualAddress));
 
             Assert.StartsWith("CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code InternalServerError, HttpResponse: ", result.Message);
         }
@@ -79,7 +91,13 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
                     ResponseContent = new CreateImmediateBasketResponse { Success = "false" }
                 });
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }, new List<Answers>()));
+            var manualAddress = new List<Answers>();
+
+            manualAddress.Add(new Answers("yourAddress-AddressLine1", "8 test road"));
+            manualAddress.Add(new Answers("yourAddress-AddressTown", "Stockport"));
+            manualAddress.Add(new Answers("yourAddress-ManualPostcode", "SK1 1Az"));
+
+            var result = await Assert.ThrowsAsync<Exception>(() => _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }, manualAddress));
 
             Assert.StartsWith("CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response", result.Message);
         }
@@ -90,11 +108,42 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
             _mockCivicaPayGateway.Setup(_ => _.GetPaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns("12345");
 
-            var result = await _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() },  new List<Answers>());
+            var manualAddress = new List<Answers>();
+
+            manualAddress.Add(new Answers("yourAddress-AddressLine1", "8 test road"));
+            manualAddress.Add(new Answers("yourAddress-AddressTown", "Stockport"));
+            manualAddress.Add(new Answers("yourAddress-ManualPostcode", "SK1 1Az"));
+
+            var result = await _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings() }, manualAddress);
 
             Assert.IsType<string>(result);
             Assert.NotNull(result);
         }
+
+
+        [Fact]
+        public async Task eneratePaymentUrl_Should_ReturnPaymentUrlWithManualAddress()
+        {
+            _mockCivicaPayGateway.Setup(_ => _.GetPaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+               .Returns("12345");
+
+            var manualAddress = new List<Answers>();
+
+            manualAddress.Add(new Answers("yourAddress-AddressLine1", "8 test road"));
+            manualAddress.Add(new Answers("yourAddress-AddressTown", "Stockport"));
+            manualAddress.Add(new Answers("yourAddress-ManualPostcode", "SK1 1Az"));
+
+            var settings = new Settings
+            {
+                AddressReference = "yourAddress-ManualPostcode"
+            };
+
+            var result = await _civicaPayProvider.GeneratePaymentUrl("form", "page", "ref12345", "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = settings }, manualAddress);
+
+            Assert.IsType<string>(result);
+            Assert.NotNull(result);
+        }
+
 
 
         [Theory]
@@ -123,7 +172,13 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         {
             var caseRef = "caseRef";
 
-            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings{ Name = "Test Name"} }, new List<Answers>());
+            var manualAddress = new List<Answers>();
+
+            manualAddress.Add(new Answers("yourAddress-AddressLine1", "8 test road"));
+            manualAddress.Add(new Answers("yourAddress-AddressTown", "Stockport"));
+            manualAddress.Add(new Answers("yourAddress-ManualPostcode", "SK1 1Az"));
+
+            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings { Name = "Test Name" } }, manualAddress);
 
             _mockCivicaPayGateway.Verify(_ => _.CreateImmediateBasketAsync(It.Is<CreateImmediateBasketRequest>(_ => _.PaymentItems[0].AddressDetails.Name.Equals("Test Name"))));
         }
@@ -133,12 +188,32 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
         {
             var caseRef = "caseRef";
 
-            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings{ Email = "test@stockport.gov.uk"} }, new List<Answers>());
+            var manualAddress = new List<Answers>();
+
+            manualAddress.Add(new Answers("yourAddress-AddressLine1", "8 test road"));
+            manualAddress.Add(new Answers("yourAddress-AddressTown", "Stockport"));
+            manualAddress.Add(new Answers("yourAddress-ManualPostcode", "SK1 1Az"));
+
+            await _civicaPayProvider.GeneratePaymentUrl("form", "page", caseRef, "0101010-1010101", new PaymentInformation { FormName = new[] { "form" }, Settings = new Settings { Email = "test@stockport.gov.uk" } }, manualAddress);
 
             _mockCivicaPayGateway.Verify(_ => _.CreateImmediateBasketAsync(It.Is<CreateImmediateBasketRequest>(_ => _.PaymentItems[0].PaymentDetails.EmailAddress.Equals("test@stockport.gov.uk"))));
         }
-    }
 
+
+        [Theory]
+        [InlineData("8 Monmouth Drive", "8")]
+        [InlineData("8a Monmouth Drive", "8a")]
+        [InlineData("Flat 5 8 Monmouth Drive", "Flat 5 8")]
+        [InlineData("Xanadu 8 Mobmouth Drive", "8")]
+        public async Task GetHouseNumber_shouldReturnHouseNumber(string street, string expected)
+        {
+            var result = _civicaPayProvider.GetHouseNumber(street);
+            Assert.Equal(expected, result["number"]);
+        }
+
+       
+
+    }
 }
 
 

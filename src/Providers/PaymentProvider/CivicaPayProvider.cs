@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -46,24 +48,29 @@ namespace form_builder.Providers.PaymentProvider
                 {
                     address = paymentInformation.Settings.AddressReference.ConvertStringToObject();
                 }
-                else
-                {
-                    if (paymentInformation.Settings.AddressReference.Contains("yourAddress-ManualPostcode"))
-                    {
-                        foreach (var answer in formAnswers)
-                        {
-                            if (answer.QuestionId.Contains("yourAddress-AddressLine1"))
-                                address.Street = answer.Response;
-
-                            if (answer.QuestionId.Contains("yourAddress-AddressTown"))
-                                address.Town = answer.Response;
-
-                            if (answer.QuestionId.Contains("yourAddress-ManualPostcode"))
-                                address.Postcode = answer.Response;
-                        }
-                    }
-                }
             }
+            else if(formAnswers.Exists(_ => _.QuestionId.ToLower().Contains("youraddress-address-description")))
+            {
+                var crmAddress = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-address-description")).FirstOrDefault().Response.Split(",");
+                var result = GetHouseNumber(crmAddress[0]);
+                address.HouseName = result["name"];
+                address.HouseNo = result["number"];
+                address.Street = result["street"];
+                address.Area = crmAddress[1];
+                address.Town = crmAddress[2];
+                address.Postcode = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-postcode")).FirstOrDefault().Response;
+            }
+            else
+            {
+                var street = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-addressline1")).FirstOrDefault().Response;
+                var result = GetHouseNumber(street);
+                address.HouseName = result["name"];
+                address.HouseNo = result["number"];
+                address.Street = result["street"];
+                address.Town = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-addresstown")).FirstOrDefault().Response;
+                address.Postcode = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-manualpostcode")).FirstOrDefault().Response;
+            }
+            
             CreateImmediateBasketRequest basket = new()
             {
                 CallingAppIdentifier = "Basket",
@@ -129,6 +136,43 @@ namespace form_builder.Providers.PaymentProvider
 
             if (!responseCode.Equals("00000"))
                 throw new PaymentFailureException($"CivicaPayProvider::Payment failed with response code: {responseCode}");
+        }
+
+        public Dictionary<string,string> GetHouseNumber(string addressLine)
+        {
+            string street = addressLine, number = "", name ="";
+
+            Dictionary<string,string> result = new Dictionary<string,string>();
+
+            var flatAndNo = new Regex(@"^Flat\s*\d\,*\s+\d+[A-Z]?\s*", RegexOptions.IgnoreCase);
+            var houseName = new Regex(@"^[A-Z]+\s*", RegexOptions.IgnoreCase);
+            var houseNumber = new Regex(@"^[0-9]+[A-Z]?\s*", RegexOptions.IgnoreCase);
+
+            var match = flatAndNo.Match(addressLine);
+            if (match.Success)
+            {
+                number = match.Value;
+                street = flatAndNo.Replace(street, "");
+            }
+
+            match = houseName.Match(addressLine);
+            if (match.Success)
+            {
+                name = match.Value;
+                street = houseName.Replace(street, "");
+            }
+
+            match = houseNumber.Match(street);
+            if (match.Success)
+            {
+                number = match.Value;
+                street = houseNumber.Replace(street, "");
+            }
+
+            result.Add("name", name.Trim());
+            result.Add("street", street.Trim());
+            result.Add("number", number.Trim());
+            return result;
         }
     }
 }

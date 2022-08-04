@@ -36,5 +36,10 @@ namespace form_builder.Providers.PaymentProvider
             if (!responseCode.Equals("00000"))
                 throw new PaymentFailureException($"FakePayProvider::Payment failed with response code: {responseCode}");
         }
+
+        public  Dictionary<string, string> GetHouseNumber(string addressLine1)
+        {
+            return new Dictionary<string, string>();
+        }
     }
 }

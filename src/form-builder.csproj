@@ -6,6 +6,13 @@
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <NoWarn>CS8632</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Attributes\wwwroot\assets\css\form-builder.css" />
+    <Content Include="Attributes\wwwroot\assets\images\favicon-sg.png" />
+    <Content Include="Attributes\wwwroot\assets\images\favicon.ico" />
+    <Content Include="Attributes\wwwroot\robots.txt" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="5.0.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.5.9.1" />
@@ -35,12 +42,6 @@
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\assets\javascript\govuk-frontend-3.7.0.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />

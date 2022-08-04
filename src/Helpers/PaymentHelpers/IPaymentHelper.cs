@@ -5,6 +5,6 @@ namespace form_builder.Helpers.PaymentHelpers
 {
     public interface IPaymentHelper
     {
-        Task<PaymentInformation> GetFormPaymentInformation(string form);
+        Task<PaymentInformation> GetFormPaymentInformation(string form);        
     }
 }
