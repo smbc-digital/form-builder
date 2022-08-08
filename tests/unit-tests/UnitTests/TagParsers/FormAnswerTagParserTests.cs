@@ -129,6 +129,42 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
+        public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
+        {
+            var expectedString = "this value testfirstname should be replaced with name question";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithHint("this value {{QUESTION:firstname}} should be replaced with name question")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "testfirstname"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = await _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
+        }
+
+        [Fact]
         public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
         {
             var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
@@ -169,6 +205,46 @@ namespace form_builder_tests.UnitTests.TagParsers
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
         }
 
+        [Fact]
+        public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingMultipleValues()
+        {
+            var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithHint("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "testfirstname"
+                            },
+                            new()
+                            {
+                                QuestionId = "lastname",
+                                Response = "testlastname"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = await _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
+        }
 
         [Fact]
         public async Task Parse_ShouldCallFormatter_WhenProvided()
