@@ -53,9 +53,9 @@ namespace form_builder.Providers.PaymentProvider
             {
                 var crmAddress = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-address-description")).FirstOrDefault().Response.Split(",");
                 var result = GetHouseNumber(crmAddress[0]);
-                address.HouseName = result["name"];
-                address.HouseNo = result["number"];
-                address.Street = result["street"];
+                address.HouseName = result.Name;
+                address.HouseNo = result.Number;
+                address.Street = result.Street;
                 address.Area = crmAddress[1];
                 address.Town = crmAddress[2];
                 address.Postcode = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-postcode")).FirstOrDefault().Response;
@@ -64,9 +64,9 @@ namespace form_builder.Providers.PaymentProvider
             {
                 var street = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-addressline1")).FirstOrDefault().Response;
                 var result = GetHouseNumber(street);
-                address.HouseName = result["name"];
-                address.HouseNo = result["number"];
-                address.Street = result["street"];
+                address.HouseName = result.Name;
+                address.HouseNo = result.Number;
+                address.Street = result.Street;
                 address.Town = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-addresstown")).FirstOrDefault().Response;
                 address.Postcode = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-manualpostcode")).FirstOrDefault().Response;
             }
@@ -138,41 +138,40 @@ namespace form_builder.Providers.PaymentProvider
                 throw new PaymentFailureException($"CivicaPayProvider::Payment failed with response code: {responseCode}");
         }
 
-        public Dictionary<string,string> GetHouseNumber(string addressLine)
+        public StreetData GetHouseNumber(string addressLine)
         {
             string street = addressLine, number = "", name ="";
-
-            Dictionary<string,string> result = new Dictionary<string,string>();
-
-            var flatAndNo = new Regex(@"^Flat\s*\d\,*\s+\d+[A-Z]?\s*", RegexOptions.IgnoreCase);
-            var houseName = new Regex(@"^[A-Z]+\s*", RegexOptions.IgnoreCase);
-            var houseNumber = new Regex(@"^[0-9]+[A-Z]?\s*", RegexOptions.IgnoreCase);
-
-            var match = flatAndNo.Match(addressLine);
+            
+            var match = StreetConstants.FLAT_AND_NUMBER.Match(addressLine);
             if (match.Success)
             {
                 number = match.Value;
-                street = flatAndNo.Replace(street, "");
+                street = StreetConstants.FLAT_AND_NUMBER.Replace(street, "");
             }
-
-            match = houseName.Match(addressLine);
-            if (match.Success)
+            else
             {
-                name = match.Value;
-                street = houseName.Replace(street, "");
+                match = StreetConstants.HOUSE_NAME.Match(street);
+                if (match.Success)
+                {
+                    name = match.Value;
+                    street = StreetConstants.HOUSE_NAME.Replace(street, "");
+                }
             }
 
-            match = houseNumber.Match(street);
+            match = StreetConstants.HOUSE_NUMBER.Match(street);
             if (match.Success)
             {
                 number = match.Value;
-                street = houseNumber.Replace(street, "");
+                street = StreetConstants.HOUSE_NUMBER.Replace(street, "");
             }
 
-            result.Add("name", name.Trim());
-            result.Add("street", street.Trim());
-            result.Add("number", number.Trim());
-            return result;
+            return new
+            StreetData
+            {
+                Street = street.Trim(),
+                Number = number.Trim(),
+                Name = name.Trim()
+            };
         }
     }
 }

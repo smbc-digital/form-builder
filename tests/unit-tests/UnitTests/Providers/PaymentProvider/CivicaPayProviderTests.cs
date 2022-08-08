@@ -201,14 +201,17 @@ namespace form_builder_tests.UnitTests.Providers.PaymentProvider
 
 
         [Theory]
-        [InlineData("8 Monmouth Drive", "8")]
-        [InlineData("8a Monmouth Drive", "8a")]
-        [InlineData("Flat 5 8 Monmouth Drive", "Flat 5 8")]
-        [InlineData("Xanadu 8 Mobmouth Drive", "8")]
-        public async Task GetHouseNumber_shouldReturnHouseNumber(string street, string expected)
+        [InlineData("8 Monmouth Drive", "8", "")]
+        [InlineData("8a Monmouth Drive", "8a", "")]
+        [InlineData("Flat 5 8 Monmouth Drive", "Flat 5 8", "")]
+        [InlineData("Xanadu 8 Monmouth Drive", "8", "Xanadu")]
+        [InlineData("Blenheim Palace 8 Monmouth Drive", "8", "Blenheim Palace")]
+        public async Task GetHouseNumber_shouldReturnHouseNumber(string street, string expected, string name)
         {
             var result = _civicaPayProvider.GetHouseNumber(street);
-            Assert.Equal(expected, result["number"]);
+            Assert.Equal(expected, result.Number);
+            Assert.Equal(name, result.Name);
+            Assert.Equal("Monmouth Drive", result.Street);
         }
 
        

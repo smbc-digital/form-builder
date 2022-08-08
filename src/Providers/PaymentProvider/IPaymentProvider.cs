@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using form_builder.Configuration;
+using form_builder.Models;
 
 namespace form_builder.Providers.PaymentProvider
 {
@@ -12,7 +13,7 @@ namespace form_builder.Providers.PaymentProvider
 
         void VerifyPaymentResponse(string responseCode);
 
-        Dictionary<string, string> GetHouseNumber(string addressLine1);
+        StreetData GetHouseNumber(string addressLine1);
     }
 
 }

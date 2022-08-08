@@ -37,9 +37,9 @@ namespace form_builder.Providers.PaymentProvider
                 throw new PaymentFailureException($"FakePayProvider::Payment failed with response code: {responseCode}");
         }
 
-        public  Dictionary<string, string> GetHouseNumber(string addressLine1)
+        public  StreetData GetHouseNumber(string addressLine1)
         {
-            return new Dictionary<string, string>();
+            return new StreetData();
         }
     }
 }
