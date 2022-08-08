@@ -20,7 +20,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Models.FormBuilder;
-using StockportGovUK.NetStandard.Models.Civica.Pay.Notifications;
 
 namespace form_builder.Services.PayService
 {
@@ -169,18 +168,6 @@ namespace form_builder.Services.PayService
             return paymentProvider;
         }
 
-        public string LogPayment(string form, NotificationMessage notification)
-        {
-            if (notification.RequestStatus.ToLower() != "accepted")
-            {
-                _logger.LogError($"Error with civica payment: {notification.BasketReference} error: {notification.RequestStatus} form: {form}");
-            }
-            else
-            {
-                _logger.LogInformation($"Payment successeful: {notification.BasketReference} form: {form}");
-            }
-
-            return notification.BasketReference;
-        }
+        
     }
 }

@@ -70,14 +70,14 @@ namespace form_builder.Providers.PaymentProvider
                 address.Town = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-addresstown")).FirstOrDefault().Response;
                 address.Postcode = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-manualpostcode")).FirstOrDefault().Response;
             }
-            
+
             CreateImmediateBasketRequest basket = new()
             {
                 CallingAppIdentifier = "Basket",
                 CustomerID = _paymentConfig.CustomerId,
                 ApiPassword = _paymentConfig.ApiPassword,
                 ReturnURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
-                NotifyURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/payment-notification",
+                NotifyURL = string.Empty,
                 CallingAppTranReference = reference, 
                 PaymentItems = new List<PaymentItem>
                 {

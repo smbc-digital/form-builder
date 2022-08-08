@@ -125,17 +125,6 @@ namespace form_builder.Controllers.Payment
             return View("./Declined", paymentDeclinedViewModel);
         }
 
-        [HttpPost]
-        [Route("{form}/payment-notification")]
-        [IgnoreAntiforgeryToken]
-        [Consumes("application/xml")]
-        public string PaymentNotification(string form ,[FromBody] NotificationMessage notification)
-        {
-            string reference =  _payService.LogPayment(form, notification);
-            return $"{form}: {reference}";
-        }
-
-
         [HttpGet]
         [Route("{form}/callback-failure")]
         public async Task<IActionResult> CallbackFailure(string form, [FromQuery] string reference)
