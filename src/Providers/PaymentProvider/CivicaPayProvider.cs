@@ -53,8 +53,7 @@ namespace form_builder.Providers.PaymentProvider
             {
                 var crmAddress = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-address-description")).FirstOrDefault().Response.Split(",");
                 var result = GetHouseNumber(crmAddress[0]);
-                address.HouseName = result.Name;
-                address.HouseNo = result.Number;
+                address.HouseNo = !string.IsNullOrEmpty(result.Number) ? result.number : result.Name;
                 address.Street = result.Street;
                 address.Area = crmAddress[1];
                 address.Town = crmAddress[2];
@@ -64,8 +63,7 @@ namespace form_builder.Providers.PaymentProvider
             {
                 var street = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-addressline1")).FirstOrDefault().Response;
                 var result = GetHouseNumber(street);
-                address.HouseName = result.Name;
-                address.HouseNo = result.Number;
+                address.HouseNo = !string.IsNullOrEmpty(result.Number) ? result.number : result.Name;
                 address.Street = result.Street;
                 address.Town = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-addresstown")).FirstOrDefault().Response;
                 address.Postcode = formAnswers.Where(_ => _.QuestionId.ToLower().Contains("youraddress-manualpostcode")).FirstOrDefault().Response;
