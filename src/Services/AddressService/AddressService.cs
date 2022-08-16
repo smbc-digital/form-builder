@@ -61,7 +61,7 @@ namespace form_builder.Services.AddressService
             string guid,
             string path)
         {
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {
@@ -114,7 +114,7 @@ namespace form_builder.Services.AddressService
 
             if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
             {
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -123,7 +123,7 @@ namespace form_builder.Services.AddressService
 
             if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(address) && !string.IsNullOrEmpty(postcode))
             {
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -143,7 +143,7 @@ namespace form_builder.Services.AddressService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
             {
@@ -181,7 +181,7 @@ namespace form_builder.Services.AddressService
 
             if (addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
             {
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -209,7 +209,7 @@ namespace form_builder.Services.AddressService
                     throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception: {e.Message}", e);
                 }
 
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid, baseForm.BaseURL);
             }
 

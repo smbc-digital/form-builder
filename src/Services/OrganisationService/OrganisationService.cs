@@ -67,7 +67,7 @@ namespace form_builder.Services.OrganisationService
 
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
                 return new ProcessRequestEntity
                 {
@@ -87,7 +87,7 @@ namespace form_builder.Services.OrganisationService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
             {
@@ -113,7 +113,7 @@ namespace form_builder.Services.OrganisationService
 
             if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
             {
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
                 return new ProcessRequestEntity
                 {
@@ -158,7 +158,7 @@ namespace form_builder.Services.OrganisationService
                     throw new ApplicationException($"OrganisationService.ProcessInitialOrganisation:: An exception has occurred while attempting to perform organisation lookup, Exception: {e.Message}");
                 }
 
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid, baseForm.BaseURL);
             }
 

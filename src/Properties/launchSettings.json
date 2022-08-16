@@ -3,14 +3,16 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:60864/",
-      "sslPort": 44329
+      "applicationUrl": "http://localhost:60865/",
+      "sslPort": 44328
     }
   },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
+      //"launchUrl": "email-subscription?email=michael.lau@stockport.gov.uk",
+      "launchUrl": "insurance-claim-upload/document-upload?caseReference=hayesHayes_82ac2caa-veh-8665b6636d1bdf318fed4ded9273ab4fd93e2355c6627340f53757ed4dbe9097",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       }

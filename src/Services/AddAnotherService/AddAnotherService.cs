@@ -91,7 +91,7 @@ namespace form_builder.Services.AddAnotherService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, dynamicCurrentPage.IsValid);
+            await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, dynamicCurrentPage.IsValid);
 
             if (!dynamicCurrentPage.IsValid)
             {

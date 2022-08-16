@@ -159,7 +159,7 @@ namespace form_builder.Helpers.PageHelpers
             return sanitizedViewModel;
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
+        public async Task SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -186,7 +186,7 @@ namespace form_builder.Helpers.PageHelpers
                 answers = currentPageAnswers.Answers;
 
             if (files is not null && files.Any() && isPageValid)
-                answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
+                answers = await SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
 
             convertedAnswers.Pages?.Add(new PageAnswers
             {
@@ -283,9 +283,9 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
-        public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
+        public async Task<List<Answers>> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
         {
-            files.GroupBy(_ => _.QuestionId).ToList().ForEach(group =>
+            files.GroupBy(_ => _.QuestionId).ToList().ForEach(async group =>
             {
                 string questionId = group.Key;
                 IEnumerable<CustomFormFile> files = group;
@@ -305,7 +305,7 @@ namespace form_builder.Helpers.PageHelpers
                 foreach (var file in files)
                 {
                     string key = $"file-{questionId}-{Guid.NewGuid()}";
-                    _fileStorageProvider.SetStringAsync(key, JsonConvert.SerializeObject(file.Base64EncodedContent), _distributedCacheExpirationConfiguration.FileUpload);
+                    await _fileStorageProvider.SetStringAsync(key, JsonConvert.SerializeObject(file.Base64EncodedContent), _distributedCacheExpirationConfiguration.FileUpload);
                     fileUploadModel.Add(new()
                     {
                         Key = key,

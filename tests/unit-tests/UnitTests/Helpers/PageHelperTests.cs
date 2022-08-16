@@ -1080,7 +1080,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswers_ShouldInsertFilesToAnswers_IfAnswerDontExist()
+        public async Task SaveFormFileAnswers_ShouldInsertFilesToAnswers_IfAnswerDontExist()
         {
             // Arrange                                        
             var questionId = "fileUpload_FileQuestionId";
@@ -1098,7 +1098,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
+            var results = await _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
 
             // Assert
             Assert.NotNull(results);
@@ -1108,7 +1108,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswers_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
+        public async Task SaveFormFileAnswers_ShouldUpdateResponseFileForMultipleUpload_IfAnswerExist()
         {
             // Arrange                                        
             var questionId = "Item1";
@@ -1137,7 +1137,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+            var results = await _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
 
             // Assert
             Assert.NotNull(results);
@@ -1148,7 +1148,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswers_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
+        public async Task SaveFormFileAnswers_ShouldUpdateResponseFileForSingleUpload_IfAnswerExist()
         {
             // Arrange                                        
             var questionId = "Item1";
@@ -1176,7 +1176,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            var results = _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
+            var results = await _pageHelper.SaveFormFileAnswers(page.Answers, file, false, page);
 
             // Assert
             Assert.NotNull(results);
@@ -1187,7 +1187,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
 
         [Fact]
-        public void SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene()
+        public async Task SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene()
         {
             // Arrange                                        
             var questionId = "Item1";
@@ -1202,7 +1202,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            var results = _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
+            var results = await _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
 
             // Assert
             Assert.NotNull(results);
@@ -1213,7 +1213,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene_ForMultiple_Files()
+        public async Task SaveFormFileAnswers_Should_SaveFilesInCache_Under_GeneratedKey_Which_Is_Then_Saved_In_Answers_As_Referene_ForMultiple_Files()
         {
             // Arrange                                        
             var questionId = "Item1";
@@ -1230,7 +1230,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            var results = _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
+            var results = await _pageHelper.SaveFormFileAnswers(new List<Answers>(), file, false, page);
 
             // Assert
             Assert.NotNull(results);
@@ -1245,7 +1245,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveFormFileAnswers_ShouldSave_Files_InDistributedCache()
+        public async Task SaveFormFileAnswers_ShouldSave_Files_InDistributedCache()
         {
             // Arrange                                        
             var questionId = "fileUpload";
@@ -1259,14 +1259,14 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
+            await _pageHelper.SaveFormFileAnswers(page.Answers, file, true, page);
 
             // Assert
             _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Exactly(2));
         }
 
         [Fact]
-        public void SaveFormFileAnswers_ShouldNotSave_ExistingFiles_IfUploadedTwice_InDistributedCache()
+        public async Task SaveFormFileAnswers_ShouldNotSave_ExistingFiles_IfUploadedTwice_InDistributedCache()
         {
             // Arrange
             var questionId = "fileUpload";
@@ -1301,7 +1301,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            _pageHelper.SaveFormFileAnswers(pageAnswers.Answers, files, true, pageAnswers);
+            await _pageHelper.SaveFormFileAnswers(pageAnswers.Answers, files, true, pageAnswers);
 
             // Assert
             _fileStorageProvider.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.StartsWith($"file-{questionId}-")), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once());

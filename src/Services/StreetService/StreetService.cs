@@ -72,7 +72,7 @@ namespace form_builder.Services.StreetService
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -92,7 +92,7 @@ namespace form_builder.Services.StreetService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
             {
@@ -118,7 +118,7 @@ namespace form_builder.Services.StreetService
 
             if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
             {
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 return new ProcessRequestEntity
                 {
                     Page = currentPage
@@ -157,7 +157,7 @@ namespace form_builder.Services.StreetService
                     throw new ApplicationException($"StreetService::ProcessInitialStreet: An exception has occurred while attempting to perform street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}' Exception: {e.Message}");
                 }
 
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
                 _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, guid, baseForm.BaseURL);
             }
 

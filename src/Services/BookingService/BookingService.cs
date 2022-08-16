@@ -335,7 +335,7 @@ namespace form_builder.Services.BookingService
             {
                 await ReserveAppointment(element, viewModel, baseForm.BaseURL, guid);
 
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
                 return new ProcessRequestEntity
                 {
@@ -343,7 +343,7 @@ namespace form_builder.Services.BookingService
                 };
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
             {
@@ -362,7 +362,7 @@ namespace form_builder.Services.BookingService
         {
             await ReserveAppointment(element, viewModel, baseForm.BaseURL, guid);
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity { Page = currentPage };
         }

@@ -15,7 +15,7 @@ namespace form_builder.Helpers.PageHelpers
 
         Dictionary<string, dynamic> SanitizeViewModel(Dictionary<string, dynamic> viewModel);
 
-        void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
+        Task SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false);
 
         void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedRefereceMappingId = "");
 
@@ -27,7 +27,7 @@ namespace form_builder.Helpers.PageHelpers
 
         void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid);
 
-        List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
+        Task<List<Answers>> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload);
 
         Page GetPageWithMatchingRenderConditions(List<Page> pages);
     }

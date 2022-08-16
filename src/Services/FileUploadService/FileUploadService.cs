@@ -128,7 +128,7 @@ namespace form_builder.Services.FileUploadService
             if (currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files is null || !files.Any()) && modelStateIsValid)
             {
                 if (currentPage.Elements.Where(_ => _.Type.Equals(EElementType.MultipleFileUpload)).Any(_ => _.Properties.Optional))
-                    _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
+                    await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
                 return new ProcessRequestEntity
                 {
@@ -151,7 +151,7 @@ namespace form_builder.Services.FileUploadService
             }
 
             if (files is not null && files.Any())
-                _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
+                await _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, files, currentPage.IsValid, true);
 
             if (viewModel.ContainsKey(ButtonConstants.SUBMIT) && modelStateIsValid)
             {
