@@ -553,7 +553,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldCallCacheProvider()
+        public async Task SaveAnswers_ShouldCallCacheProvider()
         {
             // Arrange
             var guid = Guid.NewGuid();
@@ -569,7 +569,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Returns(mockData);
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, guid.ToString(), "formName", null, true);
+            await _pageHelper.SaveAnswers(viewModel, guid.ToString(), "formName", null, true);
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid.ToString()))));
@@ -578,7 +578,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldRemoveCurrentPageData_IfPageKey_AlreadyExists()
+        public async Task SaveAnswers_ShouldRemoveCurrentPageData_IfPageKey_AlreadyExists()
         {
             // Arrange
             var item1Data = "item1-data";
@@ -617,7 +617,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             // Assert
@@ -628,7 +628,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldNotAddKeys_OnDisallowedList()
+        public async Task SaveAnswers_ShouldNotAddKeys_OnDisallowedList()
         {
             // Arrange
             var callbackCacheProvider = string.Empty;
@@ -649,7 +649,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic> { { "Path", "path" } };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             // Assert
@@ -657,7 +657,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_AddAnswersInViewModel()
+        public async Task SaveAnswers_AddAnswersInViewModel()
         {
             // Arrange
             var callbackCacheProvider = string.Empty;
@@ -684,7 +684,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             // Assert
@@ -695,7 +695,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldSaveFileUpload_WithinDistributedCache_OnSeperateKey()
+        public async Task SaveAnswers_ShouldSaveFileUpload_WithinDistributedCache_OnSeperateKey()
         {
             // Arrange
             var questionId = "fileUpload_testFileQuestionId";
@@ -722,7 +722,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
 
             // Assert
             _fileStorageProvider.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.Is<int>(_ => _ == 60), It.IsAny<CancellationToken>()), Times.Once);
@@ -730,7 +730,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldSaveFilUploadReference_WithinFormAnswers_InDistributedCache()
+        public async Task SaveAnswers_ShouldSaveFilUploadReference_WithinFormAnswers_InDistributedCache()
         {
             // Arrange
             var callbackCacheProvider = string.Empty;
@@ -786,7 +786,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             // Assert
@@ -796,7 +796,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
+        public async Task SaveAnswers_ShouldReplaceFilUploadReference_WithinFormAnswers_IfAnswerAlreadyExists_InDistributedCache()
         {
             // Arrange
             var callbackCacheProvider = string.Empty;
@@ -850,7 +850,7 @@ namespace form_builder_tests.UnitTests.Helpers
             };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             // Assert
@@ -860,7 +860,7 @@ namespace form_builder_tests.UnitTests.Helpers
         }
 
         [Fact]
-        public void SaveAnswers_ShouldNotCallDistributedCache_ForFileUpload_WhenNoFile()
+        public async Task SaveAnswers_ShouldNotCallDistributedCache_ForFileUpload_WhenNoFile()
         {
             // Arrange
             var mockData = JsonConvert.SerializeObject(new FormAnswers
@@ -875,7 +875,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic> { { "Path", "path" } };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
 
             // Arrange
             _mockDistributedCache.Verify(
@@ -888,7 +888,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
 
         [Fact]
-        public void SaveAnswers_ShouldSave_CurrentPageAnswer_WhenNoFilesSelected_And_PageAlreadyHasData_ForMultipleFileUpload()
+        public async Task SaveAnswers_ShouldSave_CurrentPageAnswer_WhenNoFilesSelected_And_PageAlreadyHasData_ForMultipleFileUpload()
         {
             // Arrange
             var callbackValue = string.Empty;
@@ -921,7 +921,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic> { { "Path", "page-two" } };
 
             // Act
-            _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true, true);
+            await _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true, true);
 
             // Arrange
             _mockDistributedCache.Verify(

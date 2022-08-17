@@ -126,6 +126,7 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.Equal($"{label} must be to 2 decimal places or less", result.Message);
         }
 
+        [Fact]
         public void Validate_ShouldReturn_CustomValidationMessage_When_Value_Is_Greater_Then_Allowed_Decimal_Places()
         {
             var label = "Test label";

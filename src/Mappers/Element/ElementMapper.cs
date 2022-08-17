@@ -95,7 +95,7 @@ namespace form_builder.Mappers
             }
         }
 
-        private object GetDeclarationElementValue(string key, FormAnswers formAnswers)
+        private static object GetDeclarationElementValue(string key, FormAnswers formAnswers)
         {
             var value = formAnswers.Pages
                 .SelectMany(_ => _.Answers)
@@ -197,11 +197,13 @@ namespace form_builder.Mappers
                 if (fileData is null)
                     throw new Exception($"ElementMapper::GetFileUploadElementValue: An error has occurred while attempting to retrieve an uploaded file with key: {file.Key} from the distributed cache");
 
-                File model = new();
-                model.Content = fileData;
-                model.TrustedOriginalFileName = file.TrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
-                model.UntrustedOriginalFileName = file.UntrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100);
-                model.KeyName = key;
+                File model = new()
+                {
+                    Content = fileData,
+                    TrustedOriginalFileName = file.TrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100),
+                    UntrustedOriginalFileName = file.UntrustedOriginalFileName.ToMaxSpecifiedStringLengthForFileName(100),
+                    KeyName = key
+                };
 
                 listOfFiles.Add(model);
             }

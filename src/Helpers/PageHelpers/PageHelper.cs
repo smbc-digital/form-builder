@@ -197,7 +197,7 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            await _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
 
         public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
