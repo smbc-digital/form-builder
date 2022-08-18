@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
@@ -43,6 +45,7 @@ namespace form_builder.Services.ValidateService
 
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
+            List<Answers> answers = new();
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingData = await _mappingService.Map(sessionGuid, formName);
 
@@ -62,8 +65,18 @@ namespace form_builder.Services.ValidateService
 
                 response = await _gateway.GetAsync(entity.Url);
 
+                var responseAnswer = await response.Content.ReadAsStringAsync();
+                answers.Add(new(ValidateConstants.ValidateId, responseAnswer));
+
+                if (mappingData.FormAnswers.AdditionalFormData.TryGetValue(ValidateConstants.ValidateId, out object _))
+                    mappingData.FormAnswers.AdditionalFormData.Remove(ValidateConstants.ValidateId);
+                
+                mappingData.FormAnswers.AdditionalFormData.Add(ValidateConstants.ValidateId, responseAnswer);
+
+                await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
+
                 if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
+                throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
             }
         }
     }
