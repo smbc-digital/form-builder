@@ -179,15 +179,8 @@ namespace form_builder.Services.PageService
                 _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
             }
 
-            var validCaseRef = convertedAnswers.AdditionalFormData.ContainsKey(ValidateConstants.ValidateId);
-            var actions = page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList();
-
             if (page.HasPageActionsGetValues)
-            {
-                if (actions.Any(_ => _.Type.Equals(EActionType.Validate)) && !validCaseRef ||
-                    !actions.Any(_ => _.Type.Equals(EActionType.Validate)))
-                    await _actionsWorkflow.Process(page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(), null, form);
-            }
+                await _actionsWorkflow.Process(page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(), null, form);
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
             {
