@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
 
@@ -56,7 +55,7 @@ namespace form_builder.Extensions
             if (string.IsNullOrEmpty(questionId))
                 return string.Empty;
 
-            return questionId.Replace("{{QUESTION:", String.Empty).Replace("}}", String.Empty);   
+            return questionId.Replace("{{QUESTION:", String.Empty).Replace("}}", String.Empty);
         }
     }
 }

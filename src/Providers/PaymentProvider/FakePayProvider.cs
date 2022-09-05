@@ -1,10 +1,6 @@
-using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
 using form_builder.Extensions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 
 namespace form_builder.Providers.PaymentProvider

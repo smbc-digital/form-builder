@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Constants;
+﻿using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Models;
@@ -10,7 +6,6 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
 using form_builder.Services.RetrieveExternalDataService.Entities;
-using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Factories.Transform.UserSchema
 {

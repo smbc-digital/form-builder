@@ -1,4 +1,3 @@
-using System;
 using form_builder.TagParsers.Formatters;
 using Xunit;
 

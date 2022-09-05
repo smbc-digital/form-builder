@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 using form_builder.Providers.Lookup;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;

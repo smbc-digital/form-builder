@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.Session;
@@ -29,7 +27,7 @@ namespace form_builder.Validators
             if (element.Properties.Optional && viewModel.ContainsKey(ButtonConstants.SUBMIT))
                 return new ValidationResult { IsValid = true };
 
-            var key = $"{ element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
+            var key = $"{element.Properties.QuestionId}{FileUploadConstants.SUFFIX}";
             var isValid = false;
 
             List<DocumentModel> value = viewModel.ContainsKey(key)

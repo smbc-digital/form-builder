@@ -1,7 +1,4 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Http;
-
-namespace form_builder.Models
+﻿namespace form_builder.Models
 {
     public class UploadedFile : FormFile
     {

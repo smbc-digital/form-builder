@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using form_builder.Enum;
+﻿using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
-using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
 {
@@ -47,7 +44,7 @@ namespace form_builder.Models.Elements
                 properties.Add("pattern", @"[0-9]*");
                 properties.Add("max", Properties.Max);
                 properties.Add("min", Properties.Min);
-                properties.Add("type","text");
+                properties.Add("type", "text");
             }
 
             if (Properties.Decimal)

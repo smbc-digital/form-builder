@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -46,7 +45,7 @@ namespace form_builder.Validators
                 IsValid = isValid,
                 Message = isValid ? string.Empty
                     : !string.IsNullOrEmpty(element.Properties.RequiredIfValidationMessage)
-                    ? element.Properties.RequiredIfValidationMessage : $"Check the { element.Properties.Label} and try again."
+                    ? element.Properties.RequiredIfValidationMessage : $"Check the {element.Properties.Label} and try again."
             };
         }
     }

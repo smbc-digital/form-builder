@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
 using form_builder.Builders.Email;

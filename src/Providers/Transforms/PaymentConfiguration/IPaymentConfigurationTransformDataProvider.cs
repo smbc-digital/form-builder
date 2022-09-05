@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace form_builder.Providers.Transforms.PaymentConfiguration
+﻿namespace form_builder.Providers.Transforms.PaymentConfiguration
 {
     public interface IPaymentConfigurationTransformDataProvider
     {

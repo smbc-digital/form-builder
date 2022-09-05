@@ -1,5 +1,3 @@
-using System;
-
 namespace form_builder.Models.Booking
 {
     public class CalendarDay

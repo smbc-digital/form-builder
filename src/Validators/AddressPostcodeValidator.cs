@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using form_builder.Constants;
+﻿using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
@@ -29,8 +28,8 @@ namespace form_builder.Validators
                             .Match(viewModel[addressElement.AddressSearchQuestionId])
                             .Success;
 
-            return new ValidationResult(isValid, isValid 
-                                                    ? string.Empty 
+            return new ValidationResult(isValid, isValid
+                                                    ? string.Empty
                                                     : ValidationConstants.POSTCODE_INCORRECT_FORMAT);
         }
     }

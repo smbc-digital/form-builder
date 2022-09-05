@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 using form_builder.Configuration;
 using form_builder.Exceptions;
 using form_builder.Extensions;
@@ -14,8 +9,6 @@ using form_builder.Providers.PaymentProvider;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
@@ -152,14 +145,14 @@ namespace form_builder.Services.PayService
                 throw new Exception(
                     $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
                     $"No payment providers are configured");
-            
+
             if (_paymentConfiguration.FakePayment && _paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
                 return _paymentProviders
                             .FirstOrDefault(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName));
-            
+
             var paymentProvider = _paymentProviders
                                     .FirstOrDefault(_ => _.ProviderName.Equals(paymentInfo.PaymentProvider));
-                                    
+
             if (paymentProvider is null)
                 throw new Exception(
                     $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +

@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-
-namespace form_builder.Middleware
+﻿namespace form_builder.Middleware
 {
     public class HeaderConfiguration
     {

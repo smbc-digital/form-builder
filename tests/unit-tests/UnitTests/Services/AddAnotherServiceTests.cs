@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using form_builder.Builders;
+﻿using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
@@ -227,7 +224,7 @@ namespace form_builder_tests.UnitTests.Services
             await _addAnotherService.ProcessAddAnother(viewModel, page, baseSchema, Guid.NewGuid().ToString(), "page-one");
 
             // Assert
-            _mockPageHelper.Verify(_ => _.RemoveFormData($"{AddAnotherConstants.IncrementKeyPrefix}person",It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mockPageHelper.Verify(_ => _.RemoveFormData($"{AddAnotherConstants.IncrementKeyPrefix}person", It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]

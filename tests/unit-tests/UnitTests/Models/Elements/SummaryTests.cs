@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -296,7 +293,9 @@ namespace form_builder_tests.UnitTests.Models.Elements
                 .WithPage(summaryPage)
                 .Build();
 
-            var formAnswers = new FormAnswers { FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}addAnother", 1 } },
+            var formAnswers = new FormAnswers
+            {
+                FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}addAnother", 1 } },
                 Pages = new List<PageAnswers>
                 {
                     new PageAnswers

@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
-using Microsoft.AspNetCore.Hosting;
 
 namespace form_builder.Models.Elements
 {
@@ -85,7 +82,7 @@ namespace form_builder.Models.Elements
             var describedBy = new List<string>();
             if (DisplayHint)
                 describedBy.Add(HintId);
-    
+
             if (!IsValid)
                 describedBy.Add(ErrorId);
 

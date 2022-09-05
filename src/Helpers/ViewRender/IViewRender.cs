@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace form_builder.Helpers.ViewRender
+﻿namespace form_builder.Helpers.ViewRender
 {
     public interface IViewRender
     {

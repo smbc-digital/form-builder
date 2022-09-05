@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -40,7 +37,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
 
             foreach (var element in elements)
             {
-                if(string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId))
+                if (string.IsNullOrEmpty(element.Properties.OptionalIf.QuestionId))
                     result.AddFailureMessage(
                            $"The provided json has an OptionalIf that does not contain a QuestionId. Error on: '{element.Properties.QuestionId}'");
 

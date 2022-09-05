@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Dynamic;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -11,11 +7,11 @@ using form_builder.Models.Elements;
 using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
 using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
+using File = StockportGovUK.NetStandard.Models.FileManagement.File;
 using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
 
 namespace form_builder.Mappers
@@ -79,7 +75,7 @@ namespace form_builder.Mappers
                 default:
                     if (element.Properties.Numeric)
                         return GetNumericElementValue(key, formAnswers);
-                    
+
                     if (element.Properties.Decimal)
                         return GetDecimalElementValue(key, formAnswers);
 

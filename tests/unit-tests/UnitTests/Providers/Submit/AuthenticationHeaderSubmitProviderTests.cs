@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Dynamic;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using form_builder.Models;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -31,7 +30,7 @@ namespace form_builder.Validators
                 IsValid = isValid,
                 Message = isValid ? string.Empty
                     : !string.IsNullOrEmpty(element.Properties.RegexValidationMessage)
-                        ? element.Properties.RegexValidationMessage : $"Check the { element.Properties.Label} and try again"
+                        ? element.Properties.RegexValidationMessage : $"Check the {element.Properties.Label} and try again"
             };
         }
     }

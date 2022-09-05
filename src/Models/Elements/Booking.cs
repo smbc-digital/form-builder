@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -10,7 +6,6 @@ using form_builder.Helpers.ViewRender;
 using form_builder.Models.Booking;
 using form_builder.Models.Time;
 using form_builder.Utils.Extensions;
-using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Response;
 

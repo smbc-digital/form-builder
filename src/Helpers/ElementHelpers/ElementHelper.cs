@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -11,8 +7,6 @@ using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace form_builder.Helpers.ElementHelpers
@@ -252,7 +246,8 @@ namespace form_builder.Helpers.ElementHelpers
 
         public int GetAddAnotherNumberOfFieldsets(IElement addAnotherElement, FormAnswers formAnswers)
         {
-            if (formAnswers.FormData.Any()) {
+            if (formAnswers.FormData.Any())
+            {
                 var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
                 return formAnswers.FormData.ContainsKey(formDataIncrementKey)
                     ? int.Parse(formAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString())
