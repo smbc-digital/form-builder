@@ -1,5 +1,3 @@
-using System;
-
 namespace form_builder.Exceptions
 {
     public class BookingNoAvailabilityException : Exception

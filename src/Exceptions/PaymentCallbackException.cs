@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace form_builder.Exceptions
+﻿namespace form_builder.Exceptions
 {
     public class PaymentCallbackException : Exception
     {

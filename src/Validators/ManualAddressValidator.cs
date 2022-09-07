@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using form_builder.Constants;
+﻿using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
@@ -33,7 +32,7 @@ namespace form_builder.Validators
                 : null;
 
             var addressPostcodeMessage = string.Empty;
-            var addressPostcodeValid = true;    
+            var addressPostcodeValid = true;
 
             if (string.IsNullOrEmpty(valueAddressPostcode))
             {
@@ -48,15 +47,12 @@ namespace form_builder.Validators
                     addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                     addressPostcodeValid = false;
                 }
-                else if(!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
+                else if (!AddressConstants.POSTCODE_REGEX.IsMatch(valueAddressPostcode))
                 {
                     addressPostcodeMessage = ValidationConstants.POSTCODE_INCORRECT_FORMAT;
                     addressPostcodeValid = false;
                 }
             }
-                
-
-            
 
             var isValid = addressLine1Valid && addressTownValid && addressPostcodeValid;
 

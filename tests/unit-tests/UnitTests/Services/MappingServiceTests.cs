@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Threading.Tasks;
+﻿using System.Dynamic;
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -21,6 +18,7 @@ using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Xunit;
+using File = StockportGovUK.NetStandard.Models.FileManagement.File;
 
 namespace form_builder_tests.UnitTests.Services
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace form_builder.Helpers.Session
+﻿namespace form_builder.Helpers.Session
 {
     public class SessionHelper : ISessionHelper
     {

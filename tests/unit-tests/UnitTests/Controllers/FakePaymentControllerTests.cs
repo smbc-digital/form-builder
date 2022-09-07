@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Controllers
             _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
                             .Returns(new HostString("www.test.com"));
 
-            _mockWebHostEnvironment.Setup(_ => _.EnvironmentName)   
+            _mockWebHostEnvironment.Setup(_ => _.EnvironmentName)
                                     .Returns("local");
         }
 
@@ -29,7 +29,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public void Index_ShouldReturn_View_if_PaymentConfiguration_FakePayment_Is_False()
         {
             // Arrange
-            _mockPaymentConfiguration.Setup(_ => _.Value).Returns(new PaymentConfiguration {  FakePayment = false });
+            _mockPaymentConfiguration.Setup(_ => _.Value).Returns(new PaymentConfiguration { FakePayment = false });
 
             _controller = new FakePaymentController(_mockHttpContextAccessor.Object, _mockWebHostEnvironment.Object, _mockPaymentConfiguration.Object);
 
@@ -43,13 +43,13 @@ namespace form_builder_tests.UnitTests.Controllers
         [Fact]
         public void Index_ShouldReturn_NotFound_If_PaymentConfiguration_FakePayment_Is_True()
         {
-            _mockPaymentConfiguration.Setup(_ => _.Value).Returns(new PaymentConfiguration {  FakePayment = true });
+            _mockPaymentConfiguration.Setup(_ => _.Value).Returns(new PaymentConfiguration { FakePayment = true });
 
             // Arrange
             _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
                                         .Returns(new HostString("www.test.com"));
 
-            _mockWebHostEnvironment.Setup(_ => _.EnvironmentName)   
+            _mockWebHostEnvironment.Setup(_ => _.EnvironmentName)
                                     .Returns("local");
 
             _controller = new FakePaymentController(_mockHttpContextAccessor.Object, _mockWebHostEnvironment.Object, _mockPaymentConfiguration.Object);

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace form_builder.Models.Properties.ActionProperties
+﻿namespace form_builder.Models.Properties.ActionProperties
 {
     public partial class BaseActionProperty
     {

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using System.Reflection;
 using Amazon;
 using Amazon.Runtime;
@@ -79,14 +78,8 @@ using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.RedirectWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Notify.Client;
 using Notify.Interfaces;
 using StackExchange.Redis;
@@ -314,9 +307,9 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection ConfigurePaymentProviders(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
             services.AddSingleton<IPaymentProvider, CivicaPayProvider>();
-            
+
             if (!hostEnvironment.IsEnvironment("prod"))
-                services.AddSingleton<IPaymentProvider, FakePayProvider>();    
+                services.AddSingleton<IPaymentProvider, FakePayProvider>();
 
             return services;
         }

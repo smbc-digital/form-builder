@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace form_builder.Workflows.RedirectWorkflow 
+﻿namespace form_builder.Workflows.RedirectWorkflow
 {
     public interface IRedirectWorkflow
     {

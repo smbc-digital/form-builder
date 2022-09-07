@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using form_builder.Builders;
+﻿using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
@@ -87,7 +85,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
+            Assert.Equal($"Year must be less than or equal to {maxYear}", result.Message);
         }
 
         [Fact]
@@ -111,7 +109,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal($"Year must be less than or equal to { maxYear}", result.Message);
+            Assert.Equal($"Year must be less than or equal to {maxYear}", result.Message);
         }
     }
 }

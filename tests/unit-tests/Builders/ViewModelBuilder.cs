@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace form_builder_tests.Builders
+﻿namespace form_builder_tests.Builders
 {
     public class ViewModelBuilder
     {

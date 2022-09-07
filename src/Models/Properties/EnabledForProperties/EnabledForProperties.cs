@@ -1,5 +1,3 @@
-using System;
-
 namespace form_builder.Models.Properties.EnabledForProperties
 {
     public class EnabledForProperties

@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Extensions;
@@ -15,7 +11,6 @@ using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 

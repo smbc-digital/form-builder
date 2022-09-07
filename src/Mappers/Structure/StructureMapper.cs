@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
+﻿using System.Dynamic;
 using System.Reflection;
-using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Models.Elements;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using File = StockportGovUK.NetStandard.Models.FileManagement.File;
 
 namespace form_builder.Mappers.Structure
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using form_builder.Utils.Extensions;
+﻿using form_builder.Utils.Extensions;
 
 namespace form_builder.ViewModels
 {

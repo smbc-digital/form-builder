@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using StockportGovUK.NetStandard.Gateways.AddressService;
+﻿using StockportGovUK.NetStandard.Gateways.AddressService;
 using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Enums;
 

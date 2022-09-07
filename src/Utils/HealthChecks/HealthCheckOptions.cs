@@ -1,8 +1,6 @@
-using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Newtonsoft.Json;
 

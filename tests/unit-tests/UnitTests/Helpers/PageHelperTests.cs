@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -1360,7 +1355,7 @@ namespace form_builder_tests.UnitTests.Helpers
             {
                 Path = "page-one",
                 Pages = new List<PageAnswers>(),
-                FormData = new Dictionary<string, object> { {"key", 1} }
+                FormData = new Dictionary<string, object> { { "key", 1 } }
             });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))

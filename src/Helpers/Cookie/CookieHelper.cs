@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http;
-
 namespace form_builder.Helpers.Cookie
 {
     public class CookieHelper : ICookieHelper

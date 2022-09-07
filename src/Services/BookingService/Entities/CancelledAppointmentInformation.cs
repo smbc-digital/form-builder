@@ -1,5 +1,3 @@
-using System;
-
 namespace form_builder.Services.BookingService.Entities
 {
     public class CancelledAppointmentInformation

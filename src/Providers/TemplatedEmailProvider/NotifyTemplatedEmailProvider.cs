@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Notify.Interfaces;
 
 namespace form_builder.Providers.TemplatedEmailProvider

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using form_builder.Enum;
+﻿using form_builder.Enum;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

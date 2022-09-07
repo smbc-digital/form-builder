@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Constants;
+﻿using form_builder.Constants;
 using form_builder.ContentFactory.PageFactory;
 using form_builder.Enum;
 using form_builder.Helpers.PageHelpers;
@@ -51,8 +47,8 @@ namespace form_builder.Services.AddAnotherService
                 if (!string.IsNullOrEmpty(removeKey))
                     currentIncrement--;
 
-                if (!addEmptyFieldset && 
-                    string.IsNullOrEmpty(removeKey) && 
+                if (!addEmptyFieldset &&
+                    string.IsNullOrEmpty(removeKey) &&
                     addAnotherElement.Properties.Elements.All(subElement => subElement.Properties.Optional))
                 {
                     var allOptionalElementsEmpty = true;
