@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>form_builder</RootNamespace>
-	<ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <NoWarn>CS8632</NoWarn>
   </PropertyGroup>
