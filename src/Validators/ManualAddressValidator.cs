@@ -54,9 +54,6 @@ namespace form_builder.Validators
                 }
             }
 
-
-
-
             var isValid = addressLine1Valid && addressTownValid && addressPostcodeValid;
 
             return new ValidationResult
