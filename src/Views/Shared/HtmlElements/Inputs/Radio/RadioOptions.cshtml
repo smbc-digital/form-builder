@@ -32,8 +32,6 @@
 <div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? " govuk-radios--conditional" : "")" data-module="govuk-radios">
 	@for (var i = 0; i < Model.Properties.Options.Count; i++)
 	{
-		var strongLabel = Model.Properties.Options[i].HasHint ? "govuk-label--s" : null;
-
 		@if (Model.Properties.Options[i].HasDivider)
 		{
 			<div class="govuk-radios__divider">@Model.Properties.Options[i].Divider</div>
@@ -49,7 +47,7 @@
 				   @(Model.Properties.Checked || Model.Properties.Value.Contains(Model.Properties.Options[i].Value) ? "checked" : string.Empty)
 				   @(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? $"data-aria-controls=conditional-{i}{fieldsetIncrement}-{questionID}" : string.Empty) />
 
-			<label class="govuk-label govuk-radios__label @strongLabel"
+			<label class="govuk-label govuk-radios__label"
 				   for="@Model.GetListItemId(i)">
 				@Html.Raw(Model.Properties.Options[i].Text)
 			</label>
