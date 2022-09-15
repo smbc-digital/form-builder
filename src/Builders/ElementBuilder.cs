@@ -521,6 +521,13 @@ namespace form_builder.Builders
             return this;
         }
 
+
+        public ElementBuilder WithSelectExactly(int value)
+        {
+            _property.SelectExactly = value;
+            return this;
+        }
+
         public ElementBuilder WithOutsideRange(string value)
         {
             _property.OutsideRange = value;

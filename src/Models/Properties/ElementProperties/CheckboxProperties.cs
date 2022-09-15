@@ -3,5 +3,7 @@
     public partial class BaseProperty
     {
         public string ExclusiveCheckboxValidationMessage { get; set; }
+
+        public int SelectExactly { get; set; } = 0;
     }
 }
