@@ -10,7 +10,7 @@ namespace form_builder_tests.UnitTests.Validators
     public class ExactNumberOptionsCheckboxValidatorTests
     {
 
-        private readonly ExactNumberOptionsCheckboxValidator _numberRequiredCheckboxValidator = new ExactNumberOptionsCheckboxValidator();
+        private readonly SelectExactlyCheckboxValidator _numberRequiredCheckboxValidator = new SelectExactlyCheckboxValidator();
 
         [Theory]
         [InlineData(EElementType.DateInput)]
@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithQuestionId(questionId)
-                .WithExactNumberOptions(2)
+                .WithSelectExactly(2)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithQuestionId(questionId)
-                .WithExactNumberOptions(2)
+                .WithSelectExactly(2)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
@@ -102,7 +102,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithQuestionId(questionId)
-                .WithExactNumberOptions(2)
+                .WithSelectExactly(2)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();

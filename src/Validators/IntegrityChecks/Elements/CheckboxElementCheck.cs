@@ -34,6 +34,12 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                 }
             }
 
+            if (element.Properties.SelectExactly > element.Properties.Options.Count)
+            {
+                result.AddFailureMessage("Checkbox Element Check: " +
+                        $"{element.Properties.QuestionId} the number of options are less than the exact number of selected options required");
+            }
+
             return result;
         }
 

@@ -4,6 +4,6 @@
     {
         public string ExclusiveCheckboxValidationMessage { get; set; }
 
-        public int ExactNumberOptions { get; set; } = 0;
+        public int SelectExactly { get; set; } = 0;
     }
 }

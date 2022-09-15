@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using form_builder.Enum;
+﻿using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators
 {
-    public class ExactNumberOptionsCheckboxValidator : IElementValidator
+    public class SelectExactlyCheckboxValidator : IElementValidator
     {
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
@@ -17,13 +15,13 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
 
 
-            if(element.Properties.ExactNumberOptions < 0)
+            if(element.Properties.SelectExactly < 1)
                 return new ValidationResult { IsValid = true };
 
             var answer = (string[])viewModel[element.Properties.QuestionId].Split(",");
 
             bool isValid = true;
-            if (answer.Length != element.Properties.ExactNumberOptions)
+            if (answer.Length != element.Properties.SelectExactly)
                 isValid = false;
 
             return new ValidationResult { IsValid = isValid, Message = isValid ? string.Empty : element.Properties.CustomValidationMessage};

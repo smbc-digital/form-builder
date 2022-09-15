@@ -522,9 +522,9 @@ namespace form_builder.Builders
         }
 
 
-        public ElementBuilder WithExactNumberOptions(int value)
+        public ElementBuilder WithSelectExactly(int value)
         {
-            _property.ExactNumberOptions = value;
+            _property.SelectExactly = value;
             return this;
         }
 
