@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace form_builder.Workflows.SubmitWorkflow
+﻿namespace form_builder.Workflows.SubmitWorkflow
 {
     public interface ISubmitWorkflow
     {

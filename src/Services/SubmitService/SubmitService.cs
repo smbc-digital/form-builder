@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
@@ -15,7 +10,6 @@ using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.SubmissionActions;
 using form_builder.TagParsers;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;

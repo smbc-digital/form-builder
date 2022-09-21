@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using form_builder.Constants;
 
 namespace form_builder.Validators.IntegrityChecks

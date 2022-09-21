@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Controllers.Document;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StockportGovUK.NetStandard.Gateways;
 

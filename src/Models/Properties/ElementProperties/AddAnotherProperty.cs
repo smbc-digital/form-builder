@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using form_builder.Models.Elements;
+﻿using form_builder.Models.Elements;
 
 namespace form_builder.Models.Properties.ElementProperties
 {

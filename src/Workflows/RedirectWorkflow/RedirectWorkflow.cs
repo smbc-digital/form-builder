@@ -1,11 +1,11 @@
 ﻿using form_builder.Helpers.Session;
 using form_builder.Services.MappingService;
 using form_builder.Services.SubmitService;
-using System;
-using System.Threading.Tasks;
 
-namespace form_builder.Workflows.RedirectWorkflow {
-    public class RedirectWorkflow : IRedirectWorkflow {
+namespace form_builder.Workflows.RedirectWorkflow
+{
+    public class RedirectWorkflow : IRedirectWorkflow
+    {
 
         private readonly ISubmitService _submitService;
         private readonly IMappingService _mappingService;

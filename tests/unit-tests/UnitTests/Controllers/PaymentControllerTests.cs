@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using form_builder.Controllers.Payment;
+﻿using form_builder.Controllers.Payment;
 using form_builder.Exceptions;
 using form_builder.Helpers.Session;
 using form_builder.Models;

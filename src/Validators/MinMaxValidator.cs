@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using form_builder.Constants;
 using form_builder.Models;
 using form_builder.Models.Elements;
@@ -30,7 +29,7 @@ namespace form_builder.Validators
                         IsValid = false,
                         Message = !string.IsNullOrEmpty(element.Properties.UpperLimitValidationMessage)
                             ? element.Properties.UpperLimitValidationMessage
-                            : $"{ element.Properties.Label} must be between {min} and {max} inclusive"
+                            : $"{element.Properties.Label} must be between {min} and {max} inclusive"
                     };
                 }
             }

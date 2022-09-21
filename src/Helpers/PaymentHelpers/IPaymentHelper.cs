@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 
 namespace form_builder.Helpers.PaymentHelpers
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using form_builder.Helpers.Session;
+﻿using form_builder.Helpers.Session;
 using Moq;
 using Xunit;
 

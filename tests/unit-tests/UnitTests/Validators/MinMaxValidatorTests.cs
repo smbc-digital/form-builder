@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using form_builder.Builders;
 using form_builder.Validators;
 using Xunit;

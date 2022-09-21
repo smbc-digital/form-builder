@@ -1,7 +1,5 @@
 using System.Net;
-using System.Threading.Tasks;
 using form_builder.Models;
-using Microsoft.Extensions.Logging;
 
 namespace form_builder.Providers.EmailProvider
 {

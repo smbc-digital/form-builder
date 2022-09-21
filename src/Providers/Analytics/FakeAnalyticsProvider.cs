@@ -1,6 +1,4 @@
-using System.Threading.Tasks;
 using form_builder.Providers.Analytics.Request;
-using Microsoft.Extensions.Logging;
 
 namespace form_builder.Providers.Analytics
 {

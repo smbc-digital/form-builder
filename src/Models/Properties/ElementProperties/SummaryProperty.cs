@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace form_builder.Models.Properties.ElementProperties
+﻿namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty
     {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
@@ -57,17 +53,17 @@ namespace form_builder_tests.UnitTests.Services
             _tagParser
                 .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns("{\"PaymentProvider\":\"testPaymentProvider\",\"Settings\":{\"CalculationSlug\":{\"Environment\":null,\"URL\":\"url\",\"Type\":\"AuthHeader\",\"AuthToken\":\"TestToken\",\"CallbackUrl\":null}}}");
-            
+
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
-            
+
             _mockTagParsers
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => tagParserItems.GetEnumerator());
-            
+
             _paymentProvider
                 .Setup(_ => _.ProviderName)
                 .Returns("testPaymentProvider");
-            
+
             _paymentProvider
                 .Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<PaymentInformation>()))
@@ -76,7 +72,7 @@ namespace form_builder_tests.UnitTests.Services
             _fakePaymentProvider
                 .Setup(_ => _.ProviderName)
                 .Returns("Fake");
-            
+
             _fakePaymentProvider
                 .Setup(_ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<PaymentInformation>()))
@@ -116,7 +112,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             var paymentProviderItems = new List<IPaymentProvider> { _paymentProvider.Object, _fakePaymentProvider.Object };
-            
+
             _mockPaymentProviders
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => paymentProviderItems.GetEnumerator());
@@ -154,7 +150,7 @@ namespace form_builder_tests.UnitTests.Services
                     });
 
             _service = new PayService(_mockPaymentProviders.Object, _mockLogger.Object, _mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object,
-                _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentHelper.Object, _mockPaymentConfiguration.Object,  _mockTagParsers.Object);
+                _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentHelper.Object, _mockPaymentConfiguration.Object, _mockTagParsers.Object);
         }
 
         private static MappingEntity GetMappingEntityData()
@@ -687,15 +683,15 @@ namespace form_builder_tests.UnitTests.Services
             _mockPaymentConfiguration.Setup(_ => _.Value).Returns(new PaymentConfiguration { FakePayment = true });
 
             _service = new PayService(_mockPaymentProviders.Object, _mockLogger.Object, _mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object,
-                _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentHelper.Object, _mockPaymentConfiguration.Object,  _mockTagParsers.Object);
-                        // Act
+                _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentHelper.Object, _mockPaymentConfiguration.Object, _mockTagParsers.Object);
+            // Act
             var result = await _service.ProcessPayment(GetMappingEntityData(), "testForm", "page-one", "12345", "guid");
 
             // Assert
             _fakePaymentProvider.Verify(
                 _ => _.GeneratePaymentUrl(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), It.IsAny<PaymentInformation>()), Times.Once);
-                    
+
             Assert.IsType<string>(result);
         }
     }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Amazon.S3;
+﻿using Amazon.S3;
 using form_builder.Configuration;
 using form_builder.Gateways;
 using form_builder.Providers.Transforms.PaymentConfiguration;

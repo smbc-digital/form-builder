@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Models;
@@ -35,7 +32,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 {
                     result.AddFailureMessage(
                         "The provided json has date input element with a incorrect outside range value for " +
-                        $"'{ String.Join(", ", element.Properties.QuestionId) }'");
+                        $"'{String.Join(", ", element.Properties.QuestionId)}'");
                 }
             }
 
@@ -47,7 +44,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 {
                     result.AddFailureMessage(
                         "The provided json has date input element with a incorrect within range value for " +
-                        $"'{ String.Join(", ", element.Properties.QuestionId) }'");
+                        $"'{String.Join(", ", element.Properties.QuestionId)}'");
                 }
             }
 

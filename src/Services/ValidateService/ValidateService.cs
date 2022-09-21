@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using form_builder.Constants;
+﻿using form_builder.Constants;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Session;
@@ -12,7 +6,6 @@ using form_builder.Models;
 using form_builder.Models.Actions;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
-using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 
@@ -70,13 +63,13 @@ namespace form_builder.Services.ValidateService
 
                 if (mappingData.FormAnswers.AdditionalFormData.TryGetValue(ValidateConstants.ValidateId, out object _))
                     mappingData.FormAnswers.AdditionalFormData.Remove(ValidateConstants.ValidateId);
-                
+
                 mappingData.FormAnswers.AdditionalFormData.Add(ValidateConstants.ValidateId, responseAnswer);
 
                 await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
 
                 if (!response.IsSuccessStatusCode)
-                throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
+                    throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
             }
         }
     }

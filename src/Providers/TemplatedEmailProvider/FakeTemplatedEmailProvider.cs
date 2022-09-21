@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace form_builder.Providers.TemplatedEmailProvider
 {
     public class FakeTemplatedEmailProvider : ITemplatedEmailProvider

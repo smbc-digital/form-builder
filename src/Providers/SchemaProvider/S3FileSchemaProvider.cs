@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -11,8 +6,6 @@ using form_builder.Extensions;
 using form_builder.Gateways;
 using form_builder.Models;
 using form_builder.Providers.StorageProvider;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 

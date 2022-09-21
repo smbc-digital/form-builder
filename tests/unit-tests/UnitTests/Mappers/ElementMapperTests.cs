@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using form_builder.Builders;
+﻿using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Mappers;
@@ -16,6 +13,7 @@ using StockportGovUK.NetStandard.Models.Addresses;
 using StockportGovUK.NetStandard.Models.Booking;
 using StockportGovUK.NetStandard.Models.FileManagement;
 using Xunit;
+using File = StockportGovUK.NetStandard.Models.FileManagement.File;
 
 namespace form_builder_tests.UnitTests.Mappers
 {

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using form_builder.Configuration;
+﻿using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Helpers.Session;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
-using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 
@@ -51,7 +46,7 @@ namespace form_builder.Helpers.PaymentHelpers
                 throw new Exception($"PayService:: No payment information found for {form}");
 
             if (!string.IsNullOrEmpty(formPaymentConfig.Settings.AddressReference))
-                formPaymentConfig.Settings.AddressReference = formPaymentConfig.Settings.AddressReference.Insert(formPaymentConfig.Settings.AddressReference.Length -2, AddressConstants.DESCRIPTION_SUFFIX);
+                formPaymentConfig.Settings.AddressReference = formPaymentConfig.Settings.AddressReference.Insert(formPaymentConfig.Settings.AddressReference.Length - 2, AddressConstants.DESCRIPTION_SUFFIX);
 
             if (string.IsNullOrEmpty(formPaymentConfig.Settings.Amount))
                 formPaymentConfig.Settings.Amount = await GetPaymentAmountAsync(mappingEntity, formPaymentConfig);

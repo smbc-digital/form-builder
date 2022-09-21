@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace form_builder.Models
+﻿namespace form_builder.Models
 {
     public class PostData
     {

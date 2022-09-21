@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using form_builder.Configuration;
 using form_builder.Exceptions;
 using form_builder.Extensions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
@@ -89,7 +83,7 @@ namespace form_builder.Providers.PaymentProvider
                 throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
             if (civicaResponse.ResponseContent.Success.Equals("false"))
-                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response from the provider, { civicaResponse.ResponseContent.ResponseCode }, Summary: { civicaResponse.ResponseContent.ErrorMessage } - { civicaResponse.ResponseContent.ErrorSummary }, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
+                throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response from the provider, {civicaResponse.ResponseContent.ResponseCode}, Summary: {civicaResponse.ResponseContent.ErrorMessage} - {civicaResponse.ResponseContent.ErrorSummary}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
 
             return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
         }

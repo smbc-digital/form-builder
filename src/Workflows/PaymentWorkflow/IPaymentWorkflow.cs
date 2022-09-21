@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace form_builder.Workflows.PaymentWorkflow
+﻿namespace form_builder.Workflows.PaymentWorkflow
 {
     public interface IPaymentWorkflow
     {

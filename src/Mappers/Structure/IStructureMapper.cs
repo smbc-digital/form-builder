@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace form_builder.Mappers.Structure
+﻿namespace form_builder.Mappers.Structure
 {
     public interface IStructureMapper
     {

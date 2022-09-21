@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace form_builder.Services.BookingService.Entities
+﻿namespace form_builder.Services.BookingService.Entities
 {
     public class BookingProcessEntity
     {

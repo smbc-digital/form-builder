@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Dynamic;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
@@ -13,11 +9,10 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Models.Booking.Request;
 using StockportGovUK.NetStandard.Models.FileManagement;
+using File = StockportGovUK.NetStandard.Models.FileManagement.File;
 
 namespace form_builder.Services.MappingService
 {
@@ -230,7 +225,7 @@ namespace form_builder.Services.MappingService
         {
             if (!formAnswers.FormData.Any() || !formAnswers.FormData.ContainsKey($"{AddAnotherConstants.IncrementKeyPrefix}{element.Properties.QuestionId}"))
                 return obj;
-            
+
             var savedIncrementValue = formAnswers.FormData[$"{AddAnotherConstants.IncrementKeyPrefix}{element.Properties.QuestionId}"].ToString();
 
             var numberOfIncrements = int.Parse(savedIncrementValue);

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
@@ -47,7 +46,7 @@ namespace form_builder_tests.UnitTests.Models
             // Assert
             Assert.False(element.DisplayAriaDescribedby);
         }
-        
+
         [Theory]
         [InlineData(EElementType.Textarea)]
         public void GenerateElementProperties_ShouldReturnCorrectPropertiesFor_TextArea(EElementType type)
