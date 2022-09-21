@@ -24,4 +24,11 @@ namespace form_builder.Models
 
         public bool Exclusive { get; set; } = false;
     }
+
+    public class OptionsResult
+    {
+        public List<Option> Options { get; set; }
+
+        public int SelectExactly { get; set; }
+    }
 }

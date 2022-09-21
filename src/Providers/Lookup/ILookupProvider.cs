@@ -5,6 +5,6 @@ namespace form_builder.Providers.Lookup
     public interface ILookupProvider
     {
         string ProviderName { get; }
-        Task<List<Option>> GetAsync(string url, string authToken);
+        Task<OptionsResult> GetAsync(string url, string authToken);
     }
 }

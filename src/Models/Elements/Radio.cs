@@ -21,7 +21,7 @@ namespace form_builder.Models.Elements
             Properties.Value = elementHelper.CurrentValue(Properties.QuestionId, viewModel, formAnswers);
             elementHelper.CheckForQuestionId(this);
             elementHelper.CheckForLabel(this);
-            elementHelper.CheckForRadioOptions(this);
+            //elementHelper.CheckForRadioOptions(this);
             elementHelper.ReCheckPreviousRadioOptions(this);
             elementHelper.OrderOptionsAlphabetically(this);
 

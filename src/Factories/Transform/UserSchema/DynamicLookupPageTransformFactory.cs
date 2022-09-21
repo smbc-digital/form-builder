@@ -52,12 +52,17 @@ namespace form_builder.Factories.Transform.UserSchema
                 throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources");
 
             var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
-            List<Option> lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
+            OptionsResult lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
 
-            if (!lookupOptions.Any())
+            if (!lookupOptions.Options.Any())
                 throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, Provider returned no options");
 
-            element.Properties.Options.AddRange(lookupOptions);
+            element.Properties.Options.AddRange(lookupOptions.Options);
+            if (lookupOptions.SelectExactly > 0)
+            {
+                element.Properties.SelectExactly = lookupOptions.SelectExactly;
+                element.Properties.Hint = $"You must select {lookupOptions.SelectExactly} options";
+            }
         }
     }
 }
