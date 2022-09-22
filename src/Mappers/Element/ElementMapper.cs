@@ -8,11 +8,11 @@ using form_builder.Providers.FileStorage;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.FileManagement;
-using Address = StockportGovUK.NetStandard.Models.Addresses.Address;
-using Booking = StockportGovUK.NetStandard.Models.Booking.Booking;
-using File = StockportGovUK.NetStandard.Models.FileManagement.File;
-using Organisation = StockportGovUK.NetStandard.Models.Verint.Organisation;
+using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
+using Address = StockportGovUK.NetStandard.Gateways.Models.Addresses.Address;
+using Booking = StockportGovUK.NetStandard.Gateways.Models.Booking.Booking;
+using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
+using Organisation = StockportGovUK.NetStandard.Gateways.Models.Verint.Organisation;
 
 namespace form_builder.Mappers
 {

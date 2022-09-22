@@ -3,8 +3,8 @@ using form_builder.Providers.Booking;
 using Moq;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.Response;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.Booking

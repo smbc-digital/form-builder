@@ -1,7 +1,7 @@
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Utils.Extensions;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 
 namespace form_builder.Models.Time
 {

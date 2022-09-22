@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Models.FormBuilder;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services

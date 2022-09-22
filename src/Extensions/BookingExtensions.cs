@@ -1,4 +1,4 @@
-using StockportGovUK.NetStandard.Models.Booking;
+using StockportGovUK.NetStandard.Gateways.Models.Booking;
 
 namespace form_builder.Extensions
 {

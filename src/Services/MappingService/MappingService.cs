@@ -10,9 +10,9 @@ using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.FileManagement;
-using File = StockportGovUK.NetStandard.Models.FileManagement.File;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
+using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Services.MappingService
 {

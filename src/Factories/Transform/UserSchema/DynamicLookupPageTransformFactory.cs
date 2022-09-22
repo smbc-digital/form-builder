@@ -6,6 +6,7 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
 using form_builder.Services.RetrieveExternalDataService.Entities;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Factories.Transform.UserSchema
 {
@@ -52,12 +53,29 @@ namespace form_builder.Factories.Transform.UserSchema
                 throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources");
 
             var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
-            List<Option> lookupOptions = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
+            OptionsResponse lookupOptionsResult = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
 
-            if (!lookupOptions.Any())
+            if (!lookupOptionsResult.Options.Any())
                 throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, Provider returned no options");
 
-            element.Properties.Options.AddRange(lookupOptions);
+            if (lookupOptionsResult.SelectExactly > lookupOptionsResult.Options.Count)
+                throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, There cannot be less options available than the SelectExactly value");
+
+            element.Properties.Options.AddRange(lookupOptionsResult.Options);
+
+            if (lookupOptionsResult.SelectExactly > 0)
+                element.Properties.SelectExactly = lookupOptionsResult.SelectExactly;
+
+            if (lookupOptionsResult.SelectExactly > 1)
+            {
+                element.Properties.Hint = $"Select <b>{lookupOptionsResult.SelectExactly}</b> options";
+                element.Properties.CustomValidationMessage = $"Select {lookupOptionsResult.SelectExactly} options";
+            }
+            else if (lookupOptionsResult.SelectExactly is 1)
+            {
+                element.Properties.Hint = $"Select <b>{lookupOptionsResult.SelectExactly}</b> option";
+                element.Properties.CustomValidationMessage = $"Select {lookupOptionsResult.SelectExactly} option";
+            }
         }
     }
 }

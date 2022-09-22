@@ -9,7 +9,7 @@ using form_builder.Services.StreetService;
 using form_builder_tests.Builders;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Enums;
+using StockportGovUK.NetStandard.Gateways.Enums;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services

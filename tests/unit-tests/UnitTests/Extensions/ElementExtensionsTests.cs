@@ -3,6 +3,7 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Extensions

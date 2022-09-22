@@ -7,7 +7,7 @@ using form_builder.Models;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
+using StockportGovUK.NetStandard.Gateways.Models.Verint.Lookup;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements

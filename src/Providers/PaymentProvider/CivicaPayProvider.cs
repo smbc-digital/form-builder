@@ -4,7 +4,7 @@ using form_builder.Extensions;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
-using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Civica.Pay.Request;
 
 namespace form_builder.Providers.PaymentProvider
 {

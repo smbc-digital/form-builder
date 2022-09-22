@@ -2,6 +2,7 @@
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Validators;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
