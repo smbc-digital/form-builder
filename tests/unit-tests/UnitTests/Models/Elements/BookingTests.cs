@@ -9,7 +9,7 @@ using form_builder.Models.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements

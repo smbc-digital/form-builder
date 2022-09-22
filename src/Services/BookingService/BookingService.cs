@@ -19,8 +19,8 @@ using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 
 namespace form_builder.Services.BookingService
 {
@@ -272,15 +272,15 @@ namespace form_builder.Services.BookingService
             await _bookingProviders.Get(provider).Cancel(bookingGuid);
         }
 
-        private async Task<BoookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider, AppointmentType appointmentType)
+        private async Task<BookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider, AppointmentType appointmentType)
         {
             var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
             if (bookingNextAvailabilityCachedResponse is not null)
-                return JsonConvert.DeserializeObject<BoookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
+                return JsonConvert.DeserializeObject<BookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
 
             AvailabilityDayResponse nextAvailability;
-            BoookingNextAvailabilityEntity result;
+            BookingNextAvailabilityEntity result;
             try
             {
                 nextAvailability = await bookingProvider
@@ -294,12 +294,12 @@ namespace form_builder.Services.BookingService
             }
             catch (BookingNoAvailabilityException)
             {
-                result = new BoookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
+                result = new BookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
                 await _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
                 return result;
             }
 
-            result = new BoookingNextAvailabilityEntity { DayResponse = nextAvailability };
+            result = new BookingNextAvailabilityEntity { DayResponse = nextAvailability };
             await _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
             return result;
         }

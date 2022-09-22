@@ -8,6 +8,7 @@ using form_builder.Providers.Lookup;
 using form_builder.Services.RetrieveExternalDataService.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Factories.Transform
@@ -25,7 +26,10 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             _fakeLookupProvider.Setup(_ => _.ProviderName).Returns("fake");
 
             _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<Option> { new Option() });
+                .ReturnsAsync(new OptionsResponse
+                {
+                    Options = new List<Option> { new Option() }
+                });
 
             _mockLookupProviders = new List<ILookupProvider>
             {
@@ -180,7 +184,10 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         {
             // Arrange
             _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new List<Option>());
+                .ReturnsAsync(new OptionsResponse
+                {
+                    Options = new List<Option>()
+                });
 
             var element = new ElementBuilder()
                 .WithQuestionId("dynamicQuestion")
@@ -202,6 +209,123 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             // Act & Assert
             var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers()));
             Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, Provider returned no options", result.Message);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldSetProperties_If_SelectExactlyIs1()
+        {
+            // Arrange
+            _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new OptionsResponse
+                {
+                    Options = new List<Option>
+                    {
+                        new Option()
+                    },
+                    SelectExactly = 1
+                });
+
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    URL = "waste={{wasteId}}",
+                    AuthToken = "test",
+                    Provider = "fake"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            var result = await _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers());
+
+            // Assert
+            Assert.Equal("Select <b>1</b> option", result.Elements.FirstOrDefault().Properties.Hint);
+            Assert.Equal("Select 1 option", result.Elements.FirstOrDefault().Properties.CustomValidationMessage);
+            Assert.Equal(1, result.Elements.FirstOrDefault().Properties.SelectExactly);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldSetProperties_If_SelectExactlyIsMoreThan1()
+        {
+            // Arrange
+            _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new OptionsResponse
+                {
+                    Options = new List<Option>
+                    {
+                        new Option(),
+                        new Option()
+                    },
+                    SelectExactly = 2
+                });
+
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    URL = "waste={{wasteId}}",
+                    AuthToken = "test",
+                    Provider = "fake"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            var result = await _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers());
+
+            // Assert
+            Assert.Equal("Select <b>2</b> options", result.Elements.FirstOrDefault().Properties.Hint);
+            Assert.Equal("Select 2 options", result.Elements.FirstOrDefault().Properties.CustomValidationMessage);
+            Assert.Equal(2, result.Elements.FirstOrDefault().Properties.SelectExactly);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldThrowIfProviderReturnsLessOptionsThanTheSelectExactlyValue()
+        {
+            // Arrange
+            _fakeLookupProvider.Setup(_ => _.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new OptionsResponse
+                {
+                    Options = new List<Option>
+                    {
+                        new Option()
+                    },
+                    SelectExactly = 2
+                });
+
+            var element = new ElementBuilder()
+                .WithQuestionId("dynamicQuestion")
+                .WithLookup("dynamic")
+                .WithLookupSource(new LookupSource
+                {
+                    EnvironmentName = "local",
+                    URL = "waste={{wasteId}}",
+                    AuthToken = "test",
+                    Provider = "fake"
+                })
+                .WithType(EElementType.Checkbox)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act & Assert
+            var result = await Assert.ThrowsAsync<Exception>(() => _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers()));
+            Assert.Equal("DynamicLookupPageTransformFactory::AddDynamicOptions, There cannot be less options available than the SelectExactly value", result.Message);
         }
     }
 }

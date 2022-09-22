@@ -1,7 +1,7 @@
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
-using StockportGovUK.NetStandard.Models.Enums;
-using StockportGovUK.NetStandard.Models.Organisation;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
+using StockportGovUK.NetStandard.Gateways.Enums;
+using StockportGovUK.NetStandard.Gateways.Models.Organisation;
+using StockportGovUK.NetStandard.Gateways.Models.Verint.Lookup;
 
 namespace form_builder.Providers.Organisation
 {

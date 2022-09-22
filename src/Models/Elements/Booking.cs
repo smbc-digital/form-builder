@@ -7,7 +7,7 @@ using form_builder.Models.Booking;
 using form_builder.Models.Time;
 using form_builder.Utils.Extensions;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 
 namespace form_builder.Models.Elements
 {

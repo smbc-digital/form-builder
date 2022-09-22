@@ -5,8 +5,8 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Models.Elements;
-using StockportGovUK.NetStandard.Models.FileManagement;
-using File = StockportGovUK.NetStandard.Models.FileManagement.File;
+using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
+using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Mappers.Structure
 {
@@ -116,17 +116,17 @@ namespace form_builder.Mappers.Structure
 
                 case EElementType.Street:
                 case EElementType.Address:
-                    var address = new StockportGovUK.NetStandard.Models.Addresses.Address();
+                    var address = new StockportGovUK.NetStandard.Gateways.Models.Addresses.Address();
                     properties = address.GetType().GetProperties();
                     return GeneratePropertyDictionary(properties);
 
                 case EElementType.Organisation:
-                    var organisation = new StockportGovUK.NetStandard.Models.Verint.Organisation();
+                    var organisation = new StockportGovUK.NetStandard.Gateways.Models.Verint.Organisation();
                     properties = organisation.GetType().GetProperties();
                     return GeneratePropertyDictionary(properties);
 
                 case EElementType.Booking:
-                    var booking = new StockportGovUK.NetStandard.Models.Booking.Booking();
+                    var booking = new StockportGovUK.NetStandard.Gateways.Models.Booking.Booking();
                     properties = booking.GetType().GetProperties();
                     return GeneratePropertyDictionary(properties);
 

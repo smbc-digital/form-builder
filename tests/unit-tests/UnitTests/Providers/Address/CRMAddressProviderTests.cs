@@ -2,7 +2,7 @@
 using Moq;
 using StockportGovUK.NetStandard.Gateways.Response;
 using StockportGovUK.NetStandard.Gateways.VerintService;
-using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.Address

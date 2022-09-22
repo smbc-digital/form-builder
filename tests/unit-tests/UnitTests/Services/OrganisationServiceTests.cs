@@ -9,8 +9,8 @@ using form_builder.Services.OrganisationService;
 using form_builder_tests.Builders;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Enums;
-using StockportGovUK.NetStandard.Models.Organisation;
+using StockportGovUK.NetStandard.Gateways.Enums;
+using StockportGovUK.NetStandard.Gateways.Models.Organisation;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services

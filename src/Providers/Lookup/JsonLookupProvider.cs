@@ -1,6 +1,6 @@
-﻿using form_builder.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Providers.Lookup
 {
@@ -10,7 +10,7 @@ namespace form_builder.Providers.Lookup
         private readonly IGateway _gateway;
         public JsonLookupProvider(IGateway gateway) => _gateway = gateway;
 
-        public async Task<OptionsResult> GetAsync(string url, string authToken)
+        public async Task<OptionsResponse> GetAsync(string url, string authToken)
         {
             _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(authToken) ? string.Empty : authToken);
 
@@ -19,7 +19,7 @@ namespace form_builder.Providers.Lookup
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"JSONLookupProvider::GetAsync, Gateway returned with non success status code of {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
 
-            return JsonConvert.DeserializeObject<OptionsResult>(await response.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<OptionsResponse>(await response.Content.ReadAsStringAsync());
         }
     }
 }

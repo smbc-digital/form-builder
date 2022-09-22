@@ -1,10 +1,10 @@
-using form_builder.Models;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Providers.Lookup
 {
     public interface ILookupProvider
     {
         string ProviderName { get; }
-        Task<OptionsResult> GetAsync(string url, string authToken);
+        Task<OptionsResponse> GetAsync(string url, string authToken);
     }
 }

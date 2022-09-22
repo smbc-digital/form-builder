@@ -1,5 +1,5 @@
 using form_builder.Extensions;
-using StockportGovUK.NetStandard.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Extensions

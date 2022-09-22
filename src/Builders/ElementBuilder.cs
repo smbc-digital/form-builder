@@ -3,6 +3,7 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Builders
 {
@@ -168,6 +169,13 @@ namespace form_builder.Builders
         public ElementBuilder WithOptional(bool value)
         {
             _property.Optional = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithAllowSingleOption(bool value)
+        {
+            _property.AllowSingleOption = value;
 
             return this;
         }

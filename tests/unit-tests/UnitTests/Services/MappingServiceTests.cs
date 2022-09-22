@@ -15,10 +15,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.FileManagement;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
 using Xunit;
-using File = StockportGovUK.NetStandard.Models.FileManagement.File;
+using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder_tests.UnitTests.Services
 {

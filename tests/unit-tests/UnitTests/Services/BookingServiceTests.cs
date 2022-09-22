@@ -23,8 +23,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -339,7 +339,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BoookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse() }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse() }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
@@ -378,7 +378,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BoookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
+                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)

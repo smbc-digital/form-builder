@@ -1,5 +1,5 @@
 using StockportGovUK.NetStandard.Gateways.VerintService;
-using StockportGovUK.NetStandard.Models.Addresses;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 
 namespace form_builder.Providers.Street
 {

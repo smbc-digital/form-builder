@@ -1,11 +1,11 @@
-﻿using form_builder.Models;
+﻿using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Providers.Lookup
 {
     public class FakeLookupProvider : ILookupProvider
     {
         public string ProviderName { get => "Fake"; }
-        public async Task<OptionsResult> GetAsync(string url, string authToken)
+        public async Task<OptionsResponse> GetAsync(string url, string authToken)
         {
             if (url.Contains("waste", StringComparison.OrdinalIgnoreCase))
                 return await Waste();
@@ -13,7 +13,7 @@ namespace form_builder.Providers.Lookup
             return await Generic();
         }
 
-        private static async Task<OptionsResult> Waste()
+        private static async Task<OptionsResponse> Waste()
         {
             var options = new List<Option>{
                 new Option {
@@ -38,14 +38,14 @@ namespace form_builder.Providers.Lookup
                 }
             };
 
-            return await Task.FromResult(new OptionsResult
+            return await Task.FromResult(new OptionsResponse
             {
                 Options = options,
                 SelectExactly = 1
             });
         }
 
-        private static async Task<OptionsResult> Generic()
+        private static async Task<OptionsResponse> Generic()
         {
             var options = new List<Option>{
                 new Option {
@@ -70,7 +70,7 @@ namespace form_builder.Providers.Lookup
                 }
             };
 
-            return await Task.FromResult(new OptionsResult
+            return await Task.FromResult(new OptionsResponse
             {
                 Options = options,
                 SelectExactly = 1

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using form_builder.Models;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Factories.Transform.UserSchema
 {

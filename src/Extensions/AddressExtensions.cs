@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Civica.Pay.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
+using StockportGovUK.NetStandard.Gateways.Models.Civica.Pay.Request;
 
 namespace form_builder.Extensions
 {

@@ -7,7 +7,7 @@ using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
-using StockportGovUK.NetStandard.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
