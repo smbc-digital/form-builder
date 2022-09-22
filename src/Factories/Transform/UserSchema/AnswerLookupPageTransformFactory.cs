@@ -8,7 +8,6 @@ namespace form_builder.Factories.Transform.UserSchema
     {
         private static Page TransformPage(Page page, FormAnswers convertedAnswers)
         {
-            
             var elements = page.Elements
                 .Where(element => element.Lookup is not null &&
                        element.Lookup.StartsWith("#"));
