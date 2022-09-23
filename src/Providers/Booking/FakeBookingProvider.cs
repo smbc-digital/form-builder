@@ -1,7 +1,7 @@
 ﻿using form_builder.Builders;
 using form_builder.Exceptions;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 
 namespace form_builder.Providers.Booking
 {

@@ -1,16 +1,16 @@
-﻿using form_builder.Builders;
+﻿using System.Collections.Generic;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Validators;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators
 {
-    public class ExclusiveCheckboxValidatorTests
+    public class ExactNumberOptionsCheckboxValidatorTests
     {
 
-        private readonly ExclusiveCheckboxValidator _exclusiveCheckboxValidator = new ExclusiveCheckboxValidator();
+        private readonly SelectExactlyCheckboxValidator _numberRequiredCheckboxValidator = new SelectExactlyCheckboxValidator();
 
         [Theory]
         [InlineData(EElementType.DateInput)]
@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .Build();
 
             // Act
-            var result = _exclusiveCheckboxValidator.Validate(element, null, new form_builder.Models.FormSchema());
+            var result = _numberRequiredCheckboxValidator.Validate(element, null, new FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
@@ -43,90 +43,76 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _exclusiveCheckboxValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            var result = _numberRequiredCheckboxValidator.Validate(element, viewModel, new FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
         }
 
         [Fact]
-        public void Validate_ShouldReturnTrue_WhenSingleAnswerProvided()
+        public void Validate_ShouldReturnTrue_WhenExactNumberOptionsProvided()
         {
             // Arrange
             var questionId = "testElement";
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithQuestionId(questionId)
+                .WithSelectExactly(2)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(questionId, "testAnswer");
+            viewModel.Add(questionId, "testAnswer1,testanswer2");
 
             // Act
-            var result = _exclusiveCheckboxValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            var result = _numberRequiredCheckboxValidator.Validate(element, viewModel, new FormSchema());
 
             // Assert
             Assert.True(result.IsValid);
         }
 
+
         [Fact]
-        public void Validate_ShouldReturnTrue_WhenExclusiveOptionNotProvided()
+        public void Validate_ShouldReturnFalse_WhenLessThanTheExactNumberOptionsAreChecked()
         {
             // Arrange
-            var questionId = "testElement";
-            var options = new List<Option>();
 
-            options.Add(new Option());
+            var questionId = "testElement";
             var element = new ElementBuilder()
                 .WithType(EElementType.Checkbox)
                 .WithQuestionId(questionId)
-                .WithOptions(options)
+                .WithSelectExactly(2)
                 .Build();
 
             var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(questionId, "testAnswer, testAnswerTwo");
+            viewModel.Add(questionId, "testAnswer1");
 
             // Act
-            var result = _exclusiveCheckboxValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            // Assert
-            Assert.True(result.IsValid);
-        }
-
-        [Fact]
-        public void Validate_ShouldReturnFalse_WhenExclusiveAndNonExclusiveOptionIsChecked()
-        {
-            // Arrange
-            var questionId = "testElement";
-            var options = new List<Option>();
-
-            var option1 = new Option();
-            option1.Value = "Option1";
-            option1.Exclusive = true;
-            option1.Checked = true;
-
-            var option2 = new Option();
-            option2.Value = "Option2";
-            option2.Checked = true;
-
-            options.Add(option1);
-            options.Add(option2);
-            var element = new ElementBuilder()
-                .WithType(EElementType.Checkbox)
-                .WithQuestionId(questionId)
-                .WithOptions(options)
-                .WithExclusiveCheckboxValidationMessage("ErrorMessage")
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add(questionId, "Option1, Option2");
-
-            // Act
-            var result = _exclusiveCheckboxValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+            var result = _numberRequiredCheckboxValidator.Validate(element, viewModel, new FormSchema());
 
             // Assert
             Assert.False(result.IsValid);
-            Assert.Equal("ErrorMessage", result.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturnFalse_WhenMoreThanTheExactNumberOptionsAreChecked()
+        {
+            // Arrange
+
+            var questionId = "testElement";
+            var element = new ElementBuilder()
+                .WithType(EElementType.Checkbox)
+                .WithQuestionId(questionId)
+                .WithSelectExactly(2)
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>();
+            viewModel.Add(questionId, "testAnswer1,testAnswer2,testAnswer3");
+
+            // Act
+            var result = _numberRequiredCheckboxValidator.Validate(element, viewModel, new FormSchema());
+
+            // Assert
+            Assert.False(result.IsValid);
         }
     }
 }

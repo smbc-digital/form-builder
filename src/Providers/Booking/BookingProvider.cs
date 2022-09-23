@@ -2,8 +2,8 @@
 using form_builder.Exceptions;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.BookingService;
-using StockportGovUK.NetStandard.Models.Booking.Request;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 
 namespace form_builder.Providers.Booking
 {

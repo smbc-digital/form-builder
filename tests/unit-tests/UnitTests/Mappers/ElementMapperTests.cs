@@ -9,11 +9,12 @@ using form_builder.Utils.Hash;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Models.Addresses;
-using StockportGovUK.NetStandard.Models.Booking;
-using StockportGovUK.NetStandard.Models.FileManagement;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
+using StockportGovUK.NetStandard.Gateways.Models.Booking;
+using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
-using File = StockportGovUK.NetStandard.Models.FileManagement.File;
+using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder_tests.UnitTests.Mappers
 {
@@ -702,7 +703,7 @@ namespace form_builder_tests.UnitTests.Mappers
             var result = await _elementMapper.GetAnswerValue(element, formAnswers);
 
             // Assert
-            var type = Assert.IsType<StockportGovUK.NetStandard.Models.Verint.Organisation>(result);
+            var type = Assert.IsType<StockportGovUK.NetStandard.Gateways.Models.Verint.Organisation>(result);
             Assert.Equal("0101010101", type.Reference);
             Assert.Equal("im an organisation", type.Name);
         }

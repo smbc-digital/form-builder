@@ -98,8 +98,14 @@ namespace form_builder.Helpers.ElementHelpers
 
         public bool CheckForRadioOptions(Element element)
         {
-            if (element.Properties.Options is null || element.Properties.Options.Count <= 1)
+            if (element.Properties.Options is null)
+                throw new Exception("A radio element requires options to be present.");
+
+            if (!element.Properties.AllowSingleOption && element.Properties.Options.Count < 2)
                 throw new Exception("A radio element requires two or more options to be present.");
+
+            if (element.Properties.AllowSingleOption && element.Properties.Options.Count < 1)
+                throw new Exception("A radio element requires one or more options to be present.");
 
             return true;
         }

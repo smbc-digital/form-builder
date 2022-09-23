@@ -12,7 +12,7 @@ using form_builder.TagParsers;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Models.FormBuilder;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Services.PayService
 {

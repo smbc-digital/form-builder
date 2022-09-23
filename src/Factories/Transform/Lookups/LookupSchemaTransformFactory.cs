@@ -2,6 +2,7 @@
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.Transforms.Lookups;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Factories.Transform.Lookups
 {

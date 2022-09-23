@@ -1,5 +1,5 @@
 using form_builder.Enum;
-using StockportGovUK.NetStandard.Models.Booking.Response;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 
 namespace form_builder.ViewModels
 {

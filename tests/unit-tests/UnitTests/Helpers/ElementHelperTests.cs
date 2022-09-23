@@ -11,6 +11,7 @@ using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Helpers
@@ -354,6 +355,40 @@ namespace form_builder_tests.UnitTests.Helpers
 
             // Act & Assert
             Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
+        }
+
+        [Fact]
+        public void CheckForRadioOptions_ShouldThrowException_IfOneOption_And_AllowSingleOptionFalse()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("questionId")
+                .WithLabel("Label")
+                .WithOptions(new List<Option> { new Option() })
+                .Build();
+
+            // Act & Assert
+            Assert.Throws<Exception>(() => _elementHelper.CheckForRadioOptions(element));
+        }
+
+        [Fact]
+        public void CheckForRadioOptions_ShouldReturnTrue_IfOneOption_And_AllowSingleOptionTrue()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("questionId")
+                .WithLabel("Label")
+                .WithOptions(new List<Option> { new Option() })
+                .WithAllowSingleOption(true)
+                .Build();
+
+            // Act
+            var result = _elementHelper.CheckForRadioOptions(element);
+
+            // Assert
+            Assert.True(result);
         }
 
         [Theory]

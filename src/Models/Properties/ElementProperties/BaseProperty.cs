@@ -1,3 +1,5 @@
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
+
 namespace form_builder.Models.Properties.ElementProperties
 {
     public partial class BaseProperty

@@ -5,7 +5,7 @@ using form_builder.Helpers.ElementHelpers;
 using form_builder.Helpers.ViewRender;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Linq;
-using StockportGovUK.NetStandard.Models.Verint.Lookup;
+using StockportGovUK.NetStandard.Gateways.Models.Verint.Lookup;
 
 namespace form_builder.Models.Elements
 {

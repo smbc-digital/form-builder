@@ -6,6 +6,7 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Models.Elements
