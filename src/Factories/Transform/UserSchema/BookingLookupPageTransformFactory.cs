@@ -33,14 +33,14 @@ public class BookingLookupPageTransformFactory : IUserPageTransformFactory
             foreach (var element in page.Elements.Where(_ => _.Type.Equals(EElementType.Booking) &&
                          !string.IsNullOrEmpty(_.Lookup) && _.Lookup.Equals(LookUpConstants.Dynamic)))
             {
-                await AddDynamicOptions(element, convertedAnswers);
+                await AddDynamicAppointmentTypes(element, convertedAnswers);
             }
         }
 
         return page;
     }
 
-    private async Task AddDynamicOptions(IElement element, FormAnswers convertedAnswers)
+    private async Task AddDynamicAppointmentTypes(IElement element, FormAnswers convertedAnswers)
     {
         LookupSource submitDetails = element.Properties.LookupSources
             .SingleOrDefault(x => x.EnvironmentName
@@ -48,21 +48,21 @@ public class BookingLookupPageTransformFactory : IUserPageTransformFactory
 
         if (submitDetails is null)
             throw new Exception(
-                "BookingLookupPageTransformFactory::AddDynamicOptions, No Environment specific details found");
+                $"{nameof(BookingLookupPageTransformFactory)}::{nameof(AddDynamicAppointmentTypes)}: No LookUpSource found for environment");
 
         RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, convertedAnswers);
 
         if (string.IsNullOrEmpty(submitDetails.Provider))
             throw new Exception(
-                "BookingLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources");
+                $"{nameof(BookingLookupPageTransformFactory)}::{nameof(AddDynamicAppointmentTypes)}: No Provider name given in LookupSources");
 
         var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
         List<AppointmentType> lookupAppointmentResult = await lookupProvider.GetAppointmentTypesAsync(request.Url, submitDetails.AuthToken);
 
         if (!lookupAppointmentResult.Any())
             throw new Exception(
-                "BookingLookupPageTransformFactory::AddDynamicOptions, Provider returned no options");
+                $"{nameof(BookingLookupPageTransformFactory)}::{nameof(AddDynamicAppointmentTypes)}: Provider returned no AppointmentTypes");
 
-        element.Properties.AppointmentTypes.AddRange(lookupAppointmentResult);
+        element.Properties.AppointmentTypes = lookupAppointmentResult;
     }
 }

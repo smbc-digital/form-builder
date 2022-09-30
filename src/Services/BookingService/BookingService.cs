@@ -191,10 +191,10 @@ namespace form_builder.Services.BookingService
             var appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
-            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-
             if (appointmentType.NeedsAppointmentIdMapping)
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+
+            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .GetAvailability(new AvailabilityRequest
@@ -316,7 +316,12 @@ namespace form_builder.Services.BookingService
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{element.Properties.AppointmentTypes.FirstOrDefault(_ => _.Environment.Equals(_environment.EnvironmentName)).AppointmentId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"].ToString());
+                var appointmentType = element.Properties.AppointmentTypes
+                    .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
+                var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
+                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingInformationCacheKey}"].ToString());
                 var bookingInformation = new List<object> { cachedBookingInformation };
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, bookingInformation);
 
