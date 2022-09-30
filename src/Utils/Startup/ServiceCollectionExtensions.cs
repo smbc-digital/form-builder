@@ -424,6 +424,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IUserPageTransformFactory, AnswerLookupPageTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, OptionalIfTransformFactory>();
             services.AddTransient<IUserPageTransformFactory, BehaviourConditionsPageTransformFactory>();
+            services.AddTransient<IUserPageTransformFactory, BookingLookupPageTransformFactory>();
 
             return services;
         }
