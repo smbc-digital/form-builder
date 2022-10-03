@@ -7,7 +7,6 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Providers.Lookup;
 using form_builder.Services.RetrieveExternalDataService.Entities;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Factories.Transform.UserSchema;
 

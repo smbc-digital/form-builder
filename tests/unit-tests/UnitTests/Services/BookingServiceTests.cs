@@ -408,6 +408,69 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
+        public async Task ProcessMonthRequest_Should_CallSchemaFactory_TransformPage()
+        {
+            // Arrange
+            var questionId = "bookingQuestion";
+            var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
+            string sessionGuid = "session";
+            var bookingCacheKey = $"{appointmentId}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
+
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = new() });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
+            BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
+            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers
+                {
+                    FormData = new Dictionary<string, object> { { bookingCacheKey, cachedBookingInfo } }
+                }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider(bookingProvider)
+                .WithQuestionId(questionId)
+                .WithAppointmentType(new AppointmentType
+                {
+                    Environment = environmentName,
+                    AppointmentId = appointmentId
+                })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("path")
+                .Build();
+
+            var formSchema = new FormSchemaBuilder()
+                .WithBaseUrl("form")
+                .WithPage(page)
+                .Build();
+
+            _schemaFactory.Setup(_ => _.Build("form"))
+                .ReturnsAsync(formSchema);
+
+            Dictionary<string, object> viewModel = new()
+            {
+                {
+                    BookingConstants.BOOKING_MONTH_REQUEST,
+                    DateTime.UtcNow
+                }
+            };
+
+            // Act
+            await _service.ProcessMonthRequest(viewModel, "form", "path");
+
+            // Assert
+            _schemaFactory.Verify(_ => _.TransformPage(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
+
+        [Fact]
         public async Task ProcessMonthRequest_Should_CallMapAppointmentId_WhenAppointmentType_HasAppointmentIdKey()
         {
             // Arrange
