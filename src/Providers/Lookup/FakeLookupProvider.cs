@@ -1,4 +1,6 @@
-﻿using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
+﻿using form_builder.Models;
+using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 
 namespace form_builder.Providers.Lookup
 {
@@ -11,6 +13,26 @@ namespace form_builder.Providers.Lookup
                 return await Waste();
 
             return await Generic();
+        }
+
+        public async Task<List<AppointmentType>> GetAppointmentTypesAsync(string url, string authToken)
+        {
+            return await Task.FromResult(new List<AppointmentType>
+            {
+                new()
+                {
+                    Environment = "local",
+                    AppointmentId = new Guid("6ab97a7b-0ef7-4e4e-958f-937f98d3c2be"),
+                    OptionalResources = new List<BookingResource>
+                    {
+                        new()
+                        {
+                            ResourceId = new Guid("a4cff58b-096f-4275-8197-35d9d8192aad"),
+                            Quantity = 1
+                        }
+                    }
+                }
+            });
         }
 
         private static async Task<OptionsResponse> Waste()
