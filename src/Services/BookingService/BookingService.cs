@@ -72,10 +72,10 @@ namespace form_builder.Services.BookingService
 
             List<AvailabilityDayResponse> appointmentTimes = new();
 
-            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-
             var appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
+            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
             FormAnswers convertedAnswers = new();
@@ -156,6 +156,19 @@ namespace form_builder.Services.BookingService
             if (currentPage is null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
+            var guid = _sessionHelper.GetSessionGuid();
+
+            if (string.IsNullOrEmpty(guid))
+                throw new ApplicationException("BookingService::ProcessMonthRequest Session has expired");
+            var cachedAnswers = _distributedCache.GetString(guid);
+
+            if (cachedAnswers is null)
+                throw new ApplicationException("BookingService::ProcessMonthRequest, Session data is null");
+
+            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
+
+            await _schemaFactory.TransformPage(currentPage, convertedAnswers);
+
             if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
                 throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
 
@@ -175,24 +188,13 @@ namespace form_builder.Services.BookingService
             if (requestedMonth < currentDate)
                 throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
-            var guid = _sessionHelper.GetSessionGuid();
-
-            if (string.IsNullOrEmpty(guid))
-                throw new ApplicationException("BookingService::ProcessMonthRequest Session has expired");
-
-            var cachedAnswers = _distributedCache.GetString(guid);
-
-            if (cachedAnswers is null)
-                throw new ApplicationException("BookingService::ProcessMonthRequest, Session data is null");
-
-            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
-            var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
-
             var appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
             if (appointmentType.NeedsAppointmentIdMapping)
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+
+            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .GetAvailability(new AvailabilityRequest
@@ -314,7 +316,12 @@ namespace form_builder.Services.BookingService
                     ? new FormAnswers { Pages = new List<PageAnswers>() }
                     : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{element.Properties.QuestionId}{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}"].ToString());
+                var appointmentType = element.Properties.AppointmentTypes
+                    .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+
+                var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
+                var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingInformationCacheKey}"].ToString());
                 var bookingInformation = new List<object> { cachedBookingInformation };
                 var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, null, bookingInformation);
 

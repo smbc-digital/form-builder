@@ -1,4 +1,5 @@
 ﻿using form_builder.Constants;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Models;
@@ -29,7 +30,8 @@ namespace form_builder.Factories.Transform.UserSchema
         {
             if (page.HasDynamicLookupElements)
             {
-                foreach (var element in page.Elements.Where(_ => !string.IsNullOrEmpty(_.Lookup) && _.Lookup.Equals(LookUpConstants.Dynamic)))
+                foreach (var element in page.Elements.Where(_ => (_.Type.Equals(EElementType.Radio) || _.Type.Equals(EElementType.Checkbox) || _.Type.Equals(EElementType.Select)) &&
+                             !string.IsNullOrEmpty(_.Lookup) && _.Lookup.Equals(LookUpConstants.Dynamic)))
                 {
                     await AddDynamicOptions(element, convertedAnswers);
                 }
