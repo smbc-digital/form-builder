@@ -98,7 +98,6 @@ namespace form_builder.Services.SubmitService
 
         private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string sessionGuid, string reference)
         {
-            var json = JsonConvert.SerializeObject(mappingEntity.Data);
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
