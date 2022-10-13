@@ -25,6 +25,9 @@ namespace form_builder.Validators.IntegrityChecks.Elements
                     $"Booking element '{element.Properties.QuestionId}' requires a valid booking provider property.");
             }
 
+            if (element.Lookup is "dynamic")
+                return result;
+
             AppointmentType appointmentTypeForEnv = element.Properties.AppointmentTypes
                 .FirstOrDefault(appointmentType => appointmentType.Environment
                 .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
