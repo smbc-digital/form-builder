@@ -246,7 +246,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var result = await _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers());
 
             // Assert
-            Assert.Equal("Select <b>1</b> option", result.Elements.FirstOrDefault().Properties.Hint);
+            Assert.Equal("Select <b>1</b> option.", result.Elements.FirstOrDefault().Properties.Hint);
             Assert.Equal("Select 1 option", result.Elements.FirstOrDefault().Properties.CustomValidationMessage);
             Assert.Equal(1, result.Elements.FirstOrDefault().Properties.SelectExactly);
         }
@@ -287,7 +287,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             var result = await _dynamicLookupPageTransformFactory.Transform(page, new FormAnswers());
 
             // Assert
-            Assert.Equal("Select <b>2</b> options", result.Elements.FirstOrDefault().Properties.Hint);
+            Assert.Equal("Select <b>2</b> options.", result.Elements.FirstOrDefault().Properties.Hint);
             Assert.Equal("Select 2 options", result.Elements.FirstOrDefault().Properties.CustomValidationMessage);
             Assert.Equal(2, result.Elements.FirstOrDefault().Properties.SelectExactly);
         }
