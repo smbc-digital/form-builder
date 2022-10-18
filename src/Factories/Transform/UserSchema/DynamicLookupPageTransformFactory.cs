@@ -70,12 +70,12 @@ namespace form_builder.Factories.Transform.UserSchema
 
             if (lookupOptionsResult.SelectExactly > 1)
             {
-                element.Properties.Hint = $"Select <b>{lookupOptionsResult.SelectExactly}</b> options";
+                element.Properties.Hint = $"Select <b>{lookupOptionsResult.SelectExactly}</b> options.";
                 element.Properties.CustomValidationMessage = $"Select {lookupOptionsResult.SelectExactly} options";
             }
             else if (lookupOptionsResult.SelectExactly is 1)
             {
-                element.Properties.Hint = $"Select <b>{lookupOptionsResult.SelectExactly}</b> option";
+                element.Properties.Hint = $"Select <b>{lookupOptionsResult.SelectExactly}</b> option.";
                 element.Properties.CustomValidationMessage = $"Select {lookupOptionsResult.SelectExactly} option";
             }
         }
