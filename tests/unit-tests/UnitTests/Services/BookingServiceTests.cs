@@ -171,7 +171,7 @@ namespace form_builder_tests.UnitTests.Services
                     FormData = new Dictionary<string, object>
                     {
                         {
-                            $"{appointmentId}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo
+                            $"bookingQuestion:{appointmentId}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", cachedBookingInfo
                         }
                     }
                 }));
@@ -204,7 +204,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             var guid = Guid.NewGuid();
             var date = DateTime.Today.AddDays(-2);
-            var bookingCacheKey = $"{guid}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingCacheKey = $"bookingQuestion:{guid}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
                 .ReturnsAsync(new AvailabilityDayResponse { Date = date });
@@ -239,7 +239,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.Is<string>(_ => _.Equals(bookingCacheKey)), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -250,7 +250,7 @@ namespace form_builder_tests.UnitTests.Services
             var date = DateTime.Today.AddDays(-2);
             var bookingResourceId = Guid.NewGuid();
             var bookingResourceQuantity = 3;
-            var bookingCacheKey = $"{guid}:-3{bookingResourceId}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingCacheKey = $"bookingQuestion:{guid}:-3{bookingResourceId}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
                 .ReturnsAsync(new AvailabilityDayResponse { Date = date });
@@ -291,7 +291,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}-{bookingResourceQuantity}{bookingResourceId}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}-{bookingResourceQuantity}{bookingResourceId}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.Is<string>(_ => _.Equals(bookingCacheKey)), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -323,7 +323,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.True(result.BookingHasNoAvailableAppointments);
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Never);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.BookingNoAppointmentsAvailable)), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.BookingNoAppointmentsAvailable)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -332,7 +332,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Get_Should_NotCall_NextAvailability_OnBookingProvider_WhenBookingInformationIs_InCache()
         {
             var guid = Guid.NewGuid();
-            var bookingCacheKey = $"{guid}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingCacheKey = $"bookingQuestion:{guid}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
                 .ReturnsAsync(new AvailabilityDayResponse());
@@ -343,7 +343,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}"))))
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse() }));
 
             var element = new ElementBuilder()
@@ -363,7 +363,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.False(result.BookingHasNoAvailableAppointments);
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Never);
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Never);
+            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Never);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.Is<string>(_ => _.Equals(bookingCacheKey)), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -382,7 +382,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-{guid}"))))
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}"))))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
 
             var element = new ElementBuilder()
@@ -414,7 +414,7 @@ namespace form_builder_tests.UnitTests.Services
             var questionId = "bookingQuestion";
             var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
             string sessionGuid = "session";
-            var bookingCacheKey = $"{appointmentId}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingCacheKey = $"{questionId}:{appointmentId}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
 
@@ -477,7 +477,7 @@ namespace form_builder_tests.UnitTests.Services
             var questionId = "bookingQuestion";
             var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
             string sessionGuid = "session";
-            var bookingCacheKey = $"{Guid.Empty}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingCacheKey = $"bookingQuestion:{Guid.Empty}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
 
@@ -650,7 +650,7 @@ namespace form_builder_tests.UnitTests.Services
             var questionId = "bookingQuestion";
             var appointmentId = new Guid("022ebc92-1c51-4a68-a079-f6edefc63a07");
             string sessionGuid = "session";
-            var bookingCacheKey = $"{appointmentId}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingCacheKey = $"{questionId}:{appointmentId}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(sessionGuid);
 
@@ -872,7 +872,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            var bookingInformationCacheKey = $"{guid}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingInformationCacheKey = $"bookingQuestion:{guid}::{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
