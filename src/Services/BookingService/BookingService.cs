@@ -282,8 +282,10 @@ namespace form_builder.Services.BookingService
             if (bookingNextAvailabilityCachedResponse is not null)
                 return JsonConvert.DeserializeObject<BookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
 
-            var startDate = !string.IsNullOrEmpty(bookingElement.Properties.LimitNextAvailableFromDate) &&
-                            bookingElement.Properties.LimitNextAvailableByDays > 0
+            var hasLimitProperties = !string.IsNullOrEmpty(bookingElement.Properties.LimitNextAvailableFromDate) &&
+                                     bookingElement.Properties.LimitNextAvailableByDays > 0;
+
+            var startDate = hasLimitProperties
                 ? DateTime.Parse(bookingElement.Properties.LimitNextAvailableFromDate).AddDays(bookingElement.Properties.LimitNextAvailableByDays)
                 : DateTime.Now;
 
