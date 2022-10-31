@@ -162,6 +162,42 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
+        public async Task Parse_ShouldReturnUpdatedValueForLimitNextAvailableFromDate_WhenReplacingSingleValue()
+        {
+            var expectedString = "01-01-2022";
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithLimitNextAvailableFromDate("{{QUESTION:date}}")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "date",
+                                Response = "01-01-2022"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = await _tagParser.Parse(page, formAnswers);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.LimitNextAvailableFromDate);
+        }
+
+        [Fact]
         public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
         {
             var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
