@@ -15,6 +15,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
+using form_builder.TagParsers;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Microsoft.Extensions.Options;
@@ -75,7 +76,7 @@ namespace form_builder.Services.BookingService
             var appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
-            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
             FormAnswers convertedAnswers = new();
@@ -194,7 +195,7 @@ namespace form_builder.Services.BookingService
             if (appointmentType.NeedsAppointmentIdMapping)
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
-            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .GetAvailability(new AvailabilityRequest
@@ -276,10 +277,17 @@ namespace form_builder.Services.BookingService
 
         private async Task<BookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider, AppointmentType appointmentType)
         {
-            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
+            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.QuestionId}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
             if (bookingNextAvailabilityCachedResponse is not null)
                 return JsonConvert.DeserializeObject<BookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
+
+            var hasLimitProperties = !string.IsNullOrEmpty(bookingElement.Properties.LimitNextAvailableFromDate) &&
+                                     bookingElement.Properties.LimitNextAvailableByDays > 0;
+
+            var startDate = hasLimitProperties
+                ? DateTime.Parse(bookingElement.Properties.LimitNextAvailableFromDate).AddDays(bookingElement.Properties.LimitNextAvailableByDays)
+                : DateTime.Now;
 
             AvailabilityDayResponse nextAvailability;
             BookingNextAvailabilityEntity result;
@@ -288,8 +296,8 @@ namespace form_builder.Services.BookingService
                 nextAvailability = await bookingProvider
                     .NextAvailability(new AvailabilityRequest
                     {
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
+                        StartDate = startDate,
+                        EndDate = startDate.AddMonths(bookingElement.Properties.SearchPeriod),
                         AppointmentId = appointmentType.AppointmentId,
                         OptionalResources = appointmentType.OptionalResources
                     });

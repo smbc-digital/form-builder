@@ -238,6 +238,20 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithLimitNextAvailableByDays(int value)
+        {
+            _property.LimitNextAvailableByDays = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithLimitNextAvailableFromDate(string value)
+        {
+            _property.LimitNextAvailableFromDate = value;
+
+            return this;
+        }
+
         public ElementBuilder WithNumeric(bool value)
         {
             _property.Numeric = value;

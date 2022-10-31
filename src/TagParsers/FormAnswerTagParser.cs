@@ -22,6 +22,9 @@ namespace form_builder.TagParsers
                 if (!string.IsNullOrEmpty(element.Properties?.Hint))
                     element.Properties.Hint = Parse(element.Properties.Hint, answersDictionary, Regex);
 
+                if (!string.IsNullOrEmpty(element.Properties?.LimitNextAvailableFromDate))
+                    element.Properties.LimitNextAvailableFromDate = Parse(element.Properties.LimitNextAvailableFromDate, answersDictionary, Regex);
+
                 return element;
             }).ToList();
 
