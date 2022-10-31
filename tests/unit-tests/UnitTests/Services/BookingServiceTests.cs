@@ -200,7 +200,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Get_Should_Call_NextAvailability_And_GetAvailability_OnBookingProvdier_WhenDataNotInCache_And_SaveInCacheForFutureUse()
+        public async Task Get_Should_Call_NextAvailability_And_GetAvailability_OnBookingProvider_WhenDataNotInCache_And_SaveInCacheForFutureUse()
         {
             var guid = Guid.NewGuid();
             var date = DateTime.Today.AddDays(-2);
@@ -241,6 +241,39 @@ namespace form_builder_tests.UnitTests.Services
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.Is<string>(_ => _.Equals(bookingCacheKey)), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Get_Should_Call_NextAvailability_WithAdjustedStartDate_IfPropertiesProvided()
+        {
+            var guid = Guid.NewGuid();
+            var expectedStartDate = new DateTime(2022, 01, 11);
+
+            _bookingProvider.Setup(_ => _.NextAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new AvailabilityDayResponse { Date = expectedStartDate });
+
+            _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
+                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+
+            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithBookingProvider("testBookingProvider")
+                .WithQuestionId("bookingQuestion")
+                .WithLimitNextAvailableByDays(10)
+                .WithLimitNextAvailableFromDate("01-01-2022")
+                .WithAppointmentType(new AppointmentType { AppointmentId = guid, Environment = environmentName })
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            await _service.Get("form", page, "guid");
+
+            _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.StartDate.Equals(expectedStartDate))), Times.Once);
         }
 
         [Fact]
@@ -326,7 +359,6 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.BookingNoAppointmentsAvailable)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
-
 
         [Fact]
         public async Task Get_Should_NotCall_NextAvailability_OnBookingProvider_WhenBookingInformationIs_InCache()
