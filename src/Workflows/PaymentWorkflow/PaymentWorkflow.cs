@@ -27,6 +27,8 @@ namespace form_builder.Workflows.PaymentWorkflow
             if (string.IsNullOrEmpty(sessionGuid))
                 throw new ApplicationException("A Session GUID was not provided.");
 
+            await _submitService.PreProcessSubmission(form, sessionGuid);
+
             var data = await _mappingService.Map(sessionGuid, form);
             var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
 
