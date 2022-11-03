@@ -16,6 +16,8 @@ namespace form_builder.Models
 
         public string FirstPageSlug { get; set; }
 
+        public bool Embeddable { get; set; }
+
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
