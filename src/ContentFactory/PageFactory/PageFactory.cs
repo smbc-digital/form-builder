@@ -56,6 +56,7 @@ namespace form_builder.ContentFactory.PageFactory
             result.BreadCrumbs = baseForm.BreadCrumbs;
             result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
             result.StartPageUrl = baseForm.StartPageUrl;
+            result.Embeddable = baseForm.Embeddable;
             result.IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX);
             return result;
         }
