@@ -18,8 +18,6 @@ namespace form_builder.Models
         
         public bool Embeddable { get; set; }
 
-        public bool Embeddable { get; set; }
-
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }
