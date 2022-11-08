@@ -229,7 +229,7 @@ namespace form_builder.Utils.Startup
                     policy.WithOrigins("https://int-iag-stockportgov.smbcdigital.net/",
                                         "https://qa-iag-stockportgov.smbcdigital.net/",
                                         "https://stage-iag-stockportgov.smbcdigital.net/",
-                                        "https://stage-iag-stockportgov.smbcdigital.net/");
+                                        "https://www.stockport.gov.uk/");
                 });
             });
 
