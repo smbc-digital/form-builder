@@ -3,7 +3,7 @@
     public class HeaderConfiguration
     {
         private readonly RequestDelegate _next;
-        public IWebHostEnvironment _env { get; }
+        private IWebHostEnvironment _env { get; }
 
         public HeaderConfiguration(RequestDelegate next, IWebHostEnvironment env)
         {
