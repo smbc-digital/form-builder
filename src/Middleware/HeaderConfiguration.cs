@@ -16,7 +16,7 @@
         {
             var headers = context.Response.Headers;
 
-            var testUrls = !_env.IsEnvironment("stage") || !_env.IsEnvironment("prod") ? "http://localhost:* https://localhost:*" : "";
+            var testUrls = !_env.IsEnvironment("stage") || !_env.IsEnvironment("prod") ? "http://localhost https://localhost" : "";
 
             var queryString = context.Request.QueryString.ToString();
             
