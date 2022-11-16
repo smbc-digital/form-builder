@@ -1,8 +1,12 @@
 ﻿@{
     var currentYear = DateTime.Now.Year;
+    
+    var embeddable = Model is null 
+        ? false 
+        : Model.Embeddable;
 }
 
-@if(!Model.Embeddable)
+@if(!embeddable)
 {
     <footer class="smbc-footer">
         <div class="govuk-width-container">

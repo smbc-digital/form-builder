@@ -6,9 +6,13 @@
     var startPageUrl = string.IsNullOrWhiteSpace(Model?.StartPageUrl) 
         ? string.Empty 
         : Model.StartPageUrl;
+    
+    var embeddable = Model is null 
+        ? false 
+        : Model.Embeddable;
 }
 
-@if(!Model.Embeddable)
+@if(!embeddable)
 {
     <header class="smbc-header" role="banner" data-module="govuk-header">
         <div class="smbc-header__container govuk-width-container">
