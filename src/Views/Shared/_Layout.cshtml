@@ -7,10 +7,11 @@
     var displayBreadcrumbs = (bool)ViewData["DisplayBreadcrumbs"];
     var breadcrumbs = ViewData["Breadcrumbs"];
     var displayPreviewModeBanner = (bool)ViewData["PreviewMode"];
+    var embeddable = (bool)ViewData["Embeddable"] == true ? "embeddable" : String.Empty;
 }
 
 <!doctype html>
-<html lang="en" class="govuk-template flexbox no-flexboxtweener">
+<html lang="en" class="govuk-template @embeddable flexbox no-flexboxtweener">
 
 <head>
     <meta charset="utf-8" />
@@ -66,7 +67,7 @@
 
         <main class="govuk-main-wrapper " id="main-content">
             <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
+                <div class="govuk-grid-column-two-thirds @embeddable">
                     @RenderBody()
                 </div>
             </div>
