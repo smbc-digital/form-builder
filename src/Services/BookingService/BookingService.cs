@@ -38,6 +38,7 @@ namespace form_builder.Services.BookingService
         private readonly IHashUtil _hashUtil;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEnumerable<ITagParser> _tagParsers;
 
         public BookingService(
             IDistributedCacheWrapper distributedCache,
@@ -50,7 +51,8 @@ namespace form_builder.Services.BookingService
             ISessionHelper sessionHelper,
             IHashUtil hashUtil,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IEnumerable<ITagParser> tagParsers)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
@@ -63,6 +65,7 @@ namespace form_builder.Services.BookingService
             _hashUtil = hashUtil;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _httpContextAccessor = httpContextAccessor;
+            _tagParsers = tagParsers;
         }
 
         public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string sessionGuid)
@@ -172,6 +175,10 @@ namespace form_builder.Services.BookingService
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             await _schemaFactory.TransformPage(currentPage, convertedAnswers);
+            foreach (var tagParser in _tagParsers)
+            {
+                await tagParser.Parse(currentPage, convertedAnswers);
+            }
 
             if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
                 throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
