@@ -17,6 +17,7 @@ using form_builder.Services.BookingService;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
+using form_builder.TagParsers;
 using form_builder.Utils.Hash;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
@@ -47,6 +48,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISessionHelper> _sessionHelper = new();
         private readonly Mock<IHashUtil> _hashUtil = new();
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
+        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
+        private readonly Mock<ITagParser> _tagParser = new();
 
         const string environmentName = "local";
         const string bookingProvider = "testBookingProvider";
@@ -66,6 +69,11 @@ namespace form_builder_tests.UnitTests.Services
                 _bookingProvider.Object
             };
 
+            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+                .ReturnsAsync(new Page());
+            var tagParserItems = new List<ITagParser> { _tagParser.Object };
+            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
+
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns(environmentName);
 
             _service = new BookingService(
@@ -79,7 +87,8 @@ namespace form_builder_tests.UnitTests.Services
               _sessionHelper.Object,
               _hashUtil.Object,
               _mockDistributedCacheExpirationConfiguration.Object,
-              _mockHttpContextAccessor.Object);
+              _mockHttpContextAccessor.Object,
+              _mockTagParsers.Object);
         }
 
         [Fact]
