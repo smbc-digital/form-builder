@@ -8,13 +8,10 @@
     var breadcrumbs = ViewData["Breadcrumbs"];
     var displayPreviewModeBanner = (bool)ViewData["PreviewMode"];
     var embeddable = (bool)ViewData["Embeddable"] == true ? "smbc-embeddable" : String.Empty;
-
-    var embeddableHtml = (bool)ViewData["Embeddable"] == true ? "style=background-color:white;overflow-y:auto" : String.Empty;
-    var embeddableColumn = (bool)ViewData["Embeddable"] == true ? "style=padding:0" : String.Empty;
 }
 
 <!doctype html>
-<html lang="en" @embeddableHtml class="govuk-template flexbox no-flexboxtweener">
+<html lang="en" class="govuk-template @embeddable flexbox no-flexboxtweener">
 
 <head>
     <meta charset="utf-8" />
@@ -70,7 +67,7 @@
 
         <main class="govuk-main-wrapper " id="main-content">
             <div class="govuk-grid-row">
-                <div @embeddableColumn class="govuk-grid-column-two-thirds">
+                <div class="govuk-grid-column-two-thirds @embeddable">
                     @RenderBody()
                 </div>
             </div>
