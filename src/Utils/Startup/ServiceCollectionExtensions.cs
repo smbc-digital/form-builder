@@ -17,6 +17,7 @@ using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Cookie;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
@@ -43,6 +44,7 @@ using form_builder.Providers.Street;
 using form_builder.Providers.Submit;
 using form_builder.Providers.TemplatedEmailProvider;
 using form_builder.Providers.Transforms.Lookups;
+using form_builder.Providers.Transforms.EmailConfiguration;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.Transforms.ReusableElements;
 using form_builder.Services.AddAnotherService;
@@ -193,6 +195,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IActionHelper, ActionHelper>();
             services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
             services.AddSingleton<IPaymentHelper, PaymentHelper>();
+            services.AddSingleton<IEmailHelper, EmailHelper>();
             services.AddSingleton<ICookieHelper, CookieHelper>();
             services.AddSingleton<IStructureMapper, StructureMapper>();
 
@@ -342,7 +345,8 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
             if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
-                services.AddSingleton<IEmailProvider, FakeEmailProvider>();
+                //services.AddSingleton<IEmailProvider, FakeEmailProvider>();
+                services.AddSingleton<IEmailProvider, AwsSesProvider>();
             else
                 services.AddSingleton<IEmailProvider, AwsSesProvider>();
 
@@ -463,6 +467,7 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
+            services.AddSingleton<IEmailConfigurationTransformDataProvider, EmailConfigurationTransformDataProvider>();
             if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();

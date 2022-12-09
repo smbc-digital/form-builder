@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="DSL\email-config\emailconfiguration.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.3" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.9.47" />
     <PackageReference Include="AWSSDK.SimpleEmail" Version="3.7.0.200" />
@@ -45,6 +49,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DSL\email-config\emailconfiguration.json" />
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
   <ProjectExtensions>

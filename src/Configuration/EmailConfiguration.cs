@@ -1,9 +1,9 @@
 ﻿namespace form_builder.Configuration
 {
-    public class EmailConfiguration
+    public class EmailConfig
     {
-        public string Form { get; set; }
-        public List<string>To { get; set; }
+        public List<string> FormName { get; set; }
+        public List<string> To { get; set; }
         public string Subject { get; set; }
     }
 }

@@ -1,31 +1,35 @@
-﻿using form_builder.Helpers.Session;
-using form_builder.Services.EmailService;
+﻿using form_builder.Enum;
+using form_builder.Helpers.EmailHelpers;
+using form_builder.Helpers.Session;
+using form_builder.Models;
+using form_builder.Providers.EmailProvider;
+using form_builder.Services.DocumentService;
+using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.SubmitService;
-using System.Net.Mail;
-using StockportGovUK.NetStandard.Gateways.MailingService;
-using StockportGovUK.NetStandard.Gateways.Models.Mail;
 
 namespace form_builder.Workflows.EmailWorkflow
 {
     public class EmailWorkflow : IEmailWorkflow
     {
-        private readonly IEmailService _emailService;
-        private readonly ISubmitService _submitService;
         private readonly IMappingService _mappingService;
+        private readonly IEmailHelper _emailHelper;
         private readonly ISessionHelper _sessionHelper;
-        private readonly IMailingServiceGateway _mailingServiceGateway;
-
+        private readonly IEmailProvider _emailProvider;
+        private readonly IDocumentSummaryService _documentSummaryService;
         public EmailWorkflow(ISubmitService submitService,
             IMappingService mappingService,
+            IEmailHelper emailHelper,
             ISessionHelper sessionHelper,
-            IEmailService emailService)
+            IEmailProvider emailProvider,
+            IDocumentSummaryService documentSummaryService
+            )
         {
-            _submitService = submitService;
             _mappingService = mappingService;
+            _emailHelper = emailHelper;
             _sessionHelper = sessionHelper;
-            _emailService = emailService;
-            _mailingServiceGateway = new MailingServiceGateway(new HttpClient());
+            _emailProvider = emailProvider;
+            _documentSummaryService = documentSummaryService;
         }
 
         public async Task<string> Submit(string form)
@@ -37,19 +41,24 @@ namespace form_builder.Workflows.EmailWorkflow
 
             var data = await _mappingService.Map(sessionGuid, form);
 
-            var emailMessage = new MailMessage
-            {
-                Subject = "Subject",
-                Sender= new MailAddress("forms@stockport.gov.uk"),
-                DeliveryNotificationOptions = DeliveryNotificationOptions.Never, 
-                IsBodyHtml = true,
-                Body = "Body"
-            };
+            var doc = _documentSummaryService.GenerateDocument(
+               new DocumentSummaryEntity
+               {
+                   DocumentType = EDocumentType.Txt,
+                   PreviousAnswers = data.FormAnswers,
+                   FormSchema = data.BaseForm
+               });
 
-            emailMessage.To.Add("simon.estill@stockport.gov.uk");
+            var body = System.Text.Encoding.Default.GetString(doc.Result);
 
-            _mailingServiceGateway.Send(new MailModel { });
+            var email = _emailHelper.GetEmailInformation(form).Result;
+            var emailMessage = new EmailMessage
+                (email.Subject, body,
+                "online.forms@stockport.gov.uk",
+                string.Join(",", email.To.ToArray())
+                );
 
+            await _emailProvider.SendEmail(emailMessage);
             return "success";
         }
     }
