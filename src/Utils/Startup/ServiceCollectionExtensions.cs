@@ -369,6 +369,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, OptionalIfCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, PaymentCallbackCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, KeyCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();

@@ -101,19 +101,26 @@ namespace form_builder.Services.PageService
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
         {
+            var isNewSession = false;
+
             if (string.IsNullOrEmpty(path))
-                _sessionHelper.RemoveSessionGuid();
-
+                _sessionHelper.Clear();
+            else
+            {
+                var currentForm = _sessionHelper.GetSessionForm();
+                if(!string.IsNullOrEmpty(currentForm) 
+                    && !form.Equals(currentForm))
+                    _sessionHelper.Clear();    
+            }
+            
             var sessionGuid = _sessionHelper.GetSessionGuid();
-
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                sessionGuid = Guid.NewGuid().ToString();
-                _sessionHelper.SetSessionGuid(sessionGuid);
+                _sessionHelper.Set(Guid.NewGuid().ToString(), form);
+                isNewSession = true;
             }
 
             var baseForm = await _schemaFactory.Build(form);
-
             if (baseForm is null)
                 return null;
 
@@ -122,6 +129,13 @@ namespace form_builder.Services.PageService
                 _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
                 return null;
             }
+
+            if(isNewSession 
+                && !_formAvailabilityService.HaveFormAccessPreRequirsitesBeenMet(baseForm))
+            {
+                _logger.LogWarning($"Form: {baseForm.BaseURL} attempted load but the form access prerequirsites have not been met");
+                return null;
+            }    
 
             if (string.IsNullOrEmpty(path))
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };

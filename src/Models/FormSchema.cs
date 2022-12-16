@@ -15,6 +15,10 @@ namespace form_builder.Models
         public string StartPageUrl { get; set; }
 
         public string FirstPageSlug { get; set; }
+
+        public string Key { get; set; }
+        
+        public string KeyName { get; set; }   
         
         public bool Embeddable { get; set; }
 
