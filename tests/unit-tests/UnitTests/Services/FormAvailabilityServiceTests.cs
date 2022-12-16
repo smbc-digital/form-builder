@@ -4,6 +4,7 @@ using form_builder.Models.Properties.EnabledForProperties;
 using form_builder.Providers.EnabledFor;
 using form_builder.Services.FormAvailabilityService;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -13,6 +14,7 @@ namespace form_builder_tests.UnitTests.Services
     {
         private readonly FormAvailabilityService _service;
         private readonly Mock<IEnabledForProvider> _mockEnabledFor = new();
+        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
         private readonly Mock<IEnumerable<IEnabledForProvider>> _mockEnabledForProviders = new();
 
         public FormAvailabilityServicsTests()
@@ -27,7 +29,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => enabledForItems.GetEnumerator());
 
-            _service = new FormAvailabilityService(_mockEnabledForProviders.Object);
+            _service = new FormAvailabilityService(_mockEnabledForProviders.Object, _mockHttpContextAccessor.Object);
         }
 
         [Fact]
@@ -116,5 +118,79 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             _mockEnabledFor.Verify(_ => _.IsAvailable(It.IsAny<EnabledForBase>()), Times.Once);
         }
+
+        [Fact]
+        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_No_Key_Is_Specified()
+        {
+            var formSchema = new FormSchemaBuilder().Build(); 
+            
+            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_False_If_Key_Is_Specified_And_HttpContext_Contains_No_Values()
+        {
+            var mockHttpContext = new Mock<HttpContent>();
+            var queryCollection = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
+
+           _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Query)
+                            .Returns(queryCollection);
+
+            var formSchema = new FormSchemaBuilder()
+            .WithSpecifiedKey("TestKey", "TestToken")
+            .Build(); 
+            
+            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+
+            Assert.False(result);
+        }
+        
+        [Fact]
+        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_False_If_Key_Is_Specified_And_HttpContext_Contains_Incorrect_Values()
+        {
+            
+            var mockHttpContext = new Mock<HttpContent>();
+            var queryCollection = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+            {
+                { "TestKey", "IncorrectToken" }
+            });
+
+           _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Query)
+                            .Returns(queryCollection);
+
+            var formSchema = new FormSchemaBuilder()
+            .WithSpecifiedKey("TestKey", "TestToken")
+            .Build(); 
+            
+            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_Key_Is_Specified_And_HttpContext_Contains_Correct_Values()
+        {
+            
+            var mockHttpContext = new Mock<HttpContent>();
+            var queryCollection = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+            {
+                { "TestKey", "TestToken" }
+            });
+
+           _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Query)
+                            .Returns(queryCollection);
+
+            var formSchema = new FormSchemaBuilder()
+            .WithSpecifiedKey("TestKey", "TestToken")
+            .Build(); 
+            
+            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+
+            Assert.True(result);
+        }
     }
+
+
 }

@@ -10,6 +10,8 @@ namespace form_builder_tests.Builders
         private string _feedbackForm = "www.feedback.com";
         private string _feedbackPhase = "";
         private string _formName = "formname";
+        private string _keyValue  { get; set; }
+        private string _keyName { get; set; }
         private List<Page> _pages = new List<Page>();
         private string _startPageUrl = "page-url";
         private string _firstPageSlug = "page-one";
@@ -44,7 +46,9 @@ namespace form_builder_tests.Builders
             SavePaymentAmount = _savePaymentAmount,
             PaymentAmountMapping = _paymentAmountMapping,
             ProcessPaymentCallbackResponse = _processPaymentCallbackResponse,
-            CallbackFailureContactNumber = _callbackFailureContactNumber
+            CallbackFailureContactNumber = _callbackFailureContactNumber,
+            Key = _keyValue,
+            KeyName = _keyName
         };
 
         public FormSchemaBuilder WithBaseUrl(string baseUrl)
@@ -157,5 +161,27 @@ namespace form_builder_tests.Builders
 
             return this;
         }
+
+        public FormSchemaBuilder WithSpecifiedKey(string keyName, string keyValue)
+        {
+            _keyName = keyName;
+            _keyValue = keyValue;
+
+            return this;
+        }
+        public FormSchemaBuilder WithKey(string keyValue)
+        {
+            _keyValue = keyValue;
+
+            return this;
+        }
+
+        public FormSchemaBuilder WithKeyName(string keyName)
+        {
+            _keyName = keyName;
+        
+            return this;
+        }
+
     }
 }

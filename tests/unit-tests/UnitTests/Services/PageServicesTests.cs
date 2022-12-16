@@ -87,6 +87,9 @@ namespace form_builder_tests.UnitTests.Services
             _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(true);
 
+            _mockFormAvailabilityService.Setup(_ => _.HaveFormAccessPreRequirsitesBeenMet(It.IsAny<FormSchema>()))
+                .Returns(true);
+
             _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
 
@@ -152,6 +155,7 @@ namespace form_builder_tests.UnitTests.Services
                 _fileStorageProviders,
                 _mockTagParsers.Object,
                 _mockFileStorageConfiguration.Object
+                
                 );
         }
 
@@ -220,7 +224,69 @@ namespace form_builder_tests.UnitTests.Services
             Assert.IsType<ProcessPageEntity>(result);
 
             _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
-            _sessionHelper.Verify(_ => _.SetSessionGuid(It.IsAny<string>()), Times.Once);
+            _sessionHelper.Verify(_ => _.Set(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPage_ClearSession_If_There_Is_No_Path_And_ShouldCheck_If_AccessPreRequirsitesBeenMet()
+        {
+            // Arrange
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.H1)
+                .WithQuestionId("test-id")
+                .WithPropertyText("test-text")
+                .Build();
+
+            var schema = new FormSchemaBuilder()    
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+
+            // Act
+            var result = await _service.ProcessPage("form", "", "", new QueryCollection());
+
+            // Assert
+            Assert.IsType<ProcessPageEntity>(result);
+            _sessionHelper.Verify(_ => _.Clear(), Times.Once);
+            _mockFormAvailabilityService.Verify(_ => _.HaveFormAccessPreRequirsitesBeenMet(It.IsAny<FormSchema>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessPage_Should_Call_ClearSession_If_CurrentForm_IsNotEqual_ToSessionStoredFormName()
+        {
+            // Arrange
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.H1)
+                .WithQuestionId("test-id")
+                .WithPropertyText("test-text")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+                .ReturnsAsync(schema);
+
+            _sessionHelper.Setup(_ => _.GetSessionForm()).Returns("TestForm");
+            // Act
+            var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+
+            // Assert
+            Assert.IsType<ProcessPageEntity>(result);
+            _sessionHelper.Verify(_ => _.Clear(), Times.Once);
+            _mockFormAvailabilityService.Verify(_ => _.HaveFormAccessPreRequirsitesBeenMet(It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
