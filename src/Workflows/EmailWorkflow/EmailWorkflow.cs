@@ -6,7 +6,8 @@ using form_builder.Providers.EmailProvider;
 using form_builder.Services.DocumentService;
 using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
-using form_builder.Services.SubmitService;
+using form_builder.Providers.StorageProvider;
+
 
 namespace form_builder.Workflows.EmailWorkflow
 {
@@ -17,12 +18,14 @@ namespace form_builder.Workflows.EmailWorkflow
         private readonly ISessionHelper _sessionHelper;
         private readonly IEmailProvider _emailProvider;
         private readonly IDocumentSummaryService _documentSummaryService;
-        public EmailWorkflow(ISubmitService submitService,
+        private readonly IDistributedCacheWrapper _distributedCache;
+        public EmailWorkflow(
             IMappingService mappingService,
             IEmailHelper emailHelper,
             ISessionHelper sessionHelper,
             IEmailProvider emailProvider,
-            IDocumentSummaryService documentSummaryService
+            IDocumentSummaryService documentSummaryService,
+            IDistributedCacheWrapper distibutedCacheWrapper
             )
         {
             _mappingService = mappingService;
@@ -30,6 +33,7 @@ namespace form_builder.Workflows.EmailWorkflow
             _sessionHelper = sessionHelper;
             _emailProvider = emailProvider;
             _documentSummaryService = documentSummaryService;
+            _distributedCache = distibutedCacheWrapper;
         }
 
         public async Task<string> Submit(string form)
@@ -39,7 +43,14 @@ namespace form_builder.Workflows.EmailWorkflow
             if (string.IsNullOrEmpty(sessionGuid))
                 throw new ApplicationException($"A Session GUID was not provided.");
 
+            var reference = string.Empty;
+
             var data = await _mappingService.Map(sessionGuid, form);
+
+            if (data.BaseForm.GenerateReferenceNumber)
+            {
+                reference = data.FormAnswers.CaseReference;
+            }
 
             var doc = _documentSummaryService.GenerateDocument(
                new DocumentSummaryEntity
@@ -58,8 +69,18 @@ namespace form_builder.Workflows.EmailWorkflow
                 string.Join(",", email.To.ToArray())
                 );
 
-            await _emailProvider.SendEmail(emailMessage);
-            return "success";
+
+            var result =  _emailProvider.SendEmail(emailMessage).Result;
+
+            if (result == System.Net.HttpStatusCode.OK)
+            {
+                return reference;
+            }
+            else
+            {
+                return "failure";
+            }
+            
         }
     }
 }
