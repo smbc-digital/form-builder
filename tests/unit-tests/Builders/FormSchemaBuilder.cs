@@ -13,6 +13,8 @@ namespace form_builder_tests.Builders
         private string _keyValue  { get; set; }
         private string _keyName { get; set; }
         private List<Page> _pages = new List<Page>();
+
+        private List<string> _referrers = new List<string>();
         private string _startPageUrl = "page-url";
         private string _firstPageSlug = "page-one";
         private bool _generateReferenceNumber = false;
@@ -33,6 +35,7 @@ namespace form_builder_tests.Builders
             FeedbackForm = _feedbackForm,
             FeedbackPhase = _feedbackPhase,
             FormName = _formName,
+            Referrers = _referrers,
             Pages = _pages,
             StartPageUrl = _startPageUrl,
             FirstPageSlug = _firstPageSlug,
@@ -180,6 +183,14 @@ namespace form_builder_tests.Builders
         {
             _keyName = keyName;
         
+            return this;
+        }
+
+        
+        public FormSchemaBuilder AddReferrer(string referrer)
+        {
+            _referrers.Add(referrer);
+    
             return this;
         }
 

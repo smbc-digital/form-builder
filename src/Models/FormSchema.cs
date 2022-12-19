@@ -19,6 +19,8 @@ namespace form_builder.Models
         public string Key { get; set; }
         
         public string KeyName { get; set; }   
+
+        public List<string> Referrers { get; set; }
         
         public bool Embeddable { get; set; }
 
