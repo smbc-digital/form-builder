@@ -1,6 +1,7 @@
 using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Providers.EnabledFor;
+using form_builder.Restrictions;
 
 namespace form_builder.Services.FormAvailabilityService
 {
@@ -14,12 +15,12 @@ namespace form_builder.Services.FormAvailabilityService
     {
         private readonly IEnumerable<IEnabledForProvider> _enabledFor;
 
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEnumerable<IFormAccessRestriction> _formAccessRestrictions;
 
-        public FormAvailabilityService(IEnumerable<IEnabledForProvider> enabledFor, IHttpContextAccessor httpContextAccessor)
+        public FormAvailabilityService(IEnumerable<IEnabledForProvider> enabledFor, IEnumerable<IFormAccessRestriction> formAccessRestrictions)
         {
-            _httpContextAccessor = httpContextAccessor;
             _enabledFor = enabledFor;
+            _formAccessRestrictions = formAccessRestrictions;
         }
 
         public bool IsAvailable(List<EnvironmentAvailability> availability, string environment)
@@ -32,20 +33,6 @@ namespace form_builder.Services.FormAvailabilityService
             return environmentAvailability is null || environmentAvailability.IsAvailable;
         }
 
-        public bool HaveFormAccessPreRequirsitesBeenMet(FormSchema baseForm)
-        {
-                if(!string.IsNullOrEmpty(baseForm.Key) && !string.IsNullOrEmpty(baseForm.KeyName))
-                {
-                    var context = _httpContextAccessor.HttpContext;
-                    if(!_httpContextAccessor.HttpContext.Request.Query.Any(KeyValuePair => KeyValuePair.Key == baseForm.KeyName))
-                        return false;
-                    
-                    var keyValuePair = _httpContextAccessor.HttpContext.Request.Query.SingleOrDefault(KeyValuePair => KeyValuePair.Key == baseForm.KeyName);
-                    if(!keyValuePair.Value.Equals(baseForm.Key))
-                        return false;
-                }
-
-                return true;
-        }
+        public bool HaveFormAccessPreRequirsitesBeenMet(FormSchema baseForm) => !_formAccessRestrictions.Any(restriction => restriction.IsRestricted(baseForm));
     }
 }
