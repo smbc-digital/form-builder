@@ -2,9 +2,9 @@ using form_builder.Enum;
 using form_builder.Models;
 using form_builder.Models.Properties.EnabledForProperties;
 using form_builder.Providers.EnabledFor;
+using form_builder.Restrictions;
 using form_builder.Services.FormAvailabilityService;
 using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -14,8 +14,8 @@ namespace form_builder_tests.UnitTests.Services
     {
         private readonly FormAvailabilityService _service;
         private readonly Mock<IEnabledForProvider> _mockEnabledFor = new();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
         private readonly Mock<IEnumerable<IEnabledForProvider>> _mockEnabledForProviders = new();
+        private readonly List<IFormAccessRestriction> _formAccessRestrictions = new List<IFormAccessRestriction>();
 
         public FormAvailabilityServicsTests()
         {
@@ -29,7 +29,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => enabledForItems.GetEnumerator());
 
-            _service = new FormAvailabilityService(_mockEnabledForProviders.Object, _mockHttpContextAccessor.Object);
+            _service = new FormAvailabilityService(_mockEnabledForProviders.Object, _formAccessRestrictions);
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_No_Key_Is_Specified()
+        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_No_RestrictionsProvided()
         {
             var formSchema = new FormSchemaBuilder().Build(); 
             
@@ -129,68 +129,39 @@ namespace form_builder_tests.UnitTests.Services
             Assert.True(result);
         }
 
-        [Fact]
-        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_False_If_Key_Is_Specified_And_HttpContext_Contains_No_Values()
-        {
-            var mockHttpContext = new Mock<HttpContent>();
-            var queryCollection = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
-
-           _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Query)
-                            .Returns(queryCollection);
-
-            var formSchema = new FormSchemaBuilder()
-            .WithSpecifiedKey("TestKey", "TestToken")
-            .Build(); 
-            
-            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
-
-            Assert.False(result);
-        }
         
         [Fact]
-        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_False_If_Key_Is_Specified_And_HttpContext_Contains_Incorrect_Values()
+        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_All_RestrictionsProvided_Return_False()
         {
-            
-            var mockHttpContext = new Mock<HttpContent>();
-            var queryCollection = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
-            {
-                { "TestKey", "IncorrectToken" }
-            });
+            var formSchema = new FormSchemaBuilder().Build(); 
+            var firstMockRestriction = new Mock<IFormAccessRestriction>();
+            firstMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(false);
+            _formAccessRestrictions.Add(firstMockRestriction.Object);
 
-           _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Query)
-                            .Returns(queryCollection);
+            var secondMockRestriction = new Mock<IFormAccessRestriction>();
+            secondMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(false);
+            _formAccessRestrictions.Add(secondMockRestriction.Object);
 
-            var formSchema = new FormSchemaBuilder()
-            .WithSpecifiedKey("TestKey", "TestToken")
-            .Build(); 
-            
-            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
-
-            Assert.False(result);
-        }
-
-        [Fact]
-        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_Key_Is_Specified_And_HttpContext_Contains_Correct_Values()
-        {
-            
-            var mockHttpContext = new Mock<HttpContent>();
-            var queryCollection = new QueryCollection(new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
-            {
-                { "TestKey", "TestToken" }
-            });
-
-           _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Query)
-                            .Returns(queryCollection);
-
-            var formSchema = new FormSchemaBuilder()
-            .WithSpecifiedKey("TestKey", "TestToken")
-            .Build(); 
-            
             var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
 
             Assert.True(result);
         }
+
+        [Fact]
+        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_False_If_Any_RestrictionsProvided_Return_True()
+        {
+            var formSchema = new FormSchemaBuilder().Build(); 
+            var firstMockRestriction = new Mock<IFormAccessRestriction>();
+            firstMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(false);
+            _formAccessRestrictions.Add(firstMockRestriction.Object);
+
+            var secondMockRestriction = new Mock<IFormAccessRestriction>();
+            secondMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(true);
+            _formAccessRestrictions.Add(secondMockRestriction.Object);
+
+            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+
+            Assert.False(result);
+        }
     }
-
-
 }
