@@ -23,8 +23,7 @@ namespace form_builder.Providers.EmailProvider
                 mailMessage.From = new MailAddress(emailMessage.FromEmail);
                 mailMessage.Body = emailMessage.Body;
                 mailMessage.Subject = emailMessage.Subject;
-
-                mailMessage.IsBodyHtml = true;
+                mailMessage.IsBodyHtml = false;
 
                 foreach (var address in emailMessage.ToEmail.Split(","))
                 {
@@ -32,7 +31,6 @@ namespace form_builder.Providers.EmailProvider
                 }
 
                 client.Send(mailMessage);
-
             }
 
             return Task.FromResult(HttpStatusCode.OK);

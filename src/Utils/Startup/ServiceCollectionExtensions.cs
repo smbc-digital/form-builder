@@ -346,7 +346,8 @@ namespace form_builder.Utils.Startup
         {
             if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
                 //services.AddSingleton<IEmailProvider, FakeEmailProvider>();
-                services.AddSingleton<IEmailProvider, LocalEmailProvider>();
+                //services.AddSingleton<IEmailProvider, LocalEmailProvider>();
+                services.AddSingleton<IEmailProvider, AwsSesProvider>();
             else
                 services.AddSingleton<IEmailProvider, AwsSesProvider>();
 

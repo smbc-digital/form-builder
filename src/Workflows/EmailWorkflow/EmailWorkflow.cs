@@ -65,7 +65,7 @@ namespace form_builder.Workflows.EmailWorkflow
             var email = _emailHelper.GetEmailInformation(form).Result;
             var emailMessage = new EmailMessage
                 (email.Subject, body,
-                "online.forms@stockport.gov.uk",
+                "noreply@stockport.gov.uk",
                 string.Join(",", email.To.ToArray())
                 );
 
