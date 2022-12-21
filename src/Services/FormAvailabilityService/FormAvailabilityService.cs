@@ -8,7 +8,7 @@ namespace form_builder.Services.FormAvailabilityService
     public interface IFormAvailabilityService
     {
         bool IsAvailable(List<EnvironmentAvailability> availability, string environment);
-        bool HaveFormAccessPreRequirsitesBeenMet(FormSchema baseForm);
+        bool IsFormAccessApproved(FormSchema baseForm);
     }
 
     public class FormAvailabilityService : IFormAvailabilityService
@@ -33,6 +33,6 @@ namespace form_builder.Services.FormAvailabilityService
             return environmentAvailability is null || environmentAvailability.IsAvailable;
         }
 
-        public bool HaveFormAccessPreRequirsitesBeenMet(FormSchema baseForm) => !_formAccessRestrictions.Any(restriction => restriction.IsRestricted(baseForm));
+        public bool IsFormAccessApproved(FormSchema baseForm) => !_formAccessRestrictions.Any(restriction => restriction.IsRestricted(baseForm));
     }
 }

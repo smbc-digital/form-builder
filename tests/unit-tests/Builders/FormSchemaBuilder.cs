@@ -10,11 +10,11 @@ namespace form_builder_tests.Builders
         private string _feedbackForm = "www.feedback.com";
         private string _feedbackPhase = "";
         private string _formName = "formname";
-        private string _keyValue  { get; set; }
-        private string _keyName { get; set; }
-        private List<Page> _pages = new List<Page>();
+        private string _formAccessKeyValue  { get; set; }
+        private string _formAccessKeyName { get; set; }
+        private List<Page> _pages = new();
 
-        private List<string> _referrers = new List<string>();
+        private List<string> _formAccessReferrers = new();
         private string _startPageUrl = "page-url";
         private string _firstPageSlug = "page-one";
         private bool _generateReferenceNumber = false;
@@ -35,7 +35,7 @@ namespace form_builder_tests.Builders
             FeedbackForm = _feedbackForm,
             FeedbackPhase = _feedbackPhase,
             FormName = _formName,
-            Referrers = _referrers,
+            FormAccessReferrers = _formAccessReferrers,
             Pages = _pages,
             StartPageUrl = _startPageUrl,
             FirstPageSlug = _firstPageSlug,
@@ -50,8 +50,8 @@ namespace form_builder_tests.Builders
             PaymentAmountMapping = _paymentAmountMapping,
             ProcessPaymentCallbackResponse = _processPaymentCallbackResponse,
             CallbackFailureContactNumber = _callbackFailureContactNumber,
-            Key = _keyValue,
-            KeyName = _keyName
+            FormAccessKey = _formAccessKeyValue,
+            FormAccessKeyName = _formAccessKeyName
         };
 
         public FormSchemaBuilder WithBaseUrl(string baseUrl)
@@ -165,31 +165,31 @@ namespace form_builder_tests.Builders
             return this;
         }
 
-        public FormSchemaBuilder WithSpecifiedKey(string keyName, string keyValue)
+        public FormSchemaBuilder WithSpecifiedFormAccessKey(string formAccessKeyName, string formAccessKeyValue)
         {
-            _keyName = keyName;
-            _keyValue = keyValue;
+            _formAccessKeyName = formAccessKeyName;
+            _formAccessKeyValue = formAccessKeyValue;
 
             return this;
         }
-        public FormSchemaBuilder WithKey(string keyValue)
+        public FormSchemaBuilder WithFormAccessKeyValue(string formAccessKeyValue)
         {
-            _keyValue = keyValue;
+            _formAccessKeyValue = formAccessKeyValue;
 
             return this;
         }
 
-        public FormSchemaBuilder WithKeyName(string keyName)
+        public FormSchemaBuilder WithKeyName(string formAccessKeyName)
         {
-            _keyName = keyName;
+            _formAccessKeyName = formAccessKeyName;
         
             return this;
         }
 
         
-        public FormSchemaBuilder AddReferrer(string referrer)
+        public FormSchemaBuilder AddFormAccessReferrer(string formAccessReferrer)
         {
-            _referrers.Add(referrer);
+            _formAccessReferrers.Add(formAccessReferrer);
     
             return this;
         }

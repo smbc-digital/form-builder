@@ -10,14 +10,14 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
-    public class FormAvailabilityServicsTests
+    public class FormAvailabilityServiceTests
     {
         private readonly FormAvailabilityService _service;
         private readonly Mock<IEnabledForProvider> _mockEnabledFor = new();
         private readonly Mock<IEnumerable<IEnabledForProvider>> _mockEnabledForProviders = new();
-        private readonly List<IFormAccessRestriction> _formAccessRestrictions = new List<IFormAccessRestriction>();
+        private readonly List<IFormAccessRestriction> _formAccessRestrictions = new();
 
-        public FormAvailabilityServicsTests()
+        public FormAvailabilityServiceTests()
         {
             _mockEnabledFor.Setup(_ => _.Type)
                 .Returns(EEnabledFor.TimeWindow);
@@ -95,13 +95,16 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void IsAvailable_Should_Call_EnabledForProvider_When_EnvironmentAvailability_Contains_EnabledFor_Option()
+        public void IsAvailable_Should_CallEnabledForProvider_When_EnvironmentAvailabilityContainsEnabledForOption()
         {
             // Arrange
-            var enabledForTimeWindow = new List<EnabledForBase> {
-                new EnabledForBase {
+            var enabledForTimeWindow = new List<EnabledForBase> 
+            {
+                new() 
+                {
                     Type = EEnabledFor.TimeWindow,
-                    Properties = new EnabledForProperties {
+                    Properties = new EnabledForProperties 
+                    {
                         Start = DateTime.Now.AddDays(-1),
                         End = DateTime.Now.AddDays(+1)
                     }
@@ -120,46 +123,54 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_No_RestrictionsProvided()
+        public void IsFormAccessApproved_ShouldReturn_True_If_NoRestrictionsProvided()
         {
             var formSchema = new FormSchemaBuilder().Build(); 
             
-            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+            var result = _service.IsFormAccessApproved(formSchema);
 
             Assert.True(result);
         }
 
         
         [Fact]
-        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_True_If_All_RestrictionsProvided_Return_False()
+        public void IsFormAccessApproved_ShouldReturn_True_If_AllRestrictionsProvidedReturnFalse()
         {
-            var formSchema = new FormSchemaBuilder().Build(); 
             var firstMockRestriction = new Mock<IFormAccessRestriction>();
-            firstMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(false);
-            _formAccessRestrictions.Add(firstMockRestriction.Object);
-
             var secondMockRestriction = new Mock<IFormAccessRestriction>();
-            secondMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(false);
-            _formAccessRestrictions.Add(secondMockRestriction.Object);
+            
+            firstMockRestriction
+                .Setup(_ => _.IsRestricted(It.IsAny<FormSchema>()))
+                .Returns(false);
+            
+            secondMockRestriction
+                .Setup(_ => _.IsRestricted(It.IsAny<FormSchema>()))
+                .Returns(false);
 
-            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+            _formAccessRestrictions.AddRange(new List<IFormAccessRestriction> { firstMockRestriction.Object, secondMockRestriction.Object });
+
+            var result = _service.IsFormAccessApproved(new FormSchemaBuilder().Build());
 
             Assert.True(result);
         }
 
         [Fact]
-        public void HaveFormAccessPreRequirsitesBeenMet_ShouldReturn_False_If_Any_RestrictionsProvided_Return_True()
+        public void IsFormAccessApproved_ShouldReturn_False_If_Any_RestrictionsProvided_Return_True()
         {
-            var formSchema = new FormSchemaBuilder().Build(); 
             var firstMockRestriction = new Mock<IFormAccessRestriction>();
-            firstMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(false);
-            _formAccessRestrictions.Add(firstMockRestriction.Object);
-
             var secondMockRestriction = new Mock<IFormAccessRestriction>();
-            secondMockRestriction.Setup(_ => _.IsRestricted(It.IsAny<FormSchema>())).Returns(true);
-            _formAccessRestrictions.Add(secondMockRestriction.Object);
 
-            var result = _service.HaveFormAccessPreRequirsitesBeenMet(formSchema);
+            firstMockRestriction
+                .Setup(_ => _.IsRestricted(It.IsAny<FormSchema>()))
+                .Returns(false);
+
+            secondMockRestriction
+                .Setup(_ => _.IsRestricted(It.IsAny<FormSchema>()))
+                .Returns(true);
+
+            _formAccessRestrictions.AddRange(new List<IFormAccessRestriction> { firstMockRestriction.Object, secondMockRestriction.Object });
+
+            var result = _service.IsFormAccessApproved(new FormSchemaBuilder().Build());
 
             Assert.False(result);
         }

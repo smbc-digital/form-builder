@@ -1,4 +1,3 @@
-using form_builder.Constants;
 using form_builder.Models;
 
 namespace form_builder.Validators.IntegrityChecks.Form
@@ -9,19 +8,15 @@ namespace form_builder.Validators.IntegrityChecks.Form
         {
             IntegrityCheckResult result = new();
 
-            if (!string.IsNullOrEmpty(schema.Key))
+            if (!string.IsNullOrEmpty(schema.FormAccessKey) && string.IsNullOrEmpty(schema.FormAccessKeyName))
             {
-                if(string.IsNullOrEmpty(schema.KeyName))
-                    result.AddFailureMessage("FormSchema Key Check, 'KeyName' can not be empty if 'Key' has been specified");
-
+                result.AddFailureMessage("FormSchema Key Check, 'KeyName' can not be empty if 'Key' has been specified");
                 return result;
             }
 
-            if (!string.IsNullOrEmpty(schema.KeyName))
+            if (string.IsNullOrEmpty(schema.FormAccessKey) && !string.IsNullOrEmpty(schema.FormAccessKeyName))
             {
-                if(string.IsNullOrEmpty(schema.Key))
-                    result.AddFailureMessage("FormSchema Key Check, 'Key' can not be empty if a 'KeyName' has been specified");
-
+                result.AddFailureMessage("FormSchema Key Check, 'Key' can not be empty if a 'KeyName' has been specified");
                 return result;
             }
 

@@ -5,15 +5,14 @@ using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.Restrictions
 {
     public class RefererRestrictionsTests
     {
-
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
 
         [Fact]
-        public void IsRestricted_ShouldReturn_False_If_No_Referer_Is_Specified()
+        public void IsRestricted_Should_ReturnFalse_If_NoRefererIsSpecified()
         {
             var formSchema = new FormSchemaBuilder().Build();
             RefererRestriction restriction = new(_mockHttpContextAccessor.Object);
@@ -24,17 +23,16 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void IsRestricted_ShouldReturn_True_If_Referrers_Specified_But_NoValue_In_HttpContext()
+        public void IsRestricted_Should_ReturnTrue_If_ReferrersSpecified_And_NoValueInHttpContext()
         {
-            var mockHttpContext = new Mock<HttpContent>();
-
-            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Headers.Referer)
-                                    .Returns(StringValues.Empty);
+            _mockHttpContextAccessor
+                .Setup(_ => _.HttpContext.Request.Headers.Referer)
+                .Returns(StringValues.Empty);
 
             var formSchema = new FormSchemaBuilder()
-            .AddReferrer("test.co.uk")
-            .AddReferrer("live.co.uk")
-            .Build();
+                .AddFormAccessReferrer("test.co.uk")
+                .AddFormAccessReferrer("live.co.uk")
+                .Build();
 
             RefererRestriction restriction = new(_mockHttpContextAccessor.Object);
 
@@ -44,17 +42,16 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void IsRestricted_ShouldReturn_False_If_Referrers_Specified_And_MathchingValue_In_HttpContext()
+        public void IsRestricted_Should_ReturnFalse_If_ReferrersSpecified_And_MatchingValueInHttpContext()
         {
-            var mockHttpContext = new Mock<HttpContent>();
-
-            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Headers.Referer)
-                                    .Returns(new StringValues("https://www.test.co.uk"));
+            _mockHttpContextAccessor
+                .Setup(_ => _.HttpContext.Request.Headers.Referer)
+                .Returns(new StringValues("https://www.test.co.uk"));
 
             var formSchema = new FormSchemaBuilder()
-            .AddReferrer("test.co.uk")
-            .AddReferrer("live.co.uk")
-            .Build();
+                .AddFormAccessReferrer("test.co.uk")
+                .AddFormAccessReferrer("live.co.uk")
+                .Build();
 
             RefererRestriction restriction = new(_mockHttpContextAccessor.Object);
 
@@ -64,17 +61,16 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void IsRestricted_ShouldReturn_True_If_Referrers_Specified_And_MathchingValue_Not_In_HttpContext()
+        public void IsRestricted_Should_ReturnTrue_If_ReferrersSpecified_And_MatchingValueNotInHttpContext()
         {
-            var mockHttpContext = new Mock<HttpContent>();
-
-            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Headers.Referer)
-                                    .Returns(new StringValues("https://www.NotValid.co.uk"));
+            _mockHttpContextAccessor
+                .Setup(_ => _.HttpContext.Request.Headers.Referer)
+                .Returns(new StringValues("https://www.NotValid.co.uk"));
 
             var formSchema = new FormSchemaBuilder()
-            .AddReferrer("test.co.uk")
-            .AddReferrer("live.co.uk")
-            .Build();
+                .AddFormAccessReferrer("test.co.uk")
+                .AddFormAccessReferrer("live.co.uk")
+                .Build();
 
             RefererRestriction restriction = new(_mockHttpContextAccessor.Object);
 
@@ -84,17 +80,16 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void IsRestricted_ShouldReturn_False_If_Referrers_Specified_And_MathchingMultipleValue_In_HttpContext()
+        public void IsRestricted_Should_ReturnFalse_If_ReferrersSpecified_And_MatchingMultipleValueInHttpContext()
         {
-            var mockHttpContext = new Mock<HttpContent>();
-
-            _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Headers.Referer)
-                                    .Returns(new StringValues(new [] {"https://www.NotValid.co.uk", "https://www.live.co.uk"}));
+            _mockHttpContextAccessor
+                .Setup(_ => _.HttpContext.Request.Headers.Referer)
+                .Returns(new StringValues(new [] {"https://www.NotValid.co.uk", "https://www.live.co.uk"}));
 
             var formSchema = new FormSchemaBuilder()
-            .AddReferrer("test.co.uk")
-            .AddReferrer("live.co.uk")
-            .Build();
+                .AddFormAccessReferrer("test.co.uk")
+                .AddFormAccessReferrer("live.co.uk")
+                .Build();
 
             RefererRestriction restriction = new(_mockHttpContextAccessor.Object);
 

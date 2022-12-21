@@ -103,15 +103,9 @@ namespace form_builder.Services.PageService
         {
             var isNewSession = false;
 
-            if (string.IsNullOrEmpty(path))
+            var currentForm = _sessionHelper.GetSessionForm();
+            if((string.IsNullOrEmpty(path)) || !string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm))
                 _sessionHelper.Clear();
-            else
-            {
-                var currentForm = _sessionHelper.GetSessionForm();
-                if(!string.IsNullOrEmpty(currentForm) 
-                    && !form.Equals(currentForm))
-                    _sessionHelper.Clear();    
-            }
             
             var sessionGuid = _sessionHelper.GetSessionGuid();
             if (string.IsNullOrEmpty(sessionGuid))
@@ -130,10 +124,9 @@ namespace form_builder.Services.PageService
                 return null;
             }
 
-            if(isNewSession 
-                && !_formAvailabilityService.HaveFormAccessPreRequirsitesBeenMet(baseForm))
+            if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
             {
-                _logger.LogWarning($"Form: {baseForm.BaseURL} attempted load but the form access prerequirsites have not been met");
+                _logger.LogWarning($"Form: {form} has restricted access requirements that have not been met");
                 return null;
             }    
 

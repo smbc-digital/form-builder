@@ -71,29 +71,40 @@ namespace form_builder_tests.UnitTests.Services
 
         public PageServicesTests()
         {
-            _mockFileStorageConfiguration.Setup(_ => _.Value).Returns(new FileStorageProviderConfiguration { Type = "Redis" });
+            _mockFileStorageConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new FileStorageProviderConfiguration { Type = "Redis" });
 
-            _fileStorageProvider.Setup(_ => _.ProviderName).Returns("Redis");
-            _fileStorageProviders = new List<IFileStorageProvider>
-            {
-                _fileStorageProvider.Object
-            };
+            _fileStorageProvider
+                .Setup(_ => _.ProviderName)
+                .Returns("Redis");
 
-            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+            _fileStorageProviders = new List<IFileStorageProvider> { _fileStorageProvider.Object };
+
+            _tagParser
+                .Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
                 .ReturnsAsync(new Page());
+
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
-            _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
 
-            _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
+            _mockTagParsers
+                .Setup(m => m.GetEnumerator())
+                .Returns(() => tagParserItems.GetEnumerator());
+
+            _mockFormAvailabilityService
+                .Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(true);
 
-            _mockFormAvailabilityService.Setup(_ => _.HaveFormAccessPreRequirsitesBeenMet(It.IsAny<FormSchema>()))
+            _mockFormAvailabilityService
+                .Setup(_ => _.IsFormAccessApproved(It.IsAny<FormSchema>()))
                 .Returns(true);
 
-            _validator.Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
+            _validator
+                .Setup(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()))
                 .Returns(new ValidationResult { IsValid = false });
 
             var elementValidatorItems = new List<IElementValidator> { _validator.Object };
+
             _validators
                 .Setup(m => m.GetEnumerator())
                 .Returns(() => elementValidatorItems.GetEnumerator());
@@ -123,14 +134,17 @@ namespace form_builder_tests.UnitTests.Services
                 FormName = "form"
             };
 
-            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            _distributedCache
+                .Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(cacheData));
 
-            _fileStorageProvider.Setup(_ => _.GetString(It.IsAny<string>())).ReturnsAsync(JsonConvert.SerializeObject(cacheData));
+            _fileStorageProvider
+                .Setup(_ => _.GetString(It.IsAny<string>()))
+                .ReturnsAsync(JsonConvert.SerializeObject(cacheData));
 
-            _mockDistributedCacheExpirationConfiguration.Setup(_ => _.Value).Returns(new DistributedCacheExpirationConfiguration
-            {
-                FormJson = 1
-            });
+            _mockDistributedCacheExpirationConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new DistributedCacheExpirationConfiguration { FormJson = 1 });
 
             _service = new PageService(
                 _validators.Object,
@@ -154,9 +168,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockLogger.Object,
                 _fileStorageProviders,
                 _mockTagParsers.Object,
-                _mockFileStorageConfiguration.Object
-                
-                );
+                _mockFileStorageConfiguration.Object);
         }
 
         [Fact]
@@ -228,38 +240,35 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ClearSession_If_There_Is_No_Path_And_ShouldCheck_If_AccessPreRequirsitesBeenMet()
+        public async Task ProcessPage_Should_ClearSession_And_CallIsFormAccessApproved_If_ThereIsNoPath()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
-
-            var element = new ElementBuilder()
-                .WithType(EElementType.H1)
-                .WithQuestionId("test-id")
-                .WithPropertyText("test-text")
-                .Build();
-
-            var schema = new FormSchemaBuilder()    
-                .Build();
+            _sessionHelper
+                .Setup(_ => _.GetSessionGuid())
+                .Returns(string.Empty);
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(schema);
-
+                .ReturnsAsync(new FormSchemaBuilder().Build());
 
             // Act
-            var result = await _service.ProcessPage("form", "", "", new QueryCollection());
+            await _service.ProcessPage("form", "", "", new QueryCollection());
 
             // Assert
-            Assert.IsType<ProcessPageEntity>(result);
             _sessionHelper.Verify(_ => _.Clear(), Times.Once);
-            _mockFormAvailabilityService.Verify(_ => _.HaveFormAccessPreRequirsitesBeenMet(It.IsAny<FormSchema>()), Times.Once);
+            _mockFormAvailabilityService.Verify(_ => _.IsFormAccessApproved(It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
-        public async Task ProcessPage_Should_Call_ClearSession_If_CurrentForm_IsNotEqual_ToSessionStoredFormName()
+        public async Task ProcessPage_Should_CallClearSession_If_CurrentFormIsNotEqualToSessionStoredFormName()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper
+                .Setup(_ => _.GetSessionGuid())
+                .Returns(string.Empty);
+
+            _sessionHelper
+                .Setup(_ => _.GetSessionForm())
+                .Returns("TestForm");
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -276,17 +285,16 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            _mockSchemaFactory
+                .Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
-
-            _sessionHelper.Setup(_ => _.GetSessionForm()).Returns("TestForm");
+            
             // Act
-            var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+            await _service.ProcessPage("form", "page-one", "", new QueryCollection());
 
             // Assert
-            Assert.IsType<ProcessPageEntity>(result);
             _sessionHelper.Verify(_ => _.Clear(), Times.Once);
-            _mockFormAvailabilityService.Verify(_ => _.HaveFormAccessPreRequirsitesBeenMet(It.IsAny<FormSchema>()), Times.Once);
+            _mockFormAvailabilityService.Verify(_ => _.IsFormAccessApproved(It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]

@@ -4,28 +4,22 @@ namespace form_builder.Restrictions
 {
     public class KeyFormAccessRestriction : IFormAccessRestriction
     {
-
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public KeyFormAccessRestriction(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
+        public KeyFormAccessRestriction(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
         public bool IsRestricted(FormSchema baseForm)
         {
-            if(!string.IsNullOrEmpty(baseForm.Key) && !string.IsNullOrEmpty(baseForm.KeyName))
-            {
-                var context = _httpContextAccessor.HttpContext;
-                if(!_httpContextAccessor.HttpContext.Request.Query.Any(KeyValuePair => KeyValuePair.Key == baseForm.KeyName))
-                    return true;
-                
-                var keyValuePair = _httpContextAccessor.HttpContext.Request.Query.SingleOrDefault(KeyValuePair => KeyValuePair.Key == baseForm.KeyName);
-                if(!keyValuePair.Value.Equals(baseForm.Key))
-                    return true;
-            }
+            if (string.IsNullOrEmpty(baseForm.FormAccessKey) && string.IsNullOrEmpty(baseForm.FormAccessKeyName))
+                return false;
 
-            return false;
+            var context = _httpContextAccessor.HttpContext;
+            if (!context.Request.Query.Any(keyValuePair => keyValuePair.Key.Equals(baseForm.FormAccessKeyName)))
+                return true;
+            
+            var keyValuePair = context.Request.Query.Single(keyValuePair => keyValuePair.Key.Equals(baseForm.FormAccessKeyName));
+
+            return !keyValuePair.Value.Equals(baseForm.FormAccessKey);
         }
     }
 }
