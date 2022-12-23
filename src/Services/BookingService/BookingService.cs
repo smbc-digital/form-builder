@@ -346,6 +346,12 @@ namespace form_builder.Services.BookingService
                 var appointmentType = element.Properties.AppointmentTypes
                     .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
+                await _schemaFactory.TransformPage(currentPage, convertedAnswers);
+                foreach (var tagParser in _tagParsers)
+                {
+                    await tagParser.Parse(currentPage, convertedAnswers);
+                }
+
                 var bookingInformationCacheKey = $"{element.Properties.QuestionId}:{appointmentType.AppointmentId}:" +
                                                  $"{element.Properties.LimitNextAvailableFromDate}:" +
                                                  $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
