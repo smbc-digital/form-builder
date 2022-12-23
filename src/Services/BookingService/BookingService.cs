@@ -219,6 +219,9 @@ namespace form_builder.Services.BookingService
                     OptionalResources = appointmentType.OptionalResources
                 });
 
+            if (!convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
+                throw new ApplicationException($"BookingService::ProcessMonthRequest, The key {bookingInformationCacheKey} is not stored in FormData");
+
             var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
             BookingInformation bookingInformation = new()
             {
@@ -347,6 +350,9 @@ namespace form_builder.Services.BookingService
                                                  $"{element.Properties.LimitNextAvailableFromDate}:" +
                                                  $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
                                                  $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
+                if (!convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
+                    throw new ApplicationException($"BookingService::ProcessDateAndTime, The key {bookingInformationCacheKey} is not stored in FormData");
 
                 var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingInformationCacheKey}"].ToString());
                 var bookingInformation = new List<object> { cachedBookingInformation };
