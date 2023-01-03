@@ -220,6 +220,22 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
+        public static IServiceCollection ConfigureCorsPolicy(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins("https://int-iag-stockportgov.smbcdigital.net/",
+                                        "https://qa-iag-stockportgov.smbcdigital.net/",
+                                        "https://stage-iag-stockportgov.smbcdigital.net/",
+                                        "https://www.stockport.gov.uk/");
+                });
+            });
+
+            return services;
+        }
+
         public static IServiceCollection ConfigureAddressProviders(this IServiceCollection services)
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
