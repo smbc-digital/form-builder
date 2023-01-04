@@ -7,7 +7,6 @@
     ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadCrumbs;
     ViewData["Breadcrumbs"] = Model.BreadCrumbs;
     ViewData["PreviewMode"] = Model.IsInPreviewMode;
-    ViewData["Embeddable"] = Model.Embeddable;
 }
 
 @using (Html.BeginForm("IndexPost", "Preview", new {}, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )

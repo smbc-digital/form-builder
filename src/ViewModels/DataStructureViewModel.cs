@@ -12,8 +12,6 @@ namespace form_builder.ViewModels
 
         public string StartPageUrl { get; set; }
 
-        public bool Embeddable { get; set; }
-
         public bool HideBackButton => true;
 
         public string PageTitle { get; set; }

@@ -76,7 +76,6 @@ namespace form_builder.Controllers.Payment
                 PageContent = result.HtmlContent,
                 FormName = result.FormName,
                 StartPageUrl = result.StartPageUrl,
-                Embeddable = result.Embeddable,
                 PageTitle = result.PageTitle,
                 BannerTitle = result.BannerTitle,
                 LeadingParagraph = result.LeadingParagraph
@@ -99,8 +98,7 @@ namespace form_builder.Controllers.Payment
                 PageTitle = "Failure",
                 Reference = reference,
                 PaymentUrl = url,
-                StartPageUrl = data.BaseForm.StartPageUrl,
-                Embeddable = data.BaseForm.Embeddable
+                StartPageUrl = data.BaseForm.StartPageUrl
             };
 
             return View("./Failure", paymentFailureViewModel);
@@ -119,8 +117,7 @@ namespace form_builder.Controllers.Payment
                 PageTitle = "Declined",
                 Reference = reference,
                 PaymentUrl = url,
-                StartPageUrl = data.BaseForm.StartPageUrl,
-                Embeddable = data.BaseForm.Embeddable
+                StartPageUrl = data.BaseForm.StartPageUrl
             };
 
             return View("./Declined", paymentDeclinedViewModel);
@@ -139,7 +136,6 @@ namespace form_builder.Controllers.Payment
                 PageTitle = "Error",
                 Reference = reference,
                 StartPageUrl = data.BaseForm.StartPageUrl,
-                Embeddable = data.BaseForm.Embeddable,
                 CallbackFailureContactNumber = data.BaseForm.CallbackFailureContactNumber
             };
 

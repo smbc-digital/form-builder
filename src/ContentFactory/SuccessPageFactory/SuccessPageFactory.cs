@@ -59,7 +59,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                     FeedbackPhase = baseForm.FeedbackPhase,
                     FormName = baseForm.FormName,
                     StartPageUrl = baseForm.StartPageUrl,
-                    Embeddable = baseForm.Embeddable,
                     IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX)
                 };
             }
@@ -74,7 +73,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 FeedbackPhase = result.FeedbackPhase,
                 FormName = result.FormName,
                 StartPageUrl = result.StartPageUrl,
-                Embeddable = result.Embeddable,
                 PageTitle = result.PageTitle,
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph,
@@ -100,7 +98,6 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 FeedbackPhase = result.FeedbackPhase,
                 FormName = result.FormName,
                 StartPageUrl = result.StartPageUrl,
-                Embeddable = result.Embeddable,
                 PageTitle = result.PageTitle,
                 BannerTitle = page.BannerTitle,
                 LeadingParagraph = page.LeadingParagraph,
