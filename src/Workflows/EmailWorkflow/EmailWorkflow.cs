@@ -7,6 +7,7 @@ using form_builder.Services.DocumentService;
 using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Providers.StorageProvider;
+using form_builder.Providers.ReferenceNumbers;
 
 
 namespace form_builder.Workflows.EmailWorkflow
@@ -19,11 +20,13 @@ namespace form_builder.Workflows.EmailWorkflow
         private readonly IEmailProvider _emailProvider;
         private readonly IDocumentSummaryService _documentSummaryService;
         private readonly IDistributedCacheWrapper _distributedCache;
+        private readonly IReferenceNumberProvider _referenceNumberProvider;
         public EmailWorkflow(
             IMappingService mappingService,
             IEmailHelper emailHelper,
             ISessionHelper sessionHelper,
             IEmailProvider emailProvider,
+            IReferenceNumberProvider referenceNumberProvider,
             IDocumentSummaryService documentSummaryService,
             IDistributedCacheWrapper distibutedCacheWrapper
             )
@@ -32,6 +35,7 @@ namespace form_builder.Workflows.EmailWorkflow
             _emailHelper = emailHelper;
             _sessionHelper = sessionHelper;
             _emailProvider = emailProvider;
+            _referenceNumberProvider = referenceNumberProvider;
             _documentSummaryService = documentSummaryService;
             _distributedCache = distibutedCacheWrapper;
         }
@@ -49,13 +53,14 @@ namespace form_builder.Workflows.EmailWorkflow
 
             if (data.BaseForm.GenerateReferenceNumber)
             {
+                data.FormAnswers.CaseReference = _referenceNumberProvider.GetReference(data.BaseForm.ReferencePrefix);
                 reference = data.FormAnswers.CaseReference;
             }
 
             var doc = _documentSummaryService.GenerateDocument(
                new DocumentSummaryEntity
                {
-                   DocumentType = EDocumentType.Txt,
+                   DocumentType = EDocumentType.Html,
                    PreviousAnswers = data.FormAnswers,
                    FormSchema = data.BaseForm
                });
@@ -68,7 +73,6 @@ namespace form_builder.Workflows.EmailWorkflow
                 "noreply@stockport.gov.uk",
                 string.Join(",", email.To.ToArray())
                 );
-
 
             var result =  _emailProvider.SendEmail(emailMessage).Result;
 

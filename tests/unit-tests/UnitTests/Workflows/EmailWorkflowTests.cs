@@ -30,7 +30,6 @@ namespace form_builder_tests.UnitTests.Workflows
             (
                 _mappingService.Object,
                 _emailHelper.Object,
-                _sessionHelper.Object,
                 _emailProvider.Object,
                 _documentSummaryService.Object
             );

@@ -20,5 +20,25 @@ namespace form_builder.Providers.DocumentCreation.Generic
                 return stream.ToArray();
             }
         }
+
+        public byte[] CreateHtmlDocument(List<string> fileContent)
+        {
+            using (var stream = new MemoryStream())
+            {
+                var objStreamWriter = new StreamWriter(stream);
+                objStreamWriter.WriteLine("<div>");
+                objStreamWriter.WriteLine("<h2>Results</h2>");
+                objStreamWriter.WriteLine("<hr />");
+                fileContent.ForEach((line) =>
+                {
+                    objStreamWriter.WriteLine($"<p>{line}</p>");
+                });
+                objStreamWriter.WriteLine("<hr />");
+                objStreamWriter.WriteLine("</div>");
+                objStreamWriter.Flush();
+                objStreamWriter.Close();
+                return stream.ToArray();
+            }
+        }
     }
 }

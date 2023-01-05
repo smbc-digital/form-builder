@@ -12,5 +12,10 @@ namespace form_builder.Providers.DocumentCreation.Smbc
         {
             throw new System.NotImplementedException();
         }
+
+        public byte[] CreateHtmlDocument(List<string> fileContent)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

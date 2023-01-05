@@ -9,5 +9,7 @@ namespace form_builder.Providers.DocumentCreation
         EDocumentType DocumentType { get; }
 
         byte[] CreateDocument(List<string> fileContent);
+
+        byte[] CreateHtmlDocument(List<string> fileContent);
     }
 }
