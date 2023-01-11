@@ -183,6 +183,11 @@ namespace form_builder.Services.PageService
 
             if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
             {
+                foreach (var tagParser in _tagParsers)
+                {
+                    await tagParser.Parse(page, convertedAnswers);
+                }
+
                 var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, sessionGuid);
 
                 if (bookingProcessEntity.BookingHasNoAvailableAppointments)

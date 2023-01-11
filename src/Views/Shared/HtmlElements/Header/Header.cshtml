@@ -6,20 +6,27 @@
     var startPageUrl = string.IsNullOrWhiteSpace(Model?.StartPageUrl) 
         ? string.Empty 
         : Model.StartPageUrl;
+    
+    var embeddable = Model is null 
+        ? false 
+        : Model.Embeddable;
 }
 
-<header class="smbc-header" role="banner" data-module="govuk-header">
-    <div class="smbc-header__container govuk-width-container">
-        <div class="govuk-header__logo">
-            <a href="https://www.stockport.gov.uk/" class="govuk-header__link smbc-header__link--homepage">STOCKPORT.GOV.UK</a>
+@if(!embeddable)
+{
+    <header class="smbc-header" role="banner" data-module="govuk-header">
+        <div class="smbc-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <a href="https://www.stockport.gov.uk/" class="govuk-header__link smbc-header__link--homepage">STOCKPORT.GOV.UK</a>
+            </div>
+            <div class="govuk-header__content">
+                @if (!isError)
+                {
+                    <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name">
+                        @Model.FormName
+                    </a>
+                }
+            </div>
         </div>
-        <div class="govuk-header__content">
-            @if (!isError)
-            {
-                <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name">
-                    @Model.FormName
-                </a>
-            }
-        </div>
-    </div>
-</header>
+    </header>
+}

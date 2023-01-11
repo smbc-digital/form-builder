@@ -15,6 +15,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
+using form_builder.TagParsers;
 using form_builder.Utils.Extensions;
 using form_builder.Utils.Hash;
 using Microsoft.Extensions.Options;
@@ -37,6 +38,7 @@ namespace form_builder.Services.BookingService
         private readonly IHashUtil _hashUtil;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEnumerable<ITagParser> _tagParsers;
 
         public BookingService(
             IDistributedCacheWrapper distributedCache,
@@ -49,7 +51,8 @@ namespace form_builder.Services.BookingService
             ISessionHelper sessionHelper,
             IHashUtil hashUtil,
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IEnumerable<ITagParser> tagParsers)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
@@ -62,6 +65,7 @@ namespace form_builder.Services.BookingService
             _hashUtil = hashUtil;
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _httpContextAccessor = httpContextAccessor;
+            _tagParsers = tagParsers;
         }
 
         public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string sessionGuid)
@@ -75,7 +79,10 @@ namespace form_builder.Services.BookingService
             var appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
-            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:" + 
+                                             $"{bookingElement.Properties.LimitNextAvailableFromDate}:" +
+                                             $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
+                                             $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             var cachedAnswers = _distributedCache.GetString(sessionGuid);
             FormAnswers convertedAnswers = new();
@@ -168,6 +175,10 @@ namespace form_builder.Services.BookingService
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             await _schemaFactory.TransformPage(currentPage, convertedAnswers);
+            foreach (var tagParser in _tagParsers)
+            {
+                await tagParser.Parse(currentPage, convertedAnswers);
+            }
 
             if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
                 throw new ApplicationException("BookingService::ProcessMonthRequest, request for appointment did not contain requested month");
@@ -194,7 +205,10 @@ namespace form_builder.Services.BookingService
             if (appointmentType.NeedsAppointmentIdMapping)
                 _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
-            var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:" +
+                                             $"{bookingElement.Properties.LimitNextAvailableFromDate}:" +
+                                             $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
+                                             $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
             var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
                 .GetAvailability(new AvailabilityRequest
@@ -204,6 +218,9 @@ namespace form_builder.Services.BookingService
                     AppointmentId = appointmentType.AppointmentId,
                     OptionalResources = appointmentType.OptionalResources
                 });
+
+            if (!convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
+                throw new ApplicationException($"BookingService::ProcessMonthRequest, The key {bookingInformationCacheKey} is not stored in FormData");
 
             var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[bookingInformationCacheKey].ToString());
             BookingInformation bookingInformation = new()
@@ -276,10 +293,20 @@ namespace form_builder.Services.BookingService
 
         private async Task<BookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider, AppointmentType appointmentType)
         {
-            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
+            var bookingNextAvailabilityCachedKey = $"{bookingElement.Properties.BookingProvider}-{bookingElement.Properties.QuestionId}-" +
+                                                   $"{bookingElement.Properties.LimitNextAvailableFromDate}-" +
+                                                   $"{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
+
             var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
             if (bookingNextAvailabilityCachedResponse is not null)
                 return JsonConvert.DeserializeObject<BookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
+
+            var hasLimitProperties = !string.IsNullOrEmpty(bookingElement.Properties.LimitNextAvailableFromDate) &&
+                                     bookingElement.Properties.LimitNextAvailableByDays > 0;
+
+            var startDate = hasLimitProperties
+                ? DateTime.Parse(bookingElement.Properties.LimitNextAvailableFromDate).AddDays(bookingElement.Properties.LimitNextAvailableByDays)
+                : DateTime.Now;
 
             AvailabilityDayResponse nextAvailability;
             BookingNextAvailabilityEntity result;
@@ -288,8 +315,8 @@ namespace form_builder.Services.BookingService
                 nextAvailability = await bookingProvider
                     .NextAvailability(new AvailabilityRequest
                     {
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now.AddMonths(bookingElement.Properties.SearchPeriod),
+                        StartDate = startDate,
+                        EndDate = startDate.AddMonths(bookingElement.Properties.SearchPeriod),
                         AppointmentId = appointmentType.AppointmentId,
                         OptionalResources = appointmentType.OptionalResources
                     });
@@ -319,7 +346,19 @@ namespace form_builder.Services.BookingService
                 var appointmentType = element.Properties.AppointmentTypes
                     .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
-                var bookingInformationCacheKey = $"{appointmentType.AppointmentId}:{appointmentType.OptionalResources.CreateKeyFromResources()}:{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+                await _schemaFactory.TransformPage(currentPage, convertedAnswers);
+                foreach (var tagParser in _tagParsers)
+                {
+                    await tagParser.Parse(currentPage, convertedAnswers);
+                }
+
+                var bookingInformationCacheKey = $"{element.Properties.QuestionId}:{appointmentType.AppointmentId}:" +
+                                                 $"{element.Properties.LimitNextAvailableFromDate}:" +
+                                                 $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
+                                                 $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
+
+                if (!convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
+                    throw new ApplicationException($"BookingService::ProcessDateAndTime, The key {bookingInformationCacheKey} is not stored in FormData");
 
                 var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingInformationCacheKey}"].ToString());
                 var bookingInformation = new List<object> { cachedBookingInformation };

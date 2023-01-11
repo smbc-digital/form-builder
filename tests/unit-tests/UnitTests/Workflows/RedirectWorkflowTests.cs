@@ -1,4 +1,5 @@
 ﻿using form_builder.Helpers.Session;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
@@ -14,10 +15,11 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly Mock<ISessionHelper> _sessionHelper = new();
         private readonly Mock<ISubmitService> _submitService = new();
         private readonly Mock<IMappingService> _mappingService = new();
+        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
 
         public RedirectWorkflowTests()
         {
-            _workflow = new RedirectWorkflow(_submitService.Object, _mappingService.Object, _sessionHelper.Object);
+            _workflow = new RedirectWorkflow(_submitService.Object, _mappingService.Object, _sessionHelper.Object, _distributedCache.Object);
         }
 
         [Fact]
@@ -56,6 +58,21 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Submit_ShouldDeleteCacheEntry()
+        {
+            // Arrange
+            var guid = "1234";
+            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid);
+
+            // Act
+            await _workflow.Submit("form", "page");
+
+            // Assert
+            _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x.Equals(guid))), Times.Once);
         }
     }
 }

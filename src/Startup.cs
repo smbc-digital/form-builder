@@ -46,6 +46,7 @@ namespace form_builder
                 .AddUtilities()
                 .AddAnalyticsProviders()
                 .ConfigureAddressProviders()
+                .ConfigureCorsPolicy()
                 .ConfigureDynamicLookDataProviders()
                 .ConfigureOrganisationProviders()
                 .ConfigureStreetProviders()

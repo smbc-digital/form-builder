@@ -124,6 +124,7 @@ namespace form_builder.Controllers
                 FormAnswers = result.FormAnswers,
                 FormName = result.FormName,
                 StartPageUrl = result.StartPageUrl,
+                Embeddable = result.Embeddable,
                 FeedbackPhase = result.FeedbackPhase,
                 FeedbackForm = result.FeedbackFormUrl,
                 PageTitle = result.PageTitle,
