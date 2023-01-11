@@ -18,12 +18,9 @@ namespace form_builder.ViewModels
 
         public string StartPageUrl { get; set; }
 
-        public bool Embeddable { get; set; }
-
         public bool HideBackButton { get; set; }
 
         public string PageTitle { get; set; }
-        
         public bool DisplayBreadcrumbs { get; set; }
 
         public List<Breadcrumb> Breadcrumbs { get; set; }
