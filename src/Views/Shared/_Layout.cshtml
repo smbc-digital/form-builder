@@ -7,6 +7,7 @@
     var displayBreadcrumbs = (bool)ViewData["DisplayBreadcrumbs"];
     var breadcrumbs = ViewData["Breadcrumbs"];
     var displayPreviewModeBanner = (bool)ViewData["PreviewMode"];
+    var embeddable = Model.Embeddable == true ? "smbc-embeddable" : String.Empty;
 }
 
 <!doctype html>
