@@ -19,7 +19,6 @@ namespace form_builder.Workflows.EmailWorkflow
         private readonly ISessionHelper _sessionHelper;
         private readonly IEmailProvider _emailProvider;
         private readonly IDocumentSummaryService _documentSummaryService;
-        private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IReferenceNumberProvider _referenceNumberProvider;
         public EmailWorkflow(
             IMappingService mappingService,
@@ -27,8 +26,7 @@ namespace form_builder.Workflows.EmailWorkflow
             ISessionHelper sessionHelper,
             IEmailProvider emailProvider,
             IReferenceNumberProvider referenceNumberProvider,
-            IDocumentSummaryService documentSummaryService,
-            IDistributedCacheWrapper distibutedCacheWrapper
+            IDocumentSummaryService documentSummaryService
             )
         {
             _mappingService = mappingService;
@@ -37,7 +35,6 @@ namespace form_builder.Workflows.EmailWorkflow
             _emailProvider = emailProvider;
             _referenceNumberProvider = referenceNumberProvider;
             _documentSummaryService = documentSummaryService;
-            _distributedCache = distibutedCacheWrapper;
         }
 
         public async Task<string> Submit(string form)

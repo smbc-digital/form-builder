@@ -4,11 +4,11 @@ using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.EmailProvider;
+using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.DocumentService;
 using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
-using form_builder.Services.SubmitService;
 using form_builder.Workflows.EmailWorkflow;
 using Moq;
 using Xunit;
@@ -23,6 +23,7 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly Mock<ISessionHelper>_sessionHelper = new();
         private readonly Mock<IEmailProvider> _emailProvider = new();
         private readonly Mock<IDocumentSummaryService> _documentSummaryService=new();
+        private readonly Mock<IReferenceNumberProvider> _referenceNumberProvider = new();
         private readonly EmailWorkflow _emailWorkflow;
         public EmailWorkflowTests()
         {
@@ -30,7 +31,9 @@ namespace form_builder_tests.UnitTests.Workflows
             (
                 _mappingService.Object,
                 _emailHelper.Object,
+                _sessionHelper.Object,
                 _emailProvider.Object,
+                _referenceNumberProvider.Object,
                 _documentSummaryService.Object
             );
         }
@@ -71,10 +74,15 @@ namespace form_builder_tests.UnitTests.Workflows
                 .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
                 .ReturnsAsync(new EmailConfig { FormName = new List<string> { "form" }, Subject = "test", To = new List<string> { "google" } });
 
+            _referenceNumberProvider
+                 .Setup(_ => _.GetReference(It.IsAny<string>(),8))
+                 .Returns("12345678");
+            
             // Act
-            await _emailWorkflow.Submit("form");
+            var result = await _emailWorkflow.Submit("form");
 
             // Assert
+            Assert.Equal("12345678", result);
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _documentSummaryService.Verify(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()), Times.Once);
             _emailHelper.Verify(_ => _.GetEmailInformation(It.IsAny<string>()), Times.Once);
