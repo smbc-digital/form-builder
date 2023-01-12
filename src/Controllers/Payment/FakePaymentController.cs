@@ -10,7 +10,7 @@ namespace form_builder.Controllers.Payment
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _environment;
-        private PaymentConfiguration _paymentConfiguration;
+        private readonly PaymentConfiguration _paymentConfiguration;
 
         public FakePaymentController(IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment, IOptions<PaymentConfiguration> paymentConfiguration)
         {
