@@ -204,8 +204,13 @@ namespace form_builder.Helpers.PageHelpers
                 convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             if (isGenerated)
-                convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
+            {
+                if (convertedAnswers.AdditionalFormData.ContainsKey(generatedReferenceMappingId))
+                    convertedAnswers.AdditionalFormData.Remove(generatedReferenceMappingId);
 
+                convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
+            }
+            
             convertedAnswers.CaseReference = caseReference;
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
