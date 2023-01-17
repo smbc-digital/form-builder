@@ -1,12 +1,14 @@
 ﻿using form_builder.Enum;
 using form_builder.Configuration;
 using form_builder.Helpers.EmailHelpers;
+using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.DocumentService;
 using form_builder.Services.DocumentService.Entities;
+using form_builder.Services.EmailSubmitService;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Workflows.EmailWorkflow;
@@ -19,22 +21,16 @@ namespace form_builder_tests.UnitTests.Workflows
     {
 
         private readonly Mock<IMappingService>_mappingService = new();
-        private readonly Mock<IEmailHelper> _emailHelper = new();
         private readonly Mock<ISessionHelper>_sessionHelper = new();
-        private readonly Mock<IEmailProvider> _emailProvider = new();
-        private readonly Mock<IDocumentSummaryService> _documentSummaryService=new();
-        private readonly Mock<IReferenceNumberProvider> _referenceNumberProvider = new();
+        private readonly Mock<IEmailSubmitService> _emailSubmitService = new();
         private readonly EmailWorkflow _emailWorkflow;
         public EmailWorkflowTests()
         {
             _emailWorkflow = new EmailWorkflow
             (
+                _emailSubmitService.Object,
                 _mappingService.Object,
-                _emailHelper.Object,
-                _sessionHelper.Object,
-                _emailProvider.Object,
-                _referenceNumberProvider.Object,
-                _documentSummaryService.Object
+                _sessionHelper.Object
             );
         }
 
@@ -48,8 +44,6 @@ namespace form_builder_tests.UnitTests.Workflows
             // Assert
             Assert.Equal("A Session GUID was not provided.", result.Message);
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-            _documentSummaryService.Verify(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()), Times.Never);
-            _emailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Never);
         }
 
         [Fact]
@@ -62,32 +56,17 @@ namespace form_builder_tests.UnitTests.Workflows
             _mappingService
                 .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
-            _documentSummaryService
-                .Setup(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()))
-                .ReturnsAsync(new byte[] { 0x1a, 0x0f, 0x00 });
+            _emailSubmitService
+                .Setup(_ => _.EmailSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("12345678");
 
-            _emailProvider
-                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .ReturnsAsync(System.Net.HttpStatusCode.OK);
-
-            _emailHelper
-                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfig { FormName = new List<string> { "form" }, Subject = "test", To = new List<string> { "google" } });
-
-            _referenceNumberProvider
-                 .Setup(_ => _.GetReference(It.IsAny<string>(),8))
-                 .Returns("12345678");
-            
             // Act
             var result = await _emailWorkflow.Submit("form");
 
             // Assert
-            Assert.Equal("12345678", result);
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _documentSummaryService.Verify(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()), Times.Once);
-            _emailHelper.Verify(_ => _.GetEmailInformation(It.IsAny<string>()), Times.Once);
-            _emailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Once);
+            _emailSubmitService.Verify(_ => _.EmailSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.Equal("12345678",_emailWorkflow.Submit("form").Result);
         }
-
     }
 }

@@ -53,6 +53,7 @@ using form_builder.Services.AnalyticsService;
 using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
+using form_builder.Services.EmailSubmitService;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.MappingService;
@@ -418,6 +419,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
             services.AddSingleton<IPreviewService, PreviewService>();
             services.AddSingleton<IAnalyticsService, AnalyticsService>();
+            services.AddSingleton<IEmailSubmitService, EmailSubmitService>();
 
             return services;
         }

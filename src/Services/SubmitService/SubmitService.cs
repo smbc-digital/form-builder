@@ -197,7 +197,6 @@ namespace form_builder.Services.SubmitService
                 reference = answers.CaseReference;
             }
 
-            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
                 await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
 
             var submissionReference = _submissionServiceConfiguration.FakeSubmission

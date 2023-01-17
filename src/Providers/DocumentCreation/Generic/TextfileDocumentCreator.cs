@@ -27,7 +27,7 @@ namespace form_builder.Providers.DocumentCreation.Generic
             {
                 var objStreamWriter = new StreamWriter(stream);
                 objStreamWriter.WriteLine("<div>");
-                objStreamWriter.WriteLine("<h2>Results</h2>");
+                objStreamWriter.WriteLine("<h2>Form answers</h2>");
                 objStreamWriter.WriteLine("<hr />");
                 fileContent.ForEach((line) =>
                 {
@@ -40,5 +40,6 @@ namespace form_builder.Providers.DocumentCreation.Generic
                 return stream.ToArray();
             }
         }
+
     }
 }
