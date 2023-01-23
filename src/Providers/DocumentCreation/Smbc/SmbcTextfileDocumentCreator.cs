@@ -17,5 +17,10 @@ namespace form_builder.Providers.DocumentCreation.Smbc
         {
             throw new System.NotImplementedException();
         }
+
+        public byte[] CreatePdfDocument(List<string> fileContent)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

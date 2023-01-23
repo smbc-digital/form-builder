@@ -39,6 +39,8 @@ namespace form_builder.Services.DocumentService
                     return await GenerateTextFile(entity.PreviousAnswers, entity.FormSchema);
                 case EDocumentType.Html:
                     return await GenerateHtmlFile(entity.PreviousAnswers, entity.FormSchema);
+                case EDocumentType.Pdf:
+                    return await GeneratePdfFile(entity.PreviousAnswers, entity.FormSchema);
                 default:
                     throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary");
             }
@@ -56,6 +58,13 @@ namespace form_builder.Services.DocumentService
             var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             return _textfileProvider.CreateHtmlDocument(data);
+        }
+
+        private async Task<byte[]> GeneratePdfFile(FormAnswers formAnswers, FormSchema formSchema)
+        {
+            var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+
+            return _textfileProvider.CreatePdfDocument(data);
         }
     }
 }

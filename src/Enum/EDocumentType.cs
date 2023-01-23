@@ -8,6 +8,7 @@ namespace form_builder.Enum
     {
         Unknown,
         Txt,
-        Html
+        Html,
+        Pdf
     }
 }

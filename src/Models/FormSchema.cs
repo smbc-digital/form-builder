@@ -28,6 +28,8 @@ namespace form_builder.Models
 
         public bool SavePaymentAmount { get; set; }
 
+        public bool SendAttachment { get; set; }
+
         public string PaymentAmountMapping { get; set; } = "paymentAmount";
 
         public bool ProcessPaymentCallbackResponse { get; set; }

@@ -28,9 +28,32 @@ namespace form_builder.Builders.Email
             if (!string.IsNullOrEmpty(emailMessage.CcEmail))
                 message.Cc.Add(new MailboxAddress(string.Empty, emailMessage.CcEmail));
 
-            message.Subject = emailMessage.Subject;
-            message.Body = BuildMessageBody(emailMessage.Body).ToMessageBody();
+            
+            
+            var htmlBody = new TextPart("html");
+            htmlBody.Text = emailMessage.Body;
 
+
+            Multipart multipart = new("mixed");
+            multipart.Add(htmlBody);
+
+            if (emailMessage.Attachment != null)
+            {
+                var attachment = new MimePart("application", "pdf")
+                {
+                    Content = new MimeContent(new MemoryStream(emailMessage.Attachment)),
+                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                    ContentTransferEncoding = ContentEncoding.Base64,
+                    FileName = "formanswers.pdf",
+                    IsAttachment = true
+                };
+
+
+                multipart.Add(attachment);
+            }
+
+            message.Subject = emailMessage.Subject;
+            message.Body = multipart;
             return message;
         }
 
@@ -38,6 +61,7 @@ namespace form_builder.Builders.Email
         {
             HtmlBody = bodyContent,
             TextBody = bodyContent
+           
         };
     }
 }

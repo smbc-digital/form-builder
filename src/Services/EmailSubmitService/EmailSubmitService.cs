@@ -62,14 +62,35 @@ namespace form_builder.Services.EmailSubmitService
                    FormSchema = data.BaseForm
                });
 
+            
             var body = System.Text.Encoding.Default.GetString(doc.Result);
 
             var email = _emailHelper.GetEmailInformation(form).Result;
+
             var emailMessage = new EmailMessage
-                (email.Subject, body,
-                "noreply@stockport.gov.uk",
-                string.Join(",", email.To.ToArray())
-                );
+                   (email.Subject, body,
+                   "noreply@stockport.gov.uk",
+                   string.Join(",", email.To.ToArray())
+                   );
+
+            if (data.BaseForm.SendAttachment)
+            {
+                var pdfdoc = _documentSummaryService.GenerateDocument(
+                   new DocumentSummaryEntity
+                   {
+                       DocumentType = EDocumentType.Pdf,
+                       PreviousAnswers = data.FormAnswers,
+                       FormSchema = data.BaseForm
+                   });
+
+
+                emailMessage = new EmailMessage
+                    (email.Subject, body,
+                    "noreply@stockport.gov.uk",
+                    string.Join(",", email.To.ToArray()),
+                    pdfdoc.Result
+                    );
+            }
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
 
