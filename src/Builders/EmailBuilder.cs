@@ -44,7 +44,7 @@ namespace form_builder.Builders.Email
                     Content = new MimeContent(new MemoryStream(emailMessage.Attachment)),
                     ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
                     ContentTransferEncoding = ContentEncoding.Base64,
-                    FileName = "formanswers.pdf",
+                    FileName = emailMessage.AttachmentName,
                     IsAttachment = true
                 };
 

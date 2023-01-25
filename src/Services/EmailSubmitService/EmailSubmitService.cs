@@ -62,8 +62,7 @@ namespace form_builder.Services.EmailSubmitService
                    FormSchema = data.BaseForm
                });
 
-            
-            var body = System.Text.Encoding.Default.GetString(doc.Result);
+            var body = string.IsNullOrWhiteSpace(data.BaseForm.EmailBody)?System.Text.Encoding.Default.GetString(doc.Result):data.BaseForm.EmailBody;
 
             var email = _emailHelper.GetEmailInformation(form).Result;
 
@@ -83,12 +82,12 @@ namespace form_builder.Services.EmailSubmitService
                        FormSchema = data.BaseForm
                    });
 
-
                 emailMessage = new EmailMessage
                     (email.Subject, body,
                     "noreply@stockport.gov.uk",
                     string.Join(",", email.To.ToArray()),
-                    pdfdoc.Result
+                    pdfdoc.Result,
+                    data.FormAnswers.CaseReference + "_data.pdf"
                     );
             }
 

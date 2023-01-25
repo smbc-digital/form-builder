@@ -14,6 +14,8 @@
 
         public byte[] Attachment { get; }
 
+        public string AttachmentName { get; }
+
         public EmailMessage(string subject, string body, string fromEmail, string toEmail, string ccEmail)
         {
             Subject = subject;
@@ -29,13 +31,14 @@
             ToEmail = toEmail;
         }
 
-        public EmailMessage(string subject, string body, string fromEmail, string toEmail, byte[] attachment)
+        public EmailMessage(string subject, string body, string fromEmail, string toEmail, byte[] attachment, string attachmntName)
         {
             Subject = subject;
             Body = body;
             FromEmail = fromEmail;
             ToEmail = toEmail;
             Attachment = attachment;
+            AttachmentName = attachmntName;
         }
     }
 }

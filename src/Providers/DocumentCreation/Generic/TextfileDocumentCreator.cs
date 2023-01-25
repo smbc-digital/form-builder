@@ -47,31 +47,23 @@ namespace form_builder.Providers.DocumentCreation.Generic
         public byte[] CreatePdfDocument(List<string> fileContent)
         {
             var pdfdocument = new PdfDocument();
-            
             var pdfPage = pdfdocument.AddPage();
-
             pdfPage.Size = PdfSharpCore.PageSize.A4;
-
             XGraphics gfx = XGraphics.FromPdfPage(pdfPage);
-
             XFont font = new XFont("Verdana", 20, XFontStyle.Bold);
-
             gfx.DrawString("Form Data", font, XBrushes.Black,new XRect(0, 0, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
+            
             int y = 60;
-
-
             XFont bodyFont = new XFont("Verdana", 20, XFontStyle.Regular);
             fileContent.ForEach((line) =>
             {
                 gfx.DrawString(line, bodyFont, XBrushes.Black, new XRect(0, y, pdfPage.Width, pdfPage.Height), XStringFormats.TopLeft);
-                y += 30;
+                y += 25;
             });
-            MemoryStream memoryStream = new();
 
+            MemoryStream memoryStream = new();
             pdfdocument.Save(memoryStream);
             return memoryStream.ToArray();
-             
         }
-
     }
 }
