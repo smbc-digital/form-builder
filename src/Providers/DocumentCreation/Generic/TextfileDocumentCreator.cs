@@ -51,7 +51,7 @@ namespace form_builder.Providers.DocumentCreation.Generic
             pdfPage.Size = PdfSharpCore.PageSize.A4;
             XGraphics gfx = XGraphics.FromPdfPage(pdfPage);
             XFont font = new XFont("Verdana", 20, XFontStyle.Bold);
-            gfx.DrawString("Form Data", font, XBrushes.Black,new XRect(0, 0, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
+            gfx.DrawString("Form Data", font, XBrushes.Black,new XRect(0, 20, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
             
             int y = 60;
             XFont bodyFont = new XFont("Verdana", 20, XFontStyle.Regular);

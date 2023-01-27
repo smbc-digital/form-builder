@@ -62,7 +62,7 @@ namespace form_builder.Services.EmailSubmitService
                    FormSchema = data.BaseForm
                });
 
-            var body = string.IsNullOrWhiteSpace(data.BaseForm.EmailBody)?System.Text.Encoding.Default.GetString(doc.Result):data.BaseForm.EmailBody;
+            var body = string.IsNullOrWhiteSpace(data.BaseForm.EmailBody)?System.Text.Encoding.Default.GetString(doc.Result):$"<p>{data.BaseForm.EmailBody}</p>";
 
             var email = _emailHelper.GetEmailInformation(form).Result;
 
