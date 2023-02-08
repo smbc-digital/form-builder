@@ -184,6 +184,18 @@ namespace form_builder.Controllers
         }
 
         [HttpGet]
+        [Route("{form}/email")]
+        public async Task<IActionResult> Email(string form)
+        {
+            await _emailWorkFlow.Submit(form);
+
+            return RedirectToAction("Success", new
+            {
+                form
+            });
+        }
+
+        [HttpGet]
         [Route("{form}/success")]
         public async Task<IActionResult> Success(string form)
         {
