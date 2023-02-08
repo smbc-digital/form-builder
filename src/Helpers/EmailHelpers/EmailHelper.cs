@@ -31,16 +31,15 @@ namespace form_builder.Helpers.EmailHelpers
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
-                throw new Exception($"EmailService:: No mapping entity found for {form}");
+                throw new Exception($"{nameof(EmailHelper)}::{nameof(GetEmailInformation)}: No mapping entity found for {form}");
 
             var emailConfigList = await _emailConfigProvider.Get<List<EmailConfiguration>>();
             var formEmailConfig = emailConfigList.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(form)));
 
             if (formEmailConfig is null)
-                throw new Exception($"Email:: No email information found for {form}");
+                throw new Exception($"{nameof(EmailHelper)}::{nameof(GetEmailInformation)}: No email information found for {form}");
             
             return formEmailConfig;
-
         }
     }
 }
