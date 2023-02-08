@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.PageHelpers;
@@ -15,11 +14,12 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.Configuration;
 using form_builder.Builders;
 using form_builder_tests.Builders;
+using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
 {
-    public class EmailSubmitServiceTests { 
-
+    public class EmailSubmitServiceTests
+    {
         private readonly Mock<IMappingService> _mappingService = new();
         private readonly Mock<IEmailHelper> _emailHelper = new();
         private readonly Mock<ISessionHelper> _sessionHelper = new();
@@ -27,7 +27,6 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDocumentSummaryService> _documentSummaryService = new();
         private readonly Mock<IReferenceNumberProvider> _referenceNumberProvider = new();
         private readonly Mock<IPageHelper> _pageHelper = new();
-
         private readonly EmailSubmitService _emailSubmitService;
 
         public EmailSubmitServiceTests()
@@ -42,7 +41,7 @@ namespace form_builder_tests.UnitTests.Services
                 _documentSummaryService.Object
               );
         }
-    
+
         [Fact]
         public async Task Submit_ShouldCallMapping_And_SubmitService()
         {
@@ -63,12 +62,16 @@ namespace form_builder_tests.UnitTests.Services
 
             _emailHelper
                 .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfiguration { FormName = new List<string> { "form" }, Subject = "test", Recipient = new List<string> { "google" } });
+                .ReturnsAsync(new EmailConfiguration
+                {
+                    FormName = new List<string> { "form" },
+                    Subject = "test",
+                    Recipient = new List<string> { "google" }
+                });
 
             _referenceNumberProvider
                  .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
                  .Returns("12345678");
-
 
             // Arrange
             var element = new ElementBuilder()

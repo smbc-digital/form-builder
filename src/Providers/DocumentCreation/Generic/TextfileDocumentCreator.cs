@@ -2,7 +2,6 @@ using form_builder.Enum;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Drawing;
 
-
 namespace form_builder.Providers.DocumentCreation.Generic
 {
     public class TextfileDocumentCreator : IDocumentCreation
@@ -11,17 +10,18 @@ namespace form_builder.Providers.DocumentCreation.Generic
         public EDocumentType DocumentType => EDocumentType.Txt;
         public byte[] CreateDocument(List<string> fileContent)
         {
-            using (var stream = new MemoryStream())
+            using var stream = new MemoryStream();
+            using (var objStreamWriter = new StreamWriter(stream))
             {
-                var objStreamWriter = new StreamWriter(stream);
                 fileContent.ForEach((line) =>
-                {
-                    objStreamWriter.WriteLine(line);
-                });
+                        {
+                            objStreamWriter.WriteLine(line);
+                        });
                 objStreamWriter.Flush();
                 objStreamWriter.Close();
-                return stream.ToArray();
             }
+
+            return stream.ToArray();
         }
 
         public byte[] CreateHtmlDocument(List<string> fileContent)
@@ -45,17 +45,17 @@ namespace form_builder.Providers.DocumentCreation.Generic
         }
 
         public byte[] CreatePdfDocument(List<string> fileContent)
-         {
+        {
             var pdfdocument = new PdfDocument();
             var pdfPage = pdfdocument.AddPage();
             pdfPage.Size = PdfSharpCore.PageSize.A4;
             XGraphics gfx = XGraphics.FromPdfPage(pdfPage);
-            gfx.DrawString("Form Answers", new XFont("Verdana", 18, XFontStyle.Bold), XBrushes.Black,new XRect(0, 0, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
-            
+            gfx.DrawString("Form Answers", new XFont("Verdana", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, 0, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
+
             int y = 40;
             fileContent.ForEach((line) =>
             {
-                gfx.DrawString(line, new XFont("Verdana", 16, XFontStyle.Regular), XBrushes.Black, new XRect(0, y, pdfPage.Width-10, pdfPage.Height), XStringFormats.TopLeft);
+                gfx.DrawString(line, new XFont("Verdana", 16, XFontStyle.Regular), XBrushes.Black, new XRect(0, y, pdfPage.Width - 10, pdfPage.Height), XStringFormats.TopLeft);
                 y += 20;
             });
 
