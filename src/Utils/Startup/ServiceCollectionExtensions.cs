@@ -345,12 +345,7 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
-                //services.AddSingleton<IEmailProvider, FakeEmailProvider>();
-                //services.AddSingleton<IEmailProvider, LocalEmailProvider>();
-                services.AddSingleton<IEmailProvider, AwsSesProvider>();
-            else
-                services.AddSingleton<IEmailProvider, AwsSesProvider>();
+            services.AddSingleton<IEmailProvider, AwsSesProvider>();
 
             return services;
         }

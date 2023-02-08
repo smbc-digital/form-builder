@@ -33,17 +33,13 @@ namespace form_builder.Services.DocumentService
                 await _schemaFactory.TransformPage(page, entity.PreviousAnswers);
             }
 
-            switch (entity.DocumentType)
+            return entity.DocumentType switch
             {
-                case EDocumentType.Txt:
-                    return await GenerateTextFile(entity.PreviousAnswers, entity.FormSchema);
-                case EDocumentType.Html:
-                    return await GenerateHtmlFile(entity.PreviousAnswers, entity.FormSchema);
-                case EDocumentType.Pdf:
-                    return await GeneratePdfFile(entity.PreviousAnswers, entity.FormSchema);
-                default:
-                    throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary");
-            }
+                EDocumentType.Txt => await GenerateTextFile(entity.PreviousAnswers, entity.FormSchema),
+                EDocumentType.Html => await GenerateHtmlFile(entity.PreviousAnswers, entity.FormSchema),
+                EDocumentType.Pdf => await GeneratePdfFile(entity.PreviousAnswers, entity.FormSchema),
+                _ => throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary"),
+            };
         }
 
         private async Task<byte[]> GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
