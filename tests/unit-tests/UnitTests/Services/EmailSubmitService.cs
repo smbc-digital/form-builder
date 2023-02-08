@@ -63,7 +63,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _emailHelper
                 .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfig { FormName = new List<string> { "form" }, Subject = "test", To = new List<string> { "google" } });
+                .ReturnsAsync(new EmailConfiguration { FormName = new List<string> { "form" }, Subject = "test", Recipient = new List<string> { "google" } });
 
             _referenceNumberProvider
                  .Setup(_ => _.GetReference(It.IsAny<string>(), 8))

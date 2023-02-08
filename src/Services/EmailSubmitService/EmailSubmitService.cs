@@ -62,17 +62,20 @@ namespace form_builder.Services.EmailSubmitService
                    FormSchema = data.BaseForm
                });
 
-            var body = string.IsNullOrWhiteSpace(data.BaseForm.EmailBody)?System.Text.Encoding.Default.GetString(doc.Result):$"<p>{data.BaseForm.EmailBody}</p>";
-
             var email = _emailHelper.GetEmailInformation(form).Result;
 
-            var emailMessage = new EmailMessage
-                   (email.Subject, body,
-                   "noreply@stockport.gov.uk",
-                   string.Join(",", email.To.ToArray())
+            var body = string.IsNullOrWhiteSpace(email.Body)
+                ? System.Text.Encoding.Default.GetString(doc.Result)
+                : $"<p>{email.Body}</p>";
+
+            var emailMessage = new EmailMessage(
+                   email.Subject,
+                   body,
+                   email.Sender,
+                   string.Join(",", email.Recipient)
                    );
 
-            if (data.BaseForm.SendAttachment)
+            if (email.AttachPdf)
             {
                 var pdfdoc = _documentSummaryService.GenerateDocument(
                    new DocumentSummaryEntity
@@ -82,19 +85,20 @@ namespace form_builder.Services.EmailSubmitService
                        FormSchema = data.BaseForm
                    });
 
-                emailMessage = new EmailMessage
-                    (email.Subject, body,
-                    "noreply@stockport.gov.uk",
-                    string.Join(",", email.To.ToArray()),
+                emailMessage = new EmailMessage(
+                    email.Subject,
+                    body,
+                    email.Sender,
+                    string.Join(",", email.Recipient),
                     pdfdoc.Result,
-                    data.FormAnswers.CaseReference + "_data.pdf"
+                    $"{data.FormAnswers.CaseReference}_data.pdf"
                     );
             }
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
 
             if (result != System.Net.HttpStatusCode.OK)
-                throw new ApplicationException($"Error sending email {result}");
+                throw new ApplicationException($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: threw an exception {result}");
 
             return reference;
         }
