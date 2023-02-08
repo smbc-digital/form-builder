@@ -21,7 +21,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             bool containsEmail = schema.Pages
                 .Where(page => page.Behaviours is not null)
                 .SelectMany(page => page.Behaviours)
-                .Any(page => page.BehaviourType.Equals(EBehaviourType.SubmitEmail));
+                .Any(page => page.BehaviourType.Equals(EBehaviourType.SubmitAndEmail));
 
             if (!containsEmail)
                 return result;

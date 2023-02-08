@@ -160,7 +160,7 @@ namespace form_builder.Controllers
                     var redirectUrl = await _redirectWorkflow.Submit(form, path);
                     return Redirect(redirectUrl);
 
-                case EBehaviourType.SubmitEmail:
+                case EBehaviourType.SubmitAndEmail:
                     return RedirectToAction("Email", new
                     {
                         form

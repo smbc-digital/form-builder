@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 .ReturnsAsync(new List<EmailConfiguration>());
 
             var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitEmail)
+                .WithBehaviourType(EBehaviourType.SubmitAndEmail)
                 .Build();
 
             var page = new PageBuilder()
@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 });
 
             var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitEmail)
+                .WithBehaviourType(EBehaviourType.SubmitAndEmail)
                 .Build();
 
             var page = new PageBuilder()
@@ -91,7 +91,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                 });
 
             var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitEmail)
+                .WithBehaviourType(EBehaviourType.SubmitAndEmail)
                 .Build();
 
             var page = new PageBuilder()

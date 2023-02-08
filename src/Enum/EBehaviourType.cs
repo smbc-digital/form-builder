@@ -8,6 +8,6 @@
         GoToExternalPage,
         SubmitAndPay,
         SubmitAndRedirect,
-        SubmitEmail
+        SubmitAndEmail
     }
 }

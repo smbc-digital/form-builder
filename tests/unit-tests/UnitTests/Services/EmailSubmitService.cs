@@ -78,7 +78,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitEmail)
+                .WithBehaviourType(EBehaviourType.SubmitAndEmail)
                 .WithPageSlug(null)
                 .Build();
 
