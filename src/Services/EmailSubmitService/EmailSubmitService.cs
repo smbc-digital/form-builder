@@ -4,10 +4,10 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.EmailProvider;
+using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.DocumentService;
 using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
-using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.MappingService.Entities;
 
 namespace form_builder.Services.EmailSubmitService
@@ -40,7 +40,7 @@ namespace form_builder.Services.EmailSubmitService
             _referenceNumberProvider = referenceNumberProvider;
             _documentSummaryService = documentSummaryService;
         }
-            
+
 
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
         {
@@ -97,7 +97,7 @@ namespace form_builder.Services.EmailSubmitService
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
 
-            if (result != System.Net.HttpStatusCode.OK)
+            if (!result.Equals(System.Net.HttpStatusCode.OK))
                 throw new ApplicationException($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: threw an exception {result}");
 
             return reference;

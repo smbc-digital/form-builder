@@ -15,7 +15,7 @@ namespace form_builder.Validators
                 return new ValidationResult { IsValid = true };
 
 
-            if(element.Properties.SelectExactly < 1)
+            if (element.Properties.SelectExactly < 1)
                 return new ValidationResult { IsValid = true };
 
             var answer = (string[])viewModel[element.Properties.QuestionId].Split(",");
@@ -24,7 +24,7 @@ namespace form_builder.Validators
             if (answer.Length != element.Properties.SelectExactly)
                 isValid = false;
 
-            return new ValidationResult { IsValid = isValid, Message = isValid ? string.Empty : element.Properties.CustomValidationMessage};
+            return new ValidationResult { IsValid = isValid, Message = isValid ? string.Empty : element.Properties.CustomValidationMessage };
         }
     }
 }

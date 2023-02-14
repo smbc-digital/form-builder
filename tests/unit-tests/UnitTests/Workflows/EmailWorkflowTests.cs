@@ -1,13 +1,5 @@
-﻿using form_builder.Enum;
-using form_builder.Configuration;
-using form_builder.Helpers.EmailHelpers;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
+﻿using form_builder.Helpers.Session;
 using form_builder.Models;
-using form_builder.Providers.EmailProvider;
-using form_builder.Providers.ReferenceNumbers;
-using form_builder.Services.DocumentService;
-using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.EmailSubmitService;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
@@ -20,8 +12,8 @@ namespace form_builder_tests.UnitTests.Workflows
     public class EmailWorkflowTests
     {
 
-        private readonly Mock<IMappingService>_mappingService = new();
-        private readonly Mock<ISessionHelper>_sessionHelper = new();
+        private readonly Mock<IMappingService> _mappingService = new();
+        private readonly Mock<ISessionHelper> _sessionHelper = new();
         private readonly Mock<IEmailSubmitService> _emailSubmitService = new();
         private readonly EmailWorkflow _emailWorkflow;
         public EmailWorkflowTests()
@@ -66,7 +58,7 @@ namespace form_builder_tests.UnitTests.Workflows
             // Assert
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             _emailSubmitService.Verify(_ => _.EmailSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            Assert.Equal("12345678",_emailWorkflow.Submit("form").Result);
+            Assert.Equal("12345678", _emailWorkflow.Submit("form").Result);
         }
     }
 }

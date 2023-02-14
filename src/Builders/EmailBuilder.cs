@@ -19,19 +19,26 @@ namespace form_builder.Builders.Email
             var toEmails = emailMessage.ToEmail.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var email in toEmails)
+            {
                 message.To.Add(new MailboxAddress(string.Empty, email.Trim()));
+            }
 
             message.From.Add(new MailboxAddress(string.Empty, emailMessage.FromEmail));
 
             if (!string.IsNullOrEmpty(emailMessage.CcEmail))
                 message.Cc.Add(new MailboxAddress(string.Empty, emailMessage.CcEmail));
-            
-            var htmlBody = new TextPart("html");
-            htmlBody.Text = emailMessage.Body;
-            Multipart multipart = new("mixed");
-            multipart.Add(htmlBody);
 
-            if (emailMessage.Attachment != null)
+            var multipart = new Multipart("mixed")
+            {
+                new TextPart("html")
+                {
+                    Text = emailMessage.Body
+                }
+            };
+
+
+
+            if (emailMessage.Attachment is not null)
             {
                 var attachment = new MimePart("application", "pdf")
                 {
@@ -47,7 +54,7 @@ namespace form_builder.Builders.Email
 
             message.Subject = emailMessage.Subject;
             message.Body = multipart;
-            
+
             return message;
         }
 

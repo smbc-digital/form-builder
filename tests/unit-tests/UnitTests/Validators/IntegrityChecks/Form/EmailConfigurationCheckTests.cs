@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
 
-        [Fact]        
+        [Fact]
         public async Task EmailConfigurationCheck_IsNotValid_WhenConfigFound_ForForm_ButRecipientIsNotSet()
         {
             // Arrange

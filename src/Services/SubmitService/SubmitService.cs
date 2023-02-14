@@ -197,7 +197,7 @@ namespace form_builder.Services.SubmitService
                 reference = answers.CaseReference;
             }
 
-                await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
+            await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
 
             var submissionReference = _submissionServiceConfiguration.FakeSubmission
                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
