@@ -36,8 +36,6 @@ namespace form_builder.Builders.Email
                 }
             };
 
-
-
             if (emailMessage.Attachment is not null)
             {
                 var attachment = new MimePart("application", "pdf")
