@@ -104,9 +104,9 @@ namespace form_builder.Services.PageService
             var isNewSession = false;
 
             var currentForm = _sessionHelper.GetSessionForm();
-            if((string.IsNullOrEmpty(path)) || !string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm))
+            if (string.IsNullOrEmpty(path) || (!string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm)))
                 _sessionHelper.Clear();
-            
+
             var sessionGuid = _sessionHelper.GetSessionGuid();
             if (string.IsNullOrEmpty(sessionGuid))
             {
@@ -128,7 +128,7 @@ namespace form_builder.Services.PageService
             {
                 _logger.LogWarning($"Form: {form} has restricted access requirements that have not been met");
                 return null;
-            }    
+            }
 
             if (string.IsNullOrEmpty(path))
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
