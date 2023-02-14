@@ -66,6 +66,7 @@ namespace form_builder
                 .AddServices()
                 .AddWorkflows()
                 .AddFactories()
+                .AddFormAccessRestrictions()
                 .AddAntiforgery(_ =>
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
