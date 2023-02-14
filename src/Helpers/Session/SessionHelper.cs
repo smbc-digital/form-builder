@@ -11,5 +11,23 @@
         public void SetSessionGuid(string value) => _httpContextAccessor.HttpContext.Session.SetString("sessionGuid", value);
 
         public void RemoveSessionGuid() => _httpContextAccessor.HttpContext.Session.Remove("sessionGuid");
+
+        public void SetSessionForm(string value) => _httpContextAccessor.HttpContext.Session.SetString("sessionForm", value);
+
+        public string GetSessionForm() =>  _httpContextAccessor.HttpContext.Session.GetString("sessionForm");
+
+        public void RemoveSessionForm() => _httpContextAccessor.HttpContext.Session.Remove("sessionForm");
+
+        public void Clear()
+        {
+            RemoveSessionForm();
+            RemoveSessionGuid();
+        }
+
+        public void Set(string guid, string form)
+        {
+            SetSessionGuid(guid);
+            SetSessionForm(form);
+        }
     }
 }

@@ -101,25 +101,32 @@ namespace form_builder.Services.PageService
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
         {
-            if (string.IsNullOrEmpty(path))
-                _sessionHelper.RemoveSessionGuid();
+            var isNewSession = false;
+
+            var currentForm = _sessionHelper.GetSessionForm();
+            if (string.IsNullOrEmpty(path) || (!string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm)))
+                _sessionHelper.Clear();
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
-
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                sessionGuid = Guid.NewGuid().ToString();
-                _sessionHelper.SetSessionGuid(sessionGuid);
+                _sessionHelper.Set(Guid.NewGuid().ToString(), form);
+                isNewSession = true;
             }
 
             var baseForm = await _schemaFactory.Build(form);
-
             if (baseForm is null)
                 return null;
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
                 _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                return null;
+            }
+
+            if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
+            {
+                _logger.LogWarning($"Form: {form} has restricted access requirements that have not been met");
                 return null;
             }
 
