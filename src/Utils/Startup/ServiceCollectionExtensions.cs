@@ -47,6 +47,7 @@ using form_builder.Providers.Transforms.EmailConfiguration;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.Transforms.ReusableElements;
+using form_builder.Restrictions;
 using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.AnalyticsService;
@@ -171,10 +172,19 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
+        public static IServiceCollection AddFormAccessRestrictions(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormAccessRestriction, KeyFormAccessRestriction>();
+            services.AddSingleton<IFormAccessRestriction, RefererRestriction>();
+
+            return services;
+        }
+
+
         public static IServiceCollection AddAmazonS3Client(this IServiceCollection services, string accessKey, string secretKey)
         {
             services.AddSingleton<IAmazonS3, AmazonS3Client>(provider => new AmazonS3Client(accessKey, secretKey, RegionEndpoint.EUWest1));
-
+            
             return services;
         }
 
@@ -372,6 +382,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, OptionalIfCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, PaymentCallbackCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, KeyCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();

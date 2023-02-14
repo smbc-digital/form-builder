@@ -25,6 +25,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
                 }
             }
 
+            // TODO: this seems to always report the first id on the hash set not the erroring one?
             HashSet<string> hashSet = new();
             if (questionIds.Any(id => !hashSet.Add(id)))
             {
