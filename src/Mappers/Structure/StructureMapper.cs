@@ -5,7 +5,6 @@ using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Models.Elements;
-using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Mappers.Structure

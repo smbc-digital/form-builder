@@ -29,7 +29,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             List<EmailConfiguration> emailConfig = await _emailConfigProvider.Get<List<EmailConfiguration>>();
             EmailConfiguration formEmailConfig = emailConfig
                 .FirstOrDefault(email => email.FormName
-                    .Any(_ => _.Equals(schema.BaseURL.ToLower())));
+                    .Any(_ => _.Equals(schema.BaseURL, StringComparison.OrdinalIgnoreCase)));
 
             if (formEmailConfig is null)
             {

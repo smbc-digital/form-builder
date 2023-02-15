@@ -11,7 +11,6 @@ using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using StockportGovUK.NetStandard.Gateways.Models.Booking;
-using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
 using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;

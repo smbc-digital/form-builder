@@ -1,6 +1,6 @@
 ﻿using StockportGovUK.NetStandard.Gateways.AddressService;
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using StockportGovUK.NetStandard.Gateways.Enums;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 
 namespace form_builder.Providers.Address
 {

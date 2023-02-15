@@ -1,11 +1,7 @@
 ﻿using form_builder.Configuration;
-using form_builder.Constants;
 using form_builder.Helpers.Session;
 using form_builder.Providers.Transforms.EmailConfiguration;
 using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Helpers.EmailHelpers
 {
@@ -27,7 +23,7 @@ namespace form_builder.Helpers.EmailHelpers
         }
 
         public async Task<EmailConfiguration> GetEmailInformation(string form)
-         {
+        {
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
@@ -38,7 +34,7 @@ namespace form_builder.Helpers.EmailHelpers
 
             if (formEmailConfig is null)
                 throw new Exception($"{nameof(EmailHelper)}::{nameof(GetEmailInformation)}: No email information found for {form}");
-            
+
             return formEmailConfig;
         }
     }

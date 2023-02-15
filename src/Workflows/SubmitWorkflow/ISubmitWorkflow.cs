@@ -2,6 +2,6 @@
 {
     public interface ISubmitWorkflow
     {
-       Task<string> Submit(string form);
+        Task<string> Submit(string form);
     }
 }
