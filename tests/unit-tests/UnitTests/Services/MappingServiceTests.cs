@@ -16,7 +16,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
 using Xunit;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
