@@ -61,11 +61,15 @@ namespace form_builder.Services.PayService
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
+            _logger.LogWarning($"PayService.ProcessPayment:{form} - Creating payment request - for {reference}");
+
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
         {
+            _logger.LogWarning($"PayService.ProcessPaymentResponse:{form} - Payment response received - {responseCode} for {reference}");
+
             var sessionGuid = _sessionHelper.GetSessionGuid();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
