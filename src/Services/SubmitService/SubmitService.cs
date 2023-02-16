@@ -29,6 +29,7 @@ namespace form_builder.Services.SubmitService
         private readonly IPaymentHelper _paymentHelper;
         private readonly IPostSubmissionAction _postSubmissionAction;
         private readonly IEnumerable<ITagParser> _tagParsers;
+        private readonly ILogger<SubmitService> _logger;
 
         public SubmitService(
             IGateway gateway,
@@ -41,7 +42,9 @@ namespace form_builder.Services.SubmitService
             IEnumerable<ISubmitProvider> submitProviders,
             IPaymentHelper paymentHelper,
             IPostSubmissionAction postSubmissionAction,
-            IEnumerable<ITagParser> tagParsers)
+            IEnumerable<ITagParser> tagParsers,
+            ILogger<SubmitService> logger
+            )
         {
             _gateway = gateway;
             _pageHelper = pageHelper;
@@ -54,6 +57,7 @@ namespace form_builder.Services.SubmitService
             _paymentHelper = paymentHelper;
             _postSubmissionAction = postSubmissionAction;
             _tagParsers = tagParsers;
+            _logger = logger;
         }
 
         public async Task PreProcessSubmission(string form, string sessionGuid)
@@ -64,7 +68,6 @@ namespace form_builder.Services.SubmitService
 
             if (baseForm.SavePaymentAmount)
                 _pageHelper.SavePaymentAmount(sessionGuid, _paymentHelper.GetFormPaymentInformation(baseForm.BaseURL).Result.Settings.Amount, baseForm.PaymentAmountMapping);
-
         }
 
         public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
@@ -80,10 +83,12 @@ namespace form_builder.Services.SubmitService
             if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
                 await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
 
+            _logger.LogWarning($"SubmitService.ProcessSubmission:{sessionGuid} Submitting {form}");
             var submissionReference = _submissionServiceConfiguration.FakeSubmission
                ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
                : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
-
+            
+            _logger.LogWarning($"SubmitService.ProcessSubmission:{sessionGuid} Submitted successfully {form} - {submissionReference}");
             return submissionReference;
         }
 
@@ -101,6 +106,7 @@ namespace form_builder.Services.SubmitService
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+
             HttpResponseMessage response = await _submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
 
             if (!response.IsSuccessStatusCode)
@@ -118,6 +124,8 @@ namespace form_builder.Services.SubmitService
 
         public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
+            _logger.LogWarning($"SubmitService.PaymentSubmission:{sessionGuid} Submitting {form}");
+
             if (_submissionServiceConfiguration.FakeSubmission)
                 return ProcessFakeSubmission(mappingEntity, form, sessionGuid, string.Empty);
 
@@ -142,8 +150,13 @@ namespace form_builder.Services.SubmitService
                 if (string.IsNullOrWhiteSpace(content))
                     throw new ApplicationException($"SubmitService::PaymentSubmission, Gateway {postUrl.URL} responded with empty reference");
 
-                _pageHelper.SaveCaseReference(sessionGuid, JsonConvert.DeserializeObject<string>(content));
-                return JsonConvert.DeserializeObject<string>(content);
+                var submissionReference = JsonConvert.DeserializeObject<string>(content);
+
+                _pageHelper.SaveCaseReference(sessionGuid, submissionReference);
+
+                _logger.LogWarning($"SubmitService.PaymentSubmission:{sessionGuid} Submitted successfully {form} - {submissionReference}");
+
+                return submissionReference;
             }
 
             throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred when response content from {postUrl} is null, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");

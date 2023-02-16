@@ -71,20 +71,25 @@ namespace form_builder.Services.PayService
             _logger.LogWarning($"PayService.ProcessPaymentResponse:{form} - Payment response received - {responseCode} for {reference}");
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
+
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
                 throw new Exception($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)} No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form);
+
             _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
+
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
+            
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             if (string.IsNullOrWhiteSpace(postUrl.CallbackUrl))
                 throw new ArgumentException($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, Callback url has not been specified");
 
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
