@@ -12,11 +12,13 @@
 
         public string CcEmail { get; }
 
+        public byte[] Attachment { get; }
+
+        public string AttachmentName { get; }
+
         public EmailMessage(string subject, string body, string fromEmail, string toEmail, string ccEmail)
         {
             Subject = subject;
-            Body = body;
-            FromEmail = fromEmail;
             ToEmail = toEmail;
             CcEmail = ccEmail;
         }
@@ -27,6 +29,16 @@
             Body = body;
             FromEmail = fromEmail;
             ToEmail = toEmail;
+        }
+
+        public EmailMessage(string subject, string body, string fromEmail, string toEmail, byte[] attachment, string attachmntName)
+        {
+            Subject = subject;
+            Body = body;
+            FromEmail = fromEmail;
+            ToEmail = toEmail;
+            Attachment = attachment;
+            AttachmentName = attachmntName;
         }
     }
 }

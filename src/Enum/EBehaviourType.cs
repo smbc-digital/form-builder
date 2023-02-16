@@ -7,6 +7,7 @@
         SubmitForm,
         GoToExternalPage,
         SubmitAndPay,
-        SubmitAndRedirect
+        SubmitAndRedirect,
+        SubmitAndEmail
     }
 }
