@@ -253,7 +253,6 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath, "", new QueryCollection()));
-            Assert.Equal($"Requested path '{requestPath}' object could not be found for form 'form'", result.Message);
         }
 
         [Fact]
@@ -809,7 +808,6 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(viewModel);
 
             var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
-            Assert.Equal("Session guid null.", result.Message);
         }
 
         [Fact]

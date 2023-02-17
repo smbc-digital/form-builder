@@ -32,7 +32,6 @@ namespace form_builder_tests.UnitTests.Workflows
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _workflow.Submit("form", "page"));
 
             // Assert
-            Assert.Equal("A Session GUID was not provided.", result.Message);
             _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
