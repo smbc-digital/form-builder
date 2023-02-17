@@ -61,16 +61,18 @@ namespace form_builder.Services.PayService
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-            _logger.LogWarning($"PayService.ProcessPayment:{form} - Creating payment request - for {reference}");
+            _logger.LogWarning($"PayService.ProcessPayment:{sessionGuid} {form} - Creating payment request - for {reference}");
 
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
         {
-            _logger.LogWarning($"PayService.ProcessPaymentResponse:{form} - Payment response received - {responseCode} for {reference}");
+            _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            // What happen here is sessionGuid is null or not found
 
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
@@ -99,6 +101,8 @@ namespace form_builder.Services.PayService
                     throw new PaymentCallbackException(
                         $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
                         $"Callback failed for case {reference}: {callbackResponse.ReasonPhrase}");
+
+                _logger.LogWarning($"PayService.ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
             }
             catch (PaymentDeclinedException)
             {
