@@ -4,6 +4,7 @@ using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
 using form_builder.Workflows.RedirectWorkflow;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -17,9 +18,11 @@ namespace form_builder_tests.UnitTests.Workflows
         private readonly Mock<IMappingService> _mappingService = new();
         private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
 
+        private readonly Mock<ILogger<RedirectWorkflow>> _logger = new();
+
         public RedirectWorkflowTests()
         {
-            _workflow = new RedirectWorkflow(_submitService.Object, _mappingService.Object, _sessionHelper.Object, _distributedCache.Object);
+            _workflow = new RedirectWorkflow(_submitService.Object, _mappingService.Object, _sessionHelper.Object, _distributedCache.Object, _logger.Object);
         }
 
         [Fact]
