@@ -30,12 +30,12 @@ namespace form_builder.Workflows.RedirectWorkflow
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException("PreviewSevice:Submit: Session GUID is null");
+                throw new ApplicationException("RedirectWorkflow:Submit: Session GUID is null");
 
             var data = await _mappingService.Map(sessionGuid, form);
             var redirectUrl = await _submitService.RedirectSubmission(data, form, sessionGuid);
 
-            _logger.LogWarning($"RedirectWorkflow:Submit:{sessionGuid}: Dispoing session");
+            _logger.LogWarning($"RedirectWorkflow:Submit:{sessionGuid}: Disposing session");
             _distributedCache.Remove(sessionGuid);
 
             return redirectUrl;
