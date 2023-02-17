@@ -313,7 +313,7 @@ namespace form_builder.Services.PageService
             var formData = _distributedCache.GetString(sessionGuid);
 
             if (formData is null)
-                throw new ApplicationException("PageService::FinalisePageJourney: Session data is null");
+                throw new ApplicationException($"PageService::FinalisePageJourney:{sessionGuid} Session data is null");
 
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 

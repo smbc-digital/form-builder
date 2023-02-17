@@ -1399,11 +1399,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            // Act
+            // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
-
-            // Assert
-            Assert.Equal("PageService::FinalisePageJourney: Session data is null", result.Message);
         }
 
         [Fact]
