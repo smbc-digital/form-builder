@@ -207,10 +207,16 @@ namespace form_builder.Helpers.PageHelpers
             {
                 if (convertedAnswers.AdditionalFormData.ContainsKey(generatedReferenceMappingId))
                     convertedAnswers.AdditionalFormData.Remove(generatedReferenceMappingId);
+<<<<<<< HEAD
 
                 convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
             }
+=======
+>>>>>>> master
 
+                convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
+            }
+            
             convertedAnswers.CaseReference = caseReference;
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }

@@ -39,20 +39,18 @@ namespace form_builder.Providers.StorageProvider
 
         public Task SetStringAsync(string key, string value, CancellationToken token = default)
         {
-            var distributedCacheOptions = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(_distributedCacheExpirationConfiguration.UserData)
-            };
+            var distributedCacheOptions = new DistributedCacheEntryOptions();        
+
+            distributedCacheOptions.SlidingExpiration = TimeSpan.FromMinutes(_distributedCacheExpirationConfiguration.UserData);
 
             return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
         }
 
         public Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default)
         {
-            var distributedCacheOptions = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(expiration)
-            };
+            var distributedCacheOptions = new DistributedCacheEntryOptions();
+
+            distributedCacheOptions.SlidingExpiration = TimeSpan.FromMinutes(_distributedCacheExpirationConfiguration.UserData);
 
             return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
         }

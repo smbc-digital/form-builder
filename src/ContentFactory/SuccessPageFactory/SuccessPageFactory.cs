@@ -22,10 +22,13 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         private readonly IWebHostEnvironment _environment;
         private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
 
+        private readonly ILogger<SuccessPageFactory> _logger;
+
         public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory,
             ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            ILogger<SuccessPageFactory> logger)
         {
             _pageHelper = pageHelper;
             _pageFactory = pageFactory;
@@ -33,12 +36,17 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             _distributedCache = distributedCache;
             _environment = environment;
             _previewModeConfiguration = previewModeConfiguration;
+            _logger = logger;
         }
 
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
         {
             var page = baseForm.GetPage(_pageHelper, "success");
 
+
+            _logger.LogWarning($"SuccessPageFactory:Build:{sessionGuid} Disposing session");
+            
+            // TODO: JonH - Should this be lower in the method as the session could be potentially used in the pageFactory
             _distributedCache.Remove(sessionGuid);
             _sessionHelper.RemoveSessionGuid();
 
