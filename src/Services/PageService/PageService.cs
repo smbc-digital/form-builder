@@ -107,6 +107,7 @@ namespace form_builder.Services.PageService
             if (string.IsNullOrEmpty(path) || (!string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm)))
                 _sessionHelper.Clear();
 
+            // TODO : Session handling might need to move below Form availability
             var sessionGuid = _sessionHelper.GetSessionGuid();
             if (string.IsNullOrEmpty(sessionGuid))
             {
