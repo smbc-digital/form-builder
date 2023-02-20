@@ -133,12 +133,6 @@ namespace form_builder.Services.PageService
                 return null;
             }
 
-            if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
-            {
-                _logger.LogWarning($"Form: {form} has restricted access requirements that have not been met");
-                return null;
-            }
-
             if (string.IsNullOrEmpty(path))
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
 
