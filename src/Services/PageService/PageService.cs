@@ -110,8 +110,10 @@ namespace form_builder.Services.PageService
             var sessionGuid = _sessionHelper.GetSessionGuid();
             if (string.IsNullOrEmpty(sessionGuid))
             {
-                _sessionHelper.Set(Guid.NewGuid().ToString(), form);
+                sessionGuid = Guid.NewGuid().ToString();
+                _sessionHelper.Set(sessionGuid.ToString(), form);
                 isNewSession = true;
+                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
             }
 
             var baseForm = await _schemaFactory.Build(form);
@@ -120,7 +122,13 @@ namespace form_builder.Services.PageService
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
-                _logger.LogWarning($"Form: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                return null;
+            }
+
+            if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
+            {
+                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
                 return null;
             }
 
@@ -142,12 +150,15 @@ namespace form_builder.Services.PageService
             {
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
                 if (!form.Equals(convertedFormData.FormName, StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: Disposing session form names do not match {form} {convertedFormData.FormName}");
                     _distributedCache.Remove(sessionGuid);
+                }
             }
 
             var page = baseForm.GetPage(_pageHelper, path);
             if (page is null)
-                throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
+                throw new ApplicationException($"PageService:ProcessPage:{sessionGuid} Requested path '{path}' object could not be found for in '{form}'");
 
             List<object> searchResults = null;
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -228,11 +239,11 @@ namespace form_builder.Services.PageService
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
             if (sessionGuid is null)
-                throw new NullReferenceException($"Session guid null.");
+                throw new NullReferenceException($"Form: {form} Session guid null.");
 
             var currentPage = baseForm.GetPage(_pageHelper, path);
             if (currentPage is null)
-                throw new NullReferenceException($"Current page '{path}' object could not be found.");
+                throw new NullReferenceException($"Form: {form} Current page '{path}' object could not be found.");
 
             var formData = _distributedCache.GetString(sessionGuid);
             var convertedAnswers = !string.IsNullOrEmpty(formData) ? JsonConvert.DeserializeObject<FormAnswers>(formData) : new FormAnswers();
@@ -316,7 +327,7 @@ namespace form_builder.Services.PageService
             var formData = _distributedCache.GetString(sessionGuid);
 
             if (formData is null)
-                throw new ApplicationException("PageService::FinalisePageJourney: Session data is null");
+                throw new ApplicationException($"PageService::FinalisePageJourney:{sessionGuid} Session data is null");
 
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 

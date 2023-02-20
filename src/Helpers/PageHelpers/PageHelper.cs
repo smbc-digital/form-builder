@@ -210,7 +210,7 @@ namespace form_builder.Helpers.PageHelpers
 
                 convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
             }
-
+            
             convertedAnswers.CaseReference = caseReference;
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }

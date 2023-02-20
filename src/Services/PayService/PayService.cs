@@ -61,26 +61,37 @@ namespace form_builder.Services.PayService
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
+            _logger.LogWarning($"PayService.ProcessPayment:{sessionGuid} {form} - Creating payment request - for {reference}");
+
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
         {
+            _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
+
             var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            // What happen here is sessionGuid is null or not found
+
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
                 throw new Exception($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)} No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
             var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form);
+
             _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
+
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
+            
             var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
             if (string.IsNullOrWhiteSpace(postUrl.CallbackUrl))
                 throw new ArgumentException($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, Callback url has not been specified");
 
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+
             try
             {
                 paymentProvider.VerifyPaymentResponse(responseCode);
@@ -90,6 +101,8 @@ namespace form_builder.Services.PayService
                     throw new PaymentCallbackException(
                         $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
                         $"Callback failed for case {reference}: {callbackResponse.ReasonPhrase}");
+
+                _logger.LogWarning($"PayService.ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
             }
             catch (PaymentDeclinedException)
             {

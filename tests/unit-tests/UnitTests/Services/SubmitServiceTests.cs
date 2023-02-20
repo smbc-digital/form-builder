@@ -16,6 +16,7 @@ using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
@@ -39,6 +40,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
         private readonly Mock<ITagParser> _tagParser = new();
+        private readonly Mock<ILogger<SubmitService>> _mockLogger = new();
 
         public SubmitServiceTests()
         {
@@ -92,7 +94,8 @@ namespace form_builder_tests.UnitTests.Services
                 _submitProviders,
                 _mockPaymentHelper.Object,
                 _mockPostSubmissionAction.Object,
-                _mockTagParsers.Object);
+                _mockTagParsers.Object,
+                _mockLogger.Object);
         }
 
         [Fact]
