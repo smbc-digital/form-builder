@@ -24,8 +24,10 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
         private readonly ILogger<SuccessPageFactory> _logger;
 
-        public SuccessPageFactory(IPageHelper pageHelper, IPageFactory pageFactory,
-            ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache,
+        public SuccessPageFactory(IPageHelper pageHelper, 
+            IPageFactory pageFactory,
+            ISessionHelper sessionHelper, 
+            IDistributedCacheWrapper distributedCache,
             IOptions<PreviewModeConfiguration> previewModeConfiguration,
             IWebHostEnvironment environment,
             ILogger<SuccessPageFactory> logger)
@@ -42,14 +44,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
         public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers, EBehaviourType behaviourType)
         {
             var page = baseForm.GetPage(_pageHelper, "success");
-
-
-            _logger.LogWarning($"SuccessPageFactory:Build:{sessionGuid} Disposing session");
             
-            // TODO: JonH - Should this be lower in the method as the session could be potentially used in the pageFactory
-            _distributedCache.Remove(sessionGuid);
-            _sessionHelper.RemoveSessionGuid();
-
             if (page is null && behaviourType.Equals(EBehaviourType.SubmitAndPay))
             {
                 page = GenerateGenericPaymentPage();
@@ -58,6 +53,10 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
             if (page is null)
             {
+                _logger.LogInformation($"SuccessPageFactory:Build:{sessionGuid} Disposing session");
+                _distributedCache.Remove(sessionGuid);
+                _sessionHelper.RemoveSessionGuid();
+
                 return new SuccessPageEntity
                 {
                     ViewName = "Submit",
@@ -73,6 +72,10 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             }
 
             var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, sessionGuid, formAnswers);
+
+            _logger.LogInformation($"SuccessPageFactory:Build:{sessionGuid} Disposing session");
+            _distributedCache.Remove(sessionGuid);
+            _sessionHelper.RemoveSessionGuid();
 
             return new SuccessPageEntity
             {

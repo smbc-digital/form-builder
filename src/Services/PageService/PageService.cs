@@ -146,7 +146,7 @@ namespace form_builder.Services.PageService
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
                 if (!form.Equals(convertedFormData.FormName, StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: Disposing session form names do not match {form} {convertedFormData.FormName}");
+                    _logger.LogInformation($"PageService:ProcessPage:{sessionGuid}: Disposing session form names do not match {form} {convertedFormData.FormName}");
                     _distributedCache.Remove(sessionGuid);
                 }
             }

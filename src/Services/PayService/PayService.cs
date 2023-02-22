@@ -61,7 +61,7 @@ namespace form_builder.Services.PayService
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-            _logger.LogWarning($"PayService.ProcessPayment:{sessionGuid} {form} - Creating payment request - for {reference}");
+            _logger.LogInformation($"PayService.ProcessPayment:{sessionGuid} {form} - Creating payment request - for {reference}");
 
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
         }
@@ -72,7 +72,8 @@ namespace form_builder.Services.PayService
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
-            // What happen here is sessionGuid is null or not found
+            if (string.IsNullOrWhiteSpace(sessionGuid))
+                throw new PaymentCallbackException($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, Session expired during payment {reference}");
 
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
@@ -102,7 +103,7 @@ namespace form_builder.Services.PayService
                         $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
                         $"Callback failed for case {reference}: {callbackResponse.ReasonPhrase}");
 
-                _logger.LogWarning($"PayService.ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
+                _logger.LogInformation($"PayService.ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
             }
             catch (PaymentDeclinedException)
             {
