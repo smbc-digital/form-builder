@@ -246,13 +246,23 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .WithPageSlug("page-one")
                 .Build();
 
+            var successPage = new PageBuilder()
+                .WithPageSlug("success")
+                .Build();
+
             var formSchema = new FormSchemaBuilder()
                 .WithStartPageUrl("page-one")
                 .WithBaseUrl("base-test")
                 .WithPage(page)
+                .WithPage(successPage)
                 .Build();
 
             var guid = new Guid();
+
+            _mockPageContentFactory
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(),
+                    It.IsAny<string>(), It.IsAny<FormAnswers>(), null))
+                .ReturnsAsync(new FormBuilderViewModel());
 
             // Act
             await _factory.Build(string.Empty, formSchema, guid.ToString(), new FormAnswers(), EBehaviourType.SubmitForm);
