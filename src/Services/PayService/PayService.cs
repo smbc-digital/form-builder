@@ -73,7 +73,7 @@ namespace form_builder.Services.PayService
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrWhiteSpace(sessionGuid))
-                throw new PaymentCallbackException($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, Session expired during payment {reference}");
+                _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Session expired for {reference}");
 
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
