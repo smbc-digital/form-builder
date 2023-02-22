@@ -103,7 +103,7 @@ namespace form_builder.Services.MappingService
 
             convertedAnswers.FormName = form;
             if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
-                _logger.LogWarning($"MappingService::GetFormAnswers::{sessionGuid}, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
+                _logger.LogWarning($"MappingService::GetFormAnswers:: Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
 
             return (convertedAnswers, baseForm);
         }

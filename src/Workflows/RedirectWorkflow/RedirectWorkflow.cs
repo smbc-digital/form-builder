@@ -35,7 +35,7 @@ namespace form_builder.Workflows.RedirectWorkflow
             var data = await _mappingService.Map(sessionGuid, form);
             var redirectUrl = await _submitService.RedirectSubmission(data, form, sessionGuid);
 
-            _logger.LogWarning($"RedirectWorkflow:Submit:{sessionGuid}: Disposing session");
+            _logger.LogInformation($"RedirectWorkflow:Submit:{sessionGuid}: Disposing session");
             _distributedCache.Remove(sessionGuid);
 
             return redirectUrl;

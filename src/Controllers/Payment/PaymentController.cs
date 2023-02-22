@@ -71,7 +71,7 @@ namespace form_builder.Controllers.Payment
         public async Task<IActionResult> PaymentSuccess(string form, [FromQuery] string reference)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
-            _logger.LogWarning($"PaymentController:PaymentSuccess:{sessionGuid} {form} Attempting payment success {reference}");
+            _logger.LogInformation($"PaymentController:PaymentSuccess:{sessionGuid} {form} Attempting payment success {reference}");
 
             var result = await _successWorkflow.Process(EBehaviourType.SubmitAndPay, form);
 
