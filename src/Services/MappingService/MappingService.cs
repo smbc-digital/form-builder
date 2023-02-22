@@ -85,11 +85,11 @@ namespace form_builder.Services.MappingService
             var baseForm = await _schemaFactory.Build(form);
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException("MappingService::GetFormAnswers Session has expired");
+                throw new ApplicationException($"MappingService::GetFormAnswers:{sessionGuid} Session has expired");
 
             var sessionData = _distributedCache.GetString(sessionGuid);
             if (sessionData is null)
-                throw new ApplicationException("MappingService::GetFormAnswers, Session data is null");
+                throw new ApplicationException($"MappingService::GetFormAnswer:{sessionGuid}, Session data is null");
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
@@ -102,7 +102,7 @@ namespace form_builder.Services.MappingService
 
             convertedAnswers.FormName = form;
             if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
-                _logger.LogWarning($"MappingService::GetFormAnswers, Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
+                _logger.LogWarning($"MappingService::GetFormAnswers:: Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
 
             return (convertedAnswers, baseForm);
         }

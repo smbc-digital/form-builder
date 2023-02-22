@@ -7,6 +7,7 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.Services.PayService;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -19,6 +20,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ISessionHelper> _sessionHelper = new();
         private readonly Mock<IMappingService> _mappingService = new();
         private readonly Mock<ISuccessWorkflow> _successWorkflow = new();
+        private readonly Mock<ILogger<PaymentController>> _logger = new();
 
         public PaymentControllerTests()
         {
@@ -38,7 +40,7 @@ namespace form_builder_tests.UnitTests.Controllers
                     }
                 });
 
-            _controller = new PaymentController(_payService.Object, _sessionHelper.Object, _mappingService.Object, _successWorkflow.Object);
+            _controller = new PaymentController(_payService.Object, _sessionHelper.Object, _mappingService.Object, _successWorkflow.Object, _logger.Object);
         }
 
         [Fact]

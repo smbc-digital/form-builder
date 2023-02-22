@@ -13,12 +13,16 @@ namespace form_builder.Workflows.RedirectWorkflow
         private readonly ISessionHelper _sessionHelper;
         private readonly IDistributedCacheWrapper _distributedCache;
 
-        public RedirectWorkflow(ISubmitService submitService, IMappingService mappingService, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+        private readonly ILogger<RedirectWorkflow> _logger;
+
+        public RedirectWorkflow(ISubmitService submitService, IMappingService mappingService, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, ILogger<RedirectWorkflow> logger)
         {
             _submitService = submitService;
             _mappingService = mappingService;
             _sessionHelper = sessionHelper;
             _distributedCache = distributedCache;
+            _logger = logger;
+            
         }
 
         public async Task<string> Submit(string form, string path)
@@ -26,11 +30,12 @@ namespace form_builder.Workflows.RedirectWorkflow
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException("A Session GUID was not provided.");
+                throw new ApplicationException("RedirectWorkflow:Submit: Session GUID is null");
 
             var data = await _mappingService.Map(sessionGuid, form);
             var redirectUrl = await _submitService.RedirectSubmission(data, form, sessionGuid);
 
+            _logger.LogInformation($"RedirectWorkflow:Submit:{sessionGuid}: Disposing session");
             _distributedCache.Remove(sessionGuid);
 
             return redirectUrl;

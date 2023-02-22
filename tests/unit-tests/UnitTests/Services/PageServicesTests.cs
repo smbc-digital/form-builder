@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
-            _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
+            _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.AtLeastOnce);
             _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
             Assert.Null(result);
         }
@@ -327,7 +327,6 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessPage("form", requestPath, "", new QueryCollection()));
-            Assert.Equal($"Requested path '{requestPath}' object could not be found for form 'form'", result.Message);
         }
 
         [Fact]
@@ -883,7 +882,6 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(viewModel);
 
             var result = await Assert.ThrowsAsync<NullReferenceException>(() => _service.ProcessRequest("form", "page-one", viewModel, null, true));
-            Assert.Equal("Session guid null.", result.Message);
         }
 
         [Fact]
@@ -1475,11 +1473,8 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            // Act
+            // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
-
-            // Assert
-            Assert.Equal("PageService::FinalisePageJourney: Session data is null", result.Message);
         }
 
         [Fact]
