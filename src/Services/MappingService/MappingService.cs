@@ -11,7 +11,6 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService.Entities;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Services.MappingService

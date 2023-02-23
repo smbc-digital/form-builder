@@ -15,6 +15,12 @@ namespace form_builder.Models
         public string StartPageUrl { get; set; }
 
         public string FirstPageSlug { get; set; }
+
+        public string FormAccessKey { get; set; }
+        
+        public string FormAccessKeyName { get; set; }   
+
+        public List<string> FormAccessReferrers { get; set; }
         
         public bool Embeddable { get; set; }
 

@@ -202,5 +202,25 @@ namespace form_builder.Services.SubmitService
             mappingEntity.FormAnswers.CaseReference = JsonConvert.DeserializeObject<string>(content);
             return _tagParsers.Aggregate(postUrl.RedirectUrl, (current, tagParser) => tagParser.ParseString(current, mappingEntity.FormAnswers));
         }
+
+
+        public async Task<string> EmailSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
+        {
+            var reference = string.Empty;
+
+            if (mappingEntity.BaseForm.GenerateReferenceNumber)
+            {
+                var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
+                reference = answers.CaseReference;
+            }
+
+            await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
+
+            var submissionReference = _submissionServiceConfiguration.FakeSubmission
+               ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
+               : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
+
+            return submissionReference;
+        }
     }
 }

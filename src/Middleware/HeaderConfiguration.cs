@@ -19,7 +19,7 @@
             var testUrls = !_env.IsEnvironment("stage") || !_env.IsEnvironment("prod") ? "http://localhost:5006/ https://localhost:5006/" : "";
 
             var queryString = context.Request.QueryString.ToString();
-            
+
             if (queryString.Contains("utm_source=lagan") || context.Request.Cookies.ContainsKey("is_verint"))
             {
                 headers["Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080";

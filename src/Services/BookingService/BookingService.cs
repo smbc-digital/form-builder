@@ -79,7 +79,7 @@ namespace form_builder.Services.BookingService
             var appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
 
-            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:" + 
+            var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:" +
                                              $"{bookingElement.Properties.LimitNextAvailableFromDate}:" +
                                              $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
                                              $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";

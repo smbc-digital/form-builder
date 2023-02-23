@@ -8,9 +8,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
-using StockportGovUK.NetStandard.Gateways.Response;
 using StockportGovUK.NetStandard.Gateways.Models.Civica.Pay.Request;
 using StockportGovUK.NetStandard.Gateways.Models.Civica.Pay.Response;
+using StockportGovUK.NetStandard.Gateways.Response;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Providers.PaymentProvider

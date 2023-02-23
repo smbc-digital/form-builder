@@ -1,5 +1,5 @@
-using StockportGovUK.NetStandard.Gateways.VerintService;
 using StockportGovUK.NetStandard.Gateways.Models.Verint.Lookup;
+using StockportGovUK.NetStandard.Gateways.VerintService;
 
 namespace form_builder.Providers.Organisation
 {
