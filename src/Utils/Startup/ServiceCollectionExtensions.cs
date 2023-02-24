@@ -477,18 +477,20 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            services.AddSingleton<IEmailConfigurationTransformDataProvider, EmailConfigurationTransformDataProvider>();
+            
             if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
                 services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
+                services.AddSingleton<IEmailConfigurationTransformDataProvider, LocalEmailConfigurationTransformDataProvider>();
             }
             else
             {
                 services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
                 services.AddSingleton<IPaymentConfigurationTransformDataProvider, S3PaymentConfigurationTransformDataProvider>();
+                services.AddSingleton<IEmailConfigurationTransformDataProvider, S3EmailConfigurationTransformDataProvider>();
             }
 
             return services;
