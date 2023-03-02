@@ -8,10 +8,10 @@ namespace form_builder.Providers.DocumentCreation
 
         EDocumentType DocumentType { get; }
 
-        byte[] CreateDocument(List<string> fileContent);
+        byte[] CreateDocument(List<string> FileContent);
 
-        byte[] CreateHtmlDocument(List<string> fileContent);
+        byte[] CreateHtmlDocument(List<string> FileContent, string FormName);
 
-        byte[] CreatePdfDocument(List<string> fileContent);
+        byte[] CreatePdfDocument(List<string> FileContent, string FormName);
     }
 }
