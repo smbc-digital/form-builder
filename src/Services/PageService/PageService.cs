@@ -119,17 +119,22 @@ namespace form_builder.Services.PageService
 
             var baseForm = await _schemaFactory.Build(form);
             if (baseForm is null)
+            {
+                _sessionHelper.Clear();
                 return null;
+            }
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
                 _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                _sessionHelper.Clear();
                 return null;
             }
 
             if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
             {
                 _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                _sessionHelper.Clear();
                 return null;
             }
 
