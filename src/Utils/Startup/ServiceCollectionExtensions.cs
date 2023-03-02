@@ -17,6 +17,7 @@ using form_builder.Helpers.ActionsHelpers;
 using form_builder.Helpers.Cookie;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Helpers.ElementHelpers;
+using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
@@ -42,15 +43,18 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Street;
 using form_builder.Providers.Submit;
 using form_builder.Providers.TemplatedEmailProvider;
+using form_builder.Providers.Transforms.EmailConfiguration;
 using form_builder.Providers.Transforms.Lookups;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Providers.Transforms.ReusableElements;
+using form_builder.Restrictions;
 using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.AnalyticsService;
 using form_builder.Services.BookingService;
 using form_builder.Services.DocumentService;
 using form_builder.Services.EmailService;
+using form_builder.Services.EmailSubmitService;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.MappingService;
@@ -74,6 +78,7 @@ using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder.Validators.IntegrityChecks.Form;
 using form_builder.Workflows.ActionsWorkflow;
 using form_builder.Workflows.DocumentWorkflow;
+using form_builder.Workflows.EmailWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.RedirectWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
@@ -167,10 +172,19 @@ namespace form_builder.Utils.Startup
             return services;
         }
 
+        public static IServiceCollection AddFormAccessRestrictions(this IServiceCollection services)
+        {
+            services.AddSingleton<IFormAccessRestriction, KeyFormAccessRestriction>();
+            services.AddSingleton<IFormAccessRestriction, RefererRestriction>();
+
+            return services;
+        }
+
+
         public static IServiceCollection AddAmazonS3Client(this IServiceCollection services, string accessKey, string secretKey)
         {
             services.AddSingleton<IAmazonS3, AmazonS3Client>(provider => new AmazonS3Client(accessKey, secretKey, RegionEndpoint.EUWest1));
-
+            
             return services;
         }
 
@@ -192,6 +206,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IActionHelper, ActionHelper>();
             services.AddSingleton<IIncomingDataHelper, IncomingDataHelper>();
             services.AddSingleton<IPaymentHelper, PaymentHelper>();
+            services.AddSingleton<IEmailHelper, EmailHelper>();
             services.AddSingleton<ICookieHelper, CookieHelper>();
             services.AddSingleton<IStructureMapper, StructureMapper>();
 
@@ -340,10 +355,7 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection ConfigureEmailProviders(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
-                services.AddSingleton<IEmailProvider, FakeEmailProvider>();
-            else
-                services.AddSingleton<IEmailProvider, AwsSesProvider>();
+            services.AddSingleton<IEmailProvider, AwsSesProvider>();
 
             return services;
         }
@@ -356,6 +368,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EmailConfigurationCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, PaymentConfigurationCheck>();
@@ -369,6 +382,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, OptionalIfCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, PaymentCallbackCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, KeyCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();
@@ -412,6 +426,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IFormAvailabilityService, FormAvailabilityService>();
             services.AddSingleton<IPreviewService, PreviewService>();
             services.AddSingleton<IAnalyticsService, AnalyticsService>();
+            services.AddSingleton<IEmailSubmitService, EmailSubmitService>();
 
             return services;
         }
@@ -424,6 +439,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IDocumentWorkflow, DocumentWorkflow>();
             services.AddSingleton<IActionsWorkflow, ActionsWorkflow>();
             services.AddSingleton<ISuccessWorkflow, SuccessWorkflow>();
+            services.AddSingleton<IEmailWorkflow, EmailWorkflow>();
 
             return services;
         }
@@ -461,17 +477,20 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
+            
             if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, LocalReusableElementTransformDataProvider>();
                 services.AddSingleton<IPaymentConfigurationTransformDataProvider, LocalPaymentConfigurationTransformDataProvider>();
+                services.AddSingleton<IEmailConfigurationTransformDataProvider, LocalEmailConfigurationTransformDataProvider>();
             }
             else
             {
                 services.AddSingleton<ILookupTransformDataProvider, S3LookupTransformDataProvider>();
                 services.AddSingleton<IReusableElementTransformDataProvider, S3ReusableElementTransformDataProvider>();
                 services.AddSingleton<IPaymentConfigurationTransformDataProvider, S3PaymentConfigurationTransformDataProvider>();
+                services.AddSingleton<IEmailConfigurationTransformDataProvider, S3EmailConfigurationTransformDataProvider>();
             }
 
             return services;

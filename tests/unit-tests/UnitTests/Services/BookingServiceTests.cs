@@ -7,7 +7,6 @@ using form_builder.Exceptions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
-using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Models.Booking;
 using form_builder.Models.Elements;
@@ -22,7 +21,6 @@ using form_builder.Utils.Hash;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -778,7 +776,7 @@ namespace form_builder_tests.UnitTests.Services
             _sessionHelper
                 .Setup(_ => _.GetSessionGuid())
                 .Returns("guid");
-            
+
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {

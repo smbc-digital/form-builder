@@ -15,13 +15,15 @@ namespace form_builder.Controllers.Payment
         private readonly ISessionHelper _sessionHelper;
         private readonly IMappingService _mappingService;
         private readonly ISuccessWorkflow _successWorkflow;
+        private readonly ILogger<PaymentController> _logger;
 
-        public PaymentController(IPayService payService, ISessionHelper sessionHelper, IMappingService mappingService, ISuccessWorkflow successWorkflow)
+        public PaymentController(IPayService payService, ISessionHelper sessionHelper, IMappingService mappingService, ISuccessWorkflow successWorkflow, ILogger<PaymentController> logger)
         {
             _payService = payService;
             _sessionHelper = sessionHelper;
             _mappingService = mappingService;
             _successWorkflow = successWorkflow;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -68,6 +70,9 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/payment-success")]
         public async Task<IActionResult> PaymentSuccess(string form, [FromQuery] string reference)
         {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+            _logger.LogInformation($"PaymentController:PaymentSuccess:{sessionGuid} {form} Attempting payment success {reference}");
+
             var result = await _successWorkflow.Process(EBehaviourType.SubmitAndPay, form);
 
             var success = new SuccessViewModel
@@ -111,6 +116,8 @@ namespace form_builder.Controllers.Payment
         public async Task<IActionResult> PaymentDeclined(string form, [FromQuery] string reference)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
+            _logger.LogWarning($"PaymentController:PaymentDeclined:{sessionGuid} {form} Payment declined {reference}");
+
             var data = await _mappingService.Map(sessionGuid, form);
             var url = await _payService.ProcessPayment(data, form, "payment", reference, sessionGuid);
             var paymentDeclinedViewModel = new PaymentFailureViewModel
@@ -131,6 +138,8 @@ namespace form_builder.Controllers.Payment
         public async Task<IActionResult> CallbackFailure(string form, [FromQuery] string reference)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
+            _logger.LogWarning($"PaymentController:PaymentFailure:{sessionGuid} {form} Payment failure {reference}");
+
             var data = await _mappingService.Map(sessionGuid, form);
 
             var callbackFailureViewModel = new CallbackFailureViewModel

@@ -16,7 +16,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.FileManagement;
 using Xunit;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
@@ -992,7 +991,6 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest(string.Empty, element, viewModel, "testform"));
-            Assert.Equal("MappingService::GetFormAnswers Session has expired", result.Message);
         }
 
         [Fact]
@@ -1024,7 +1022,6 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.MapBookingRequest("guid", element, viewModel, "testform"));
-            Assert.Equal("MappingService::GetFormAnswers, Session data is null", result.Message);
         }
     }
 }

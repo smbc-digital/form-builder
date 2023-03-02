@@ -48,7 +48,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .Returns("local");
 
             _bookingLookupPageTransformFactory = new BookingLookupPageTransformFactory(_mockActionHelper.Object,
-                _mockLookupProviders, 
+                _mockLookupProviders,
                 _mockWebHostEnvironment.Object);
         }
 

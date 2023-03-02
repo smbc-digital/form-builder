@@ -10,6 +10,7 @@ using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
+using form_builder.Workflows.EmailWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.RedirectWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
@@ -23,6 +24,7 @@ namespace form_builder.Controllers
     {
         private readonly IPageService _pageService;
         private readonly ISubmitWorkflow _submitWorkflow;
+        private readonly IEmailWorkflow _emailWorkFlow;
         private readonly IRedirectWorkflow _redirectWorkflow;
         private readonly IPaymentWorkflow _paymentWorkflow;
         private readonly IActionsWorkflow _actionsWorkflow;
@@ -39,6 +41,7 @@ namespace form_builder.Controllers
             IFileUploadService fileUploadService,
             IWebHostEnvironment hostingEnvironment,
             IActionsWorkflow actionsWorkflow,
+            IEmailWorkflow emailWorkFlow,
             ISuccessWorkflow successWorkflow,
             IStructureMapper structureMapper,
             IOptions<DataStructureConfiguration> dataStructureConfiguration)
@@ -53,6 +56,7 @@ namespace form_builder.Controllers
             _successWorkflow = successWorkflow;
             _structureMapper = structureMapper;
             _dataStructureConfiguration = dataStructureConfiguration.Value;
+            _emailWorkFlow = emailWorkFlow;
         }
 
         [HttpGet]
@@ -156,6 +160,12 @@ namespace form_builder.Controllers
                     var redirectUrl = await _redirectWorkflow.Submit(form, path);
                     return Redirect(redirectUrl);
 
+                case EBehaviourType.SubmitAndEmail:
+                    return RedirectToAction("Email", new
+                    {
+                        form
+                    });
+
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
             }
@@ -166,6 +176,18 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Submit(string form)
         {
             await _submitWorkflow.Submit(form);
+
+            return RedirectToAction("Success", new
+            {
+                form
+            });
+        }
+
+        [HttpGet]
+        [Route("{form}/email")]
+        public async Task<IActionResult> Email(string form)
+        {
+            await _emailWorkFlow.Submit(form);
 
             return RedirectToAction("Success", new
             {

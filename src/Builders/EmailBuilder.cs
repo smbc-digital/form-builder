@@ -28,8 +28,30 @@ namespace form_builder.Builders.Email
             if (!string.IsNullOrEmpty(emailMessage.CcEmail))
                 message.Cc.Add(new MailboxAddress(string.Empty, emailMessage.CcEmail));
 
+            var multipart = new Multipart("mixed")
+            {
+                new TextPart("html")
+                {
+                    Text = emailMessage.Body
+                }
+            };
+
+            if (emailMessage.Attachment is not null)
+            {
+                var attachment = new MimePart("application", "pdf")
+                {
+                    Content = new MimeContent(new MemoryStream(emailMessage.Attachment)),
+                    ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                    ContentTransferEncoding = ContentEncoding.Base64,
+                    FileName = emailMessage.AttachmentName,
+                    IsAttachment = true
+                };
+
+                multipart.Add(attachment);
+            }
+
             message.Subject = emailMessage.Subject;
-            message.Body = BuildMessageBody(emailMessage.Body).ToMessageBody();
+            message.Body = multipart;
 
             return message;
         }

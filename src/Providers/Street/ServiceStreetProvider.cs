@@ -1,7 +1,7 @@
-using StockportGovUK.NetStandard.Gateways.StreetService;
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using StockportGovUK.NetStandard.Gateways.Enums;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using StockportGovUK.NetStandard.Gateways.Models.Street;
+using StockportGovUK.NetStandard.Gateways.StreetService;
 
 namespace form_builder.Providers.Street
 {

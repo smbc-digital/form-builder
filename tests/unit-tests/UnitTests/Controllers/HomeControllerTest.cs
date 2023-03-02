@@ -9,6 +9,7 @@ using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Workflows.ActionsWorkflow;
+using form_builder.Workflows.EmailWorkflow;
 using form_builder.Workflows.PaymentWorkflow;
 using form_builder.Workflows.RedirectWorkflow;
 using form_builder.Workflows.SubmitWorkflow;
@@ -30,6 +31,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new();
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new();
+        private readonly Mock<IEmailWorkflow> _emailWorkflow = new();
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new();
         private readonly Mock<IRedirectWorkflow> _redirectWorkflow = new();
         private readonly Mock<IFileUploadService> _mockFileUploadService = new();
@@ -64,6 +66,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
+                _emailWorkflow.Object,
                 _mockSuccessWorkflow.Object,
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object)
@@ -726,6 +729,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockFileUploadService.Object,
                 _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
+                _emailWorkflow.Object,
                 _mockSuccessWorkflow.Object,
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object);

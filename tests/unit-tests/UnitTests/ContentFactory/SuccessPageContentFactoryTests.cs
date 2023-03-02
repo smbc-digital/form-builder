@@ -13,6 +13,7 @@ using form_builder.Services.PageService.Entities;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -29,6 +30,8 @@ namespace form_builder_tests.UnitTests.ContentFactory
         private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
         private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
 
+        private readonly Mock<ILogger<SuccessPageFactory>> _logger = new();
+
         public SuccessPageContentFactoryTests()
         {
             _mockPreviewModeConfiguration
@@ -41,7 +44,8 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 _mockSessionHelper.Object,
                 _mockDistributedCache.Object,
                 _mockPreviewModeConfiguration.Object,
-                _mockWebHostEnvironment.Object);
+                _mockWebHostEnvironment.Object,
+                _logger.Object);
 
             _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
         }
@@ -242,13 +246,23 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .WithPageSlug("page-one")
                 .Build();
 
+            var successPage = new PageBuilder()
+                .WithPageSlug("success")
+                .Build();
+
             var formSchema = new FormSchemaBuilder()
                 .WithStartPageUrl("page-one")
                 .WithBaseUrl("base-test")
                 .WithPage(page)
+                .WithPage(successPage)
                 .Build();
 
             var guid = new Guid();
+
+            _mockPageContentFactory
+                .Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(),
+                    It.IsAny<string>(), It.IsAny<FormAnswers>(), null))
+                .ReturnsAsync(new FormBuilderViewModel());
 
             // Act
             await _factory.Build(string.Empty, formSchema, guid.ToString(), new FormAnswers(), EBehaviourType.SubmitForm);

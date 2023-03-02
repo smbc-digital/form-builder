@@ -15,6 +15,9 @@ namespace form_builder.Helpers.DocumentCreation
             var summaryBuilder = new SummaryAnswerBuilder();
             var reducedAnswers = FormAnswersExtensions.GetReducedAnswers(formAnswers, formSchema);
 
+            if (!string.IsNullOrEmpty(formAnswers.CaseReference))
+                summaryBuilder.Add("Case Reference", formAnswers.CaseReference, Enum.EElementType.Textbox);
+
             foreach (var page in formSchema.Pages.ToList())
             {
                 var formSchemaQuestions = page.ValidatableElements
