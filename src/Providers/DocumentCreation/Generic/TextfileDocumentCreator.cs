@@ -30,7 +30,7 @@ namespace form_builder.Providers.DocumentCreation.Generic
             {
                 var objStreamWriter = new StreamWriter(stream);
                 objStreamWriter.WriteLine("<div>");
-                objStreamWriter.WriteLine("<h2>Submitted answers for {0}</h2>", formName);
+                objStreamWriter.WriteLine($"<h2>Submitted answers for {formName}</h2>");
                 objStreamWriter.WriteLine("<hr />");
                 fileContent.ForEach((line) =>
                 {
