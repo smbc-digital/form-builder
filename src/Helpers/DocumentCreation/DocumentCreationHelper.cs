@@ -17,7 +17,7 @@ namespace form_builder.Helpers.DocumentCreation
 
             if (!string.IsNullOrEmpty(formAnswers.CaseReference))
             {
-                summaryBuilder.Add("Case Reference", formAnswers.CaseReference, Enum.EElementType.H2);
+                summaryBuilder.Add("Case Reference", formAnswers.CaseReference, Enum.EElementType.Textbox);
                 summaryBuilder.AddBlankLine();
             }
 
