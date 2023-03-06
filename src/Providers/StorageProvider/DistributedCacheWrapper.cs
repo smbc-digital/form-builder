@@ -50,7 +50,7 @@ namespace form_builder.Providers.StorageProvider
         {
             var distributedCacheOptions = new DistributedCacheEntryOptions();
 
-            distributedCacheOptions.SlidingExpiration = TimeSpan.FromMinutes(_distributedCacheExpirationConfiguration.UserData);
+            distributedCacheOptions.SlidingExpiration = TimeSpan.FromMinutes(expiration);
 
             return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
         }
