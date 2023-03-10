@@ -112,9 +112,9 @@ namespace form_builder.Services.PageService
             if (string.IsNullOrEmpty(sessionGuid))
             {
                 sessionGuid = Guid.NewGuid().ToString();
-                _sessionHelper.Set(sessionGuid.ToString(), form);
+                _sessionHelper.Set(sessionGuid, form);
                 isNewSession = true;
-                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                _logger.LogInformation($"PageService:ProcessPage: sessionId was empty, new session created {form} ");
             }
 
             var baseForm = await _schemaFactory.Build(form);
@@ -133,7 +133,7 @@ namespace form_builder.Services.PageService
 
             if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
             {
-                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: access to {form} is not approved");
                 _sessionHelper.Clear();
                 return null;
             }
