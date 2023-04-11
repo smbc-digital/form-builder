@@ -147,8 +147,8 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         {
             // Act
             var result = await _transformFactory.Transform(_page, _savedAnswers);
-            var textboxZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:1:")).ToList();
-            var textboxOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox:2:")).ToList();
+            var textboxZero = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox_1_")).ToList();
+            var textboxOne = result.Elements.Where(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox_2_")).ToList();
 
             // Assert
             Assert.Equal(2, result.Elements.Count(_ => _.Type.Equals(EElementType.Textbox)));
@@ -199,10 +199,10 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 
             // Act
             var result = await _transformFactory.Transform(page, _savedAnswers);
-            var radioOne = result.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Radio) && _.Properties.QuestionId.Equals("radio:1:"));
+            var radioOne = result.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Radio) && _.Properties.QuestionId.Equals("radio_1_"));
 
             // Assert
-            Assert.Equal("optionOne:1:", radioOne.Properties.Options[0].ConditionalElementId);
+            Assert.Equal("optionOne_1_", radioOne.Properties.Options[0].ConditionalElementId);
         }
     }
 }

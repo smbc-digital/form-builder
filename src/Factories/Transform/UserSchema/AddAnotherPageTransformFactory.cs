@@ -54,13 +54,13 @@ namespace form_builder.Factories.Transform.UserSchema
                         foreach (var element in addAnotherElement.Properties.Elements)
                         {
                             var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(element));
-                            incrementedElement.Properties.QuestionId = $"{element.Properties.QuestionId}:{i}:";
+                            incrementedElement.Properties.QuestionId = $"{element.Properties.QuestionId}_{i}_";
                             if (incrementedElement.Properties.Options.Any(_ => _.HasConditionalElement))
                             {
                                 foreach (var option in incrementedElement.Properties.Options)
                                 {
                                     if (!string.IsNullOrEmpty(option.ConditionalElementId))
-                                        option.ConditionalElementId = $"{option.ConditionalElementId}:{i}:";
+                                        option.ConditionalElementId = $"{option.ConditionalElementId}_{i}_";
                                 }
                             }
 
