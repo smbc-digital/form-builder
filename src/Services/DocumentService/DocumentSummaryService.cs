@@ -53,14 +53,14 @@ namespace form_builder.Services.DocumentService
         {
             var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            return _textfileProvider.CreateHtmlDocument(data);
+            return _textfileProvider.CreateHtmlDocument(data, formSchema.FormName);
         }
 
         private async Task<byte[]> GeneratePdfFile(FormAnswers formAnswers, FormSchema formSchema)
         {
             var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            return _textfileProvider.CreatePdfDocument(data);
+            return _textfileProvider.CreatePdfDocument(data, formSchema.FormName);
         }
     }
 }
