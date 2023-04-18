@@ -37,6 +37,9 @@ namespace form_builder.Models.Elements
                 { "value", Properties.Options[i].Value},
             };
 
+            if (Properties.Autofocus)
+                properties.Add("autofocus", true);
+
             if (Properties.Options.Any(_ => _.HasConditionalElement))
             {
                 var fieldsetIncrement = Properties.QuestionId.Split(':').Length > 1 ? $"-{Properties.QuestionId.Split(':')[1]}" : null;

@@ -76,5 +76,9 @@ namespace form_builder.Models.Properties.ElementProperties
         public string SummaryLabel { get; set; } = string.Empty;
 
         public string Warning { get; set; } = string.Empty;
+
+        public bool Autofocus { get; set; }
+
+        public bool SetAutofocus { get; set; }
     }
 }

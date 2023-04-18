@@ -1,4 +1,7 @@
-﻿@model Element
+﻿@using Microsoft.AspNetCore.Razor.TagHelpers
+@using NuGet.Packaging
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Element
 @{
     var maxYear = DateTime.Now.Year + 100;
     var inputClassesShort = "govuk-input govuk-date-input__input govuk-input--width-2";
@@ -22,6 +25,23 @@
         inputClassesShort += " govuk-input--error";
         inputClassesLong += " govuk-input--error";
     }
+
+    var elements = Model.GenerateElementProperties();
+
+    elements.AddRange(new Dictionary<string, dynamic>
+    {
+        {"name", dayId},
+        {"id", dayId},
+        {"autocomplete", "bday-day"},
+        {"maxlength", "2"},
+        {"type", "text"},
+        {"inputmode", "numeric"},
+        {"pattern", "[0-9]*"},
+        {"class", inputClassesShort},
+    });
+
+    if (Model.Properties.Autofocus)
+        elements.Add("autofocus", true);
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
@@ -43,7 +63,7 @@
                 <label class="@labelClasses" for=@dayId>
                     Day
                 </label>
-                @Html.TextBox(dayId, Model.Properties.Day, new { name = dayId, id = dayId, autocomplete = "bday-day", maxlength = "2", type = "text", inputmode = "numeric", pattern = "[0-9]*", @class = inputClassesShort })
+                @Html.TextBox(dayId, Model.Properties.Day, elements)
             </div>
         </div>
 

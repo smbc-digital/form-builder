@@ -2,6 +2,9 @@
 @{
     var elements = Model.GenerateElementProperties();
     elements.Add("class", !Model.IsValid ? "govuk-input govuk-input--width-10 govuk-input--error" : "govuk-input govuk-input--width-10");
+
+    if (Model.Properties.Autofocus)
+        elements.Add("autofocus", true);
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">

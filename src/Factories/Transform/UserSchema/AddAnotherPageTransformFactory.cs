@@ -12,11 +12,23 @@ namespace form_builder.Factories.Transform.UserSchema
         public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
         {
             var newListOfElements = new List<IElement>();
+
             foreach (var element in page.Elements)
             {
                 if (element.Type.Equals(EElementType.AddAnother))
                 {
                     newListOfElements.AddRange(GenerateListOfIncrementedElements(page.Elements, convertedAnswers));
+
+                    if (newListOfElements.Any(_ => _.Properties.SetAutofocus))
+                    {
+                        foreach (var existingElement in newListOfElements)
+                        {
+                            existingElement.Properties.Autofocus = false;
+                        }
+                        
+                        var autofocusElements = newListOfElements.Where(_ => _.Properties.SetAutofocus);
+                        autofocusElements.Last().Properties.Autofocus = true;
+                    }
                 }
 
                 newListOfElements.Add(element);
@@ -61,6 +73,7 @@ namespace form_builder.Factories.Transform.UserSchema
                                 {
                                     if (!string.IsNullOrEmpty(option.ConditionalElementId))
                                         option.ConditionalElementId = $"{option.ConditionalElementId}_{i}_";
+
                                 }
                             }
 
