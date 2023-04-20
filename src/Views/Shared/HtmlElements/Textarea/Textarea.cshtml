@@ -4,6 +4,9 @@
     elementProperties.Add("class", !Model.IsValid
         ? "govuk-textarea govuk-js-character-count govuk-textarea--error"
         : "govuk-textarea govuk-js-character-count");
+
+    @if (Model.Properties.Autofocus)
+        elementProperties.Add("autofocus", true);
 }
 
 @if (Model.DisplayCharacterCount)
