@@ -621,5 +621,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithSetAutofocus(bool autofocus)
+        {
+            _property.SetAutofocus= autofocus;
+
+            return this;
+        }
     }
 }

@@ -25,6 +25,9 @@
     elements.Add("class", !Model.IsValid
     ? $"{baseCssClasses} govuk-input--error"
     : baseCssClasses);
+
+    if (Model.Properties.Autofocus)
+        elements.Add("autofocus", true);
 }
 
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
