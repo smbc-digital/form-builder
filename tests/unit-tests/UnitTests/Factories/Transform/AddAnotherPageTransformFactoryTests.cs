@@ -204,5 +204,39 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             // Assert
             Assert.Equal("optionOne_1_", radioOne.Properties.Options[0].ConditionalElementId);
         }
+
+        [Fact]
+        public async Task Transform_ShouldSetAutofocus()
+        {
+            // Arrange
+            var textbox = new ElementBuilder()
+                .WithQuestionId("textbox")
+                .WithSetAutofocus(true)
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .WithType(EElementType.AddAnother)
+                .WithNestedElement(textbox)
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textbox };
+
+            var page = new PageBuilder()
+                .WithPageSlug("people")
+                .WithElement(addAnotherElement)
+                .Build();
+
+            // Act
+            var result = await _transformFactory.Transform(page, _savedAnswers);
+            var firstTextbox = result.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox_1_") && _.Properties.SetAutofocus);
+            var secondTextbox = result.Elements.Last(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox_2_") && _.Properties.SetAutofocus);
+
+            // Assert
+            Assert.False(firstTextbox.Properties.Autofocus);
+            Assert.True(secondTextbox.Properties.Autofocus);
+        }
     }
 }
