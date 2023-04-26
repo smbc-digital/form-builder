@@ -184,6 +184,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
                 .WithQuestionId("ReusableTest")
                 .WithOptional(true)
                 .WithTargetMapping("target.mapping")
+                .WithSetAutofocus(true)
                 .Build();
 
             element.ElementRef = "test";
@@ -206,8 +207,8 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             Assert.IsType<FormSchema>(result);
             Assert.Equal("target.mapping", result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.TargetMapping);
             Assert.True(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.Optional);
+            Assert.True(result.Pages.FirstOrDefault().Elements.FirstOrDefault().Properties.SetAutofocus);
         }
-
 
         [Fact]
         public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_MaxLength_WhenSupplied()
