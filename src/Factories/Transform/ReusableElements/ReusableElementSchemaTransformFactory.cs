@@ -95,6 +95,8 @@ namespace form_builder.Factories.Transform.ReusableElements
             if (!string.IsNullOrEmpty(reusableElement.Properties.SummaryLabel))
                 substituteElement.Properties.SummaryLabel = reusableElement.Properties.SummaryLabel;
 
+            substituteElement.Properties.SetAutofocus = reusableElement.Properties.SetAutofocus;
+
             return substituteElement;
         }
 

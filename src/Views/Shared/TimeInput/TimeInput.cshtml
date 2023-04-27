@@ -1,4 +1,6 @@
-﻿@model Element
+﻿@using NuGet.Packaging
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Element
 @{
     var inputClasses = "govuk-input govuk-date-input__input govuk-input--width-2";
     var labelClasses = "govuk-label";
@@ -16,6 +18,23 @@
     {
         inputClasses += " govuk-input--error";
     }
+
+    var elements = Model.GenerateElementProperties();
+    elements.AddRange(new Dictionary<string, dynamic>
+    {
+        {"class", inputClasses},
+        {"maxLength", "2"},
+        {"type", "text"},
+        {"inputmode", "numeric"},
+        {"pattern", "[0-9]*"},
+        {"min", "1"},
+        {"max", "12"},
+        {"style", "width:3em"},
+    });
+
+    if (Model.Properties.Autofocus)
+        elements.Add("autofocus", true);
+
 }
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)">
     @Html.BeginFieldSet(Model, new string[] { "govuk-fieldset" })
@@ -35,7 +54,7 @@
                 <label class="@labelClasses" for=@Model.GetCustomItemId("hours")>
                     Hours
                 </label>
-                @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, new { @class = inputClasses, maxLength = "2", type = "text", inputmode = "numeric", pattern = @"[0-9]*", min = "1", max = "12", style = "width:3em" }):
+                @Html.TextBox(Model.GetCustomItemId("hours"), Model.Properties.Hours, elements):
             </div>
         </div>
         <div class="smbc-time-input__divider"></div>
