@@ -93,7 +93,7 @@ namespace form_builder.Helpers.PageHelpers
             {
                 if (!_disallowedKeys.DisallowedAnswerKeys.Any(key => item.Key.Contains(key)))
                 {
-                    var splitQuestionId = item.Key.Split(':');
+                    var splitQuestionId = item.Key.Split('_');
                     var currentQuestionIncrement = int.Parse(splitQuestionId[1]);
                     if (currentQuestionIncrement.Equals(incrementToRemove))
                     {
@@ -104,7 +104,7 @@ namespace form_builder.Helpers.PageHelpers
                         if (currentQuestionIncrement > incrementToRemove)
                         {
                             splitQuestionId[1] = $"{currentQuestionIncrement - 1}";
-                            var newQuestionId = string.Join(':', splitQuestionId);
+                            var newQuestionId = string.Join('_', splitQuestionId);
 
                             updatedViewModel.Add(newQuestionId, item.Value);
                         }
