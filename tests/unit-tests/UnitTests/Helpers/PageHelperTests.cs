@@ -444,10 +444,10 @@ namespace form_builder_tests.UnitTests.Helpers
             var viewModel = new Dictionary<string, dynamic>
             {
                 {
-                    "answer:0:", "answer0"
+                    "answer_0_", "answer0"
                 },
                 {
-                    "answer:1:", "answer1"
+                    "answer_1_", "answer1"
                 },
                 {
                     "Path", "page-one"
@@ -466,12 +466,12 @@ namespace form_builder_tests.UnitTests.Helpers
                         {
                             new Answers
                             {
-                                QuestionId = "answer:0:",
+                                QuestionId = "answer_0_",
                                 Response = "answer0"
                             },
                             new Answers
                             {
-                                QuestionId = "answer:1:",
+                                QuestionId = "answer_1_",
                                 Response = "answer1"
                             }
                         }
@@ -491,7 +491,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
 
             // Assert
-            Assert.Equal("answer:0:", callbackModel.Pages[0].Answers[0].QuestionId);
+            Assert.Equal("answer_0_", callbackModel.Pages[0].Answers[0].QuestionId);
             Assert.Equal("answer1", callbackModel.Pages[0].Answers[0].Response);
             Assert.Single(callbackModel.Pages[0].Answers);
         }
