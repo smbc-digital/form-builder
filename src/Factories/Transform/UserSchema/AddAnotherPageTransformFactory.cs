@@ -45,7 +45,7 @@ namespace form_builder.Factories.Transform.UserSchema
             var addAnotherReplacementElements = new List<IElement>();
 
             var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
-            var fieldsetIncrements = convertedAnswers.FormData is not null && convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
+            var fieldsetIncrements = convertedAnswers.FormData is not null && convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : addAnotherElement.Properties.MinimumFieldsets;
 
             foreach (var pageElement in currentPageElements)
             {
