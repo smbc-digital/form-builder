@@ -516,6 +516,20 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithMinimumFieldsets(int value)
+        {
+            _property.MinimumFieldsets = value;
+
+            return this;
+        }
+
+        public ElementBuilder WithFirstLabel(string value)
+        {
+            _property.FirstLabel = value;
+
+            return this;
+        }
+
         public ElementBuilder WithIsConditionalElement(bool value)
         {
             _property.isConditionalElement = value;
