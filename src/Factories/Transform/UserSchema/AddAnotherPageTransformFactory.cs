@@ -63,7 +63,7 @@ namespace form_builder.Factories.Transform.UserSchema
                             .WithOpeningTagValue(true)
                             .Build());
 
-                        if (i.Equals(1))
+                        if (i.Equals(1) && !string.IsNullOrEmpty(pageElement.Properties.FirstLabel))
                             addAnotherReplacementElements.Add(new ElementBuilder()
                                 .WithType(EElementType.Legend)
                                 .WithLabel(addAnotherElement.Properties.FirstLabel)
