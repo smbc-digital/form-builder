@@ -30,13 +30,14 @@ namespace form_builder.Services.AddAnotherService
             bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals(AddAnotherConstants.AddAnotherButtonKey));
 
             FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(guid);
+            var minimumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.MinimumFieldsets;
             var maximumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.MaximumFieldsets;
 
             if (dynamicCurrentPage.IsValid || !string.IsNullOrEmpty(removeKey))
             {
                 var addAnotherElement = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother));
                 var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
-                var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
+                var currentIncrement = convertedFormAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedFormAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : minimumFieldsets;
 
                 if (addEmptyFieldset && currentIncrement >= maximumFieldsets)
                     throw new ApplicationException("AddAnotherService::ProcessAddAnother, maximum number of fieldsets exceeded");

@@ -26,8 +26,13 @@ namespace form_builder.Factories.Transform.UserSchema
                             existingElement.Properties.Autofocus = false;
                         }
                         
-                        var autofocusElements = newListOfElements.Where(_ => _.Properties.SetAutofocus);
-                        autofocusElements.Last().Properties.Autofocus = true;
+                        var autofocusElements = newListOfElements.Where(_ => _.Properties.SetAutofocus).ToList();
+                        var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{element.Properties.QuestionId}";
+
+                        if (convertedAnswers.FormData is not null && convertedAnswers.FormData.ContainsKey(formDataIncrementKey))
+                            autofocusElements.Last().Properties.Autofocus = true;
+                        else
+                            autofocusElements.First().Properties.Autofocus = true;
                     }
                 }
 
@@ -45,7 +50,7 @@ namespace form_builder.Factories.Transform.UserSchema
             var addAnotherReplacementElements = new List<IElement>();
 
             var formDataIncrementKey = $"{AddAnotherConstants.IncrementKeyPrefix}{addAnotherElement.Properties.QuestionId}";
-            var fieldsetIncrements = convertedAnswers.FormData is not null && convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : 1;
+            var fieldsetIncrements = convertedAnswers.FormData is not null && convertedAnswers.FormData.ContainsKey(formDataIncrementKey) ? int.Parse(convertedAnswers.FormData.GetValueOrDefault(formDataIncrementKey).ToString()) : addAnotherElement.Properties.MinimumFieldsets;
 
             foreach (var pageElement in currentPageElements)
             {
@@ -58,10 +63,16 @@ namespace form_builder.Factories.Transform.UserSchema
                             .WithOpeningTagValue(true)
                             .Build());
 
-                        addAnotherReplacementElements.Add(new ElementBuilder()
-                            .WithType(EElementType.Legend)
-                            .WithLabel(addAnotherElement.Properties.Label)
-                            .Build());
+                        if (i.Equals(1) && !string.IsNullOrEmpty(pageElement.Properties.FirstLabel))
+                            addAnotherReplacementElements.Add(new ElementBuilder()
+                                .WithType(EElementType.Legend)
+                                .WithLabel(addAnotherElement.Properties.FirstLabel)
+                                .Build());
+                        else
+                            addAnotherReplacementElements.Add(new ElementBuilder()
+                                .WithType(EElementType.Legend)
+                                .WithLabel(addAnotherElement.Properties.Label)
+                                .Build());
 
                         foreach (var element in addAnotherElement.Properties.Elements)
                         {
@@ -81,7 +92,7 @@ namespace form_builder.Factories.Transform.UserSchema
                             addAnotherReplacementElements.Add(incrementedElement);
                         }
 
-                        if (fieldsetIncrements > 1)
+                        if (fieldsetIncrements > addAnotherElement.Properties.MinimumFieldsets)
                         {
                             addAnotherReplacementElements.Add(new ElementBuilder()
                                 .WithType(EElementType.Button)
