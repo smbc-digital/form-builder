@@ -60,7 +60,7 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
-        public async Task Transform_ShouldRetainOriginalAddnotherElement()
+        public async Task Transform_ShouldRetainOriginalAddAnotherElement()
         {
             // Act
             var result = await _transformFactory.Transform(_page, _savedAnswers);
@@ -91,6 +91,92 @@ namespace form_builder_tests.UnitTests.Factories.Transform
 
             // Assert
             Assert.Equal(2, result.Elements.Count(_ => _.Type.Equals(EElementType.Legend)));
+        }
+
+        [Theory]
+        [InlineData(2, 4, 2)]
+        [InlineData(3, 6, 3)]
+        [InlineData(4, 8, 4)]
+        [InlineData(5, 10, 5)]
+        [InlineData(6, 12, 6)]
+        [InlineData(7, 14, 7)]
+        public async Task Transform_ShouldReturnCorrectNumberOf_FieldsetElements_WhenMinimumFieldsetsUsed(int minimumFieldsets, int expectedFieldsets, int expectedFieldsetOpenClose)
+        {
+            // Arrange
+            var savedAnswers = new FormAnswers();
+
+            var textboxElement = new ElementBuilder()
+                .WithQuestionId("textbox")
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .WithType(EElementType.AddAnother)
+                .WithNestedElement(textboxElement)
+                .WithMinimumFieldsets(minimumFieldsets)
+                .WithMaximumFieldsets(8)
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
+
+            var page = new PageBuilder()
+                .WithPageSlug("people")
+                .WithElement(addAnotherElement)
+                .Build();
+
+            // Act
+            var result = await _transformFactory.Transform(page, savedAnswers);
+            var openingFieldsets = result.Elements.Count(_ => _.Type.Equals(EElementType.Fieldset) && _.Properties.OpeningTag);
+            var closingFieldsets = result.Elements.Count(_ => _.Type.Equals(EElementType.Fieldset) && !_.Properties.OpeningTag);
+
+            // Assert
+            Assert.Equal(expectedFieldsets, result.Elements.Count(_ => _.Type.Equals(EElementType.Fieldset)));
+            Assert.Equal(expectedFieldsetOpenClose, openingFieldsets);
+            Assert.Equal(expectedFieldsetOpenClose, closingFieldsets);
+        }
+
+        [Theory]
+        [InlineData(2, 2)]
+        [InlineData(3, 3)]
+        [InlineData(4, 4)]
+        [InlineData(5, 5)]
+        [InlineData(6, 6)]
+        [InlineData(7, 7)]
+        public async Task Transform_ShouldReturnCorrectLegendElements_WhenMinimumFieldsetsUsed(int minimumFieldsets, int expectedLegends)
+        {
+            // Arrange
+            var savedAnswers = new FormAnswers();
+
+            var textboxElement = new ElementBuilder()
+                .WithQuestionId("textbox")
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithLabel("Next person")
+                .WithFirstLabel("First person")
+                .WithQuestionId("person")
+                .WithType(EElementType.AddAnother)
+                .WithNestedElement(textboxElement)
+                .WithMinimumFieldsets(minimumFieldsets)
+                .WithMaximumFieldsets(8)
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
+
+            var page = new PageBuilder()
+                .WithPageSlug("people")
+                .WithElement(addAnotherElement)
+                .Build();
+            // Act
+            var result = await _transformFactory.Transform(page, savedAnswers);
+
+            // Assert
+            Assert.Equal(expectedLegends, result.Elements.Count(_ => _.Type.Equals(EElementType.Legend)));
+            Assert.Equal(addAnotherElement.Properties.FirstLabel, result.Elements.First(_ => _.Type.Equals(EElementType.Legend)).Properties.Label);
+            Assert.Equal(addAnotherElement.Properties.Label, result.Elements.Last(_ => _.Type.Equals(EElementType.Legend)).Properties.Label);
         }
 
         [Fact]
@@ -140,6 +226,39 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             // Assert
             Assert.Equal(2, result.Elements.Count(_ => _.Type.Equals(EElementType.Button)));
             Assert.Empty(addAnotherButton);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldNotReturnRemoveButtonElement_WhenAtMinimumFieldsets()
+        {
+            // Act
+            var textboxElement = new ElementBuilder()
+                .WithQuestionId("textbox")
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .WithType(EElementType.AddAnother)
+                .WithNestedElement(textboxElement)
+                .WithMinimumFieldsets(2)
+                .WithMaximumFieldsets(3)
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textboxElement };
+
+            var page = new PageBuilder()
+                .WithPageSlug("people")
+                .WithElement(addAnotherElement)
+                .Build();
+
+            var result = await _transformFactory.Transform(page, _savedAnswers);
+            var removeButtons = result.Elements.Where(_ => _.Type.Equals(EElementType.Button) && _.Properties.ButtonName.Contains("remove-")).ToList();
+
+            // Assert
+            Assert.Equal(1, result.Elements.Count(_ => _.Type.Equals(EElementType.Button)));
+            Assert.Empty(removeButtons);
         }
 
         [Fact]
@@ -237,6 +356,42 @@ namespace form_builder_tests.UnitTests.Factories.Transform
             // Assert
             Assert.False(firstTextbox.Properties.Autofocus);
             Assert.True(secondTextbox.Properties.Autofocus);
+        }
+
+        [Fact]
+        public async Task Transform_ShouldSetAutofocus_ToFirstElement_WhenMinimumFieldsetAbove1_AndNoSavedAnswers()
+        {
+            // Arrange
+            var savedAnswers = new FormAnswers();
+            var textbox = new ElementBuilder()
+                .WithQuestionId("textbox")
+                .WithSetAutofocus(true)
+                .WithType(EElementType.Textbox)
+                .Build();
+
+            var addAnotherElement = new ElementBuilder()
+                .WithLabel("Person")
+                .WithQuestionId("person")
+                .WithType(EElementType.AddAnother)
+                .WithMinimumFieldsets(2)
+                .WithNestedElement(textbox)
+                .Build();
+
+            addAnotherElement.Properties.Elements = new List<IElement> { textbox };
+
+            var page = new PageBuilder()
+                .WithPageSlug("people")
+                .WithElement(addAnotherElement)
+                .Build();
+
+            // Act
+            var result = await _transformFactory.Transform(page, savedAnswers);
+            var firstTextbox = result.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox_1_") && _.Properties.SetAutofocus);
+            var secondTextbox = result.Elements.Last(_ => _.Type.Equals(EElementType.Textbox) && _.Properties.QuestionId.Equals("textbox_2_") && _.Properties.SetAutofocus);
+
+            // Assert
+            Assert.True(firstTextbox.Properties.Autofocus);
+            Assert.False(secondTextbox.Properties.Autofocus);
         }
     }
 }

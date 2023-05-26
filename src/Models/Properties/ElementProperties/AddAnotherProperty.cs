@@ -6,6 +6,8 @@ namespace form_builder.Models.Properties.ElementProperties
     {
         public List<IElement> Elements { get; set; }
 
+        public string FirstLabel { get; set; }
+
         public int MinimumFieldsets { get; set; } = 1;
 
         public int MaximumFieldsets { get; set; } = 10;
