@@ -236,7 +236,7 @@ namespace form_builder.Services.MappingService
                 foreach (var nestedElement in element.Properties.Elements)
                 {
                     var incrementedElement = JsonConvert.DeserializeObject<IElement>(JsonConvert.SerializeObject(nestedElement));
-                    incrementedElement.Properties.QuestionId = $"{nestedElement.Properties.QuestionId}:{i}:";
+                    incrementedElement.Properties.QuestionId = $"{nestedElement.Properties.QuestionId}_{i}_";
                     fieldsetAnswers = (Dictionary<string, dynamic>)await RecursiveCheckAndCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping) ? nestedElement.Properties.QuestionId : nestedElement.Properties.TargetMapping, incrementedElement, formAnswers, fieldsetAnswers);
                 }
 
