@@ -55,18 +55,18 @@ namespace form_builder.Providers.DocumentCreation.Generic
 
             XGraphics graph = XGraphics.FromPdfPage(pdfPage);
 
-            var tf = new XTextFormatter(graph);
+            var textFormatter = new XTextFormatter(graph);
             var format = new XStringFormat();
             format.LineAlignment = XLineAlignment.Near;
             format.Alignment = XStringAlignment.Near;
 
-            tf.DrawString($"Submitted answers for {formName}", new XFont("Verdana", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, 0, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
+            textFormatter.DrawString($"Submitted answers for {formName}", new XFont("Verdana", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, 0, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
 
             int y = 40;
 
             fileContent.ForEach((line) =>
             {
-                tf.DrawString(line, new XFont("Verdana", 16, XFontStyle.Regular), XBrushes.Black, new XRect(0, y, pdfPage.Width - 10, pdfPage.Height), format);
+                textFormatter.DrawString(line, new XFont("Verdana", 16, XFontStyle.Regular), XBrushes.Black, new XRect(0, y, pdfPage.Width - 10, pdfPage.Height), format);
                 y += 20;
             });
 
