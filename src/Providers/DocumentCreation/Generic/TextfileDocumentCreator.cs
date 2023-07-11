@@ -56,11 +56,13 @@ namespace form_builder.Providers.DocumentCreation.Generic
             XGraphics graph = XGraphics.FromPdfPage(pdfPage);
 
             var textFormatter = new XTextFormatter(graph);
-            var format = new XStringFormat();
-            format.LineAlignment = XLineAlignment.Near;
-            format.Alignment = XStringAlignment.Near;
+            var format = new XStringFormat
+            {
+                LineAlignment = XLineAlignment.Near,
+                Alignment = XStringAlignment.Near
+            };
 
-            textFormatter.DrawString($"Submitted answers for {formName}", new XFont("Verdana", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, 0, pdfPage.Width, pdfPage.Height), XStringFormats.TopCenter);
+            textFormatter.DrawString($"Submitted answers for {formName}", new XFont("Verdana", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, 0, pdfPage.Width, pdfPage.Height), format);
 
             int y = 40;
 
