@@ -51,7 +51,6 @@ namespace form_builder.Services.EmailSubmitService
                 data.FormAnswers.CaseReference = _referenceNumberProvider.GetReference(data.BaseForm.ReferencePrefix);
                 reference = data.FormAnswers.CaseReference;
                 _pageHelper.SaveCaseReference(sessionGuid, reference);
-                data = await _mappingService.Map(sessionGuid, form);
             }
 
             var doc = _documentSummaryService.GenerateDocument(

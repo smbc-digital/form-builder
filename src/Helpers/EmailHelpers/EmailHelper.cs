@@ -24,11 +24,6 @@ namespace form_builder.Helpers.EmailHelpers
 
         public async Task<EmailConfiguration> GetEmailInformation(string form)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            var mappingEntity = await _mappingService.Map(sessionGuid, form);
-            if (mappingEntity is null)
-                throw new Exception($"{nameof(EmailHelper)}::{nameof(GetEmailInformation)}: No mapping entity found for {form}");
-
             var emailConfigList = await _emailConfigProvider.Get<List<EmailConfiguration>>();
             var formEmailConfig = emailConfigList.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(form)));
 
