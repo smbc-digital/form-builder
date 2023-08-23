@@ -50,7 +50,7 @@ namespace form_builder.Services.DocumentService
 
         private async Task<byte[]> GeneratePdfFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var data = await _documentCreationHelper.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
 
             return _textfileProvider.CreatePdfDocument(data, formSchema.FormName);
         }
