@@ -39,9 +39,14 @@ namespace form_builder_tests.UnitTests.Services
                .WithQuestionId("test-question")
                .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -55,7 +60,21 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
-                    Pages = new List<PageAnswers>(),
+                    Pages = new List<PageAnswers>
+                    {
+                        new()
+                        {
+                            PageSlug = "page-one",
+                            Answers = new List<Answers>
+                            {
+                                new()
+                                {
+                                    QuestionId = "test-question",
+                                    Response = "answer"
+                                }
+                            }
+                        }
+                    },
                     Path = "page-one"
                 }));
 
@@ -106,12 +125,17 @@ namespace form_builder_tests.UnitTests.Services
                 .WithButtonId("test-button")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithElement(element2)
                 .WithElement(element3)
                 .WithValidatedModel(true)
                 .WithPageSlug("page-one")
+                .WithBehaviour(behaviour)
                 .Build();
 
             var schema = new FormSchemaBuilder()
@@ -143,11 +167,15 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("text")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
 
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithElement(element2)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -191,11 +219,16 @@ namespace form_builder_tests.UnitTests.Services
                 .WithTargetMapping("customer.datepicker.date")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithElement(element2)
                 .WithElement(element3)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -232,9 +265,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("text")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -291,10 +329,15 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("text")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithElement(element2)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -348,9 +391,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("file")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -393,9 +441,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("file")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -454,10 +507,15 @@ namespace form_builder_tests.UnitTests.Services
                 .WithTargetMapping("file")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithElement(element2)
                 .WithElement(element3)
+                .WithBehaviour(behaviour)
                 .WithValidatedModel(true)
                 .WithPageSlug("page-one")
                 .Build();
@@ -512,9 +570,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithNestedElement(textboxElement)
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(addAnotherElement)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -557,9 +620,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("textbox")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -603,9 +671,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithQuestionId("textbox")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -684,9 +757,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithTargetMapping("customer.firstname")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(customerFirstnameElement)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -823,9 +901,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithTargetMapping("customer.firstname")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(customerFirstnameElement)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -864,9 +947,14 @@ namespace form_builder_tests.UnitTests.Services
                 .WithTargetMapping("customer.firstname")
                 .Build();
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(customerFirstnameElement)
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
@@ -902,8 +990,13 @@ namespace form_builder_tests.UnitTests.Services
             var startDate = DateTime.Now.AddDays(-2);
             var startTime = DateTime.Today.Add(new TimeSpan(1, 0, 0));
 
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .Build();
+
             var page = new PageBuilder()
                 .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
                 .WithPageSlug("page-one")
                 .Build();
 
