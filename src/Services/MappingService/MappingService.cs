@@ -156,8 +156,7 @@ namespace form_builder.Services.MappingService
         {
             var data = new ExpandoObject() as IDictionary<string, dynamic>;
 
-            var pages = formSchema.GetReducedPages(formAnswers);
-            var elements = pages.SelectMany(_ => _.ValidatableElements)
+            var elements = formSchema.Pages.SelectMany(_ => _.ValidatableElements)
                 .ToList();
 
             foreach (var element in elements)
