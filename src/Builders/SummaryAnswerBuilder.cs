@@ -1,4 +1,5 @@
 using form_builder.Enum;
+using form_builder.Models;
 
 namespace form_builder.Builders.Document
 {
@@ -16,6 +17,19 @@ namespace form_builder.Builders.Document
                 _filesData.Add($"{question}: {answer}");
             else
                 _data.Add($"{question}: {answer}");
+        }
+
+        public void AddQuestion(string question)
+        {
+            _data.Add($"{question}:");
+        }
+
+        public void AddAnswer(string answer)
+        {
+            if (string.IsNullOrWhiteSpace(answer))
+                return;
+
+            _data.Add($"{answer}");
         }
 
         public List<string> Build()

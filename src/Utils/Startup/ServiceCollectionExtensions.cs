@@ -348,7 +348,7 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection ConfigureDocumentCreationProviders(this IServiceCollection services)
         {
-            services.AddSingleton<IDocumentCreation, TextfileDocumentCreator>();
+            services.AddSingleton<IDocumentCreation, TextFileDocumentCreator>();
 
             return services;
         }

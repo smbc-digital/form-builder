@@ -1,11 +1,11 @@
 using form_builder.Enum;
+using form_builder.Helpers.DocumentCreation;
 using PdfSharpCore.Drawing;
-using PdfSharpCore.Drawing.Layout;
 using PdfSharpCore.Pdf;
 
 namespace form_builder.Providers.DocumentCreation.Generic
 {
-    public class TextfileDocumentCreator : IDocumentCreation
+    public class TextFileDocumentCreator : IDocumentCreation
     {
         public EProviderPriority Priority => EProviderPriority.High;
         public EDocumentType DocumentType => EDocumentType.Txt;
@@ -47,34 +47,60 @@ namespace form_builder.Providers.DocumentCreation.Generic
 
         public byte[] CreatePdfDocument(List<string> fileContent, string formName)
         {
-            var pdfdocument = new PdfDocument();
-            var pdfPage = pdfdocument.AddPage();
-            pdfPage.Size = PdfSharpCore.PageSize.A4;
-            pdfPage.TrimMargins.Left = 50;
-			pdfPage.TrimMargins.Top = 50;
-
-            XGraphics graph = XGraphics.FromPdfPage(pdfPage);
-
-            var textFormatter = new XTextFormatter(graph);
-            var format = new XStringFormat
+            PdfDocument pdfDocument = new();
+            LayoutHelper layoutHelper = new(pdfDocument, XUnit.FromPoint(10), XUnit.FromCentimeter(29.7 - 1));
+            XStringFormat format = new()
             {
                 LineAlignment = XLineAlignment.Near,
                 Alignment = XStringAlignment.Near
             };
 
-            textFormatter.DrawString($"Submitted answers for {formName}", new XFont("Verdana", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, 0, pdfPage.Width, pdfPage.Height), format);
+            XFont fontBold = new("Verdana", 16, XFontStyle.Bold);
+            XFont fontRegular = new("Verdana", 16, XFontStyle.Regular);
 
-            int y = 40;
+            string header = $"Submitted answers for {formName}";
+            XUnit headerTop = layoutHelper.GetLinePosition(
+                GetRequestedHeightBasedOnLineLength(header.Length, 45, 15));
 
-            fileContent.ForEach((line) =>
+            layoutHelper.TextFormatter.DrawString(header, fontBold, XBrushes.Black, 
+                new XRect(7.5, headerTop, layoutHelper.Page.Width - 15, layoutHelper.Page.Height), format);
+            
+            for (int line = 0; line < fileContent.Count; line++)
             {
-                textFormatter.DrawString(line, new XFont("Verdana", 16, XFontStyle.Regular), XBrushes.Black, new XRect(0, y, pdfPage.Width - 10, pdfPage.Height), format);
-                y += 20;
-            });
+                // FileContent lines should come in groups of 3 - question, answer, empty line. If the previous line is empty then we use the fontBold for the question
+                if (line.Equals(0) || (line >= 1 && fileContent[line - 1].Length.Equals(0)))
+                {
+                    XUnit top = layoutHelper.GetLinePosition(
+                        GetRequestedHeightBasedOnLineLength(fileContent[line].Length, 20, 17));
+
+                    layoutHelper.TextFormatter.DrawString(fileContent[line], fontBold, XBrushes.Black, 
+                        new XRect(7.5, top, layoutHelper.Page.Width - 15, layoutHelper.Page.Height), format);
+                }
+                else
+                {
+                    XUnit top = layoutHelper.GetLinePosition(
+                        GetRequestedHeightBasedOnLineLength(fileContent[line].Length, 25, 15));
+
+                    layoutHelper.TextFormatter.DrawString(fileContent[line], fontRegular, XBrushes.Black,
+                        new XRect(7.5, top, layoutHelper.Page.Width - 15, layoutHelper.Page.Height), format);
+                }
+            }
 
             MemoryStream memoryStream = new();
-            pdfdocument.Save(memoryStream);
+            pdfDocument.Save(memoryStream);
             return memoryStream.ToArray();
+        }
+
+        private int GetRequestedHeightBasedOnLineLength(int lineLength, int baseHeight, int incrementAmount)
+        {
+            // Uses an estimate of 60 characters per line to calculate how much height to add to the _currentPosition in the LayoutHelper
+            while (lineLength > 60)
+            {
+                baseHeight += incrementAmount;
+                lineLength -= 60;
+            }
+
+            return baseHeight;
         }
     }
 }
