@@ -60,7 +60,6 @@ namespace form_builder.Providers.DocumentCreation.Generic
 
             string header = $"Submitted answers for {formName}";
             XUnit headerTop = layoutHelper.GetLinePosition(
-                GetRequestedHeightBasedOnLineLength(header.Length, 45, 15),
                 GetRequestedHeightBasedOnLineLength(header.Length, 45, 15));
 
             layoutHelper.TextFormatter.DrawString(header, fontBold, XBrushes.Black, 
@@ -72,7 +71,6 @@ namespace form_builder.Providers.DocumentCreation.Generic
                 if (line.Equals(0) || (line >= 1 && fileContent[line - 1].Length.Equals(0)))
                 {
                     XUnit top = layoutHelper.GetLinePosition(
-                        GetRequestedHeightBasedOnLineLength(fileContent[line].Length, 20, 17), 
                         GetRequestedHeightBasedOnLineLength(fileContent[line].Length, 20, 17));
 
                     layoutHelper.TextFormatter.DrawString(fileContent[line], fontBold, XBrushes.Black, 
@@ -81,7 +79,6 @@ namespace form_builder.Providers.DocumentCreation.Generic
                 else
                 {
                     XUnit top = layoutHelper.GetLinePosition(
-                        GetRequestedHeightBasedOnLineLength(fileContent[line].Length, 25, 15),
                         GetRequestedHeightBasedOnLineLength(fileContent[line].Length, 25, 15));
 
                     layoutHelper.TextFormatter.DrawString(fileContent[line], fontRegular, XBrushes.Black,
@@ -96,7 +93,7 @@ namespace form_builder.Providers.DocumentCreation.Generic
 
         private int GetRequestedHeightBasedOnLineLength(int lineLength, int baseHeight, int incrementAmount)
         {
-            // Uses an estimate of 60 characters per line to calculate what to add to the _currentPosition in the LayoutHelper
+            // Uses an estimate of 60 characters per line to calculate how much height to add to the _currentPosition in the LayoutHelper
             while (lineLength > 60)
             {
                 baseHeight += incrementAmount;

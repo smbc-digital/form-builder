@@ -21,18 +21,12 @@ public class LayoutHelper
         CreatePage();
     }
 
-    public XUnit GetLinePosition(XUnit requestedHeight)
+    public XUnit GetLinePosition(XUnit requiredHeight)
     {
-        return GetLinePosition(requestedHeight, -1f);
-    }
-
-    public XUnit GetLinePosition(XUnit requestedHeight, XUnit requiredHeight)
-    {
-        XUnit required = requiredHeight == -1f ? requestedHeight : requiredHeight;
-        if (_currentPosition + required > _bottomMargin)
+        if (_currentPosition + requiredHeight > _bottomMargin)
             CreatePage();
         XUnit result = _currentPosition;
-        _currentPosition += requestedHeight;
+        _currentPosition += requiredHeight;
         return result;
     }
 
