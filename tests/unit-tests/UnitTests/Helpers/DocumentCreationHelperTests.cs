@@ -489,7 +489,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal(3, result.Count);
             Assert.Equal($"{labelText}:", result[0]);
-            Assert.Equal($" {value}", result[1]);
+            Assert.Equal($"{value}", result[1]);
         }
 
         [Theory]
@@ -532,7 +532,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal(3, result.Count);
             Assert.Equal($"{titleText}:", result[0]);
-            Assert.Equal($" {value}", result[1]);
+            Assert.Equal($"{value}", result[1]);
         }
 
         [Fact]
@@ -588,11 +588,11 @@ namespace form_builder_tests.UnitTests.Helpers
 
             Assert.Equal(9, result.Count);
             Assert.Equal($"{labelText}:", result[0]);
-            Assert.Equal($" {value}", result[1]);
+            Assert.Equal($"{value}", result[1]);
             Assert.Equal($"{labelText2}:", result[3]);
-            Assert.Equal($" {value}", result[4]);
+            Assert.Equal($"{value}", result[4]);
             Assert.Equal($"{labelText3}:", result[6]);
-            Assert.Equal($" {value}", result[7]);
+            Assert.Equal($"{value}", result[7]);
         }
     }
 }

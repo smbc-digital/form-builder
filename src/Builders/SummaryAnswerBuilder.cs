@@ -29,7 +29,7 @@ namespace form_builder.Builders.Document
             if (string.IsNullOrWhiteSpace(answer))
                 return;
 
-            _data.Add($" {answer}");
+            _data.Add($"{answer}");
         }
 
         public List<string> Build()
