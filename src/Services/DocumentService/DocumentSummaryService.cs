@@ -25,22 +25,14 @@ namespace form_builder.Services.DocumentService
             _schemaFactory = schemaFactory;
         }
 
-        public async Task<byte[]> GenerateDocument(DocumentSummaryEntity entity)
-        {
-            var journeyPages = entity.FormSchema.GetReducedPages(entity.PreviousAnswers);
-            foreach (var page in journeyPages)
-            {
-                await _schemaFactory.TransformPage(page, entity.PreviousAnswers);
-            }
-
-            return entity.DocumentType switch
+        public async Task<byte[]> GenerateDocument(DocumentSummaryEntity entity) =>
+            entity.DocumentType switch
             {
                 EDocumentType.Txt => await GenerateTextFile(entity.PreviousAnswers, entity.FormSchema),
                 EDocumentType.Html => await GenerateHtmlFile(entity.PreviousAnswers, entity.FormSchema),
                 EDocumentType.Pdf => await GeneratePdfFile(entity.PreviousAnswers, entity.FormSchema),
                 _ => throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary"),
             };
-        }
 
         private async Task<byte[]> GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
         {
@@ -58,7 +50,7 @@ namespace form_builder.Services.DocumentService
 
         private async Task<byte[]> GeneratePdfFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+            var data = await _documentCreationHelper.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
 
             return _textfileProvider.CreatePdfDocument(data, formSchema.FormName);
         }
