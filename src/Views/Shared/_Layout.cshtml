@@ -21,6 +21,7 @@
     <link rel="shortcut icon" type="image/png" href="~/assets/images/favicon-sg.png" />
     <title>@ViewData["PageTitle"] - @ViewData["Title"] - Stockport Council</title>
     <link href="@StylesheetConfiguration.Value.Stylesheet" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <partial name="TagManagerHead" />
 </head>
 
@@ -76,6 +77,7 @@
 
     <partial name="Footer" />
     <script type="text/javascript" src="@JavascriptConfiguration.Value.Javascript"></script>
+    <script type="text/javascript" src="../assets/javascript/reciteme.js"></script>
     <script>window.GOVUKFrontend.initAll()</script>
     <script>window.SMBCFrontend.initAll()</script>
 </body>
