@@ -194,5 +194,30 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.True(result.IsValid);
             Assert.Equal(string.Empty, result.Message);
         }
+
+        [Fact]
+        public void Validate_ShouldShowDefaultValidationMessage_WhenValidationIsTriggeredAndNoValidationMessageIsSet()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsFutureDateAfterRelative("2-d", "")
+                .Build();
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", DateTime.Now.AddDays(1).Day.ToString()},
+                {"test-date-month", DateTime.Now.Month.ToString()},
+                {"test-date-year", DateTime.Now.Year.ToString()}
+            };
+
+            // Act
+            var result = _dateInputIsFutureDateAfterRelativeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Equal("Check the date and try again", result.Message);
+        }
     }
 }
