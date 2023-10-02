@@ -12,10 +12,10 @@
         public string OutsideRangeType => string.IsNullOrEmpty(OutsideRange) ? string.Empty : OutsideRange.Substring(OutsideRange.LastIndexOf('-') + 1).Trim().ToUpper();
         public string WithinRange { get; set; }
         public string WithinRangeType => string.IsNullOrEmpty(WithinRange) ? string.Empty : WithinRange.Substring(WithinRange.LastIndexOf('-') + 1).Trim().ToUpper();
-        public string IsFutureDateAfterRelative { get; set; } //"2-d"
-        public string IsFutureDateAfterRelativeType => string.IsNullOrEmpty(IsFutureDateAfterRelative) ? string.Empty : IsFutureDateAfterRelative.Substring(IsFutureDateAfterRelative.LastIndexOf('-') + 1).Trim().ToUpper();  //D
-        public string IsFutureDateBeforeRelative { get; set; } //"2-d"
-        public string IsFutureDateBeforeRelativeType => string.IsNullOrEmpty(IsFutureDateBeforeRelative) ? string.Empty : IsFutureDateBeforeRelative.Substring(IsFutureDateBeforeRelative.LastIndexOf('-') + 1).Trim().ToUpper();  //D
+        public string IsFutureDateAfterRelative { get; set; } 
+        public string IsFutureDateAfterRelativeType => string.IsNullOrEmpty(IsFutureDateAfterRelative) ? string.Empty : IsFutureDateAfterRelative.Substring(IsFutureDateAfterRelative.LastIndexOf('-') + 1).Trim().ToUpper();  
+        public string IsFutureDateBeforeRelative { get; set; } 
+        public string IsFutureDateBeforeRelativeType => string.IsNullOrEmpty(IsFutureDateBeforeRelative) ? string.Empty : IsFutureDateBeforeRelative.Substring(IsFutureDateBeforeRelative.LastIndexOf('-') + 1).Trim().ToUpper();  
         public string Day { get; set; } = string.Empty;
 
         public string Month { get; set; } = string.Empty;
