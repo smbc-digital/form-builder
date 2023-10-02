@@ -122,6 +122,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, RestrictPastDatepickerValidator>();
             services.AddTransient<IElementValidator, RestrictFutureDatepickerValidator>();
             services.AddTransient<IElementValidator, DateInputIsFutureDateAfterRelativeValidator>();
+            services.AddTransient<IElementValidator, DateInputIsFutureDateBeforeRelativeValidator>();
             services.AddTransient<IElementValidator, EmailElementValidator>();
             services.AddTransient<IElementValidator, PostcodeElementValidator>();
             services.AddTransient<IElementValidator, StockportPostcodeElementValidator>();
