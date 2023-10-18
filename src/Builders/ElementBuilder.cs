@@ -578,6 +578,23 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIsFutureDateAfterRelative(string value, string validMessage = "")
+        {
+            _property.IsFutureDateAfterRelative = value;
+            _property.ValidationMessageIsFutureDateAfterRelative = validMessage;
+
+            return this;
+        }
+
+        public ElementBuilder WithIsFutureDateBeforeRelative(string value, string validMessage = "")
+        {
+            _property.IsFutureDateBeforeRelative = value;
+            _property.ValidationMessageIsFutureDateBeforeRelative = validMessage;
+
+            return this;
+        }
+
+
         public ElementBuilder WithDecimal(bool value)
         {
             _property.Decimal = value;
