@@ -1,4 +1,5 @@
-﻿using form_builder.Builders;
+﻿using Amazon.Runtime.Internal.Util;
+using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
@@ -12,7 +13,9 @@ using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.EmailSubmitService;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
+using form_builder.TagParsers;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -28,6 +31,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IReferenceNumberProvider> _referenceNumberProvider = new();
         private readonly Mock<IPageHelper> _pageHelper = new();
         private readonly EmailSubmitService _emailSubmitService;
+        private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
+        private readonly Mock<ILogger<EmailSubmitService>> _mockLogger = new();
 
         public EmailSubmitServiceTests()
         {
@@ -38,7 +43,9 @@ namespace form_builder_tests.UnitTests.Services
                 _pageHelper.Object,
                 _emailProvider.Object,
                 _referenceNumberProvider.Object,
-                _documentSummaryService.Object
+                _documentSummaryService.Object,
+                _mockTagParsers.Object,
+                _mockLogger.Object
               );
         }
 
@@ -103,5 +110,7 @@ namespace form_builder_tests.UnitTests.Services
             _emailHelper.Verify(_ => _.GetEmailInformation(It.IsAny<string>()), Times.Once);
             _emailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Once);
         }
+
+
     }
 }

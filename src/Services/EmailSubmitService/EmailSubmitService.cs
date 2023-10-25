@@ -1,4 +1,6 @@
-﻿using form_builder.Enum;
+﻿using System.Text.RegularExpressions;
+using form_builder.Configuration;
+using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
@@ -9,6 +11,8 @@ using form_builder.Services.DocumentService;
 using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
+using form_builder.TagParsers;
+using Newtonsoft.Json;
 
 namespace form_builder.Services.EmailSubmitService
 {
@@ -21,6 +25,8 @@ namespace form_builder.Services.EmailSubmitService
         private readonly IPageHelper _pageHelper;
         private readonly IDocumentSummaryService _documentSummaryService;
         private readonly IReferenceNumberProvider _referenceNumberProvider;
+        private readonly IEnumerable<ITagParser> _tagParsers;
+        private readonly ILogger<EmailSubmitService> _logger;
 
         public EmailSubmitService(
             IMappingService mappingService,
@@ -29,7 +35,9 @@ namespace form_builder.Services.EmailSubmitService
             IPageHelper pageHelper,
             IEmailProvider emailProvider,
             IReferenceNumberProvider referenceNumberProvider,
-            IDocumentSummaryService documentSummaryService
+            IDocumentSummaryService documentSummaryService,
+            IEnumerable<ITagParser> tagParsers,
+            ILogger<EmailSubmitService> logger
             )
         {
             _mappingService = mappingService;
@@ -39,8 +47,9 @@ namespace form_builder.Services.EmailSubmitService
             _emailProvider = emailProvider;
             _referenceNumberProvider = referenceNumberProvider;
             _documentSummaryService = documentSummaryService;
+            _tagParsers = tagParsers;
+            _logger= logger;
         }
-
 
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
         {
@@ -62,13 +71,30 @@ namespace form_builder.Services.EmailSubmitService
                });
 
             var email = await _emailHelper.GetEmailInformation(form);
+            var parsedSubjectInformation = new EmailConfiguration();
+
+            try
+            {
+                var subjectInformation = JsonConvert.SerializeObject(email);
+                subjectInformation = _tagParsers.Aggregate(subjectInformation, (current, tagParser) => tagParser.ParseString(current, data.FormAnswers));
+                parsedSubjectInformation = JsonConvert.DeserializeObject<EmailConfiguration>(subjectInformation);
+            }
+            catch (Exception ex)
+            {
+                parsedSubjectInformation.Subject = Regex.Replace(email.Subject, "{{.+}}", "");
+                _logger.LogInformation($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: '{email.Subject}' QuestionID contains a null value.", ex);
+            }
+
+            var subject = !string.IsNullOrEmpty(parsedSubjectInformation.Subject)
+                ? parsedSubjectInformation.Subject
+                : string.Empty;
 
             var body = string.IsNullOrWhiteSpace(email.Body)
                 ? System.Text.Encoding.Default.GetString(doc.Result)
                 : $"<p>{email.Body}</p>";
 
             var emailMessage = new EmailMessage(
-                   email.Subject,
+                   subject,
                    body,
                    email.Sender,
                    string.Join(",", email.Recipient)
@@ -85,7 +111,7 @@ namespace form_builder.Services.EmailSubmitService
                    });
 
                 emailMessage = new EmailMessage(
-                    email.Subject,
+                    subject,
                     body,
                     email.Sender,
                     string.Join(",", email.Recipient),
