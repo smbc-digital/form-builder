@@ -37,9 +37,16 @@ namespace form_builder_tests.UnitTests.Services
 
         public EmailSubmitServiceTests()
         {
-            _tagParser
-                .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-                .Returns("{\"PaymentProvider\":\"testPaymentProvider\",\"Settings\":{\"CalculationSlug\":{\"Environment\":null,\"URL\":\"url\",\"Type\":\"AuthHeader\",\"AuthToken\":\"TestToken\",\"CallbackUrl\":null}}}");
+            //_tagParser
+            //    .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+            //    .Returns("{'AttachPdf':true,'Body':null,'FormName':['jw-roast-preference'],'Recipient':['jonathon.warwick@stockport.gov.uk'],'Sender':'noreply@stockport.gov.uk','Subject':'JW Roast Preference: {{QUESTION:firrstName}} {{QUESTION:favouriteyFood}}'}");
+
+
+            var tagParserItems = new List<ITagParser> { _tagParser.Object };
+
+            _mockTagParsers
+                .Setup(m => m.GetEnumerator())
+                .Returns(() => tagParserItems.GetEnumerator());
 
             _sessionHelper
                  .Setup(_ => _.GetSessionGuid())
@@ -127,50 +134,35 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPaymentResponse_ShouldCallGateway_ToProcess_PaymentResponse_OnDecline_WithCorrectModel()
         {
             // Arrange
-            var subject = "Subject:";
+            var subject = "Subject: ";
             EmailConfiguration callbackModel = new();
-
-            //_emailProvider
-            //    .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-            //    .ReturnsAsync(System.Net.HttpStatusCode.OK);
 
             _mockEmailHelper
                 .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
                 .ReturnsAsync(new EmailConfiguration
                 {
                     FormName = new List<string> { "form" },
-                    Subject = "Subject: {{QUESTION: tesst-id}}",
-                    Recipient = new List<string> { "google" }
+                    Subject = "Subject: {{QUESTION: test-id}}",
+                    Recipient = new List<string> { "test@stockport.com" }
                 });
 
-            // fails here -  Setup on method with parameters (EmailMessage) cannot invoke callback with parameters
+            var emailConfig = new EmailConfiguration
+            {
+                FormName = new List<string> { "form" },
+                Subject = "Subject: {{QUESTION: test-id}}",
+                Recipient = new List<string> { "test@stockport.com" }
+            };
+
             _emailProvider
                 .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .Callback<string, object>((a, b) => callbackModel = (EmailConfiguration)b);
+                .Callback<EmailMessage>(a => callbackModel = new EmailConfiguration());
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.H1)
-                .WithQuestionId("test-id")
-                .WithPropertyText("test-text")
-                .Build();
-
-            var behaviour = new BehaviourBuilder()
-                .WithBehaviourType(EBehaviourType.SubmitAndEmail)
-                .WithPageSlug(null)
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithBehaviour(behaviour)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+            _tagParser
+                .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Throws(new Exception());
 
             // Act & Assert
-            await Assert.ThrowsAnyAsync<Exception>(() => _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "sessionGuid"));
+            await Assert.ThrowsAnyAsync<Exception>(() => _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=new FormAnswers() }, "form", "sessionGuid"));
 
             Assert.Equal(subject, callbackModel.Subject);
             //Assert.Equal(EPaymentStatus.Declined, callbackModel.PaymentStatus);
