@@ -24,7 +24,7 @@ namespace form_builder_tests.UnitTests.Services
     public class EmailSubmitServiceTests
     {
         private readonly Mock<IMappingService> _mappingService = new();
-        private readonly Mock<IEmailHelper> _emailHelper = new();
+        private readonly Mock<IEmailHelper> _mockEmailHelper = new();
         private readonly Mock<ISessionHelper> _sessionHelper = new();
         private readonly Mock<IEmailProvider> _emailProvider = new();
         private readonly Mock<IDocumentSummaryService> _documentSummaryService = new();
@@ -32,13 +32,35 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IPageHelper> _pageHelper = new();
         private readonly EmailSubmitService _emailSubmitService;
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
+        private readonly Mock<ITagParser> _tagParser = new();
         private readonly Mock<ILogger<EmailSubmitService>> _mockLogger = new();
 
         public EmailSubmitServiceTests()
         {
+            _tagParser
+                .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Returns("{\"PaymentProvider\":\"testPaymentProvider\",\"Settings\":{\"CalculationSlug\":{\"Environment\":null,\"URL\":\"url\",\"Type\":\"AuthHeader\",\"AuthToken\":\"TestToken\",\"CallbackUrl\":null}}}");
+
+            _sessionHelper
+                 .Setup(_ => _.GetSessionGuid())
+                 .Returns("123454");
+
+            _mappingService
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
+
+            _documentSummaryService
+                .Setup(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()))
+                .ReturnsAsync(new byte[] { 0x1a, 0x0f, 0x00 });
+
+            _referenceNumberProvider
+                 .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
+                 .Returns("12345678");
+
+
             _emailSubmitService = new EmailSubmitService(
                 _mappingService.Object,
-                _emailHelper.Object,
+                _mockEmailHelper.Object,
                 _sessionHelper.Object,
                 _pageHelper.Object,
                 _emailProvider.Object,
@@ -53,21 +75,11 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Submit_ShouldCallMapping_And_SubmitService()
         {
             // Arrange
-            _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
-                .Returns("123454");
-            _mappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
-            _documentSummaryService
-                .Setup(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()))
-                .ReturnsAsync(new byte[] { 0x1a, 0x0f, 0x00 });
-
             _emailProvider
                 .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
                 .ReturnsAsync(System.Net.HttpStatusCode.OK);
 
-            _emailHelper
+            _mockEmailHelper
                 .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
                 .ReturnsAsync(new EmailConfiguration
                 {
@@ -107,10 +119,62 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             _documentSummaryService.Verify(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()), Times.Once);
-            _emailHelper.Verify(_ => _.GetEmailInformation(It.IsAny<string>()), Times.Once);
+            _mockEmailHelper.Verify(_ => _.GetEmailInformation(It.IsAny<string>()), Times.Once);
             _emailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Once);
         }
 
+        [Fact]
+        public async Task ProcessPaymentResponse_ShouldCallGateway_ToProcess_PaymentResponse_OnDecline_WithCorrectModel()
+        {
+            // Arrange
+            var subject = "Subject:";
+            EmailConfiguration callbackModel = new();
 
+            //_emailProvider
+            //    .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
+            //    .ReturnsAsync(System.Net.HttpStatusCode.OK);
+
+            _mockEmailHelper
+                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
+                .ReturnsAsync(new EmailConfiguration
+                {
+                    FormName = new List<string> { "form" },
+                    Subject = "Subject: {{QUESTION: tesst-id}}",
+                    Recipient = new List<string> { "google" }
+                });
+
+            // fails here -  Setup on method with parameters (EmailMessage) cannot invoke callback with parameters
+            _emailProvider
+                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
+                .Callback<string, object>((a, b) => callbackModel = (EmailConfiguration)b);
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.H1)
+                .WithQuestionId("test-id")
+                .WithPropertyText("test-text")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitAndEmail)
+                .WithPageSlug(null)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithBehaviour(behaviour)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            // Act & Assert
+            await Assert.ThrowsAnyAsync<Exception>(() => _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "sessionGuid"));
+
+            Assert.Equal(subject, callbackModel.Subject);
+            //Assert.Equal(EPaymentStatus.Declined, callbackModel.PaymentStatus);
+            //_mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+        }
     }
 }
