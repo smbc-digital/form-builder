@@ -37,9 +37,9 @@ namespace form_builder_tests.UnitTests.Services
 
         public EmailSubmitServiceTests()
         {
-            //_tagParser
-            //    .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
-            //    .Returns("{'AttachPdf':true,'Body':null,'FormName':['jw-roast-preference'],'Recipient':['jonathon.warwick@stockport.gov.uk'],'Sender':'noreply@stockport.gov.uk','Subject':'JW Roast Preference: {{QUESTION:firrstName}} {{QUESTION:favouriteyFood}}'}");
+            _tagParser
+                .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
+                .Returns("{'AttachPdf':true,'Body':null,'FormName':['jw-roast-preference'],'Recipient':['jonathon.warwick@stockport.gov.uk'],'Sender':'noreply@stockport.gov.uk','Subject':'JW Roast Preference: {{QUESTION:firrstName}} {{QUESTION:favouriteyFood}}'}");
 
 
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
@@ -131,11 +131,11 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPaymentResponse_ShouldCallGateway_ToProcess_PaymentResponse_OnDecline_WithCorrectModel()
+        public async Task Submit_ShouldSubmitAndEmail_ThrowExceptionAndRemoveVariable()
         {
             // Arrange
-            var subject = "Subject: ";
-            EmailConfiguration callbackModel = new();
+            string actualSubject = "";
+            string expectedSubject = "Subject: ";
 
             _mockEmailHelper
                 .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
@@ -146,7 +146,7 @@ namespace form_builder_tests.UnitTests.Services
                     Recipient = new List<string> { "test@stockport.com" }
                 });
 
-            var emailConfig = new EmailConfiguration
+            EmailConfiguration emailConfig = new()
             {
                 FormName = new List<string> { "form" },
                 Subject = "Subject: {{QUESTION: test-id}}",
@@ -155,7 +155,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _emailProvider
                 .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .Callback<EmailMessage>(a => callbackModel = new EmailConfiguration());
+                .Callback<EmailMessage>(emailMessageSent => actualSubject = emailMessageSent.Subject);
 
             _tagParser
                 .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
@@ -163,10 +163,61 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act & Assert
             await Assert.ThrowsAnyAsync<Exception>(() => _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=new FormAnswers() }, "form", "sessionGuid"));
-
-            Assert.Equal(subject, callbackModel.Subject);
-            //Assert.Equal(EPaymentStatus.Declined, callbackModel.PaymentStatus);
-            //_mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()), Times.Once);
+            Assert.Equal(expectedSubject, actualSubject);
         }
+
+        [Fact]
+        public async Task Submit_ShouldSubmitAndEmail_WithChangedSubjectLine()
+        {
+            // Arrange
+            string actualSubject = "";
+            string expectedSubject = "Subject: test";
+
+            _mockEmailHelper
+                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
+                .ReturnsAsync(new EmailConfiguration
+                {
+                    FormName = new List<string> { "form" },
+                    Subject = "Subject: {{QUESTION: test-id}}",
+                    Recipient = new List<string> { "test@stockport.com" }
+                });
+
+            EmailConfiguration emailConfig = new()
+            {
+                FormName = new List<string> { "form" },
+                Subject = "Subject: {{QUESTION: test-id}}",
+                Recipient = new List<string> { "test@stockport.com" }
+            };
+
+            _emailProvider
+                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
+                .Callback<EmailMessage>(emailMessageSent => actualSubject = emailMessageSent.Subject);
+
+            var formAnswers = new FormAnswers()
+            {
+                Pages = new List<PageAnswers>()
+                {
+                    new PageAnswers()
+                    {
+                        PageSlug = "page-one",
+                        Answers = new List<Answers>() {
+                            new Answers()
+                            {
+                                QuestionId = "test-id",
+                                Response = "test"
+                            }
+                        }
+                    }
+                }
+            };
+
+            _tagParser
+                .Setup(_ => _.ParseString("Subject: {{QUESTION: test-id}}", formAnswers));
+
+            // Act & Assert
+            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers = formAnswers }, "form", "sessionGuid");
+            Assert.Equal(expectedSubject, actualSubject);
+        }
+
     }
 }
