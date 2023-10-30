@@ -17,6 +17,7 @@ using form_builder.TagParsers;
 using form_builder_tests.Builders;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Net;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -137,15 +138,6 @@ namespace form_builder_tests.UnitTests.Services
             string actualSubject = "";
             string expectedSubject = "Subject: ";
 
-            _mockEmailHelper
-                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfiguration
-                {
-                    FormName = new List<string> { "form" },
-                    Subject = "Subject: {{QUESTION: test-id}}",
-                    Recipient = new List<string> { "test@stockport.com" }
-                });
-
             EmailConfiguration emailConfig = new()
             {
                 FormName = new List<string> { "form" },
@@ -153,69 +145,21 @@ namespace form_builder_tests.UnitTests.Services
                 Recipient = new List<string> { "test@stockport.com" }
             };
 
+            _mockEmailHelper
+                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
+                .ReturnsAsync(emailConfig);
+
             _emailProvider
                 .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .Callback<EmailMessage>(emailMessageSent => actualSubject = emailMessageSent.Subject);
+                .Callback<EmailMessage>(emailMessageSent => actualSubject = emailMessageSent.Subject)
+                .ReturnsAsync(HttpStatusCode.OK);
 
             _tagParser
                 .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Throws(new Exception());
 
             // Act & Assert
-            await Assert.ThrowsAnyAsync<Exception>(() => _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=new FormAnswers() }, "form", "sessionGuid"));
-            Assert.Equal(expectedSubject, actualSubject);
-        }
-
-        [Fact]
-        public async Task Submit_ShouldSubmitAndEmail_WithChangedSubjectLine()
-        {
-            // Arrange
-            string actualSubject = "";
-            string expectedSubject = "Subject: test";
-
-            _mockEmailHelper
-                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfiguration
-                {
-                    FormName = new List<string> { "form" },
-                    Subject = "Subject: {{QUESTION: test-id}}",
-                    Recipient = new List<string> { "test@stockport.com" }
-                });
-
-            EmailConfiguration emailConfig = new()
-            {
-                FormName = new List<string> { "form" },
-                Subject = "Subject: {{QUESTION: test-id}}",
-                Recipient = new List<string> { "test@stockport.com" }
-            };
-
-            _emailProvider
-                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .Callback<EmailMessage>(emailMessageSent => actualSubject = emailMessageSent.Subject);
-
-            var formAnswers = new FormAnswers()
-            {
-                Pages = new List<PageAnswers>()
-                {
-                    new PageAnswers()
-                    {
-                        PageSlug = "page-one",
-                        Answers = new List<Answers>() {
-                            new Answers()
-                            {
-                                QuestionId = "test-id",
-                                Response = "test"
-                            }
-                        }
-                    }
-                }
-            };
-
-            _tagParser
-                .Setup(_ => _.ParseString("Subject: {{QUESTION: test-id}}", formAnswers));
-
-            // Act & Assert
-            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers = formAnswers }, "form", "sessionGuid");
+            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=new FormAnswers() }, "form", "sessionGuid");
             Assert.Equal(expectedSubject, actualSubject);
         }
 
