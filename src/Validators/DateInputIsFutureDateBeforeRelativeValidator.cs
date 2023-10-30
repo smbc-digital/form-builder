@@ -24,7 +24,7 @@ namespace form_builder.Validators
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
                 : null;
 
-            if (!string.IsNullOrEmpty(valueDay) && !string.IsNullOrEmpty(valueMonth) && !string.IsNullOrEmpty(valueYear))
+            if (valueDay != null && valueMonth != null && valueYear != null)
             {
                 var chosenDate = DateTime.Now;
                 var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out chosenDate);
