@@ -55,11 +55,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsFutureDateBeforeRelative("3-d", "Date is too late")
                 .Build();
 
+            var dateToCheck = DateTime.Now.AddDays(1);
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                {"test-date-day", DateTime.Now.AddDays(1).Day.ToString()},
-                {"test-date-month", DateTime.Now.Month.ToString()},
-                {"test-date-year", DateTime.Now.Year.ToString()}
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
             };
 
             // Act
@@ -80,11 +82,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsFutureDateBeforeRelative("3-d", "Date is too late")
                 .Build();
 
+            var dateToCheck = DateTime.Now.AddDays(4);
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                {"test-date-day", DateTime.Now.AddDays(4).Day.ToString()},
-                {"test-date-month", DateTime.Now.Month.ToString()},
-                {"test-date-year", DateTime.Now.Year.ToString()}
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
             };
 
             // Act
@@ -105,11 +109,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsFutureDateBeforeRelative("3-m", "Date is too late")
                 .Build();
 
+            var dateToCheck = DateTime.Now.AddDays(1).AddYears(1);
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                {"test-date-day", DateTime.Now.AddDays(1).Day.ToString()},
-                {"test-date-month", DateTime.Now.Month.ToString()},
-                {"test-date-year", DateTime.Now.AddYears(1).Year.ToString()}
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
             };
 
             // Act
@@ -130,11 +136,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsFutureDateBeforeRelative("3-m", "Date is too late")
                 .Build();
 
+            var dateToCheck = DateTime.Now.AddDays(1).AddMonths(2);
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                {"test-date-day", DateTime.Now.AddDays(1).Day.ToString()},
-                {"test-date-month", DateTime.Now.AddMonths(2).Month.ToString()},
-                {"test-date-year", DateTime.Now.Year.ToString()}
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
             };
 
             // Act
@@ -155,11 +163,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsFutureDateBeforeRelative("2-y", "Date is too late")
                 .Build();
 
+            var dateToCheck = DateTime.Now.AddDays(1).AddYears(1);
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                {"test-date-day", DateTime.Now.AddDays(1).Day.ToString()},
-                {"test-date-month", DateTime.Now.Month.ToString()},
-                {"test-date-year", DateTime.Now.AddYears(1).Year.ToString()}
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
             };
 
             // Act
@@ -180,11 +190,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsFutureDateBeforeRelative("2-y", "Date is too late")
                 .Build();
 
+            var dateToCheck = DateTime.Now.AddDays(1).AddYears(10);
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                {"test-date-day", DateTime.Now.AddDays(1).Day.ToString()},
-                {"test-date-month", DateTime.Now.Month.ToString()},
-                {"test-date-year", DateTime.Now.AddYears(10).Year.ToString()}
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
             };
 
             // Act
@@ -205,11 +217,13 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsFutureDateBeforeRelative("2-d", "")
                 .Build();
 
+            var dateToCheck = DateTime.Now.AddDays(3);
+
             var viewModel = new Dictionary<string, dynamic>
             {
-                {"test-date-day", DateTime.Now.AddDays(3).Day.ToString()},
-                {"test-date-month", DateTime.Now.Month.ToString()},
-                {"test-date-year", DateTime.Now.Year.ToString()}
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
             };
 
             // Act
