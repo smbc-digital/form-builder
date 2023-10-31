@@ -16,6 +16,8 @@
 
         public string AttachmentName { get; }
 
+        public EmailMessage() { }
+
         public EmailMessage(string subject, string body, string fromEmail, string toEmail, string ccEmail)
         {
             Subject = subject;
