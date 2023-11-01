@@ -16,6 +16,8 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using Newtonsoft.Json;
 
+using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
+
 namespace form_builder.Services.EmailSubmitService
 {
     public class EmailSubmitService : IEmailSubmitService
@@ -53,7 +55,7 @@ namespace form_builder.Services.EmailSubmitService
             _referenceNumberProvider = referenceNumberProvider;
             _documentSummaryService = documentSummaryService;
             _tagParsers = tagParsers;
-            _logger= logger;
+            _logger = logger;
         }
 
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
@@ -125,33 +127,22 @@ namespace form_builder.Services.EmailSubmitService
                     );
             }
 
-            // IEnumerable<object> jsonNightmare = (IEnumerable<object>)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(data.Data));
+            List<string> fileContents = new();
 
-          //  var file = _elementMapper.GetAnswerValue(EElementType.FileUpload, data.FormAnswers);
-
-            var json = JsonConvert.SerializeObject(data.Data);
-            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-
-
-            foreach (var kvp in dictionary)
+            if (data.FormAnswers.AllAnswers.Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX)))
             {
-                var test = "yes";
-            }
+                var elements = data.BaseForm.Pages
+                .SelectMany(_ => _.Elements)
+                .Where(_ => _.Type.Equals(EElementType.FileUpload));
 
-            IEnumerable<Answers> formFileUploadData = data.FormAnswers.AllAnswers.Where(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
-
-
-
-            foreach (var questionAnswer in formFileUploadData)
-            {
-                List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(questionAnswer.Response.ToString());
-
-                foreach(var file in uploadedFiles)
+                foreach (var element in elements)
                 {
-                    var key = file.Key;
+                    List<File> files = (List<File>)_elementMapper.GetAnswerValue(element, data.FormAnswers).Result;
+
+                    foreach (var file in files ?? new List<File>())
+                        fileContents.Add(file.Content);
                 }
             }
-
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
 
