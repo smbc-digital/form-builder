@@ -1,9 +1,11 @@
 ﻿using System.Text.RegularExpressions;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.ReferenceNumbers;
@@ -19,6 +21,7 @@ namespace form_builder.Services.EmailSubmitService
     public class EmailSubmitService : IEmailSubmitService
     {
         private readonly IMappingService _mappingService;
+        private readonly IElementMapper _elementMapper;
         private readonly IEmailHelper _emailHelper;
         private readonly ISessionHelper _sessionHelper;
         private readonly IEmailProvider _emailProvider;
@@ -31,6 +34,7 @@ namespace form_builder.Services.EmailSubmitService
         public EmailSubmitService(
             IMappingService mappingService,
             IEmailHelper emailHelper,
+            IElementMapper elementMapper,
             ISessionHelper sessionHelper,
             IPageHelper pageHelper,
             IEmailProvider emailProvider,
@@ -42,6 +46,7 @@ namespace form_builder.Services.EmailSubmitService
         {
             _mappingService = mappingService;
             _emailHelper = emailHelper;
+            _elementMapper = elementMapper;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
             _emailProvider = emailProvider;
@@ -63,12 +68,12 @@ namespace form_builder.Services.EmailSubmitService
             }
 
             var doc = _documentSummaryService.GenerateDocument(
-               new DocumentSummaryEntity
-               {
-                   DocumentType = EDocumentType.Html,
-                   PreviousAnswers = data.FormAnswers,
-                   FormSchema = data.BaseForm
-               });
+                new DocumentSummaryEntity
+                {
+                    DocumentType = EDocumentType.Html,
+                    PreviousAnswers = data.FormAnswers,
+                    FormSchema = data.BaseForm
+                });
 
             var email = await _emailHelper.GetEmailInformation(form);
             var parsedSubjectInformation = new EmailConfiguration();
@@ -94,21 +99,21 @@ namespace form_builder.Services.EmailSubmitService
                 : $"<p>{email.Body}</p>";
 
             var emailMessage = new EmailMessage(
-                   subject,
-                   body,
-                   email.Sender,
-                   string.Join(",", email.Recipient)
-                   );
+                    subject,
+                    body,
+                    email.Sender,
+                    string.Join(",", email.Recipient)
+                    );
 
             if (email.AttachPdf)
             {
                 var pdfdoc = _documentSummaryService.GenerateDocument(
-                   new DocumentSummaryEntity
-                   {
-                       DocumentType = EDocumentType.Pdf,
-                       PreviousAnswers = data.FormAnswers,
-                       FormSchema = data.BaseForm
-                   });
+                    new DocumentSummaryEntity
+                    {
+                        DocumentType = EDocumentType.Pdf,
+                        PreviousAnswers = data.FormAnswers,
+                        FormSchema = data.BaseForm
+                    });
 
                 emailMessage = new EmailMessage(
                     subject,
@@ -119,6 +124,34 @@ namespace form_builder.Services.EmailSubmitService
                     $"{data.FormAnswers.CaseReference}_data.pdf"
                     );
             }
+
+            // IEnumerable<object> jsonNightmare = (IEnumerable<object>)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(data.Data));
+
+          //  var file = _elementMapper.GetAnswerValue(EElementType.FileUpload, data.FormAnswers);
+
+            var json = JsonConvert.SerializeObject(data.Data);
+            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+
+
+            foreach (var kvp in dictionary)
+            {
+                var test = "yes";
+            }
+
+            IEnumerable<Answers> formFileUploadData = data.FormAnswers.AllAnswers.Where(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
+
+
+
+            foreach (var questionAnswer in formFileUploadData)
+            {
+                List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(questionAnswer.Response.ToString());
+
+                foreach(var file in uploadedFiles)
+                {
+                    var key = file.Key;
+                }
+            }
+
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
 

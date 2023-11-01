@@ -1,10 +1,10 @@
-﻿using Amazon.Runtime.Internal.Util;
-using form_builder.Builders;
+﻿using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Mappers;
 using form_builder.Models;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.ReferenceNumbers;
@@ -26,6 +26,7 @@ namespace form_builder_tests.UnitTests.Services
     {
         private readonly Mock<IMappingService> _mappingService = new();
         private readonly Mock<IEmailHelper> _mockEmailHelper = new();
+        private readonly Mock<IElementMapper> _mockElementMapper = new();
         private readonly Mock<ISessionHelper> _sessionHelper = new();
         private readonly Mock<IEmailProvider> _emailProvider = new();
         private readonly Mock<IDocumentSummaryService> _documentSummaryService = new();
@@ -69,6 +70,7 @@ namespace form_builder_tests.UnitTests.Services
             _emailSubmitService = new EmailSubmitService(
                 _mappingService.Object,
                 _mockEmailHelper.Object,
+                _mockElementMapper.Object,
                 _sessionHelper.Object,
                 _pageHelper.Object,
                 _emailProvider.Object,
