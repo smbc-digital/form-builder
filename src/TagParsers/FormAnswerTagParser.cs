@@ -6,6 +6,7 @@ namespace form_builder.TagParsers
 {
     public class FormAnswerTagParser : TagParser, ITagParser
     {
+
         public FormAnswerTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
 
         public Regex Regex => new Regex("(?<={{)QUESTION:.*?(?=}})", RegexOptions.Compiled);
