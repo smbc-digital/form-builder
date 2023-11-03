@@ -14,7 +14,9 @@
 
         public byte[] Attachment { get; }
 
-        public string AttachmentName { get; }
+        public List<StockportGovUK.NetStandard.Gateways.Models.FileManagement.File> FileUploads { get; set; }
+
+        public string AttachmentName { get; set; }
 
         public EmailMessage() { }
 
@@ -33,14 +35,34 @@
             ToEmail = toEmail;
         }
 
-        public EmailMessage(string subject, string body, string fromEmail, string toEmail, byte[] attachment, string attachmntName)
+        public EmailMessage(string subject, string body, string fromEmail, string toEmail, List<StockportGovUK.NetStandard.Gateways.Models.FileManagement.File> fileUploads)
+        {
+            Subject = subject;
+            Body = body;
+            FromEmail = fromEmail;
+            ToEmail = toEmail;
+            FileUploads = fileUploads;
+        }
+
+        public EmailMessage(string subject, string body, string fromEmail, string toEmail, byte[] attachment, string attachmentName)
         {
             Subject = subject;
             Body = body;
             FromEmail = fromEmail;
             ToEmail = toEmail;
             Attachment = attachment;
-            AttachmentName = attachmntName;
+            AttachmentName = attachmentName;
+        }
+
+        public EmailMessage(string subject, string body, string fromEmail, string toEmail, byte[] attachment, string attachmentName, List<StockportGovUK.NetStandard.Gateways.Models.FileManagement.File> fileUploads)
+        {
+            Subject = subject;
+            Body = body;
+            FromEmail = fromEmail;
+            ToEmail = toEmail;
+            Attachment = attachment;
+            AttachmentName = attachmentName;
+            FileUploads = fileUploads;
         }
     }
 }

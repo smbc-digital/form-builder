@@ -36,6 +36,23 @@ namespace form_builder.Builders.Email
                 }
             };
 
+            if(emailMessage.FileUploads.Any())
+            {
+                foreach(var file in emailMessage.FileUploads)
+                {
+                    var attachment = new MimePart("application", file.TrustedOriginalFileName.Split('.').Last().ToLower())
+                    {
+                        Content = new MimeContent(new MemoryStream(Convert.FromBase64String(file.Content.Replace("\"", "")))),
+                        ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                        ContentTransferEncoding = ContentEncoding.Base64,
+                        FileName = file.TrustedOriginalFileName,
+                        IsAttachment = true
+                    };
+
+                    multipart.Add(attachment);
+                }
+            }
+
             if (emailMessage.Attachment is not null)
             {
                 var attachment = new MimePart("application", "pdf")

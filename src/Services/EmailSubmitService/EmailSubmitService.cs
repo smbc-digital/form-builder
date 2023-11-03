@@ -7,6 +7,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.DocumentService;
@@ -61,6 +62,8 @@ namespace form_builder.Services.EmailSubmitService
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
         {
             var reference = string.Empty;
+            List<File> files = new();
+            List<File> fileUploads = new();
 
             if (data.BaseForm.GenerateReferenceNumber)
             {
@@ -107,6 +110,33 @@ namespace form_builder.Services.EmailSubmitService
                     string.Join(",", email.Recipient)
                     );
 
+            bool isFileUpload = data.FormAnswers
+                .AllAnswers
+                .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
+
+            if (isFileUpload)
+            {
+                IEnumerable<IElement> elements = data.BaseForm.Pages
+                    .SelectMany(_ => _.Elements)
+                    .Where(_ => _.Type.Equals(EElementType.FileUpload));
+
+                foreach (IElement element in elements)
+                {
+                    files = (List<File>)_elementMapper.GetAnswerValue(element, data.FormAnswers).Result;
+
+                    foreach (File file in files ?? new List<File>())
+                        fileUploads.Add(file);
+                }
+
+                emailMessage = new EmailMessage(
+                    subject,
+                    body,
+                    email.Sender,
+                    string.Join(",", email.Recipient),
+                    fileUploads
+                    );
+            }
+
             if (email.AttachPdf)
             {
                 var pdfdoc = _documentSummaryService.GenerateDocument(
@@ -116,32 +146,25 @@ namespace form_builder.Services.EmailSubmitService
                         PreviousAnswers = data.FormAnswers,
                         FormSchema = data.BaseForm
                     });
-
-                emailMessage = new EmailMessage(
-                    subject,
-                    body,
-                    email.Sender,
-                    string.Join(",", email.Recipient),
-                    pdfdoc.Result,
-                    $"{data.FormAnswers.CaseReference}_data.pdf"
-                    );
-            }
-
-            List<string> fileContents = new();
-
-            if (data.FormAnswers.AllAnswers.Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX)))
-            {
-                var elements = data.BaseForm.Pages
-                .SelectMany(_ => _.Elements)
-                .Where(_ => _.Type.Equals(EElementType.FileUpload));
-
-                foreach (var element in elements)
-                {
-                    List<File> files = (List<File>)_elementMapper.GetAnswerValue(element, data.FormAnswers).Result;
-
-                    foreach (var file in files ?? new List<File>())
-                        fileContents.Add(file.Content);
-                }
+                
+                emailMessage = fileUploads.Any() ? 
+                    emailMessage = new EmailMessage(
+                        subject,
+                        body,
+                        email.Sender,
+                        string.Join(",", email.Recipient),
+                        pdfdoc.Result,
+                        $"{data.FormAnswers.CaseReference}_data.pdf",
+                        fileUploads 
+                    )
+                    : emailMessage = new EmailMessage(
+                        subject,
+                        body,
+                        email.Sender,
+                        string.Join(",", email.Recipient),
+                        pdfdoc.Result,
+                        $"{data.FormAnswers.CaseReference}_data.pdf"
+                    );                
             }
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
