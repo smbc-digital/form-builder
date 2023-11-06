@@ -34,7 +34,24 @@ namespace form_builder.TagParsers
         public string ParseString(string content, FormAnswers formAnswers)
         {
             var answersDictionary = formAnswers.Pages?.SelectMany(x => x.Answers).ToDictionary(x => x.QuestionId, x => x.Response);
-            var updatedContent = Parse(content, answersDictionary, Regex);
+            var updatedContent = content;
+            var matches = Regex.Matches(content);
+
+            foreach (Match match in matches)
+            {
+                var questionId = $"{{{{{match.Value}}}}}";
+
+                try
+                {
+                    var replacedContent = Parse(questionId, answersDictionary, Regex);
+                    updatedContent = updatedContent.Replace(questionId, replacedContent);
+                }
+                catch (Exception)
+                {
+                    updatedContent = updatedContent.Replace(questionId, string.Empty);
+                }
+            }
+
             return updatedContent;
         }
     }
