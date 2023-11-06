@@ -71,19 +71,11 @@ namespace form_builder.Services.EmailSubmitService
                });
 
             var email = await _emailHelper.GetEmailInformation(form);
-            var parsedSubjectInformation = new EmailConfiguration();
 
-            try
-            {
-                var subjectInformation = JsonConvert.SerializeObject(email);
-                subjectInformation = _tagParsers.Aggregate(subjectInformation, (current, tagParser) => tagParser.ParseString(current, data.FormAnswers));
-                parsedSubjectInformation = JsonConvert.DeserializeObject<EmailConfiguration>(subjectInformation);
-            }
-            catch (Exception ex)
-            {
-                parsedSubjectInformation.Subject = Regex.Replace(email.Subject, "{{.+}}", "");
-                _logger.LogInformation($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: '{email.Subject}' QuestionID contains a null value.", ex);
-            }
+            var subjectInformation = JsonConvert.SerializeObject(email);
+            subjectInformation = _tagParsers.Aggregate(subjectInformation, (current, tagParser) => tagParser.ParseString(current, data.FormAnswers));
+            var parsedSubjectInformation = JsonConvert.DeserializeObject<EmailConfiguration>(subjectInformation);
+
 
             var subject = !string.IsNullOrEmpty(parsedSubjectInformation.Subject)
                 ? parsedSubjectInformation.Subject
