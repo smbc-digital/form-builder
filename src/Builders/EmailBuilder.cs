@@ -36,7 +36,7 @@ namespace form_builder.Builders.Email
                 }
             };
 
-            if(emailMessage.FileUploads.Any())
+            if(emailMessage.FileUploads is not null)
             {
                 foreach(var file in emailMessage.FileUploads)
                 {

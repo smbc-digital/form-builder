@@ -110,9 +110,9 @@ namespace form_builder.Services.EmailSubmitService
                     string.Join(",", email.Recipient)
                     );
 
-            bool isFileUpload = data.FormAnswers
-                .AllAnswers
-                .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
+            bool isFileUpload = data.FormAnswers.Pages
+                .Any(_ => _.Answers
+                .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX)));
 
             if (isFileUpload)
             {
