@@ -1,5 +1,6 @@
 ﻿using form_builder.Builders;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.PageHelpers;
@@ -87,7 +88,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             _emailProvider
                 .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .ReturnsAsync(System.Net.HttpStatusCode.OK);
+                .ReturnsAsync(HttpStatusCode.OK);
 
             _mockEmailHelper
                 .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
@@ -165,5 +166,69 @@ namespace form_builder_tests.UnitTests.Services
             Assert.Equal(expectedSubject, actualSubject);
         }
 
+        [Fact]
+        public async Task Submit_ShouldAddFiles_ToEmailMessage_IfFileHasUploads()
+        {
+            // Arrange
+            var emailMessage = new EmailMessage("subject", "body", "email@stockport.gov.uk", "email@stockport.gov.uk");
+
+            _emailProvider
+                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
+                .ReturnsAsync(HttpStatusCode.OK);
+
+            _mockEmailHelper
+                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
+                .ReturnsAsync(new EmailConfiguration
+                {
+                    FormName = new List<string> { "form" },
+                    Subject = "test",
+                    Recipient = new List<string> { "google" }
+                });
+
+            _referenceNumberProvider
+                 .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
+                 .Returns("12345678");
+
+            var formAnswers = new FormAnswers
+            {
+                Path = "page-one",
+                FormName = "form",
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = $"questionIDOne{FileUploadConstants.SUFFIX}",
+                                Response = new List<FileUploadModel>
+                                {
+                                    new()
+                                    {
+                                        Key = "fileOneKey"
+                                    }
+                                }
+                            },
+                            new()
+                            {
+                                QuestionId = $"questionIDTwo{FileUploadConstants.SUFFIX}",
+                                Response = new List<FileUploadModel>
+                                {
+                                    new()
+                                    {
+                                        Key = "fileTwoKey"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            
+
+            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=formAnswers }, "form", "sessionGuid");
+        }
     }
 }
