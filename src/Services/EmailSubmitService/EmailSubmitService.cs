@@ -114,15 +114,11 @@ namespace form_builder.Services.EmailSubmitService
                 .AllAnswers
                 .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
 
-            // bool isFileUpload = data.FormAnswers.Pages
-            //     .Any(_ => _.Answers
-            //     .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX)));
-
             if (isFileUpload)
             {
                 IEnumerable<IElement> elements = data.BaseForm.Pages
                     .SelectMany(_ => _.Elements)
-                    .Where(_ => _.Type.Equals(EElementType.FileUpload));
+                    .Where(_ => _.Type.Equals(EElementType.FileUpload) || _.Type.Equals(EElementType.MultipleFileUpload));
 
                 foreach (IElement element in elements)
                 {
