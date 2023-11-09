@@ -24,7 +24,7 @@ namespace form_builder.Workflows.SubmitWorkflow
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException($"A Session GUID was not provided.");
+                throw new ApplicationException("A Session GUID was not provided.");
 
             await _submitService.PreProcessSubmission(form, sessionGuid);
 
@@ -38,7 +38,7 @@ namespace form_builder.Workflows.SubmitWorkflow
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException($"A Session GUID was not provided.");
+                throw new ApplicationException("A Session GUID was not provided.");
 
             await _submitService.PreProcessSubmission(form, sessionGuid);
 
