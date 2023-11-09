@@ -379,3 +379,4 @@ tests/visual-tests/cypress/videos/
 #cypress structure-tests
 tests/structure-tests/cypress/videos/
 tests/structure-tests/cypress/screenshots/
+/src/SubmissionActions/PostSubmissionAction.cs

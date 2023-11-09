@@ -32,5 +32,19 @@ namespace form_builder.Workflows.SubmitWorkflow
 
             return await _submitService.ProcessSubmission(data, form, sessionGuid);
         }
+
+        public async Task SubmitWithoutSubmission(string form)
+        {
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            if (string.IsNullOrEmpty(sessionGuid))
+                throw new ApplicationException($"A Session GUID was not provided.");
+
+            await _submitService.PreProcessSubmission(form, sessionGuid);
+
+            var data = await _mappingService.Map(sessionGuid, form);
+
+            await _submitService.ProcessWithoutSubmission(data, form, sessionGuid);
+        }
     }
 }

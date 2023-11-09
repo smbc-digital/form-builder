@@ -8,5 +8,6 @@ namespace form_builder.Services.SubmitService
         Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
         Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
         Task<string> RedirectSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
+        Task<string> ProcessWithoutSubmission(MappingEntity mappingEntity, string form, string sessionGuid);
     }
 }

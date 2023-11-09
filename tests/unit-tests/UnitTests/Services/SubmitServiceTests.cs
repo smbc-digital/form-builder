@@ -6,13 +6,13 @@ using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
+using form_builder.Helpers.Submit;
 using form_builder.Models;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
-using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
@@ -35,7 +35,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new();
         private readonly Mock<ISubmitProvider> _mockSubmitProvider = new();
-        private readonly Mock<IPostSubmissionAction> _mockPostSubmissionAction = new();
+        private readonly Mock<ISubmitHelper> _mockSubmitHelper = new();
         private readonly Mock<IPaymentHelper> _mockPaymentHelper = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
@@ -93,7 +93,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockReferenceNumberProvider.Object,
                 _submitProviders,
                 _mockPaymentHelper.Object,
-                _mockPostSubmissionAction.Object,
+                _mockSubmitHelper.Object,
                 _mockTagParsers.Object,
                 _mockLogger.Object);
         }
@@ -587,7 +587,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessSubmission_ShouldCall_PostSubmissionAction_ConfirmResult()
+        public async Task ProcessSubmission_ShouldCall_SubmitHelper_ConfirmBookings()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -649,7 +649,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessSubmission(_mappingEntity, "form", "123454");
 
             // Assert
-            _mockPostSubmissionAction.Verify(_ => _.ConfirmResult(It.IsAny<MappingEntity>(), It.IsAny<string>()), Times.Once);
+            _mockSubmitHelper.Verify(_ => _.ConfirmBookings(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
