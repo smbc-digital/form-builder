@@ -45,7 +45,6 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns("{'AttachPdf':true,'Body':null,'FormName':['jw-roast-preference'],'Recipient':['jonathon.warwick@stockport.gov.uk'],'Sender':'noreply@stockport.gov.uk','Subject':'JW Roast Preference: {{QUESTION:firrstName}} {{QUESTION:favouriteyFood}}'}");
 
-
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
 
             _mockTagParsers
@@ -68,6 +67,18 @@ namespace form_builder_tests.UnitTests.Services
                  .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
                  .Returns("12345678");
 
+            _emailProvider
+                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
+                .ReturnsAsync(HttpStatusCode.OK);
+
+            _mockEmailHelper
+                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
+                .ReturnsAsync(new EmailConfiguration
+                {
+                    FormName = new List<string> { "form" },
+                    Subject = "test",
+                    Recipient = new List<string> { "google" }
+                });
 
             _emailSubmitService = new EmailSubmitService(
                 _mappingService.Object,
@@ -86,24 +97,6 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Submit_ShouldCallMapping_And_SubmitService()
         {
-            // Arrange
-            _emailProvider
-                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .ReturnsAsync(HttpStatusCode.OK);
-
-            _mockEmailHelper
-                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfiguration
-                {
-                    FormName = new List<string> { "form" },
-                    Subject = "test",
-                    Recipient = new List<string> { "google" }
-                });
-
-            _referenceNumberProvider
-                 .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
-                 .Returns("12345678");
-
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -168,27 +161,10 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task Submit_ShouldAddFiles_ToEmailMessage_IfFileHasUploads()
+        public async Task Submit_ShouldCallElementMapper_ToGetListOf_FileUploads()
         {
             // Arrange
             var emailMessage = new EmailMessage("subject", "body", "email@stockport.gov.uk", "email@stockport.gov.uk");
-
-            _emailProvider
-                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .ReturnsAsync(HttpStatusCode.OK);
-
-            _mockEmailHelper
-                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfiguration
-                {
-                    FormName = new List<string> { "form" },
-                    Subject = "test",
-                    Recipient = new List<string> { "google" }
-                });
-
-            _referenceNumberProvider
-                 .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
-                 .Returns("12345678");
 
             var fileUploadElement = new ElementBuilder()
                .WithLabel("File upload")
@@ -203,23 +179,23 @@ namespace form_builder_tests.UnitTests.Services
                     Path = "page-one",
                     FormName = "form",
                     Pages = new List<PageAnswers>
-                {
-                    new() 
-                    { 
-                        Answers = new List<Answers>
+                    {
+                        new()
                         {
-                                new() { QuestionId = $"questionIDOne{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() },
-                                new() { QuestionId = $"questionIDTwo{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() }
+                            Answers = new List<Answers>
+                            {
+                                    new() { QuestionId = $"questionIDOne{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() },
+                                    new() { QuestionId = $"questionIDTwo{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() }
+                            }
                         }
                     }
-                }
                 },
                 BaseForm = new FormSchema
                 {
                     Pages = new List<Page>
-                {
-                    new() { Elements = new List<IElement> { fileUploadElement } }
-                }
+                    {
+                        new() { Elements = new List<IElement> { fileUploadElement } }
+                    }
                 }
             };
 
