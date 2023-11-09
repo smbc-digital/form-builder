@@ -208,6 +208,41 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
+        public async Task Index_ShouldRunBehaviourForRedirectToAction_SubmitWithoutSubmission()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.H1)
+                .WithQuestionId("test-id")
+                .WithPropertyText("test-text")
+                .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitWithoutSubmission)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).ReturnsAsync(new Behaviour { BehaviourType = EBehaviourType.SubmitWithoutSubmission });
+
+            var viewModel = new Dictionary<string, string[]>();
+
+            // Act
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
+
+            // Assert
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("SubmitWithoutSubmission", viewResult.ActionName);
+        }
+
+        [Fact]
         public async Task Index_ShouldThrowApplicationException_ShouldRunDefaultBehaviour()
         {
             // Arrange
@@ -690,6 +725,27 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Assert
             _mockActionsWorkflow.Verify(_ => _.Process(page.PageActions, It.IsAny<FormSchema>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SubmitWithoutSubmission_ShouldCallSubmitWorkflow()
+        {
+            // Act
+            await _homeController.SubmitWithoutSubmission("form");
+
+            // Assert
+            _submitWorkflow.Verify(_ => _.SubmitWithoutSubmission("form"), Times.Once);
+        }
+
+        [Fact]
+        public async Task SubmitWithoutSubmission_ShouldRedirectToAction_Success()
+        {
+            // Act
+            var result = await _homeController.SubmitWithoutSubmission("form");
+
+            // Assert
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Success", viewResult.ActionName);
         }
 
         [Fact]

@@ -152,6 +152,12 @@ namespace form_builder.Controllers
                         form
                     });
 
+                case EBehaviourType.SubmitWithoutSubmission:
+                    return RedirectToAction("SubmitWithoutSubmission", new
+                    {
+                        form
+                    });
+
                 case EBehaviourType.SubmitAndPay:
                     var result = await _paymentWorkflow.Submit(form, path);
                     return Redirect(result);
@@ -176,6 +182,18 @@ namespace form_builder.Controllers
         public async Task<IActionResult> Submit(string form)
         {
             await _submitWorkflow.Submit(form);
+
+            return RedirectToAction("Success", new
+            {
+                form
+            });
+        }
+
+        [HttpGet]
+        [Route("{form}/submit-without-submission")]
+        public async Task<IActionResult> SubmitWithoutSubmission(string form)
+        {
+            await _submitWorkflow.SubmitWithoutSubmission(form);
 
             return RedirectToAction("Success", new
             {

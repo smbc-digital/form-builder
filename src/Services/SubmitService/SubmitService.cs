@@ -1,14 +1,15 @@
 ﻿using form_builder.Configuration;
+using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
+using form_builder.Helpers.Submit;
 using form_builder.Models;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
-using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -27,7 +28,7 @@ namespace form_builder.Services.SubmitService
         private readonly IReferenceNumberProvider _referenceNumberProvider;
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
         private readonly IPaymentHelper _paymentHelper;
-        private readonly IPostSubmissionAction _postSubmissionAction;
+        private readonly ISubmitHelper _submitHelper;
         private readonly IEnumerable<ITagParser> _tagParsers;
         private readonly ILogger<SubmitService> _logger;
 
@@ -41,7 +42,7 @@ namespace form_builder.Services.SubmitService
             IReferenceNumberProvider referenceNumberProvider,
             IEnumerable<ISubmitProvider> submitProviders,
             IPaymentHelper paymentHelper,
-            IPostSubmissionAction postSubmissionAction,
+            ISubmitHelper submitHelper,
             IEnumerable<ITagParser> tagParsers,
             ILogger<SubmitService> logger
             )
@@ -55,7 +56,7 @@ namespace form_builder.Services.SubmitService
             _referenceNumberProvider = referenceNumberProvider;
             _submitProviders = submitProviders;
             _paymentHelper = paymentHelper;
-            _postSubmissionAction = postSubmissionAction;
+            _submitHelper = submitHelper;
             _tagParsers = tagParsers;
             _logger = logger;
         }
@@ -80,8 +81,8 @@ namespace form_builder.Services.SubmitService
                 reference = answers.CaseReference;
             }
 
-            if (mappingEntity.BaseForm.Pages is not null && mappingEntity.FormAnswers.Pages is not null)
-                await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
+            if (mappingEntity.BaseForm.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Booking) && element.Properties.AutoConfirm)))
+                await _submitHelper.ConfirmBookings(mappingEntity, _environment.EnvironmentName, reference);
 
             _logger.LogInformation($"SubmitService.ProcessSubmission:{sessionGuid} Submitting {form}");
             var submissionReference = _submissionServiceConfiguration.FakeSubmission
@@ -203,24 +204,15 @@ namespace form_builder.Services.SubmitService
             return _tagParsers.Aggregate(postUrl.RedirectUrl, (current, tagParser) => tagParser.ParseString(current, mappingEntity.FormAnswers));
         }
 
-
-        public async Task<string> EmailSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
+        public async Task<string> ProcessWithoutSubmission(MappingEntity mappingEntity, string form, string sessionGuid)
         {
-            var reference = string.Empty;
+            var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
+            var reference = answers.CaseReference;
 
-            if (mappingEntity.BaseForm.GenerateReferenceNumber)
-            {
-                var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(sessionGuid));
-                reference = answers.CaseReference;
-            }
+            if (mappingEntity.BaseForm.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Booking) && element.Properties.AutoConfirm)))
+                await _submitHelper.ConfirmBookings(mappingEntity, _environment.EnvironmentName, reference);
 
-            await _postSubmissionAction.ConfirmResult(mappingEntity, _environment.EnvironmentName);
-
-            var submissionReference = _submissionServiceConfiguration.FakeSubmission
-               ? ProcessFakeSubmission(mappingEntity, form, sessionGuid, reference)
-               : await ProcessGenuineSubmission(mappingEntity, form, sessionGuid, reference);
-
-            return submissionReference;
+            return reference;
         }
     }
 }
