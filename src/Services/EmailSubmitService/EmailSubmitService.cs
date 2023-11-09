@@ -109,10 +109,14 @@ namespace form_builder.Services.EmailSubmitService
                     email.Sender,
                     string.Join(",", email.Recipient)
                     );
+            
+            bool isFileUpload = data.FormAnswers
+                .AllAnswers
+                .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
 
-            bool isFileUpload = data.FormAnswers.Pages
-                .Any(_ => _.Answers
-                .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX)));
+            // bool isFileUpload = data.FormAnswers.Pages
+            //     .Any(_ => _.Answers
+            //     .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX)));
 
             if (isFileUpload)
             {
@@ -128,13 +132,16 @@ namespace form_builder.Services.EmailSubmitService
                         fileUploads.Add(file);
                 }
 
-                emailMessage = new EmailMessage(
-                    subject,
-                    body,
-                    email.Sender,
-                    string.Join(",", email.Recipient),
-                    fileUploads
-                    );
+                if (fileUploads.Any())
+                {
+                    emailMessage = new EmailMessage(
+                        subject,
+                        body,
+                        email.Sender,
+                        string.Join(",", email.Recipient),
+                        fileUploads
+                        );
+                }
             }
 
             if (email.AttachPdf)

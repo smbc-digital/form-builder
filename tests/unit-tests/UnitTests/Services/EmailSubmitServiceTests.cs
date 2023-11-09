@@ -7,6 +7,7 @@ using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Mappers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.DocumentService;
@@ -162,7 +163,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new Exception());
 
             // Act & Assert
-            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=new FormAnswers() }, "form", "sessionGuid");
+            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers = new FormAnswers() }, "form", "sessionGuid");
             Assert.Equal(expectedSubject, actualSubject);
         }
 
@@ -189,46 +190,42 @@ namespace form_builder_tests.UnitTests.Services
                  .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
                  .Returns("12345678");
 
-            var formAnswers = new FormAnswers
+            var fileUploadElement = new ElementBuilder()
+               .WithLabel("File upload")
+               .WithQuestionId("questionIDOne")
+               .WithType(EElementType.FileUpload)
+               .Build();
+
+            var data = new MappingEntity
             {
-                Path = "page-one",
-                FormName = "form",
-                Pages = new List<PageAnswers>
+                FormAnswers = new FormAnswers
                 {
-                    new()
-                    {
+                    Path = "page-one",
+                    FormName = "form",
+                    Pages = new List<PageAnswers>
+                {
+                    new() 
+                    { 
                         Answers = new List<Answers>
                         {
-                            new()
-                            {
-                                QuestionId = $"questionIDOne{FileUploadConstants.SUFFIX}",
-                                Response = new List<FileUploadModel>
-                                {
-                                    new()
-                                    {
-                                        Key = "fileOneKey"
-                                    }
-                                }
-                            },
-                            new()
-                            {
-                                QuestionId = $"questionIDTwo{FileUploadConstants.SUFFIX}",
-                                Response = new List<FileUploadModel>
-                                {
-                                    new()
-                                    {
-                                        Key = "fileTwoKey"
-                                    }
-                                }
-                            }
+                                new() { QuestionId = $"questionIDOne{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() },
+                                new() { QuestionId = $"questionIDTwo{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() }
                         }
                     }
                 }
+                },
+                BaseForm = new FormSchema
+                {
+                    Pages = new List<Page>
+                {
+                    new() { Elements = new List<IElement> { fileUploadElement } }
+                }
+                }
             };
 
-            
+            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = data.BaseForm, FormAnswers = data.FormAnswers }, "form", "sessionGuid");
 
-            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=formAnswers }, "form", "sessionGuid");
+            _mockElementMapper.Verify(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()), Times.Once);
         }
     }
 }
