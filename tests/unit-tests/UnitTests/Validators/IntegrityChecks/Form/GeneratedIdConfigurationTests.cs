@@ -47,7 +47,7 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
         }
 
         [Fact]
-        public void CheckGeneratedIdConfiguration_DoesNotThrow_ApplicationException_GeneratedIdConfig_IsCorrect()
+        public void CheckGeneratedIdConfiguration_DoesNotThrow_ApplicationException_GeneratedIdConfig_IsCorrectlyTrue()
         {
             // Arrange
             var schema = new FormSchema
@@ -67,7 +67,27 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
 
-        [Fact(Skip = "Skipped for investigation")]
+        [Fact]
+        public void CheckGeneratedIdConfiguration_DoesNotThrow_ApplicationException_GeneratedIdConfig_IsCorrectlyFalse()
+        {
+            // Arrange
+            var schema = new FormSchema
+            {
+                FormName = "test-form",
+                GenerateReferenceNumber = false,
+                ReferencePrefix = "TEST",
+                Pages = new List<Page>()
+            };
+
+            GeneratedIdConfigurationCheck check = new();
+
+            // Act
+            var result = check.Validate(schema);
+            Assert.True(result.IsValid);
+            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
+        }
+
+        [Fact]
         public void CheckGeneratedIdConfiguration_Throw_ApplicationException_WhenGenerateReferenceNumber_IsFalse_And_SubmitWithoutSubmission_IsUsed()
         {
             // Arrange
@@ -88,7 +108,8 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
                                 BehaviourType = EBehaviourType.SubmitWithoutSubmission
                             }
                         }
-                    }
+                    },
+                    new()
                 }
             };
 
