@@ -109,21 +109,19 @@ namespace form_builder.Services.EmailSubmitService
                     email.Sender,
                     string.Join(",", email.Recipient)
                     );
-            
-            bool isFileUpload = data.FormAnswers
-                .AllAnswers
+
+            bool isFileUpload = data.FormAnswers.AllAnswers
                 .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
 
             if (isFileUpload)
             {
-                IEnumerable<IElement> elements = data.BaseForm.Pages
+                var fileElements = data.BaseForm.Pages
                     .SelectMany(_ => _.Elements)
                     .Where(_ => _.Type.Equals(EElementType.FileUpload) || _.Type.Equals(EElementType.MultipleFileUpload));
 
-                foreach (IElement element in elements)
+                foreach (var element in fileElements)
                 {
                     files = (List<File>)_elementMapper.GetAnswerValue(element, data.FormAnswers).Result;
-
                     foreach (File file in files ?? new List<File>())
                         fileUploads.Add(file);
                 }
@@ -149,8 +147,8 @@ namespace form_builder.Services.EmailSubmitService
                         PreviousAnswers = data.FormAnswers,
                         FormSchema = data.BaseForm
                     });
-                
-                emailMessage = fileUploads.Any() ? 
+
+                emailMessage = fileUploads.Any() ?
                     emailMessage = new EmailMessage(
                         subject,
                         body,
@@ -158,7 +156,7 @@ namespace form_builder.Services.EmailSubmitService
                         string.Join(",", email.Recipient),
                         pdfdoc.Result,
                         $"{data.FormAnswers.CaseReference}_data.pdf",
-                        fileUploads 
+                        fileUploads
                     )
                     : emailMessage = new EmailMessage(
                         subject,
@@ -167,7 +165,7 @@ namespace form_builder.Services.EmailSubmitService
                         string.Join(",", email.Recipient),
                         pdfdoc.Result,
                         $"{data.FormAnswers.CaseReference}_data.pdf"
-                    );                
+                    );
             }
 
             var result = _emailProvider.SendEmail(emailMessage).Result;

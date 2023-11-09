@@ -199,8 +199,7 @@ namespace form_builder_tests.UnitTests.Services
                 }
             };
 
-            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = data.BaseForm, FormAnswers = data.FormAnswers }, "form", "sessionGuid");
-
+            await _emailSubmitService.EmailSubmission(data, "form", "sessionGuid");
             _mockElementMapper.Verify(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()), Times.Once);
         }
     }
