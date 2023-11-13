@@ -22,6 +22,7 @@ using form_builder.Helpers.IncomingDataHelper;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Helpers.Submit;
 using form_builder.Helpers.ViewRender;
 using form_builder.Mappers;
 using form_builder.Mappers.Structure;
@@ -67,7 +68,6 @@ using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.ValidateService;
-using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
 using form_builder.Utils.Hash;
@@ -211,6 +211,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IEmailHelper, EmailHelper>();
             services.AddSingleton<ICookieHelper, CookieHelper>();
             services.AddSingleton<IStructureMapper, StructureMapper>();
+            services.AddSingleton<ISubmitHelper, SubmitHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
@@ -311,13 +312,6 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<IStreetProvider, FakeStreetProvider>();
             services.AddSingleton<IStreetProvider, ServiceStreetProvider>();
-
-            return services;
-        }
-
-        public static IServiceCollection ConfigurePostSubmissionActions(this IServiceCollection services)
-        {
-            services.AddSingleton<IPostSubmissionAction, PostSubmissionAction>();
 
             return services;
         }

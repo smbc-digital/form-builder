@@ -3,5 +3,6 @@
     public interface ISubmitWorkflow
     {
         Task<string> Submit(string form);
+        Task SubmitWithoutSubmission(string form);
     }
 }

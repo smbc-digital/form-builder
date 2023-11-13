@@ -6,19 +6,20 @@ using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.PaymentHelpers;
+using form_builder.Helpers.Submit;
 using form_builder.Models;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Providers.StorageProvider;
 using form_builder.Providers.Submit;
 using form_builder.Services.MappingService.Entities;
 using form_builder.Services.SubmitService;
-using form_builder.SubmissionActions;
 using form_builder.TagParsers;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using Xunit;
 
@@ -35,7 +36,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IReferenceNumberProvider> _mockReferenceNumberProvider = new();
         private readonly Mock<ISubmitProvider> _mockSubmitProvider = new();
-        private readonly Mock<IPostSubmissionAction> _mockPostSubmissionAction = new();
+        private readonly Mock<ISubmitHelper> _mockSubmitHelper = new();
         private readonly Mock<IPaymentHelper> _mockPaymentHelper = new();
         private readonly IEnumerable<ISubmitProvider> _submitProviders;
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
@@ -93,7 +94,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockReferenceNumberProvider.Object,
                 _submitProviders,
                 _mockPaymentHelper.Object,
-                _mockPostSubmissionAction.Object,
+                _mockSubmitHelper.Object,
                 _mockTagParsers.Object,
                 _mockLogger.Object);
         }
@@ -136,7 +137,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessSubmission_Applicaton_ShouldCatchException_WhenGatewayCallThrowsException()
+        public async Task ProcessSubmission_Application_ShouldCatchException_WhenGatewayCallThrowsException()
         {
             // Arrange
             var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.Environment.com" };
@@ -351,7 +352,7 @@ namespace form_builder_tests.UnitTests.Services
                 })
                 .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
 
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers
+            var json = JsonConvert.SerializeObject(new FormAnswers
             {
                 CaseReference = "TEST123456",
                 AdditionalFormData = new Dictionary<string, object>()
@@ -375,7 +376,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessSubmission__Application_ShoudlThrowApplicationException_WhenProviderResponse_IsNotOk()
+        public async Task ProcessSubmission_Application_ShouldThrowApplicationException_WhenProviderResponse_IsNotOk()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -587,7 +588,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessSubmission_ShouldCall_PostSubmissionAction_ConfirmResult()
+        public async Task ProcessSubmission_ShouldCall_SubmitHelper_ConfirmBookings()
         {
             // Arrange
             var element = new ElementBuilder()
@@ -649,7 +650,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessSubmission(_mappingEntity, "form", "123454");
 
             // Assert
-            _mockPostSubmissionAction.Verify(_ => _.ConfirmResult(It.IsAny<MappingEntity>(), It.IsAny<string>()), Times.Once);
+            _mockSubmitHelper.Verify(_ => _.ConfirmBookings(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -813,6 +814,76 @@ namespace form_builder_tests.UnitTests.Services
 
             // Assert
             _tagParser.Verify(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessWithoutSubmission_ShouldCall_SubmitHelper_ConfirmBookings()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Booking)
+                .WithQuestionId("booking")
+                .WithAppointmentType(new AppointmentType { AppointmentId = Guid.Parse("37588e67-9852-4713-9df5-0eb94e320675"), Environment = "local" })
+                .WithBookingProvider("testBookingProvider")
+                .WithAutoConfirm(true)
+                .Build();
+
+            var submitSlug = new SubmitSlug { AuthToken = "AuthToken", Environment = "local", URL = "www.location.com" };
+
+            var formData = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.SubmitForm)
+                .WithSubmitSlug(submitSlug)
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(formData)
+                .WithPageSlug("page-one")
+                .WithElement(element)
+                .Build();
+
+            var schema = new FormSchemaBuilder()
+                .WithPage(page)
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Path = "page-one",
+                CaseReference = "caseReference",
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "booking-reserved-booking-id",
+                                Response = "93dd24cd-cea5-40e7-b72a-a6b4757786ba"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var mappingEntity = new MappingEntityBuilder()
+                .WithBaseForm(schema)
+                .WithFormAnswers(formAnswers)
+                .WithData(new ExpandoObject())
+                .Build();
+
+            _mockSubmitProvider
+                .Setup(_ => _.PostAsync(It.IsAny<MappingEntity>(), It.IsAny<SubmitSlug>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            _mockDistributedCache
+                .Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(formAnswers));
+
+            // Act
+            await _service.ProcessWithoutSubmission(mappingEntity, "form", "123454");
+
+            // Assert
+            _mockSubmitHelper.Verify(_ => _.ConfirmBookings(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
     }
 }
