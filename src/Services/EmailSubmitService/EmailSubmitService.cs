@@ -1,10 +1,13 @@
 ﻿using System.Text.RegularExpressions;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Mappers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.DocumentService;
@@ -14,11 +17,14 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using Newtonsoft.Json;
 
+using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
+
 namespace form_builder.Services.EmailSubmitService
 {
     public class EmailSubmitService : IEmailSubmitService
     {
         private readonly IMappingService _mappingService;
+        private readonly IElementMapper _elementMapper;
         private readonly IEmailHelper _emailHelper;
         private readonly ISessionHelper _sessionHelper;
         private readonly IEmailProvider _emailProvider;
@@ -31,6 +37,7 @@ namespace form_builder.Services.EmailSubmitService
         public EmailSubmitService(
             IMappingService mappingService,
             IEmailHelper emailHelper,
+            IElementMapper elementMapper,
             ISessionHelper sessionHelper,
             IPageHelper pageHelper,
             IEmailProvider emailProvider,
@@ -42,18 +49,21 @@ namespace form_builder.Services.EmailSubmitService
         {
             _mappingService = mappingService;
             _emailHelper = emailHelper;
+            _elementMapper = elementMapper;
             _pageHelper = pageHelper;
             _sessionHelper = sessionHelper;
             _emailProvider = emailProvider;
             _referenceNumberProvider = referenceNumberProvider;
             _documentSummaryService = documentSummaryService;
             _tagParsers = tagParsers;
-            _logger= logger;
+            _logger = logger;
         }
 
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
         {
             var reference = string.Empty;
+            List<File> files = new();
+            List<File> fileUploads = new();
 
             if (data.BaseForm.GenerateReferenceNumber)
             {
@@ -63,12 +73,12 @@ namespace form_builder.Services.EmailSubmitService
             }
 
             var doc = _documentSummaryService.GenerateDocument(
-               new DocumentSummaryEntity
-               {
-                   DocumentType = EDocumentType.Html,
-                   PreviousAnswers = data.FormAnswers,
-                   FormSchema = data.BaseForm
-               });
+                new DocumentSummaryEntity
+                {
+                    DocumentType = EDocumentType.Html,
+                    PreviousAnswers = data.FormAnswers,
+                    FormSchema = data.BaseForm
+                });
 
             var email = await _emailHelper.GetEmailInformation(form);
             var parsedSubjectInformation = new EmailConfiguration();
@@ -94,29 +104,67 @@ namespace form_builder.Services.EmailSubmitService
                 : $"<p>{email.Body}</p>";
 
             var emailMessage = new EmailMessage(
-                   subject,
-                   body,
-                   email.Sender,
-                   string.Join(",", email.Recipient)
-                   );
+                    subject,
+                    body,
+                    email.Sender,
+                    string.Join(",", email.Recipient)
+                    );
+
+            bool isFileUpload = data.FormAnswers.AllAnswers
+                .Any(_ => _.QuestionId.Contains(FileUploadConstants.SUFFIX));
+
+            if (isFileUpload)
+            {
+                var fileElements = data.BaseForm.Pages
+                    .SelectMany(_ => _.Elements)
+                    .Where(_ => _.Type.Equals(EElementType.FileUpload) || _.Type.Equals(EElementType.MultipleFileUpload));
+
+                foreach (var element in fileElements)
+                {
+                    files = (List<File>)_elementMapper.GetAnswerValue(element, data.FormAnswers).Result;
+                    foreach (File file in files ?? new List<File>())
+                        fileUploads.Add(file);
+                }
+
+                if (fileUploads.Any())
+                {
+                    emailMessage = new EmailMessage(
+                        subject,
+                        body,
+                        email.Sender,
+                        string.Join(",", email.Recipient),
+                        fileUploads
+                        );
+                }
+            }
 
             if (email.AttachPdf)
             {
                 var pdfdoc = _documentSummaryService.GenerateDocument(
-                   new DocumentSummaryEntity
-                   {
-                       DocumentType = EDocumentType.Pdf,
-                       PreviousAnswers = data.FormAnswers,
-                       FormSchema = data.BaseForm
-                   });
+                    new DocumentSummaryEntity
+                    {
+                        DocumentType = EDocumentType.Pdf,
+                        PreviousAnswers = data.FormAnswers,
+                        FormSchema = data.BaseForm
+                    });
 
-                emailMessage = new EmailMessage(
-                    subject,
-                    body,
-                    email.Sender,
-                    string.Join(",", email.Recipient),
-                    pdfdoc.Result,
-                    $"{data.FormAnswers.CaseReference}_data.pdf"
+                emailMessage = fileUploads.Any() ?
+                    emailMessage = new EmailMessage(
+                        subject,
+                        body,
+                        email.Sender,
+                        string.Join(",", email.Recipient),
+                        pdfdoc.Result,
+                        $"{data.FormAnswers.CaseReference}_data.pdf",
+                        fileUploads
+                    )
+                    : emailMessage = new EmailMessage(
+                        subject,
+                        body,
+                        email.Sender,
+                        string.Join(",", email.Recipient),
+                        pdfdoc.Result,
+                        $"{data.FormAnswers.CaseReference}_data.pdf"
                     );
             }
 

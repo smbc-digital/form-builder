@@ -1,11 +1,13 @@
-﻿using Amazon.Runtime.Internal.Util;
-using form_builder.Builders;
+﻿using form_builder.Builders;
 using form_builder.Configuration;
+using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.EmailHelpers;
 using form_builder.Helpers.PageHelpers;
 using form_builder.Helpers.Session;
+using form_builder.Mappers;
 using form_builder.Models;
+using form_builder.Models.Elements;
 using form_builder.Providers.EmailProvider;
 using form_builder.Providers.ReferenceNumbers;
 using form_builder.Services.DocumentService;
@@ -26,6 +28,7 @@ namespace form_builder_tests.UnitTests.Services
     {
         private readonly Mock<IMappingService> _mappingService = new();
         private readonly Mock<IEmailHelper> _mockEmailHelper = new();
+        private readonly Mock<IElementMapper> _mockElementMapper = new();
         private readonly Mock<ISessionHelper> _sessionHelper = new();
         private readonly Mock<IEmailProvider> _emailProvider = new();
         private readonly Mock<IDocumentSummaryService> _documentSummaryService = new();
@@ -41,7 +44,6 @@ namespace form_builder_tests.UnitTests.Services
             _tagParser
                 .Setup(_ => _.ParseString(It.IsAny<string>(), It.IsAny<FormAnswers>()))
                 .Returns("{'AttachPdf':true,'Body':null,'FormName':['jw-roast-preference'],'Recipient':['jonathon.warwick@stockport.gov.uk'],'Sender':'noreply@stockport.gov.uk','Subject':'JW Roast Preference: {{QUESTION:firrstName}} {{QUESTION:favouriteyFood}}'}");
-
 
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
 
@@ -65,10 +67,23 @@ namespace form_builder_tests.UnitTests.Services
                  .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
                  .Returns("12345678");
 
+            _emailProvider
+                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
+                .ReturnsAsync(HttpStatusCode.OK);
+
+            _mockEmailHelper
+                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
+                .ReturnsAsync(new EmailConfiguration
+                {
+                    FormName = new List<string> { "form" },
+                    Subject = "test",
+                    Recipient = new List<string> { "google" }
+                });
 
             _emailSubmitService = new EmailSubmitService(
                 _mappingService.Object,
                 _mockEmailHelper.Object,
+                _mockElementMapper.Object,
                 _sessionHelper.Object,
                 _pageHelper.Object,
                 _emailProvider.Object,
@@ -82,24 +97,6 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task Submit_ShouldCallMapping_And_SubmitService()
         {
-            // Arrange
-            _emailProvider
-                .Setup(_ => _.SendEmail(It.IsAny<EmailMessage>()))
-                .ReturnsAsync(System.Net.HttpStatusCode.OK);
-
-            _mockEmailHelper
-                .Setup(_ => _.GetEmailInformation(It.IsAny<string>()))
-                .ReturnsAsync(new EmailConfiguration
-                {
-                    FormName = new List<string> { "form" },
-                    Subject = "test",
-                    Recipient = new List<string> { "google" }
-                });
-
-            _referenceNumberProvider
-                 .Setup(_ => _.GetReference(It.IsAny<string>(), 8))
-                 .Returns("12345678");
-
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -159,9 +156,51 @@ namespace form_builder_tests.UnitTests.Services
                 .Throws(new Exception());
 
             // Act & Assert
-            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers=new FormAnswers() }, "form", "sessionGuid");
+            await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = new FormSchema(), FormAnswers = new FormAnswers() }, "form", "sessionGuid");
             Assert.Equal(expectedSubject, actualSubject);
         }
 
+        [Fact]
+        public async Task Submit_ShouldCallElementMapper_ToGetListOf_FileUploads()
+        {
+            // Arrange
+            var emailMessage = new EmailMessage("subject", "body", "email@stockport.gov.uk", "email@stockport.gov.uk");
+
+            var fileUploadElement = new ElementBuilder()
+               .WithLabel("File upload")
+               .WithQuestionId("questionIDOne")
+               .WithType(EElementType.FileUpload)
+               .Build();
+
+            var data = new MappingEntity
+            {
+                FormAnswers = new FormAnswers
+                {
+                    Path = "page-one",
+                    FormName = "form",
+                    Pages = new List<PageAnswers>
+                    {
+                        new()
+                        {
+                            Answers = new List<Answers>
+                            {
+                                    new() { QuestionId = $"questionIDOne{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() },
+                                    new() { QuestionId = $"questionIDTwo{FileUploadConstants.SUFFIX}", Response = new List<FileUploadModel>() }
+                            }
+                        }
+                    }
+                },
+                BaseForm = new FormSchema
+                {
+                    Pages = new List<Page>
+                    {
+                        new() { Elements = new List<IElement> { fileUploadElement } }
+                    }
+                }
+            };
+
+            await _emailSubmitService.EmailSubmission(data, "form", "sessionGuid");
+            _mockElementMapper.Verify(_ => _.GetAnswerValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>()), Times.Once);
+        }
     }
 }
