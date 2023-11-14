@@ -14,14 +14,14 @@ namespace form_builder.Builders.Document
                 return;
 
             if (type.Equals(EElementType.FileUpload) || type.Equals(EElementType.MultipleFileUpload))
-                _filesData.Add($"{question}: {answer}");
+                _filesData.Add($"<b>{question}</b><br/>{answer}");
             else
-                _data.Add($"{question}: {answer}");
+                _data.Add($"<b>{question}</b><br/>{answer}");
         }
 
         public void AddQuestion(string question)
         {
-            _data.Add($"{question}:");
+            _data.Add($"{question}");
         }
 
         public void AddAnswer(string answer)

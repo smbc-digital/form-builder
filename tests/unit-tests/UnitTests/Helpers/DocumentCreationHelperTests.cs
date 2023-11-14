@@ -179,8 +179,8 @@ namespace form_builder_tests.UnitTests.Helpers
             // Act
             var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-            Assert.Equal($"{labelText}: {value}", result[4]);
-            Assert.Equal($"{labelText2}: {value}", result[5]);
+            Assert.Equal($"<b>{labelText}</b><br/>{value}", result[4]);
+            Assert.Equal($"<b>{labelText2}</b><br/>{value}", result[5]);
         }
 
         [Theory]
@@ -227,7 +227,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(2, result.Count);
-            Assert.Equal($"{labelText}: {value}", result[0]);
+            Assert.Equal($"<b>{labelText}</b><br/>{value}", result[0]);
         }
 
         [Theory]
@@ -269,7 +269,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(2, result.Count);
-            Assert.Equal($"{titleText}: {value}", result[0]);
+            Assert.Equal($"<b>{titleText}</b><br/>{value}", result[0]);
         }
 
         [Fact]
@@ -324,9 +324,9 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _documentCreation.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
             Assert.Equal(6, result.Count);
-            Assert.Equal($"{labelText}: {value}", result[0]);
-            Assert.Equal($"{labelText2}: {value}", result[2]);
-            Assert.Equal($"{labelText3}: {value}", result[4]);
+            Assert.Equal($"<b>{labelText}</b><br/>{value}", result[0]);
+            Assert.Equal($"<b>{labelText2}</b><br/>{value}", result[2]);
+            Assert.Equal($"<b>{labelText3}</b><br/>{value}", result[4]);
         }
 
         [Fact]
@@ -488,7 +488,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _documentCreation.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
 
             Assert.Equal(3, result.Count);
-            Assert.Equal($"{labelText}:", result[0]);
+            Assert.Equal($"{labelText}", result[0]);
             Assert.Equal($"{value}", result[1]);
         }
 
@@ -531,7 +531,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _documentCreation.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
 
             Assert.Equal(3, result.Count);
-            Assert.Equal($"{titleText}:", result[0]);
+            Assert.Equal($"{titleText}", result[0]);
             Assert.Equal($"{value}", result[1]);
         }
 
@@ -587,11 +587,11 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await _documentCreation.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
 
             Assert.Equal(9, result.Count);
-            Assert.Equal($"{labelText}:", result[0]);
+            Assert.Equal($"{labelText}", result[0]);
             Assert.Equal($"{value}", result[1]);
-            Assert.Equal($"{labelText2}:", result[3]);
+            Assert.Equal($"{labelText2}", result[3]);
             Assert.Equal($"{value}", result[4]);
-            Assert.Equal($"{labelText3}:", result[6]);
+            Assert.Equal($"{labelText3}", result[6]);
             Assert.Equal($"{value}", result[7]);
         }
     }
