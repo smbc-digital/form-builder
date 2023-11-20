@@ -15,7 +15,9 @@
         public string IsFutureDateAfterRelative { get; set; } 
         public string IsFutureDateAfterRelativeType => string.IsNullOrEmpty(IsFutureDateAfterRelative) ? string.Empty : IsFutureDateAfterRelative.Substring(IsFutureDateAfterRelative.LastIndexOf('-') + 1).Trim().ToUpper();  
         public string IsFutureDateBeforeRelative { get; set; } 
-        public string IsFutureDateBeforeRelativeType => string.IsNullOrEmpty(IsFutureDateBeforeRelative) ? string.Empty : IsFutureDateBeforeRelative.Substring(IsFutureDateBeforeRelative.LastIndexOf('-') + 1).Trim().ToUpper();  
+        public string IsFutureDateBeforeRelativeType => string.IsNullOrEmpty(IsFutureDateBeforeRelative) ? string.Empty : IsFutureDateBeforeRelative.Substring(IsFutureDateBeforeRelative.LastIndexOf('-') + 1).Trim().ToUpper();
+        public string IsPastDateBeforeRelative { get; set; }
+        public string IsPastDateBeforeRelativeType => string.IsNullOrEmpty(IsPastDateBeforeRelative) ? string.Empty : IsPastDateBeforeRelative.Substring(IsPastDateBeforeRelative.LastIndexOf('-') + 1).Trim().ToUpper();
         public string Day { get; set; } = string.Empty;
 
         public string Month { get; set; } = string.Empty;
@@ -33,5 +35,7 @@
         public string ValidationMessageIsFutureDateAfterRelative { get; set; } = string.Empty;
 
         public string ValidationMessageIsFutureDateBeforeRelative { get; set; } = string.Empty;
+
+        public string ValidationMessageIsPastDateBeforeRelative { get; set; } = string.Empty;
     }
 }

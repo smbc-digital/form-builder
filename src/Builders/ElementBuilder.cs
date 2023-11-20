@@ -594,6 +594,14 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIsPastDateBeforeRelative(string value, string validMessage = "")
+        {
+            _property.IsPastDateBeforeRelative = value;
+            _property.ValidationMessageIsPastDateBeforeRelative = validMessage;
+
+            return this;
+        }
+
 
         public ElementBuilder WithDecimal(bool value)
         {
