@@ -245,7 +245,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsPastDateBeforeRelative("2-y", "Date is too late")
                 .Build();
 
-            var dateToCheck = DateTime.Now.AddDays(-1);
+            var dateToCheck = DateTime.Now.AddYears(-1);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -272,7 +272,7 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithIsPastDateBeforeRelative("2-y", "Date is too late")
                 .Build();
 
-            var dateToCheck = DateTime.Now.AddDays(-2);
+            var dateToCheck = DateTime.Now.AddYears(-2);
 
             var viewModel = new Dictionary<string, dynamic>
             {
