@@ -602,7 +602,6 @@ namespace form_builder.Builders
             return this;
         }
 
-
         public ElementBuilder WithDecimal(bool value)
         {
             _property.Decimal = value;
