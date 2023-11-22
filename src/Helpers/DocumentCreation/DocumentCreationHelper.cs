@@ -75,7 +75,7 @@ namespace form_builder.Helpers.DocumentCreation
                     }
                     else
                     {
-                        summaryBuilder.AddQuestion(question.GetLabelText(page.Title));
+                        summaryBuilder.AddQuestion(question.GetLabelText(page.Title).Replace("(optional)", ""));
                         summaryBuilder.AddAnswer(answer);
                     }
 
