@@ -1,5 +1,6 @@
 ﻿using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Helpers.RelativeDateHelper;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
@@ -11,6 +12,8 @@ namespace form_builder.Validators
         {
             if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsFutureDateBeforeRelative))
                 return new ValidationResult { IsValid = true };
+
+            var relativeDateHelper = new RelativeDateHelper(element, viewModel);
 
             var valueDay = viewModel.ContainsKey($"{element.Properties.QuestionId}-day")
                 ? viewModel[$"{element.Properties.QuestionId}-day"]
@@ -24,35 +27,31 @@ namespace form_builder.Validators
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
                 : null;
 
-            if (valueDay is not null && valueMonth is not null && valueYear is not null)
+            if (relativeDateHelper.HasValidDate())
             {
-                var chosenDate = DateTime.Now;
-                var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out chosenDate);
 
-                if (isValidDate)
+                var relativeDate = relativeDateHelper.GetRelativeDate(element.Properties.IsFutureDateBeforeRelative);
+                var maximumDate = DateTime.Today;
+
+                if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
+                    maximumDate = DateTime.Today.AddYears(relativeDate.Ammount);
+
+                if (relativeDate.Unit.Equals(DateInputConstants.MONTH))
+                    maximumDate = DateTime.Today.AddMonths(relativeDate.Ammount);
+
+                if (relativeDate.Unit.Equals(DateInputConstants.DAY))
+                    maximumDate = DateTime.Today.AddDays(relativeDate.Ammount);
+
+                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && maximumDate < relativeDateHelper.ChosenDate() ||
+                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate <= relativeDateHelper.ChosenDate())
                 {
-                    string value = element.Properties.IsFutureDateBeforeRelative.Split('-')[0].Trim();
-                    var numberOfDaysInFuture = Convert.ToInt32(value);
-
-                    var maximumDate = DateTime.Today;
-                    if (element.Properties.IsFutureDateBeforeRelativeType.Equals(DateInputConstants.YEAR))
-                        maximumDate = DateTime.Today.AddYears(numberOfDaysInFuture);
-
-                    if (element.Properties.IsFutureDateBeforeRelativeType.Equals(DateInputConstants.MONTH))
-                        maximumDate = DateTime.Today.AddMonths(numberOfDaysInFuture);
-
-                    if (element.Properties.IsFutureDateBeforeRelativeType.Equals(DateInputConstants.DAY))
-                        maximumDate = DateTime.Today.AddDays(numberOfDaysInFuture);
-
-                    if (maximumDate <= chosenDate)
+                    return new ValidationResult
                     {
-                        return new ValidationResult
-                        {
-                            IsValid = false,
-                            Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageIsFutureDateBeforeRelative) ? element.Properties.ValidationMessageIsFutureDateBeforeRelative : "Check the date and try again"
-                        };
-                    }
+                        IsValid = false,
+                        Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageIsFutureDateBeforeRelative) ? element.Properties.ValidationMessageIsFutureDateBeforeRelative : "Check the date and try again"
+                    };
                 }
+
             }
 
             return new ValidationResult

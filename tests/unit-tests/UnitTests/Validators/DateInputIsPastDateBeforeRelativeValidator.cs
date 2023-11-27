@@ -50,10 +50,16 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldNotShowValidationMessage_WhenDayIsBeforeRelativeDate()
         {
             // Arrange
-            var element = new ElementBuilder()
+            var exclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("3-d", "Date is too late")
+                .WithIsPastDateBeforeRelative("3-d-ex", "Date is too late")
+                .Build();
+
+            var inclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("3-d-in", "Date is too late")
                 .Build();
 
             var dateToCheck = DateTime.Now.AddDays(-4);
@@ -66,21 +72,25 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _dateInputIsPastDateBeforeRelativeValidator.Validate(element, viewModel, new FormSchema());
+            var exclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(exclusiveElement, viewModel, new FormSchema());
+            var inclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(inclusiveElement, viewModel, new FormSchema());
 
             // Assert
-            Assert.True(result.IsValid);
-            Assert.Equal(string.Empty, result.Message);
+            Assert.True(exclusiveResult.IsValid);
+            Assert.Equal(string.Empty, exclusiveResult.Message);
+
+            Assert.True(inclusiveResult.IsValid);
+            Assert.Equal(string.Empty, inclusiveResult.Message);
         }
 
         [Fact]
-        public void Validate_ShouldShowValidationMessage_WhenDayIsEqualRelativeDate()
+        public void Validate_ShouldShowValidationMessage_WhenDayIsEqualRelativeDate_Exclusive()
         {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("3-d", "Date is too late")
+                .WithIsPastDateBeforeRelative("3-d-ex", "Date is too late")
                 .Build();
 
             var dateToCheck = DateTime.Now.AddDays(-3);
@@ -101,43 +111,16 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldShowValidationMessage_WhenDayIsAfterRelativeDate()
+        public void Validate_ShouldNotShowValidationMessage_WhenDayIsEqualRelativeDate_Inclusive()
         {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("3-d", "Date is too late")
+                .WithIsPastDateBeforeRelative("3-d-in", "Date is too late")
                 .Build();
 
-            var dateToCheck = DateTime.Now.AddDays(-2);
-
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                {"test-date-day", dateToCheck.Day},
-                {"test-date-month", dateToCheck.Month},
-                {"test-date-year", dateToCheck.Year}
-            };
-
-            // Act
-            var result = _dateInputIsPastDateBeforeRelativeValidator.Validate(element, viewModel, new FormSchema());
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal("Date is too late", result.Message);
-        }
-
-        [Fact]
-        public void Validate_ShouldNotShowValidationMessage_WhenMonthIsBeforeRelativeDate()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("3-m", "Date is too late")
-                .Build();
-
-            var dateToCheck = DateTime.Now.AddDays(-1).AddMonths(-3);
+            var dateToCheck = DateTime.Now.AddDays(-3);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -151,17 +134,91 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.True(result.IsValid);
-            Assert.Equal(String.Empty, result.Message);
+            Assert.Equal(string.Empty, result.Message);
         }
 
         [Fact]
-        public void Validate_ShouldShowValidationMessage_WhenMonthIsEqualRelativeDate()
+        public void Validate_ShouldShowValidationMessage_WhenDayIsAfterRelativeDate()
+        {
+            // Arrange
+            var exclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("3-d-ex", "Date is too late")
+                .Build();
+
+            var inclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("3-d-in", "Date is too late")
+                .Build();
+
+            var dateToCheck = DateTime.Now.AddDays(-2);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
+            };
+
+            // Act
+            var exclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(exclusiveElement, viewModel, new FormSchema());
+            var inclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(inclusiveElement, viewModel, new FormSchema());
+
+            // Assert
+            Assert.False(exclusiveResult.IsValid);
+            Assert.Equal("Date is too late", exclusiveResult.Message);
+
+            Assert.False(inclusiveResult.IsValid);
+            Assert.Equal("Date is too late", inclusiveResult.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldNotShowValidationMessage_WhenMonthIsBeforeRelativeDate()
+        {
+            // Arrange
+            var exclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("3-m-ex", "Date is too late")
+                .Build();
+
+            var inclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("3-m-in", "Date is too late")
+                .Build();
+
+            var dateToCheck = DateTime.Now.AddDays(-1).AddMonths(-3);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
+            };
+
+            // Act
+            var exclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(exclusiveElement, viewModel, new FormSchema());
+            var inclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(inclusiveElement, viewModel, new FormSchema());
+
+            // Assert
+            Assert.True(exclusiveResult.IsValid);
+            Assert.Equal(string.Empty, exclusiveResult.Message);
+
+            Assert.True(inclusiveResult.IsValid);
+            Assert.Equal(string.Empty, inclusiveResult.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldShowValidationMessage_WhenMonthIsEqualRelativeDate_Exclusive()
         {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("3-m", "Date is too late")
+                .WithIsPastDateBeforeRelative("3-m-ex", "Date is too late")
                 .Build();
 
             var dateToCheck = DateTime.Now.AddMonths(-3);
@@ -182,43 +239,16 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldShowValidationMessage_WhenMonthIsAfterRelativeDate()
+        public void Validate_ShouldNotShowValidationMessage_WhenMonthIsEqualRelativeDate_Inclusive()
         {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("3-m", "Date is too late")
+                .WithIsPastDateBeforeRelative("3-m-in", "Date is too late")
                 .Build();
 
-            var dateToCheck = DateTime.Now.AddMonths(-2);
-
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                {"test-date-day", dateToCheck.Day},
-                {"test-date-month", dateToCheck.Month},
-                {"test-date-year", dateToCheck.Year}
-            };
-
-            // Act
-            var result = _dateInputIsPastDateBeforeRelativeValidator.Validate(element, viewModel, new FormSchema());
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal("Date is too late", result.Message);
-        }
-
-        [Fact]
-        public void Validate_ShouldNotShowValidationMessage_WhenYearBeforeRelativeDate()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DateInput)
-                .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("2-y", "Date is too late")
-                .Build();
-
-            var dateToCheck = DateTime.Now.AddYears(-2).AddDays(-1);
+            var dateToCheck = DateTime.Now.AddMonths(-3);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -236,13 +266,93 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
+        public void Validate_ShouldShowValidationMessage_WhenMonthIsAfterRelativeDate()
+        {
+            // Arrange
+            var exclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("3-m-ex", "Date is too late")
+                .Build();
+
+            var inclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("3-m-in", "Date is too late")
+                .Build();
+
+            var dateToCheck = DateTime.Now.AddMonths(-2);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
+            };
+
+            // Act
+            var exclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(exclusiveElement, viewModel, new FormSchema());
+            var inclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(inclusiveElement, viewModel, new FormSchema());
+
+            // Assert
+            Assert.False(exclusiveResult.IsValid);
+            Assert.Equal("Date is too late", exclusiveResult.Message);
+
+            Assert.False(inclusiveResult.IsValid);
+            Assert.Equal("Date is too late", inclusiveResult.Message);
+        }
+
+        [Fact]
+        public void Validate_ShouldNotShowValidationMessage_WhenYearBeforeRelativeDate()
+        {
+            // Arrange
+            var inclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("2-y-ex", "Date is too late")
+                .Build();
+
+            var exclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("2-y-in", "Date is too late")
+                .Build();
+
+            var dateToCheck = DateTime.Now.AddYears(-2).AddDays(-1);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
+            };
+
+            // Act
+            var inclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(inclusiveElement, viewModel, new FormSchema());
+            var exclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(exclusiveElement, viewModel, new FormSchema());
+
+            // Assert
+            Assert.True(inclusiveResult.IsValid);
+            Assert.Equal(string.Empty, inclusiveResult.Message);
+
+            Assert.True(exclusiveResult.IsValid);
+            Assert.Equal(string.Empty, exclusiveResult.Message);
+        }
+
+        [Fact]
         public void Validate_ShouldShowValidationMessage_WhenYearIsAfterRelativeDate()
         {
             // Arrange
-            var element = new ElementBuilder()
+            var exclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("2-y", "Date is too late")
+                .WithIsPastDateBeforeRelative("2-y-ex", "Date is too late")
+                .Build();
+
+            var inclusiveElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("2-y-in", "Date is too late")
                 .Build();
 
             var dateToCheck = DateTime.Now.AddYears(-1);
@@ -255,21 +365,25 @@ namespace form_builder_tests.UnitTests.Validators
             };
 
             // Act
-            var result = _dateInputIsPastDateBeforeRelativeValidator.Validate(element, viewModel, new FormSchema());
+            var inclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(inclusiveElement, viewModel, new FormSchema());
+            var exclusiveResult = _dateInputIsPastDateBeforeRelativeValidator.Validate(exclusiveElement, viewModel, new FormSchema());
 
             // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal("Date is too late", result.Message);
+            Assert.False(exclusiveResult.IsValid);
+            Assert.Equal("Date is too late", exclusiveResult.Message);
+
+            Assert.False(inclusiveResult.IsValid);
+            Assert.Equal("Date is too late", inclusiveResult.Message);
         }
 
         [Fact]
-        public void Validate_ShouldShowValidationMessage_WhenYearIsEqualRelativeDate()
+        public void Validate_ShouldShowValidationMessage_WhenYearIsEqualRelativeDate_Exclusive()
         {
             // Arrange
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("2-y", "Date is too late")
+                .WithIsPastDateBeforeRelative("2-y-ex", "Date is too late")
                 .Build();
 
             var dateToCheck = DateTime.Now.AddYears(-2);
@@ -288,7 +402,34 @@ namespace form_builder_tests.UnitTests.Validators
             Assert.False(result.IsValid);
             Assert.Equal("Date is too late", result.Message);
         }
-  
+
+        [Fact]
+        public void Validate_ShouldNotShowValidationMessage_WhenYearIsEqualRelativeDate_Inclusive()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("test-date")
+                .WithIsPastDateBeforeRelative("2-y-in", "Date is too late")
+                .Build();
+
+            var dateToCheck = DateTime.Now.AddYears(-2);
+
+            var viewModel = new Dictionary<string, dynamic>
+            {
+                {"test-date-day", dateToCheck.Day},
+                {"test-date-month", dateToCheck.Month},
+                {"test-date-year", dateToCheck.Year}
+            };
+
+            // Act
+            var result = _dateInputIsPastDateBeforeRelativeValidator.Validate(element, viewModel, new FormSchema());
+
+            // Assert
+            Assert.True(result.IsValid);
+            Assert.Equal(string.Empty, result.Message);
+        }
+
 
         [Fact]
         public void Validate_ShouldShowDefaultValidationMessage_WhenValidationIsTriggeredAndNoValidationMessageIsSet()
@@ -297,7 +438,7 @@ namespace form_builder_tests.UnitTests.Validators
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
-                .WithIsPastDateBeforeRelative("2-d", "")
+                .WithIsPastDateBeforeRelative("2-d-ex", "")
                 .Build();
 
             var dateToCheck = DateTime.Now.AddDays(-1);
