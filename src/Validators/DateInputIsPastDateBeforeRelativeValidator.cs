@@ -8,16 +8,21 @@ namespace form_builder.Validators
 {
     public class DateInputIsPastDateBeforeRelativeValidator : IElementValidator
     {
+        private IRelativeDateHelper _relativeDateHelper;
+
+        public DateInputIsPastDateBeforeRelativeValidator(IRelativeDateHelper relativeDateHelper)
+        {
+            _relativeDateHelper = relativeDateHelper;
+        }
+
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsPastDateBeforeRelative))
                 return new ValidationResult { IsValid = true };
 
-            var relativeDateHelper = new RelativeDateHelper(element, viewModel);
-
-            if (relativeDateHelper.HasValidDate())
+            if (_relativeDateHelper.HasValidDate(element, viewModel))
             {
-                var relativeDate = relativeDateHelper.GetRelativeDate(element.Properties.IsPastDateBeforeRelative);
+                var relativeDate = _relativeDateHelper.GetRelativeDate(element.Properties.IsPastDateBeforeRelative);
                 var maximumDate = DateTime.Today;
 
                 if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
@@ -29,8 +34,8 @@ namespace form_builder.Validators
                 if (relativeDate.Unit.Equals(DateInputConstants.DAY))
                     maximumDate = DateTime.Today.AddDays(-relativeDate.Ammount);
 
-                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && maximumDate < relativeDateHelper.ChosenDate() ||
-                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate <= relativeDateHelper.ChosenDate())
+                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && maximumDate < _relativeDateHelper.ChosenDate(element, viewModel) ||
+                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate <= _relativeDateHelper.ChosenDate(element, viewModel))
                 {
                     return new ValidationResult
                     {

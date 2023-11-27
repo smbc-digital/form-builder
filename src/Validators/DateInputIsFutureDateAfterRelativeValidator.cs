@@ -8,16 +8,21 @@ namespace form_builder.Validators
 {
     public class DateInputIsFutureDateAfterRelativeValidator : IElementValidator
     {
+        private IRelativeDateHelper _relativeDateHelper;
+
+        public DateInputIsFutureDateAfterRelativeValidator(IRelativeDateHelper relativeDateHelper)
+        {
+            _relativeDateHelper = relativeDateHelper;
+        }
+
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsFutureDateAfterRelative))
                 return new ValidationResult { IsValid = true };
 
-            var relativeDateHelper = new RelativeDateHelper(element, viewModel);
-
-            if (relativeDateHelper.HasValidDate())
+            if (_relativeDateHelper.HasValidDate(element, viewModel))
             {
-                var relativeDate = relativeDateHelper.GetRelativeDate(element.Properties.IsFutureDateAfterRelative);
+                var relativeDate = _relativeDateHelper.GetRelativeDate(element.Properties.IsFutureDateAfterRelative);
                 var minimumDate = DateTime.Today;
 
                 if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
@@ -29,8 +34,8 @@ namespace form_builder.Validators
                 if (relativeDate.Unit.Equals(DateInputConstants.DAY))
                     minimumDate = DateTime.Today.AddDays(relativeDate.Ammount);
 
-                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && minimumDate > relativeDateHelper.ChosenDate() ||
-                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && minimumDate >= relativeDateHelper.ChosenDate())
+                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && minimumDate > _relativeDateHelper.ChosenDate(element, viewModel) ||
+                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && minimumDate >= _relativeDateHelper.ChosenDate(element, viewModel))
                 {
                     return new ValidationResult
                     {

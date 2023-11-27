@@ -5,36 +5,39 @@ using form_builder.Models.Elements;
 
 namespace form_builder.Helpers.RelativeDateHelper
 {
-    public class RelativeDateHelper
+    public class RelativeDateHelper : IRelativeDateHelper
     {
-        private readonly dynamic _valueDay;
-        private readonly dynamic _valueMonth;
-        private readonly dynamic _valueYear;
-
-        public RelativeDateHelper(Element element, Dictionary<string, dynamic> viewModel)
+        private static dynamic[] GetDateValues(Element element, Dictionary<string, dynamic> viewModel)
         {
-            _valueDay = viewModel.ContainsKey($"{element.Properties.QuestionId}-day")
+            var dateResult = new dynamic[3];
+            dateResult[0] = viewModel.ContainsKey($"{element.Properties.QuestionId}-day")
                 ? viewModel[$"{element.Properties.QuestionId}-day"]
                 : null;
 
-            _valueMonth = viewModel.ContainsKey($"{element.Properties.QuestionId}-month")
+            dateResult[1] = viewModel.ContainsKey($"{element.Properties.QuestionId}-month")
                 ? viewModel[$"{element.Properties.QuestionId}-month"]
                 : null;
 
-            _valueYear = viewModel.ContainsKey($"{element.Properties.QuestionId}-year")
+            dateResult[2] = viewModel.ContainsKey($"{element.Properties.QuestionId}-year")
                 ? viewModel[$"{element.Properties.QuestionId}-year"]
                 : null;
+
+            return dateResult;
         }
 
-        public bool HasValidDate()
+        public bool HasValidDate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            var isValidDate = DateTime.TryParse($"{_valueDay}/{_valueMonth}/{_valueYear}", out DateTime chosenDate);
-            return _valueDay is not null && _valueMonth is not null && _valueYear is not null && isValidDate;
+            var dateStrings = GetDateValues(element, viewModel);
+
+            var isValidDate = DateTime.TryParse($"{dateStrings[0]}/{dateStrings[1]}/{dateStrings[2]}", out DateTime chosenDate);
+            return dateStrings[0] is not null && dateStrings[1] is not null && dateStrings[2] is not null && isValidDate;
         }
 
-        public DateTime ChosenDate()
+        public DateTime ChosenDate(Element element, Dictionary<string, dynamic> viewModel)
         {
-            DateTime.TryParse($"{_valueDay}/{_valueMonth}/{_valueYear}", out DateTime chosenDate);
+            var dateStrings = GetDateValues(element, viewModel);
+
+            DateTime.TryParse($"{dateStrings[0]}/{dateStrings[1]}/{dateStrings[2]}", out DateTime chosenDate);
             return chosenDate;
         }
 

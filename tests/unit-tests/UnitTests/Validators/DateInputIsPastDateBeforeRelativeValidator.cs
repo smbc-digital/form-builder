@@ -3,12 +3,19 @@ using form_builder.Enum;
 using form_builder.Validators;
 using form_builder.Models;
 using Xunit;
+using Moq;
+using form_builder.Helpers.RelativeDateHelper;
 
 namespace form_builder_tests.UnitTests.Validators
 {
     public class DateInputIsPastDateBeforeRelativeValidatorTests
     {
-        private readonly DateInputIsPastDateBeforeRelativeValidator _dateInputIsPastDateBeforeRelativeValidator = new();
+        private readonly DateInputIsPastDateBeforeRelativeValidator _dateInputIsPastDateBeforeRelativeValidator;
+
+        public DateInputIsPastDateBeforeRelativeValidatorTests()
+        {
+            _dateInputIsPastDateBeforeRelativeValidator = new (new RelativeDateHelper());
+        }
 
         [Fact]
         public void Validate_ShouldCheck_TheElementTypePassedIsNotADateInputElement()
