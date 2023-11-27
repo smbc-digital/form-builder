@@ -14,13 +14,10 @@
         public string WithinRangeType => string.IsNullOrEmpty(WithinRange) ? string.Empty : WithinRange.Substring(WithinRange.LastIndexOf('-') + 1).Trim().ToUpper();
 
         public string IsFutureDateAfterRelative { get; set; }
-        public string IsFutureDateAfterRelativeType => string.IsNullOrEmpty(IsFutureDateAfterRelative) ? string.Empty : IsFutureDateAfterRelative.Substring(IsFutureDateAfterRelative.LastIndexOf('-') + 1).Trim().ToUpper();
 
         public string IsFutureDateBeforeRelative { get; set; }
-        public string IsFutureDateBeforeRelativeType => string.IsNullOrEmpty(IsFutureDateBeforeRelative) ? string.Empty : IsFutureDateBeforeRelative.Substring(IsFutureDateBeforeRelative.LastIndexOf('-') + 1).Trim().ToUpper();
 
         public string IsPastDateBeforeRelative { get; set; }
-        public string IsPastDateBeforeRelativeType => string.IsNullOrEmpty(IsPastDateBeforeRelative) ? string.Empty : IsPastDateBeforeRelative.Substring(IsPastDateBeforeRelative.LastIndexOf('-') + 1).Trim().ToUpper();
 
         public string IsPastDateAfterRelative { get; set; }
 
