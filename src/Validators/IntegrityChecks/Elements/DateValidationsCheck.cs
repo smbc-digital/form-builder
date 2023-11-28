@@ -33,19 +33,19 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             }
 
             if (!string.IsNullOrEmpty(element.Properties.IsFutureDateAfterRelative) &&
-                !relativeDateStringRegex.Match(element.Properties.IsFutureDateAfterRelative).Success)
+                !relativeDateStringRegex.Match(element.Properties.IsFutureDateAfterRelative.ToLower()).Success)
             {
                 result.AddFailureMessage("Property 'IsPastDateBeforeRelative' is invalid");
             }
 
             if (!string.IsNullOrEmpty(element.Properties.IsFutureDateBeforeRelative) &&
-                !relativeDateStringRegex.Match(element.Properties.IsFutureDateBeforeRelative).Success)
+                !relativeDateStringRegex.Match(element.Properties.IsFutureDateBeforeRelative.ToLower()).Success)
             {
                 result.AddFailureMessage("Property 'IsPastDateBeforeRelative' is invalid");
             }
 
             if (!string.IsNullOrEmpty(element.Properties.IsPastDateBeforeRelative) &&
-                !relativeDateStringRegex.Match(element.Properties.IsPastDateBeforeRelative).Success)
+                !relativeDateStringRegex.Match(element.Properties.IsPastDateBeforeRelative.ToLower()).Success)
             {
                 result.AddFailureMessage("Property 'IsPastDateBeforeRelative' is invalid");
             }

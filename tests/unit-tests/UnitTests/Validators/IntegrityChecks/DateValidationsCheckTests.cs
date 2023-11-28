@@ -60,12 +60,20 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
         [Theory]
         [InlineData("3-d-ex")]
+        [InlineData("3-D-EX")]
         [InlineData("3-d-in")]
+        [InlineData("3-D-IN")]
         [InlineData("3-m-in")]
+        [InlineData("3-M-IN")]
         [InlineData("3-m-ex")]
+        [InlineData("3-M-EX")]
         [InlineData("3-y-in")]
+        [InlineData("3-Y-IN")]
         [InlineData("3-y-ex")]
+        [InlineData("3-Y-EX")]
         [InlineData("999-y-ex")]
+        [InlineData("1-Y-ex")]
+        [InlineData("1-y-iN")]
         public void DateValidationsCheck_RelativeDate_IsValid(
             string relativeDateString)
         {
