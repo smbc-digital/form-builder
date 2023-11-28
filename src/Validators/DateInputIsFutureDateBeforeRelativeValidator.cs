@@ -32,7 +32,7 @@ namespace form_builder.Validators
                 if (relativeDate.Unit.Equals(DateInputConstants.DAY))
                     maximumDate = DateTime.Today.AddDays(relativeDate.Ammount);
 
-                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && maximumDate < _relativeDateHelper.GetChosenDate(element, viewModel) ||
+                if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && maximumDate < _relativeDateHelper.GetChosenDate(element, viewModel) ||
                     relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate <= _relativeDateHelper.GetChosenDate(element, viewModel))
                 {
                     return new ValidationResult

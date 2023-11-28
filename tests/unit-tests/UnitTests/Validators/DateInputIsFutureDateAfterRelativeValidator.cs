@@ -92,7 +92,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.DAY,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -145,7 +145,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.DAY,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -227,7 +227,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.DAY,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -270,7 +270,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.MONTH,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -323,7 +323,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.MONTH,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -405,7 +405,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.MONTH,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -448,7 +448,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.YEAR,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -502,7 +502,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.YEAR,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
@@ -584,7 +584,7 @@ namespace form_builder_tests.UnitTests.Validators
             {
                 Ammount = 3,
                 Unit = DateInputConstants.YEAR,
-                Type = DateInputConstants.INCLUISIVE
+                Type = DateInputConstants.INCLUSIVE
             });
 
             _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);

@@ -12,7 +12,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             if (element.Properties is null)
                 return result;
 
-            var relativeDateStringRegex = new Regex(@"^\d+-[dmy]-(ex|in)$");
+            var relativeDateStringRegex = new Regex(@"(?i)^\d+-[dmy]-(ex|in)$");
 
             if (!string.IsNullOrEmpty(element.Properties.IsDateAfter) &&
                 element.Properties.QuestionId.Equals(element.Properties.IsDateAfter))
@@ -33,19 +33,19 @@ namespace form_builder.Validators.IntegrityChecks.Elements
             }
 
             if (!string.IsNullOrEmpty(element.Properties.IsFutureDateAfterRelative) &&
-                !relativeDateStringRegex.Match(element.Properties.IsFutureDateAfterRelative.ToLower()).Success)
+                !relativeDateStringRegex.Match(element.Properties.IsFutureDateAfterRelative).Success)
             {
                 result.AddFailureMessage("Property 'IsPastDateBeforeRelative' is invalid");
             }
 
             if (!string.IsNullOrEmpty(element.Properties.IsFutureDateBeforeRelative) &&
-                !relativeDateStringRegex.Match(element.Properties.IsFutureDateBeforeRelative.ToLower()).Success)
+                !relativeDateStringRegex.Match(element.Properties.IsFutureDateBeforeRelative).Success)
             {
                 result.AddFailureMessage("Property 'IsPastDateBeforeRelative' is invalid");
             }
 
             if (!string.IsNullOrEmpty(element.Properties.IsPastDateBeforeRelative) &&
-                !relativeDateStringRegex.Match(element.Properties.IsPastDateBeforeRelative.ToLower()).Success)
+                !relativeDateStringRegex.Match(element.Properties.IsPastDateBeforeRelative).Success)
             {
                 result.AddFailureMessage("Property 'IsPastDateBeforeRelative' is invalid");
             }

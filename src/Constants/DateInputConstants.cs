@@ -6,6 +6,6 @@ namespace form_builder.Constants
         public const string MONTH = "M";
         public const string DAY = "D";
         public const string EXCLUSIVE = "EX";
-        public const string INCLUISIVE = "IN";
+        public const string INCLUSIVE = "IN";
     }
 }
