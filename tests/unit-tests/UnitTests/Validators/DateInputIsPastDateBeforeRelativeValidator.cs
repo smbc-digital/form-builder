@@ -5,16 +5,20 @@ using form_builder.Models;
 using Xunit;
 using Moq;
 using form_builder.Helpers.RelativeDateHelper;
+using form_builder.Constants;
+using form_builder.Models.Elements;
 
 namespace form_builder_tests.UnitTests.Validators
 {
     public class DateInputIsPastDateBeforeRelativeValidatorTests
     {
+        private readonly Mock<IRelativeDateHelper> _mockRelativeDateHelper = new Mock<IRelativeDateHelper>();
         private readonly DateInputIsPastDateBeforeRelativeValidator _dateInputIsPastDateBeforeRelativeValidator;
 
         public DateInputIsPastDateBeforeRelativeValidatorTests()
         {
-            _dateInputIsPastDateBeforeRelativeValidator = new (new RelativeDateHelper());
+            _dateInputIsPastDateBeforeRelativeValidator = new(_mockRelativeDateHelper.Object);
+            _mockRelativeDateHelper.Setup(_ => _.HasValidDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(true);
         }
 
         [Fact]
@@ -33,30 +37,60 @@ namespace form_builder_tests.UnitTests.Validators
         }
 
         [Fact]
-        public void Validate_ShouldCheck_DateIsOptional()
+        public void Validate_ShouldRun_WhenDateIsOptional()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddDays(4);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .Build();
 
-            element.Properties.IsPastDateBeforeRelative = "3-d";
+            element.Properties.IsPastDateBeforeRelative = "3-d-ex";
             element.Properties.Optional = true;
 
             var viewModel = new Dictionary<string, dynamic>();
 
             // Act
-            var result = _dateInputIsPastDateBeforeRelativeValidator.Validate(element, viewModel, new FormSchema());
+            _dateInputIsPastDateBeforeRelativeValidator.Validate(element, viewModel, new FormSchema());
 
             // Assert
-            Assert.True(result.IsValid);
+            _mockRelativeDateHelper.Verify(_ => _.HasValidDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
+            _mockRelativeDateHelper.Verify(_ => _.GetRelativeDate(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public void Validate_ShouldNotShowValidationMessage_WhenDayIsBeforeRelativeDate()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddDays(-4);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-ex")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-in")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var exclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -68,8 +102,6 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-d-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddDays(-4);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -94,13 +126,22 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldShowValidationMessage_WhenDayIsEqualRelativeDate_Exclusive()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddDays(-3);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-d-ex", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddDays(-3);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -121,13 +162,22 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldNotShowValidationMessage_WhenDayIsEqualRelativeDate_Inclusive()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddDays(-3);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-d-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddDays(-3);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -148,6 +198,24 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldShowValidationMessage_WhenDayIsAfterRelativeDate()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddDays(-2);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-ex")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-in")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var exclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -159,8 +227,6 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-d-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddDays(-2);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -185,6 +251,24 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldNotShowValidationMessage_WhenMonthIsBeforeRelativeDate()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddDays(-1).AddMonths(-3);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-ex")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.MONTH,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-in")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.MONTH,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var exclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -196,8 +280,6 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-m-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddDays(-1).AddMonths(-3);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -222,13 +304,22 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldShowValidationMessage_WhenMonthIsEqualRelativeDate_Exclusive()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddMonths(-3);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.MONTH,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-m-ex", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddMonths(-3);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -249,13 +340,22 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldNotShowValidationMessage_WhenMonthIsEqualRelativeDate_Inclusive()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddMonths(-3);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.MONTH,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-m-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddMonths(-3);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -276,6 +376,24 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldShowValidationMessage_WhenMonthIsAfterRelativeDate()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddMonths(-2);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-ex")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.MONTH,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-in")).Returns(new RelativeDate()
+            {
+                Ammount = 3,
+                Unit = DateInputConstants.MONTH,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var exclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -287,8 +405,6 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("3-m-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddMonths(-2);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -313,6 +429,24 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldNotShowValidationMessage_WhenYearBeforeRelativeDate()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddYears(-3);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-ex")).Returns(new RelativeDate()
+            {
+                Ammount = 2,
+                Unit = DateInputConstants.YEAR,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-in")).Returns(new RelativeDate()
+            {
+                Ammount = 2,
+                Unit = DateInputConstants.YEAR,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var inclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -324,8 +458,6 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("2-y-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddYears(-2).AddDays(-1);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -350,6 +482,24 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldShowValidationMessage_WhenYearIsAfterRelativeDate()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddYears(-1);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-ex")).Returns(new RelativeDate()
+            {
+                Ammount = 2,
+                Unit = DateInputConstants.YEAR,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-in")).Returns(new RelativeDate()
+            {
+                Ammount = 2,
+                Unit = DateInputConstants.YEAR,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var exclusiveElement = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
@@ -361,8 +511,6 @@ namespace form_builder_tests.UnitTests.Validators
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("2-y-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddYears(-1);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -387,13 +535,22 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldShowValidationMessage_WhenYearIsEqualRelativeDate_Exclusive()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddYears(-2);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 2,
+                Unit = DateInputConstants.YEAR,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("2-y-ex", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddYears(-2);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -414,13 +571,22 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldNotShowValidationMessage_WhenYearIsEqualRelativeDate_Inclusive()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddYears(-2);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 2,
+                Unit = DateInputConstants.YEAR,
+                Type = DateInputConstants.INCLUISIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("2-y-in", "Date is too late")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddYears(-2);
 
             var viewModel = new Dictionary<string, dynamic>
             {
@@ -442,13 +608,22 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldShowDefaultValidationMessage_WhenValidationIsTriggeredAndNoValidationMessageIsSet()
         {
             // Arrange
+            var dateToCheck = DateTime.Today.AddDays(-1);
+
+            _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
+            {
+                Ammount = 2,
+                Unit = DateInputConstants.DAY,
+                Type = DateInputConstants.EXCLUSIVE
+            });
+
+            _mockRelativeDateHelper.Setup(_ => _.GetChosenDate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>())).Returns(dateToCheck);
+
             var element = new ElementBuilder()
                 .WithType(EElementType.DateInput)
                 .WithQuestionId("test-date")
                 .WithIsPastDateBeforeRelative("2-d-ex", "")
                 .Build();
-
-            var dateToCheck = DateTime.Now.AddDays(-1);
 
             var viewModel = new Dictionary<string, dynamic>
             {

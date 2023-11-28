@@ -10,10 +10,7 @@ namespace form_builder.Validators
     {
         private IRelativeDateHelper _relativeDateHelper;
 
-        public DateInputIsFutureDateAfterRelativeValidator(IRelativeDateHelper relativeDateHelper)
-        {
-            _relativeDateHelper = relativeDateHelper;
-        }
+        public DateInputIsFutureDateAfterRelativeValidator(IRelativeDateHelper relativeDateHelper) => _relativeDateHelper = relativeDateHelper;
 
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
@@ -34,8 +31,8 @@ namespace form_builder.Validators
                 if (relativeDate.Unit.Equals(DateInputConstants.DAY))
                     minimumDate = DateTime.Today.AddDays(relativeDate.Ammount);
 
-                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && minimumDate > _relativeDateHelper.ChosenDate(element, viewModel) ||
-                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && minimumDate >= _relativeDateHelper.ChosenDate(element, viewModel))
+                if (relativeDate.Type.Equals(DateInputConstants.INCLUISIVE) && minimumDate > _relativeDateHelper.GetChosenDate(element, viewModel) ||
+                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && minimumDate >= _relativeDateHelper.GetChosenDate(element, viewModel))
                 {
                     return new ValidationResult
                     {

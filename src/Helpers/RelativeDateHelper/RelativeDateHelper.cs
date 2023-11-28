@@ -33,7 +33,7 @@ namespace form_builder.Helpers.RelativeDateHelper
             return dateStrings[0] is not null && dateStrings[1] is not null && dateStrings[2] is not null && isValidDate;
         }
 
-        public DateTime ChosenDate(Element element, Dictionary<string, dynamic> viewModel)
+        public DateTime GetChosenDate(Element element, Dictionary<string, dynamic> viewModel)
         {
             var dateStrings = GetDateValues(element, viewModel);
 

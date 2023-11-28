@@ -107,7 +107,7 @@ public class RelativeDateHelperTests
         };
 
         // Act
-        var result = _relativeDateHelper.ChosenDate(element, viewModel);
+        var result = _relativeDateHelper.GetChosenDate(element, viewModel);
 
         // Assert
         Assert.Equal(new DateTime(2020, 1, 1), result);
