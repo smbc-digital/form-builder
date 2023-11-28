@@ -1,5 +1,6 @@
 ﻿using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Helpers.RelativeDateHelper;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
@@ -7,51 +8,38 @@ namespace form_builder.Validators
 {
     public class DateInputIsFutureDateBeforeRelativeValidator : IElementValidator
     {
+        private IRelativeDateHelper _relativeDateHelper;
+
+        public DateInputIsFutureDateBeforeRelativeValidator(IRelativeDateHelper relativeDateHelper) => _relativeDateHelper = relativeDateHelper;
+
         public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
         {
             if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsFutureDateBeforeRelative))
                 return new ValidationResult { IsValid = true };
 
-            var valueDay = viewModel.ContainsKey($"{element.Properties.QuestionId}-day")
-                ? viewModel[$"{element.Properties.QuestionId}-day"]
-                : null;
-
-            var valueMonth = viewModel.ContainsKey($"{element.Properties.QuestionId}-month")
-                ? viewModel[$"{element.Properties.QuestionId}-month"]
-                : null;
-
-            var valueYear = viewModel.ContainsKey($"{element.Properties.QuestionId}-year")
-                ? viewModel[$"{element.Properties.QuestionId}-year"]
-                : null;
-
-            if (valueDay is not null && valueMonth is not null && valueYear is not null)
+            if (_relativeDateHelper.HasValidDate(element, viewModel))
             {
-                var chosenDate = DateTime.Now;
-                var isValidDate = DateTime.TryParse($"{valueDay}/{valueMonth}/{valueYear}", out chosenDate);
 
-                if (isValidDate)
+                var relativeDate = _relativeDateHelper.GetRelativeDate(element.Properties.IsFutureDateBeforeRelative);
+                var maximumDate = DateTime.Today;
+
+                if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
+                    maximumDate = DateTime.Today.AddYears(relativeDate.Ammount);
+
+                if (relativeDate.Unit.Equals(DateInputConstants.MONTH))
+                    maximumDate = DateTime.Today.AddMonths(relativeDate.Ammount);
+
+                if (relativeDate.Unit.Equals(DateInputConstants.DAY))
+                    maximumDate = DateTime.Today.AddDays(relativeDate.Ammount);
+
+                if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && maximumDate < _relativeDateHelper.GetChosenDate(element, viewModel) ||
+                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate <= _relativeDateHelper.GetChosenDate(element, viewModel))
                 {
-                    string value = element.Properties.IsFutureDateBeforeRelative.Split('-')[0].Trim();
-                    var numberOfDaysInFuture = Convert.ToInt32(value);
-
-                    var maximumDate = DateTime.Today;
-                    if (element.Properties.IsFutureDateBeforeRelativeType.Equals(DateInputConstants.YEAR))
-                        maximumDate = DateTime.Today.AddYears(numberOfDaysInFuture);
-
-                    if (element.Properties.IsFutureDateBeforeRelativeType.Equals(DateInputConstants.MONTH))
-                        maximumDate = DateTime.Today.AddMonths(numberOfDaysInFuture);
-
-                    if (element.Properties.IsFutureDateBeforeRelativeType.Equals(DateInputConstants.DAY))
-                        maximumDate = DateTime.Today.AddDays(numberOfDaysInFuture);
-
-                    if (maximumDate <= chosenDate)
+                    return new ValidationResult
                     {
-                        return new ValidationResult
-                        {
-                            IsValid = false,
-                            Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageIsFutureDateBeforeRelative) ? element.Properties.ValidationMessageIsFutureDateBeforeRelative : "Check the date and try again"
-                        };
-                    }
+                        IsValid = false,
+                        Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageIsFutureDateBeforeRelative) ? element.Properties.ValidationMessageIsFutureDateBeforeRelative : "Check the date and try again"
+                    };
                 }
             }
 
