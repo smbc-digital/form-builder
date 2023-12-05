@@ -37,5 +37,9 @@ namespace form_builder.Models.Properties.ElementProperties
         public bool DisableManualAddress { get; set; } = false;
 
         public string NoManualAddressDetailText { get; set; }
+
+        public int AddressManualLineMaxLength { get; set; } = 95;
+
+        public int AddressManualPostcodeMaxLength { get; set; } = 8;
     }
 }
