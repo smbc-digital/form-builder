@@ -38,8 +38,8 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public string NoManualAddressDetailText { get; set; }
 
-        public int ManualAddressLineMaxLength { get; set; } = 95;
+        public int AddressManualLineMaxLength { get; set; } = 95;
 
-        public int ManualAddressPostcodeMaxLength { get; set; } = 8;
+        public int AddressManualPostcodeMaxLength { get; set; } = 8;
     }
 }

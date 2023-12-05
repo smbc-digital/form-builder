@@ -87,7 +87,7 @@ namespace form_builder.Models.Elements
         public Dictionary<string, dynamic> GenerateAddress1ElementProperties()
         {
             var properties = GenerateElementProperties(Line1ValidationMessage, GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1), "address-line1");
-            properties.Add("maxlength", Properties.ManualAddressLineMaxLength);
+            properties.Add("maxlength", Properties.AddressManualLineMaxLength);
 
             return properties;
         }
@@ -95,7 +95,7 @@ namespace form_builder.Models.Elements
         public Dictionary<string, dynamic> GenerateAddress2ElementProperties()
         {
             var properties = GenerateElementProperties(autocomplete: "address-line2");
-            properties.Add("maxlength", Properties.ManualAddressLineMaxLength);
+            properties.Add("maxlength", Properties.AddressManualLineMaxLength);
 
             return properties;
         }
@@ -103,7 +103,7 @@ namespace form_builder.Models.Elements
         public Dictionary<string, dynamic> GenerateTownElementProperties()
         {
             var properties = GenerateElementProperties(TownValidationMessage, GetCustomErrorId(AddressManualConstants.TOWN), "address-level1");
-            properties.Add("maxlength", Properties.ManualAddressLineMaxLength);
+            properties.Add("maxlength", Properties.AddressManualLineMaxLength);
 
             return properties;
         }
@@ -111,7 +111,7 @@ namespace form_builder.Models.Elements
         public Dictionary<string, dynamic> GeneratePostcodeElementProperties()
         {
             var properties = GenerateElementProperties(PostcodeValidationMessage, GetCustomErrorId(AddressManualConstants.POSTCODE), "postal-code");
-            properties.Add("maxlength", Properties.ManualAddressPostcodeMaxLength);
+            properties.Add("maxlength", Properties.AddressManualPostcodeMaxLength);
 
             return properties;
         }
