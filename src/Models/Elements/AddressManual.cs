@@ -85,16 +85,36 @@ namespace form_builder.Models.Elements
         }
 
         public Dictionary<string, dynamic> GenerateAddress1ElementProperties()
-            => GenerateElementProperties(Line1ValidationMessage, GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1), "address-line1");
+        {
+            var properties = GenerateElementProperties(Line1ValidationMessage, GetCustomErrorId(AddressManualConstants.ADDRESS_LINE_1), "address-line1");
+            properties.Add("maxlength", Properties.ManualAddressLineMaxLength);
+
+            return properties;
+        }
 
         public Dictionary<string, dynamic> GenerateAddress2ElementProperties()
-            => GenerateElementProperties(autocomplete: "address-line2");
+        {
+            var properties = GenerateElementProperties(autocomplete: "address-line2");
+            properties.Add("maxlength", Properties.ManualAddressLineMaxLength);
+
+            return properties;
+        }
 
         public Dictionary<string, dynamic> GenerateTownElementProperties()
-            => GenerateElementProperties(TownValidationMessage, GetCustomErrorId(AddressManualConstants.TOWN), "address-level1");
+        {
+            var properties = GenerateElementProperties(TownValidationMessage, GetCustomErrorId(AddressManualConstants.TOWN), "address-level1");
+            properties.Add("maxlength", Properties.ManualAddressLineMaxLength);
+
+            return properties;
+        }
 
         public Dictionary<string, dynamic> GeneratePostcodeElementProperties()
-            => GenerateElementProperties(PostcodeValidationMessage, GetCustomErrorId(AddressManualConstants.POSTCODE), "postal-code");
+        {
+            var properties = GenerateElementProperties(PostcodeValidationMessage, GetCustomErrorId(AddressManualConstants.POSTCODE), "postal-code");
+            properties.Add("maxlength", Properties.ManualAddressPostcodeMaxLength);
+
+            return properties;
+        }
 
         protected void SetAddressProperties(IElementHelper elementHelper, FormAnswers formAnswers, string pageSlug, string guid, Dictionary<string, dynamic> viewModel)
         {
