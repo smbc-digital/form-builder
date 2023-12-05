@@ -24,6 +24,7 @@ using form_builder.Helpers.PaymentHelpers;
 using form_builder.Helpers.Session;
 using form_builder.Helpers.Submit;
 using form_builder.Helpers.ViewRender;
+using form_builder.Helpers.RelativeDateHelper;
 using form_builder.Mappers;
 using form_builder.Mappers.Structure;
 using form_builder.Providers;
@@ -123,6 +124,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, RestrictFutureDatepickerValidator>();
             services.AddTransient<IElementValidator, DateInputIsFutureDateAfterRelativeValidator>();
             services.AddTransient<IElementValidator, DateInputIsFutureDateBeforeRelativeValidator>();
+            services.AddTransient<IElementValidator, DateInputIsPastDateBeforeRelativeValidator>();
             services.AddTransient<IElementValidator, EmailElementValidator>();
             services.AddTransient<IElementValidator, PostcodeElementValidator>();
             services.AddTransient<IElementValidator, StockportPostcodeElementValidator>();
@@ -186,7 +188,7 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection AddAmazonS3Client(this IServiceCollection services, string accessKey, string secretKey)
         {
             services.AddSingleton<IAmazonS3, AmazonS3Client>(provider => new AmazonS3Client(accessKey, secretKey, RegionEndpoint.EUWest1));
-            
+
             return services;
         }
 
@@ -212,6 +214,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<ICookieHelper, CookieHelper>();
             services.AddSingleton<IStructureMapper, StructureMapper>();
             services.AddSingleton<ISubmitHelper, SubmitHelper>();
+            services.AddSingleton<IRelativeDateHelper, RelativeDateHelper>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<IViewRender, ViewRender>();
@@ -473,7 +476,6 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddTransformDataProvider(this IServiceCollection services, IWebHostEnvironment hostEnvironment)
         {
-            
             if (hostEnvironment.IsEnvironment("local") || hostEnvironment.IsEnvironment("uitest"))
             {
                 services.AddSingleton<ILookupTransformDataProvider, LocalLookupTransformDataProvider>();
