@@ -261,6 +261,7 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
+            services.AddSingleton<IAddressProvider, SHGAddressProvider>();
 
             return services;
         }
@@ -516,7 +517,7 @@ namespace form_builder.Utils.Startup
             services.Configure<TagManagerConfiguration>(tagManagerId => tagManagerId.TagManagerId = configuration.GetValue<string>(TagManagerConfiguration.ConfigValue));
             services.Configure<StylesheetConfiguration>(stylesheetConfig => stylesheetConfig.Stylesheet = configuration.GetValue<string>(StylesheetConfiguration.ConfigValue));
             services.Configure<JavascriptConfiguration>(javascriptConfig => javascriptConfig.Javascript = configuration.GetValue<string>(JavascriptConfiguration.ConfigValue));
-
+            services.Configure<SHGAddressProviderConfiguration>(configuration.GetSection(SHGAddressProviderConfiguration.ConfigValue));
             return services;
         }
 
