@@ -97,6 +97,8 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
+using form_builder.DependencyChecks;
+using form_builder.Services.DependencyCheckingService;
 
 namespace form_builder.Utils.Startup
 {
@@ -427,6 +429,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IPreviewService, PreviewService>();
             services.AddSingleton<IAnalyticsService, AnalyticsService>();
             services.AddSingleton<IEmailSubmitService, EmailSubmitService>();
+            services.AddSingleton<IDependencyCheckingService, DependencyCheckingService>();
 
             return services;
         }
@@ -599,6 +602,14 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection AddReferenceNumberProvider(this IServiceCollection services)
         {
             services.AddTransient<IReferenceNumberProvider, ReferenceNumberProvider>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddDependencyChecks(this IServiceCollection services)
+        {
+            services.AddTransient<IDependencyCheck, FakeFailingDependencyCheck>();
+            services.AddTransient<IDependencyCheck, FakeSuccessfulDependencyCheck>();
 
             return services;
         }

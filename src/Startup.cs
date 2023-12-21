@@ -33,6 +33,7 @@ namespace form_builder
                 .ConfigureCookiePolicy()
                 .AddValidators()
                 .AddTagParsers()
+                .AddDependencyChecks()
                 .AddReferenceNumberProvider()
                 .AddStorageProvider(Configuration)
                 .AddFileStorageProvider(Configuration)

@@ -14,6 +14,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddAnotherService;
 using form_builder.Services.AddressService;
 using form_builder.Services.BookingService;
+using form_builder.Services.DependencyCheckingService;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.OrganisationService;
@@ -51,6 +52,8 @@ namespace form_builder.Services.PageService
         private readonly IFormAvailabilityService _formAvailabilityService;
         private readonly ILogger<IPageService> _logger;
         private readonly IEnumerable<ITagParser> _tagParsers;
+        private readonly IDependencyCheckingService _dependencyCheckingService;
+
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -74,7 +77,8 @@ namespace form_builder.Services.PageService
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
             IEnumerable<ITagParser> tagParsers,
-            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration,
+            IDependencyCheckingService dependencyCheckingService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -97,6 +101,7 @@ namespace form_builder.Services.PageService
             _addAnotherService = addAnotherService;
             _tagParsers = tagParsers;
             _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
+            _dependencyCheckingService = dependencyCheckingService;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
@@ -134,6 +139,13 @@ namespace form_builder.Services.PageService
             if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
             {
                 _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: access to {form} is not approved");
+                _sessionHelper.Clear();
+                return null;
+            }
+
+            if (isNewSession && ! await _dependencyCheckingService.IsAvailable(baseForm.DependencyChecks))
+            {
+                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: depedencies for {form} are not available");
                 _sessionHelper.Clear();
                 return null;
             }
