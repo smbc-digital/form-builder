@@ -141,11 +141,18 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
                 .WithIsPastDateBeforeRelative(relativeDateString, "message")
                 .Build();
 
+            var pastDateAfterRelativeElement = new ElementBuilder()
+                .WithType(EElementType.DateInput)
+                .WithQuestionId("dateInput")
+                .WithIsPastDateAfterRelative(relativeDateString, "message")
+                .Build();
+
             // Act
             DateValidationsCheck check = new();
             var futureDateAfterRelativeResult = check.Validate(futureDateAfterRelativeElement);
             var futureDateBeforeRelativeResult = check.Validate(futureDateBeforeRelativeElement);
             var pastDateBeforeRelativeRelativeResult = check.Validate(pastDateBeforeRelativeElement);
+            var pastDateAfterRelativeRelativeResult = check.Validate(pastDateAfterRelativeElement);
 
             // Assert
             Assert.False(futureDateAfterRelativeResult.IsValid);
@@ -156,6 +163,9 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
 
             Assert.False(pastDateBeforeRelativeRelativeResult.IsValid);
             Assert.Collection<string>(pastDateBeforeRelativeRelativeResult.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+
+            Assert.False(pastDateAfterRelativeRelativeResult.IsValid);
+            Assert.Collection<string>(pastDateAfterRelativeRelativeResult.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
         }
     }
 }

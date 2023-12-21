@@ -40,5 +40,7 @@
         public string ValidationMessageIsFutureDateBeforeRelative { get; set; } = string.Empty;
 
         public string ValidationMessageIsPastDateBeforeRelative { get; set; } = string.Empty;
+
+        public string ValidationMessageIsPastDateAfterRelative { get; set; } = string.Empty;
     }
 }
