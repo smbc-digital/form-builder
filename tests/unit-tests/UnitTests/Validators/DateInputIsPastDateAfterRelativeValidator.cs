@@ -252,7 +252,7 @@ namespace form_builder_tests.UnitTests.Validators
         public void Validate_ShouldNotShowValidationMessage_WhenMonthIsAfterRelativeDate()
         {
             // Arrange
-            var dateToCheck = DateTime.Today.AddDays(+0).AddMonths(-3);
+            var dateToCheck = DateTime.Today.AddMonths(-3);
 
             _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-ex")).Returns(new RelativeDate()
             {
