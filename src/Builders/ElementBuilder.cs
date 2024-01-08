@@ -602,6 +602,14 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIsPastDateAfterRelative(string value, string validMessage = "")
+        {
+            _property.IsPastDateAfterRelative = value;
+            _property.ValidationMessageIsPastDateAfterRelative = validMessage;
+
+            return this;
+        }
+
         public ElementBuilder WithDecimal(bool value)
         {
             _property.Decimal = value;
