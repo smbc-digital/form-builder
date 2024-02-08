@@ -16,7 +16,7 @@ using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using Newtonsoft.Json;
-
+using StockportGovUK.NetStandard.Gateways;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Services.EmailSubmitService
@@ -33,6 +33,8 @@ namespace form_builder.Services.EmailSubmitService
         private readonly IReferenceNumberProvider _referenceNumberProvider;
         private readonly IEnumerable<ITagParser> _tagParsers;
         private readonly ILogger<EmailSubmitService> _logger;
+        private readonly IGateway _gateway;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public EmailSubmitService(
             IMappingService mappingService,
@@ -44,7 +46,9 @@ namespace form_builder.Services.EmailSubmitService
             IReferenceNumberProvider referenceNumberProvider,
             IDocumentSummaryService documentSummaryService,
             IEnumerable<ITagParser> tagParsers,
-            ILogger<EmailSubmitService> logger
+            ILogger<EmailSubmitService> logger,
+            IGateway gateway,
+            IWebHostEnvironment hostingEnvironment
             )
         {
             _mappingService = mappingService;
@@ -57,6 +61,8 @@ namespace form_builder.Services.EmailSubmitService
             _documentSummaryService = documentSummaryService;
             _tagParsers = tagParsers;
             _logger = logger;
+            _gateway = gateway;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
@@ -169,11 +175,26 @@ namespace form_builder.Services.EmailSubmitService
             }
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
+            // send log to flow
+            var pAURL = "https://prod-108.westeurope.logic.azure.com:443/workflows/297e4ee2ec994af3add06ce95dc771f9/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Guakmg2kNaYqNnntK9CKNm9KST2kCNUPBn716kOCMHY";
+
+            var pARequest = new PARequest()
+            {
+                FormName = form,
+                Environment = _hostingEnvironment.EnvironmentName
+            };
+
+            var response = await _gateway.PostAsync(pAURL, pARequest); //, "flowtoken", powerAutomateDetails.AuthToken
 
             if (!result.Equals(System.Net.HttpStatusCode.OK))
                 throw new ApplicationException($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: threw an exception {result}");
 
             return reference;
         }
+    }
+    public class PARequest
+    {
+        public string FormName { get; set; }
+        public string Environment { get; set; }
     }
 }
