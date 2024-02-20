@@ -519,6 +519,7 @@ namespace form_builder.Utils.Startup
             services.Configure<StylesheetConfiguration>(stylesheetConfig => stylesheetConfig.Stylesheet = configuration.GetValue<string>(StylesheetConfiguration.ConfigValue));
             services.Configure<JavascriptConfiguration>(javascriptConfig => javascriptConfig.Javascript = configuration.GetValue<string>(JavascriptConfiguration.ConfigValue));
             services.Configure<SHGAddressProviderConfiguration>(configuration.GetSection(SHGAddressProviderConfiguration.ConfigValue));
+            services.Configure<PowerAutomateConfiguration>(configuration.GetSection(PowerAutomateConfiguration.ConfigValue));
             return services;
         }
 

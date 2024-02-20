@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -15,6 +16,7 @@ using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
@@ -35,6 +37,7 @@ namespace form_builder.Services.EmailSubmitService
         private readonly ILogger<EmailSubmitService> _logger;
         private readonly IGateway _gateway;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private IOptions<PowerAutomateConfiguration> _configuration;
 
         public EmailSubmitService(
             IMappingService mappingService,
@@ -48,7 +51,8 @@ namespace form_builder.Services.EmailSubmitService
             IEnumerable<ITagParser> tagParsers,
             ILogger<EmailSubmitService> logger,
             IGateway gateway,
-            IWebHostEnvironment hostingEnvironment
+            IWebHostEnvironment hostingEnvironment,
+            IOptions<PowerAutomateConfiguration> configuration
             )
         {
             _mappingService = mappingService;
@@ -63,6 +67,7 @@ namespace form_builder.Services.EmailSubmitService
             _logger = logger;
             _gateway = gateway;
             _hostingEnvironment = hostingEnvironment;
+            _configuration = configuration;
         }
 
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
@@ -175,26 +180,34 @@ namespace form_builder.Services.EmailSubmitService
             }
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
-            // send log to flow
-            var pAURL = "https://prod-108.westeurope.logic.azure.com:443/workflows/297e4ee2ec994af3add06ce95dc771f9/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Guakmg2kNaYqNnntK9CKNm9KST2kCNUPBn716kOCMHY";
-
-            var pARequest = new PARequest()
-            {
-                FormName = form,
-                Environment = _hostingEnvironment.EnvironmentName
-            };
-
-            var response = await _gateway.PostAsync(pAURL, pARequest); //, "flowtoken", powerAutomateDetails.AuthToken
 
             if (!result.Equals(System.Net.HttpStatusCode.OK))
                 throw new ApplicationException($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: threw an exception {result}");
 
+            HttpResponseMessage response = new();
+
+            try
+            {
+                FormSchema baseForm = new FormSchema();
+                var powerAutomateUrl = _configuration.Value.BaseUrl;
+                var powerAutomateDetails = new PowerAutomateDetails()
+                {
+                    FormName = form,
+                    Environment = _hostingEnvironment.EnvironmentName
+                };
+                response = await _gateway.PostAsync(powerAutomateUrl, powerAutomateDetails);
+
+                if (!response.IsSuccessStatusCode) _logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
+                            $"An unexpected error occurred writting to PowerAutomate {response}");
+            }
+            catch (Exception)
+            {
+                _logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
+                            $"An unexpected error occurred writting to PowerAutomate {response}");
+            }
+
             return reference;
         }
     }
-    public class PARequest
-    {
-        public string FormName { get; set; }
-        public string Environment { get; set; }
-    }
+    
 }
