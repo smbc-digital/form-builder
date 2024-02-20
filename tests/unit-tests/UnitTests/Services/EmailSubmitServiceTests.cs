@@ -17,8 +17,11 @@ using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using form_builder_tests.Builders;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
+using StockportGovUK.NetStandard.Gateways;
 using System.Net;
 using Xunit;
 
@@ -38,6 +41,9 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
         private readonly Mock<ITagParser> _tagParser = new();
         private readonly Mock<ILogger<EmailSubmitService>> _mockLogger = new();
+        private readonly Mock<IGateway> _mockGateway = new();
+        private readonly Mock<IWebHostEnvironment> _hostingEnvironment = new();
+        private readonly Mock<IOptions<PowerAutomateConfiguration>> _mockPowerAutomateConfiguration = new();
 
         public EmailSubmitServiceTests()
         {
@@ -90,7 +96,10 @@ namespace form_builder_tests.UnitTests.Services
                 _referenceNumberProvider.Object,
                 _documentSummaryService.Object,
                 _mockTagParsers.Object,
-                _mockLogger.Object
+                _mockLogger.Object,
+                _mockGateway.Object,
+                _hostingEnvironment.Object,
+                _mockPowerAutomateConfiguration.Object
               );
         }
 
@@ -119,6 +128,15 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
+            var paConfig = new PowerAutomateConfiguration();
+            _mockPowerAutomateConfiguration.Setup(_ => _.Value).Returns(paConfig);
+
+            _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    Content = new StringContent("Okay")
+                });
+
             // Act
             var result = await _emailSubmitService.EmailSubmission(new MappingEntity { BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "sessionGuid");
 
@@ -126,6 +144,7 @@ namespace form_builder_tests.UnitTests.Services
             _documentSummaryService.Verify(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()), Times.Once);
             _mockEmailHelper.Verify(_ => _.GetEmailInformation(It.IsAny<string>()), Times.Once);
             _emailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Once);
+            _mockGateway.Verify(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<PowerAutomateDetails>()), Times.Once);
         }
 
         [Fact]

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
@@ -15,8 +16,9 @@ using form_builder.Services.DocumentService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-
+using StockportGovUK.NetStandard.Gateways;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Services.EmailSubmitService
@@ -33,6 +35,9 @@ namespace form_builder.Services.EmailSubmitService
         private readonly IReferenceNumberProvider _referenceNumberProvider;
         private readonly IEnumerable<ITagParser> _tagParsers;
         private readonly ILogger<EmailSubmitService> _logger;
+        private readonly IGateway _gateway;
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        private IOptions<PowerAutomateConfiguration> _configuration;
 
         public EmailSubmitService(
             IMappingService mappingService,
@@ -44,7 +49,10 @@ namespace form_builder.Services.EmailSubmitService
             IReferenceNumberProvider referenceNumberProvider,
             IDocumentSummaryService documentSummaryService,
             IEnumerable<ITagParser> tagParsers,
-            ILogger<EmailSubmitService> logger
+            ILogger<EmailSubmitService> logger,
+            IGateway gateway,
+            IWebHostEnvironment hostingEnvironment,
+            IOptions<PowerAutomateConfiguration> configuration
             )
         {
             _mappingService = mappingService;
@@ -57,6 +65,9 @@ namespace form_builder.Services.EmailSubmitService
             _documentSummaryService = documentSummaryService;
             _tagParsers = tagParsers;
             _logger = logger;
+            _gateway = gateway;
+            _hostingEnvironment = hostingEnvironment;
+            _configuration = configuration;
         }
 
         public async Task<string> EmailSubmission(MappingEntity data, string form, string sessionGuid)
@@ -173,7 +184,30 @@ namespace form_builder.Services.EmailSubmitService
             if (!result.Equals(System.Net.HttpStatusCode.OK))
                 throw new ApplicationException($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: threw an exception {result}");
 
+            HttpResponseMessage response = new();
+
+            try
+            {
+                FormSchema baseForm = new FormSchema();
+                var powerAutomateUrl = _configuration.Value.BaseUrl;
+                var powerAutomateDetails = new PowerAutomateDetails()
+                {
+                    FormName = form,
+                    Environment = _hostingEnvironment.EnvironmentName
+                };
+                response = await _gateway.PostAsync(powerAutomateUrl, powerAutomateDetails);
+
+                if (!response.IsSuccessStatusCode) _logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
+                            $"An unexpected error occurred writting to PowerAutomate {response}");
+            }
+            catch (Exception)
+            {
+                _logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
+                            $"An unexpected error occurred writting to PowerAutomate {response}");
+            }
+
             return reference;
         }
     }
+    
 }
