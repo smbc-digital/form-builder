@@ -512,6 +512,7 @@ namespace form_builder.Utils.Startup
             services.Configure<AnalyticsConfiguration>(configuration.GetSection(AnalyticsConfiguration.ConfigValue));
             services.Configure<GoogleAnalyticsConfiguration>(configuration.GetSection(GoogleAnalyticsConfiguration.ConfigValue));
             services.Configure<S3SchemaProviderConfiguration>(configuration.GetSection(S3SchemaProviderConfiguration.ConfigValue));
+            services.Configure<QAFormAccessTokenConfiguration>(configuration.GetSection(QAFormAccessTokenConfiguration.ConfigValue));
 
             services.Configure<DistributedCacheConfiguration>(cacheOptions => cacheOptions.UseDistributedCache = configuration.GetValue<bool>(DistributedCacheConfiguration.ConfigValue));
             services.Configure<PreviewModeConfiguration>(cacheOptions => cacheOptions.IsEnabled = configuration.GetValue<bool>(PreviewModeConfiguration.ConfigValue));
@@ -519,6 +520,7 @@ namespace form_builder.Utils.Startup
             services.Configure<StylesheetConfiguration>(stylesheetConfig => stylesheetConfig.Stylesheet = configuration.GetValue<string>(StylesheetConfiguration.ConfigValue));
             services.Configure<JavascriptConfiguration>(javascriptConfig => javascriptConfig.Javascript = configuration.GetValue<string>(JavascriptConfiguration.ConfigValue));
             services.Configure<SHGAddressProviderConfiguration>(configuration.GetSection(SHGAddressProviderConfiguration.ConfigValue));
+            services.Configure<PowerAutomateConfiguration>(configuration.GetSection(PowerAutomateConfiguration.ConfigValue));
             return services;
         }
 
