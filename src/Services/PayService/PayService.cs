@@ -61,14 +61,14 @@ namespace form_builder.Services.PayService
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-            _logger.LogInformation($"PayService.ProcessPayment:{sessionGuid} {form} - Creating payment request - for {reference}");
+            _logger.LogInformation($"PayService::ProcessPayment:{sessionGuid} {form} - Creating payment request - for {reference}");
 
             return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
         {
-            _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
+            _logger.LogInformation($"PayService::ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
 
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
@@ -103,7 +103,7 @@ namespace form_builder.Services.PayService
                         $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
                         $"Callback failed for case {reference}: {callbackResponse.ReasonPhrase}");
 
-                _logger.LogInformation($"PayService.ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
+                _logger.LogInformation($"PayService::ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
             }
             catch (PaymentDeclinedException)
             {

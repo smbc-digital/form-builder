@@ -70,9 +70,6 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/payment-success")]
         public async Task<IActionResult> PaymentSuccess(string form, [FromQuery] string reference)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            _logger.LogInformation($"PaymentController:PaymentSuccess:{sessionGuid} {form} Attempting payment success {reference}");
-
             var result = await _successWorkflow.Process(EBehaviourType.SubmitAndPay, form);
 
             var success = new SuccessViewModel
@@ -116,7 +113,6 @@ namespace form_builder.Controllers.Payment
         public async Task<IActionResult> PaymentDeclined(string form, [FromQuery] string reference)
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
-            _logger.LogWarning($"PaymentController:PaymentDeclined:{sessionGuid} {form} Payment declined {reference}");
 
             var data = await _mappingService.Map(sessionGuid, form);
             var url = await _payService.ProcessPayment(data, form, "payment", reference, sessionGuid);
