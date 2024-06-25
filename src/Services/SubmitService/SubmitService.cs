@@ -110,7 +110,7 @@ namespace form_builder.Services.SubmitService
 
             _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{sessionGuid} {form} Posting Request");
             if (form.Equals("missed-bin-collection"))
-                _logger.LogInformation($"SubmitService:ProcessGenuineSubmission: Missed bin collection sent object - {JsonConvert.SerializeObject(mappingEntity.Data)}");
+                _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{sessionGuid} - Missed bin collection sent object - {JsonConvert.SerializeObject(mappingEntity.Data)}");
 
             HttpResponseMessage response = await _submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
             _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{sessionGuid} {form} Response Received");
