@@ -109,8 +109,6 @@ namespace form_builder.Services.SubmitService
             var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
             _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{sessionGuid} {form} Posting Request");
-            if (form.Equals("missed-bin-collection"))
-                _logger.LogInformation($"SubmitService:ProcessGenuineSubmission: Missed bin collection sent object - {JsonConvert.SerializeObject(mappingEntity)}");
 
             HttpResponseMessage response = await _submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
             _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{sessionGuid} {form} Response Received");

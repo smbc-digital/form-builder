@@ -91,9 +91,16 @@ namespace form_builder.Services.MappingService
             if (sessionData is null)
                 throw new ApplicationException($"MappingService::GetFormAnswer:{sessionGuid}, Session data is null");
 
+            if (form.Equals("missed-bin-collection"))
+                _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}:{sessionGuid} - Missed bin collection raw session data - {sessionData}");
+
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
+            if (form.Equals("missed-bin-collection"))
+                _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}:{sessionGuid} - Missed bin collection AllAnswers object - {JsonConvert.SerializeObject(convertedAnswers.AllAnswers)}");
+
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
+
             IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);
             foreach (var pageSlug in visitedPageSlugs)
             {
