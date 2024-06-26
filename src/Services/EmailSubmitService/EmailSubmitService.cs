@@ -18,6 +18,7 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Bcpg;
 using StockportGovUK.NetStandard.Gateways;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
@@ -181,6 +182,32 @@ namespace form_builder.Services.EmailSubmitService
 
             var result = _emailProvider.SendEmail(emailMessage).Result;
 
+            // customer email. new thing
+            if (email.CustomerSubject != null && email.CustomerSubject != null && email.EmailQuestionID != null)
+            {
+                try
+                {
+                    var customerEmail = data.FormAnswers.AllAnswers.Where(x => x.QuestionId == email.EmailQuestionID).First();
+
+                    if (customerEmail != null)
+                    {
+                        var customerMessage = new EmailMessage(
+                            email.CustomerSubject,
+                            email.CustomerBody,
+                            email.Sender,
+                            customerEmail.Response
+                            );
+
+                        var resultCustomer = _emailProvider.SendEmail(customerMessage).Result;
+                    }
+                }
+                catch (Exception)
+                {
+                    _logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
+                            $"An unexpected error occurred sending customer email");
+                }
+            }
+
             if (!result.Equals(System.Net.HttpStatusCode.OK))
                 throw new ApplicationException($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: threw an exception {result}");
 
@@ -209,5 +236,5 @@ namespace form_builder.Services.EmailSubmitService
             return reference;
         }
     }
-    
+
 }
