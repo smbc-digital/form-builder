@@ -26,6 +26,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IFileStorageProvider _fileStorageProvider;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly ILogger<PageHelper> _logger;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper,
             IDistributedCacheWrapper distributedCache,
@@ -34,7 +35,8 @@ namespace form_builder.Helpers.PageHelpers
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration,
+            ILogger<PageHelper> logger)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -44,6 +46,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
             _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
+            _logger = logger;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -192,7 +195,16 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
+            if (form.Equals("missed-bin-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection pre-save data - {JsonConvert.SerializeObject(convertedAnswers)}");
+
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+
+            if (form.Equals("missed-bin-collection"))
+            {
+                string cachedData = _distributedCache.GetString(guid);
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection data just cached - {cachedData}");
+            }
         }
 
         public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")

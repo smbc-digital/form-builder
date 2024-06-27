@@ -14,6 +14,7 @@ using form_builder.Providers.FileStorage;
 using form_builder.Providers.StorageProvider;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<IOptions<DistributedCacheExpirationConfiguration>> _mockDistributedCacheExpirationSettings = new();
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
         private readonly Mock<IOptions<FileStorageProviderConfiguration>> _mockFileStorageConfiguration = new();
+        private readonly Mock<ILogger<PageHelper>> _mockLogger = new();
 
         public PageHelperTests()
         {
@@ -67,7 +69,8 @@ namespace form_builder_tests.UnitTests.Helpers
                 _mockElementHelper.Object, _mockDistributedCache.Object,
                 _mockDisallowedKeysOptions.Object, _mockHostingEnv.Object,
                 _mockDistributedCacheExpirationSettings.Object,
-                _mockSessionHelper.Object, _fileStorageProviders, _mockFileStorageConfiguration.Object);
+                _mockSessionHelper.Object, _fileStorageProviders, _mockFileStorageConfiguration.Object,
+                _mockLogger.Object);
         }
 
         [Fact]
