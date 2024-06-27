@@ -85,7 +85,7 @@ namespace form_builder.Services.MappingService
             var baseForm = await _schemaFactory.Build(form);
 
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException($"MappingService::GetFormAnswers:{sessionGuid} Session has expired");
+                throw new ApplicationException($"MappingService::GetFormAnswers:{sessionGuid}, Session has expired");
 
             var sessionData = _distributedCache.GetString(sessionGuid);
             if (sessionData is null)
