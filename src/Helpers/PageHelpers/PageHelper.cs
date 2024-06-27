@@ -160,6 +160,10 @@ namespace form_builder.Helpers.PageHelpers
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);
+
+            if (form.Equals("missed-bin-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection raw data from cache - {formData}");
+
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var currentPageAnswers = new PageAnswers();
 
@@ -199,12 +203,6 @@ namespace form_builder.Helpers.PageHelpers
                 _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection pre-save data - {JsonConvert.SerializeObject(convertedAnswers)}");
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
-
-            if (form.Equals("missed-bin-collection"))
-            {
-                string cachedData = _distributedCache.GetString(guid);
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection data just cached - {cachedData}");
-            }
         }
 
         public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
