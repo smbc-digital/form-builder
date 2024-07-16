@@ -9,18 +9,21 @@ namespace form_builder.Models.Actions
 {
     public class UserEmail : Action
     {
-        private readonly ILogger<UserEmail> _logger;
-        public UserEmail(
-            ILogger<UserEmail> logger
-            )
-        {
-            Type = EActionType.UserEmail;
-            _logger = logger;
-        }
+        public UserEmail() => Type = EActionType.UserEmail;
 
         public override async Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers)
         {
+            var emails = string.Empty;
             try
+            {
+                emails = actionHelper.GetEmailToAddresses(this, formAnswers);
+            }
+            catch (Exception)
+            {
+                // no email address submitted (optional) to the form so form actions cannot complete this action. 
+            }
+
+            if (emails != string.Empty)
             {
                 await emailProvider
                     .SendEmail(
@@ -29,12 +32,6 @@ namespace form_builder.Models.Actions
                             actionHelper.GetEmailContent(this, formAnswers),
                             Properties.From,
                             actionHelper.GetEmailToAddresses(this, formAnswers)));
-
-            }
-            catch (Exception)
-            {
-                //_logger.LogInformation($"{nameof(MappingService)}::{nameof(UserEmail)}: - Failed Email Send action - {JsonConvert.SerializeObject(formAnswers)}");
-                _logger.LogInformation($"UserEmail: - Failed Email Send action ");
             }
         }
     }
