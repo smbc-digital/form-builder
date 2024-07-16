@@ -26,6 +26,7 @@ namespace form_builder.Helpers.PageHelpers
         private readonly IDistributedCacheWrapper _distributedCache;
         private readonly IFileStorageProvider _fileStorageProvider;
         private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
+        private readonly ILogger<PageHelper> _logger;
 
         public PageHelper(IViewRender viewRender, IElementHelper elementHelper,
             IDistributedCacheWrapper distributedCache,
@@ -34,7 +35,8 @@ namespace form_builder.Helpers.PageHelpers
             IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
             ISessionHelper sessionHelper,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
-            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration,
+            ILogger<PageHelper> logger)
         {
             _viewRender = viewRender;
             _elementHelper = elementHelper;
@@ -44,6 +46,7 @@ namespace form_builder.Helpers.PageHelpers
             _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
             _sessionHelper = sessionHelper;
             _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
+            _logger = logger;
         }
 
         public async Task<FormBuilderViewModel> GenerateHtml(
@@ -157,6 +160,10 @@ namespace form_builder.Helpers.PageHelpers
         public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
             var formData = _distributedCache.GetString(guid);
+
+            if (form.Equals("missed-bin-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection raw data from cache - {formData}");
+
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var currentPageAnswers = new PageAnswers();
 
@@ -191,6 +198,9 @@ namespace form_builder.Helpers.PageHelpers
 
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
+
+            if (form.Equals("missed-bin-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection pre-save data - {JsonConvert.SerializeObject(convertedAnswers)}");
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
