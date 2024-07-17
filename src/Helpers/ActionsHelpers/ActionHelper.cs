@@ -76,7 +76,13 @@ namespace form_builder.Helpers.ActionsHelpers
 
             emailList.AddRange(action.Properties.To.Split(",").Where(_ => !TagRegex.IsMatch(_)));
 
-            return emailList.Where(_ => _ is not null).Aggregate((current, email) => current + "," + email);
+            emailList = emailList.Where(_ => _ is not null).ToList();
+
+            if (emailList.Count > 0)
+                return emailList.Aggregate((current, email) => current + "," + email);
+
+            return string.Empty;
+
         }
 
         private string Replace(Match match, string current, FormAnswers formAnswers)

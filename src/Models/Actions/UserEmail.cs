@@ -13,15 +13,7 @@ namespace form_builder.Models.Actions
 
         public override async Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers)
         {
-            var emails = string.Empty;
-            try
-            {
-                emails = actionHelper.GetEmailToAddresses(this, formAnswers);
-            }
-            catch (Exception)
-            {
-                // no email address submitted (optional) to the form so form actions cannot complete this action. 
-            }
+            var emails = actionHelper.GetEmailToAddresses(this, formAnswers);
 
             if (emails != string.Empty)
             {
