@@ -9,6 +9,7 @@ namespace form_builder.Models.Actions
 {
     public class UserEmail : Action
     {
+        
         public UserEmail() => Type = EActionType.UserEmail;
 
         public override async Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers)
