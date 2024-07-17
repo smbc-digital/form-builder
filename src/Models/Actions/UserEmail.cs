@@ -24,7 +24,7 @@ namespace form_builder.Models.Actions
                             Properties.Subject,
                             actionHelper.GetEmailContent(this, formAnswers),
                             Properties.From,
-                            actionHelper.GetEmailToAddresses(this, formAnswers)));
+                            emails));
             }
         }
     }
