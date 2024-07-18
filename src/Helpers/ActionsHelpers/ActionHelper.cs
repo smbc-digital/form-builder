@@ -110,7 +110,7 @@ namespace form_builder.Helpers.ActionsHelpers
             var splitTargets = targetMapping.Split(".");
 
             if (splitTargets.Length.Equals(1))
-                return (dynamic)answer.Response;
+                return (dynamic)answer?.Response;
 
             var subObject = new Answers { Response = (dynamic)answer.Response[splitTargets[1]] };
             return RecursiveGetAnswerValue(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), subObject);
