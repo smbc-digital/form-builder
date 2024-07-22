@@ -10,8 +10,13 @@ namespace form_builder.Helpers.ActionsHelpers
     public class ActionHelper : IActionHelper
     {
         private readonly IEnumerable<IFormatter> _formatters;
+        private readonly ILogger<ActionHelper> _logger;
         private static Regex TagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
-        public ActionHelper(IEnumerable<IFormatter> formatters) => _formatters = formatters;
+        public ActionHelper(IEnumerable<IFormatter> formatters, ILogger<ActionHelper> logger)
+        {
+            _formatters = formatters;
+            _logger = logger;
+        }
 
         public RequestEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
         {
@@ -76,7 +81,15 @@ namespace form_builder.Helpers.ActionsHelpers
 
             emailList.AddRange(action.Properties.To.Split(",").Where(_ => !TagRegex.IsMatch(_)));
 
-            return emailList.Where(_ => _ is not null).Aggregate((current, email) => current + "," + email);
+            emailList = emailList.Where(_ => _ is not null).ToList();
+
+            if (emailList.Count > 0)
+                return emailList.Aggregate((current, email) => current + "," + email);
+
+            _logger.LogInformation($"{formAnswers.FormName}: form action email couldn't find and email in the submitted anwsers");
+
+            return string.Empty;
+
         }
 
         private string Replace(Match match, string current, FormAnswers formAnswers)
@@ -97,7 +110,7 @@ namespace form_builder.Helpers.ActionsHelpers
             var splitTargets = targetMapping.Split(".");
 
             if (splitTargets.Length.Equals(1))
-                return (dynamic)answer.Response;
+                return (dynamic)answer?.Response;
 
             var subObject = new Answers { Response = (dynamic)answer.Response[splitTargets[1]] };
             return RecursiveGetAnswerValue(targetMapping.Replace($"{splitTargets[0]}.", string.Empty), subObject);

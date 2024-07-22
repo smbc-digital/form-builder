@@ -1,4 +1,5 @@
-﻿using form_builder.Builders;
+﻿using Amazon.Runtime.Internal.Util;
+using form_builder.Builders;
 using form_builder.Enum;
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Models;
@@ -9,6 +10,7 @@ using form_builder.TagParsers.Formatters;
 using form_builder_tests.Builders;
 using Moq;
 using Xunit;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder_tests.UnitTests.Helpers
 {
@@ -23,6 +25,7 @@ namespace form_builder_tests.UnitTests.Helpers
 
         private readonly IActionHelper _actionHelper;
         private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
+        private readonly Mock<ILogger<ActionHelper>> _mockLogger = new();
 
         private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
             .WithFormAnswers(new FormAnswers
@@ -82,7 +85,7 @@ namespace form_builder_tests.UnitTests.Helpers
             })
             .Build();
 
-        public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object);
+        public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object, _mockLogger.Object);
 
         [Fact]
         public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()
