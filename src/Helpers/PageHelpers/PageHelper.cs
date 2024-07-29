@@ -164,7 +164,7 @@ namespace form_builder.Helpers.PageHelpers
             Thread.Sleep(2000);
 
             if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data from cache - {formData}");
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache - {formData}");
 
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var currentPageAnswers = new PageAnswers();
