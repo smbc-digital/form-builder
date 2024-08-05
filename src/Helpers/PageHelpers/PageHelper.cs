@@ -202,7 +202,7 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.FormName = form;
 
             if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - pre-save data - {JsonConvert.SerializeObject(convertedAnswers)}");
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - pre-save data - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }
