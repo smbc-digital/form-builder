@@ -33,6 +33,7 @@ namespace form_builder.Controllers
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IStructureMapper _structureMapper;
         private readonly DataStructureConfiguration _dataStructureConfiguration;
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
@@ -44,7 +45,8 @@ namespace form_builder.Controllers
             IEmailWorkflow emailWorkFlow,
             ISuccessWorkflow successWorkflow,
             IStructureMapper structureMapper,
-            IOptions<DataStructureConfiguration> dataStructureConfiguration)
+            IOptions<DataStructureConfiguration> dataStructureConfiguration,
+            ILogger<HomeController> logger)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -55,6 +57,7 @@ namespace form_builder.Controllers
             _actionsWorkflow = actionsWorkflow;
             _successWorkflow = successWorkflow;
             _structureMapper = structureMapper;
+            _logger = logger;
             _dataStructureConfiguration = dataStructureConfiguration.Value;
             _emailWorkFlow = emailWorkFlow;
         }
@@ -141,6 +144,7 @@ namespace form_builder.Controllers
                     return Redirect(behaviour.PageSlug);
 
                 case EBehaviourType.GoToPage:
+                    _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: RedirectToAction path = {behaviour.PageSlug}");
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
