@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -40,6 +41,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new();
         private readonly Mock<IStructureMapper> _mockStructureMapper = new();
         private readonly Mock<IOptions<DataStructureConfiguration>> _mockDataStructureConfiguration = new();
+        private readonly Mock<ILogger<HomeController>> _mockLogger = new();
 
         public HomeControllerTest()
         {
@@ -69,7 +71,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _emailWorkflow.Object,
                 _mockSuccessWorkflow.Object,
                 _mockStructureMapper.Object,
-                _mockDataStructureConfiguration.Object)
+                _mockDataStructureConfiguration.Object,
+                _mockLogger.Object)
             { TempData = tempData };
 
             _homeController.ControllerContext = new ControllerContext();
@@ -788,7 +791,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _emailWorkflow.Object,
                 _mockSuccessWorkflow.Object,
                 _mockStructureMapper.Object,
-                _mockDataStructureConfiguration.Object);
+                _mockDataStructureConfiguration.Object,
+                _mockLogger.Object);
 
             // Act
             var result = await homeController.DataStructure("test-form");
