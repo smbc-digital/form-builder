@@ -19,6 +19,7 @@ using form_builder.Services.FormAvailabilityService;
 using form_builder.Services.OrganisationService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.StreetService;
+using form_builder.Services.DependencyCheckService;
 using form_builder.TagParsers;
 using form_builder.Validators;
 using form_builder.ViewModels;
@@ -51,6 +52,7 @@ namespace form_builder.Services.PageService
         private readonly IFormAvailabilityService _formAvailabilityService;
         private readonly ILogger<IPageService> _logger;
         private readonly IEnumerable<ITagParser> _tagParsers;
+        private readonly IDependencyCheckService _dependencyCheckService;
 
         public PageService(
             IEnumerable<IElementValidator> validators,
@@ -74,7 +76,8 @@ namespace form_builder.Services.PageService
             ILogger<IPageService> logger,
             IEnumerable<IFileStorageProvider> fileStorageProviders,
             IEnumerable<ITagParser> tagParsers,
-            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
+            IOptions<FileStorageProviderConfiguration> fileStorageConfiguration,
+            IDependencyCheckService dependencyCheckService)
         {
             _validators = validators;
             _pageHelper = pageHelper;
@@ -97,6 +100,7 @@ namespace form_builder.Services.PageService
             _addAnotherService = addAnotherService;
             _tagParsers = tagParsers;
             _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
+            _dependencyCheckService = dependencyCheckService;
         }
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
@@ -120,6 +124,16 @@ namespace form_builder.Services.PageService
             var baseForm = await _schemaFactory.Build(form);
             if (baseForm is null)
             {
+                _sessionHelper.Clear();
+                return null;
+            }
+
+            //check dependency for if the form is usable
+            var showForm = await _dependencyCheckService.IsAvailable(baseForm.DependencyCheck);
+
+            if (!showForm)
+            {
+                _logger.LogError($"PageService:ProcessPage:{sessionGuid}: {form} has dependency issues {baseForm.DependencyCheck}");
                 _sessionHelper.Clear();
                 return null;
             }

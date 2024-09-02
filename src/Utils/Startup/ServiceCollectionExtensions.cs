@@ -69,6 +69,7 @@ using form_builder.Services.StreetService;
 using form_builder.Services.SubmitService;
 using form_builder.Services.TemplatedEmailService;
 using form_builder.Services.ValidateService;
+using form_builder.Services.DependencyCheckService;
 using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
 using form_builder.Utils.Hash;
@@ -428,6 +429,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IPreviewService, PreviewService>();
             services.AddSingleton<IAnalyticsService, AnalyticsService>();
             services.AddSingleton<IEmailSubmitService, EmailSubmitService>();
+            services.AddSingleton<IDependencyCheckService, DependencyCheckService>();
 
             return services;
         }
