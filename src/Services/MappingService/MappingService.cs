@@ -93,6 +93,9 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
+            _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}: " +
+                                   $"Cached Form Answers before processing Reduced Answers - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
+
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
             IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);

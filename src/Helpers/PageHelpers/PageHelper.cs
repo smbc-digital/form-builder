@@ -161,8 +161,10 @@ namespace form_builder.Helpers.PageHelpers
         {
             var formData = _distributedCache.GetString(guid);
 
-            if (form.Equals("missed-bin-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection raw data from cache - {formData}");
+            Thread.Sleep(2000);
+
+            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache - {formData}");
 
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var currentPageAnswers = new PageAnswers();
@@ -199,8 +201,8 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            if (form.Equals("missed-bin-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - Missed bin collection pre-save data - {JsonConvert.SerializeObject(convertedAnswers)}");
+            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - pre-save data - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
         }

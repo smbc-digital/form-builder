@@ -674,5 +674,12 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithStreetMissingText(string streetMissingText)
+        {
+            _property.StreetMissingText = streetMissingText;
+
+            return this;
+        }
     }
 }

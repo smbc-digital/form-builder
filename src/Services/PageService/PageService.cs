@@ -114,7 +114,7 @@ namespace form_builder.Services.PageService
                 sessionGuid = Guid.NewGuid().ToString();
                 _sessionHelper.Set(sessionGuid, form);
                 isNewSession = true;
-                _logger.LogInformation($"PageService:ProcessPage: sessionId was empty, new session created {form} ");
+                _logger.LogInformation($"PageService:ProcessPage: sessionId was empty, new session created {form} - {sessionGuid}");
             }
 
             var baseForm = await _schemaFactory.Build(form);

@@ -26,4 +26,19 @@
     <partial name="Error" />
 
     @Html.DropDownList(Model.QuestionId, Model.Items, elementProperties)
+
+    @if (Model.Properties.StreetMissingText is not null)
+    {
+        <details class="govuk-details govuk-!-margin-top-5" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    @StreetConstants.STREET_MANUAL_TEXT
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                @Html.Raw(Model.Properties.StreetMissingText)
+            </div>
+        </details>
+    }
+    
 </div>
