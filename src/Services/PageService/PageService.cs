@@ -129,14 +129,25 @@ namespace form_builder.Services.PageService
             }
 
             //check dependency for if the form is usable
-            var showForm = await _dependencyCheckService.IsAvailable(baseForm.DependencyCheck);
-
-            if (!showForm)
+            try
             {
-                _logger.LogError($"PageService:ProcessPage:{sessionGuid}: {form} has dependency issues {baseForm.DependencyCheck}");
-                _sessionHelper.Clear();
-                return null;
+                if (baseForm.DependencyCheck is not null)
+                {
+                    var showForm = await _dependencyCheckService.IsAvailable(baseForm.DependencyCheck);
+
+                    if (!showForm)
+                    {
+                        _logger.LogError($"PageService:ProcessPage:{sessionGuid}: {form} has dependency issues {baseForm.DependencyCheck}");
+                        _sessionHelper.Clear();
+                        return null;
+                    }
+                }
             }
+            catch (Exception)
+            {
+
+            }
+           
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
