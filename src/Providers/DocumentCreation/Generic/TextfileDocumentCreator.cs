@@ -1,3 +1,4 @@
+using Elasticsearch.Net;
 using form_builder.Enum;
 using form_builder.Helpers.DocumentCreation;
 using PdfSharpCore.Drawing;
@@ -11,12 +12,14 @@ namespace form_builder.Providers.DocumentCreation.Generic
         public EDocumentType DocumentType => EDocumentType.Txt;
         public byte[] CreateDocument(List<string> fileContent)
         {
+            string cleanLine = string.Empty;
             using var stream = new MemoryStream();
             using (var objStreamWriter = new StreamWriter(stream))
             {
                 fileContent.ForEach((line) =>
                         {
-                            objStreamWriter.WriteLine(line);
+                            cleanLine = line.Replace("<br/>", "").Replace("<b>", "").Replace("</b>", ": ");
+                            objStreamWriter.WriteLine(cleanLine);
                         });
                 objStreamWriter.Flush();
                 objStreamWriter.Close();
