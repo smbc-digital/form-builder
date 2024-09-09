@@ -145,9 +145,8 @@ namespace form_builder.Services.PageService
             }
             catch (Exception)
             {
-
+                // do nothing if the dependency check errored. it shouldn't stop the form showing...
             }
-           
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
