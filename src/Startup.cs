@@ -110,7 +110,8 @@ namespace form_builder
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}")
             );
-
+            
+            app.UseSessionLogging();
             app.UseResponseCaching();
             app.Use(async (context, next) =>
             {
