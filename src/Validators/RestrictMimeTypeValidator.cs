@@ -27,6 +27,7 @@ namespace form_builder.Validators
             var allowedFileTypes = element.Properties.AllowedFileTypes ?? SystemConstants.AcceptedMimeTypes;
 
             var fileTypes = documentModel.Select(_ => new MimeTypeFile { FileType = Convert.FromBase64String(_.Content).GetFileType(), File = _ });
+
             var invalidFiles = new List<MimeTypeFile>();
             if (fileTypes is not null)
             {
