@@ -103,6 +103,7 @@ namespace form_builder
             app.UseMiddleware<HeaderConfiguration>()
                 .UseMiddleware<LegacyRedirect>()
                 .UseSession()
+                .UseMiddleware<SessionLoggingMiddleware>()
                 .UseStaticFiles()
                 .UseRouting()
                 .UseEndpoints(endpoints =>
@@ -111,7 +112,6 @@ namespace form_builder
                     pattern: "{controller=Home}/{action=Index}/{id?}")
             );
             
-            app.UseSessionLogging();
             app.UseResponseCaching();
             app.Use(async (context, next) =>
             {
