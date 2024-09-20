@@ -110,7 +110,6 @@ namespace form_builder.Services.PageService
             var session = _sessionHelper.GetSession();
             if(session is null)
             {
-                
                 _logger.LogInformation($"PageService:ProcessPage: Browser session was empty {form} {path} {subPath}");
             }
 
