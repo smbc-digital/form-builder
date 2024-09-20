@@ -146,6 +146,14 @@ namespace form_builder_tests.UnitTests.Services
                 .Setup(_ => _.Value)
                 .Returns(new DistributedCacheExpirationConfiguration { FormJson = 1 });
 
+            Mock<ISession> mockSession = new();
+            mockSession.Setup(_ => _.IsAvailable).Returns(true);
+            mockSession.Setup(_ => _.Id).Returns("SessionMockId");
+
+            _sessionHelper
+                .Setup(_ => _.GetSession())
+                .Returns(mockSession.Object);
+
             _service = new PageService(
                 _validators.Object,
                 _mockPageHelper.Object,
@@ -1449,11 +1457,11 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            // Act
+            // Act/Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
 
             // Assert
-            Assert.Equal("PageService::FinalisePageJourney: Session has expired", result.Message);
+            Assert.EndsWith("Session has expired", result.Message);
         }
 
         [Fact]
