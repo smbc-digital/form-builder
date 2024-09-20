@@ -16,26 +16,19 @@ public class SessionLoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var session = context.Session;
-
-        if (!session.IsAvailable)
+        if (context.Session is not null && !context.Session.IsAvailable)
         {
             _logger.LogInformation("SessionLoggingMiddleware::Session is not available.");
         }
         else
         {
-            if (session.GetString("IsNewSession") == null)
+            if (context.Session.GetString("IsNewSession") == null)
             {
-                _logger.LogInformation($"SessionLoggingMiddleware::A new session has been created:{session.Id} @ {DateTime.Now.ToString("HH:mm")}");
-                session.SetString("IsNewSession", "false");
+                _logger.LogInformation($"SessionLoggingMiddleware::A new session has been created:{context.Session.Id} @ {DateTime.Now.ToString("HH:mm")}");
+                context.Session.SetString("IsNewSession", "false");
             }
         }
 
         await _next(context);
     }
-}
-
-public static class SessionLoggingMiddlewareExtensions
-{
-    public static IApplicationBuilder UseSessionLogging(this IApplicationBuilder builder) => builder.UseMiddleware<SessionLoggingMiddleware>();
 }
