@@ -107,6 +107,12 @@ namespace form_builder.Services.PageService
             if (string.IsNullOrEmpty(path) || (!string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm)))
                 _sessionHelper.Clear();
 
+            var session = _sessionHelper.GetSession();
+            if(session is null)
+            {
+                _logger.LogInformation($"PageService:ProcessPage: Browser session was empty {form} {path} {subPath}");
+            }
+
             // TODO : Session handling might need to move below Form availability
             var sessionGuid = _sessionHelper.GetSessionGuid();
             if (string.IsNullOrEmpty(sessionGuid))
@@ -114,7 +120,7 @@ namespace form_builder.Services.PageService
                 sessionGuid = Guid.NewGuid().ToString();
                 _sessionHelper.Set(sessionGuid, form);
                 isNewSession = true;
-                _logger.LogInformation($"PageService:ProcessPage: sessionId was empty, new session created {form} - {sessionGuid}");
+                _logger.LogInformation($"PageService:ProcessPage: SessionId was empty, new session created {form} {path} {subPath} - {session.Id} - {sessionGuid}");
             }
 
             var baseForm = await _schemaFactory.Build(form);
@@ -126,14 +132,14 @@ namespace form_builder.Services.PageService
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
-                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: {form} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
+                _logger.LogWarning($"PageService:ProcessPage:{session.Id} - {sessionGuid}: {form} {path} {subPath} is not available in environment: {_environment.EnvironmentName.ToS3EnvPrefix()}");
                 _sessionHelper.Clear();
                 return null;
             }
 
             if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
             {
-                _logger.LogWarning($"PageService:ProcessPage:{sessionGuid}: access to {form} is not approved");
+                _logger.LogWarning($"PageService:ProcessPage:{session.Id} - {sessionGuid}: Access to {form} {path} {subPath} is not approved");
                 _sessionHelper.Clear();
                 return null;
             }
@@ -151,14 +157,14 @@ namespace form_builder.Services.PageService
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
                 if (!form.Equals(convertedFormData.FormName, StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.LogInformation($"PageService:ProcessPage:{sessionGuid}: Disposing session form names do not match {form} {convertedFormData.FormName}");
+                    _logger.LogInformation($"PageService:ProcessPage:{session.Id} - {sessionGuid}: Disposing session form names do not match {form} {convertedFormData.FormName}");
                     _distributedCache.Remove(sessionGuid);
                 }
             }
 
             var page = baseForm.GetPage(_pageHelper, path);
             if (page is null)
-                throw new ApplicationException($"PageService:ProcessPage:{sessionGuid} Requested path '{path}' object could not be found for in '{form}'");
+                throw new ApplicationException($"PageService:ProcessPage:{session.Id} - {sessionGuid} Requested path '{path}' object could not be found for in '{form}'");
 
             List<object> searchResults = null;
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -321,13 +327,19 @@ namespace form_builder.Services.PageService
         {
             var sessionGuid = _sessionHelper.GetSessionGuid();
 
+            var session = _sessionHelper.GetSession();
+            if(session is null)
+            {
+                _logger.LogInformation($"PageService:FinalisePageJourney: Browser session was empty {form}");
+            }
+
             if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException("PageService::FinalisePageJourney: Session has expired");
+                throw new ApplicationException($"PageService::FinalisePageJourney:{session.Id} - {sessionGuid} Session has expired");
 
             var formData = _distributedCache.GetString(sessionGuid);
 
             if (formData is null)
-                throw new ApplicationException($"PageService::FinalisePageJourney:{sessionGuid} Session data is null");
+                throw new ApplicationException($"PageService::FinalisePageJourney:{session.Id} - {sessionGuid} Session data is null");
 
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 

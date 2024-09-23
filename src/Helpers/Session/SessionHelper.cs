@@ -6,6 +6,8 @@
 
         public SessionHelper(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
+        public ISession GetSession() => _httpContextAccessor.HttpContext.Session;
+
         public string GetSessionGuid() => _httpContextAccessor.HttpContext.Session.GetString("sessionGuid");
 
         public void SetSessionGuid(string value) => _httpContextAccessor.HttpContext.Session.SetString("sessionGuid", value);
@@ -16,12 +18,13 @@
 
         public string GetSessionForm() =>  _httpContextAccessor.HttpContext.Session.GetString("sessionForm");
 
-        public void RemoveSessionForm() => _httpContextAccessor.HttpContext.Session.Remove("sessionForm");
+        public void RemoveSessionForm() => _httpContextAccessor.HttpContext.Session.Remove("sessionForm");        
 
         public void Clear()
         {
             RemoveSessionForm();
             RemoveSessionGuid();
+            _httpContextAccessor.HttpContext.Session.Clear();
         }
 
         public void Set(string guid, string form)
