@@ -20,7 +20,7 @@ namespace form_builder.Validators
             {
                 var validationMessage = element.Properties.Decimal || element.Properties.Numeric
                     ? $"{element.Properties.Label} must be {element.Properties.MaxLength} digits or less"
-                     : $"{element.Properties.Label} has a maximum length of {element.Properties.MaxLength}";
+                     : $"Shorten the text so it's no longer than {element.Properties.MaxLength} characters";
 
                 return new ValidationResult
                 {
