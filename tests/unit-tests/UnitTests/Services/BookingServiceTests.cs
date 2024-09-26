@@ -217,7 +217,17 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new AvailabilityDayResponse { Date = date });
 
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+                .ReturnsAsync(new List<AvailabilityDayResponse> 
+                { 
+                    new()
+                    {
+                        Date = date,
+                        AppointmentTimes = new List<AppointmentTime>
+                        {
+                            new()
+                        }
+                    }
+                });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
@@ -296,10 +306,20 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new AvailabilityDayResponse { Date = date });
 
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+                .ReturnsAsync(new List<AvailabilityDayResponse>
+                {
+                    new()
+                    {
+                        Date = date,
+                        AppointmentTimes = new List<AppointmentTime>
+                        {
+                            new()
+                        }
+                    }
+                });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+                .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             var appointmentType = new AppointmentTypeBuilder()
                 .WithAppointmentId(guid)
@@ -417,13 +437,27 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new AvailabilityDayResponse());
 
             _bookingProvider.Setup(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()))
-                .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
+                .ReturnsAsync(new List<AvailabilityDayResponse>
+                {
+                    new()
+                    {
+                        Date = DateTime.Today.AddDays(2),
+                        AppointmentTimes = new List<AppointmentTime>
+                        {
+                            new()
+                            {
+                                StartTime = startTime,
+                                EndTime = endTime
+                            }
+                        }
+                    }
+                });
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+                .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
             _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion--{guid}"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
+                .Returns(JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Booking)
