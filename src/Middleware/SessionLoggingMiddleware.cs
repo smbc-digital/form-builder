@@ -16,19 +16,26 @@ public class SessionLoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (context.Session is not null && !context.Session.IsAvailable)
-        {
-            _logger.LogInformation("SessionLoggingMiddleware::Session is not available.");
-        }
-        else
-        {
-            if (context.Session.GetString("IsNewSession") == null)
+        if (!context.Request.Path.StartsWithSegments("/assets"))
+        {      
+            if (context.Session is not null && !context.Session.IsAvailable)
             {
-                _logger.LogInformation($"SessionLoggingMiddleware::A new session has been created:{context.Session.Id} @ {DateTime.Now.ToString("HH:mm")}");
-                context.Session.SetString("IsNewSession", "false");
+                _logger.LogInformation("SessionLoggingMiddleware::Session is not available.");
+            }
+            else
+            {
+                var existingSessionGuid = context.Session.GetString("sessionGuid"); 
+                var existingSessionForm = context.Session.GetString("sessionForm"); 
+
+                if (existingSessionGuid is null)
+                {                
+                    _logger.LogWarning($"SessionLoggingMiddleware:Existing Form session was null, Browser Session: {context.Session.Id}");
+                }
+                else {
+                    _logger.LogInformation($"SessionLoggingMiddleware:Existing Form session found for {existingSessionForm}, Browser Session:{context.Session.Id}, Form Session:{existingSessionGuid}");
+                }
             }
         }
-
         await _next(context);
     }
 }
