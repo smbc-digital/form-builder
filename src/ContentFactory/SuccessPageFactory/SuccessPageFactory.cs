@@ -91,7 +91,8 @@ namespace form_builder.ContentFactory.SuccessPageFactory
                 LeadingParagraph = page.LeadingParagraph,
                 DisplayBreadcrumbs = page.DisplayBreadCrumbs,
                 Breadcrumbs = baseForm.BreadCrumbs,
-                IsInPreviewMode = result.IsInPreviewMode
+                IsInPreviewMode = result.IsInPreviewMode,
+                HideReference = page.HideReference
             };
         }
 

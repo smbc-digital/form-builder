@@ -238,7 +238,8 @@ namespace form_builder.Controllers
                 LeadingParagraph = result.LeadingParagraph,
                 DisplayBreadcrumbs = result.DisplayBreadcrumbs,
                 Breadcrumbs = result.Breadcrumbs,
-                IsInPreviewMode = result.IsInPreviewMode
+                IsInPreviewMode = result.IsInPreviewMode,
+                HideReference = result.HideReference
             };
 
             return View(result.ViewName, success);

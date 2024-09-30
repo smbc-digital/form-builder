@@ -41,6 +41,7 @@ namespace form_builder.Models
 
         public string LeadingParagraph { get; set; }
 
+        public bool HideReference { get; set; }
         [JsonIgnore] public bool IsValid => !InvalidElements.Any();
 
         public bool HasIncomingValues => IncomingValues.Any();

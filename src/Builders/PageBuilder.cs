@@ -11,6 +11,7 @@ namespace form_builder.Builders
         private bool _hideBackButton = false;
         private string _pageSlug = "test-url";
         private string _leadingParagraph = "Leading paragraph";
+         private bool _hideReference = false;
         private bool _isValidated = false;
         private List<IElement> _elements = new List<IElement>();
         private List<Behaviour> _behaviours = new List<Behaviour>();
@@ -32,7 +33,8 @@ namespace form_builder.Builders
                 Elements = _elements,
                 IncomingValues = _incomingValues,
                 PageActions = _pageActions,
-                RenderConditions = _renderConditions
+                RenderConditions = _renderConditions,
+                HideReference = _hideReference
             };
         }
 
