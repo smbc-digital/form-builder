@@ -16,7 +16,7 @@ public class SessionLoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!context.Request.Path.StartsWithSegments("/assets"))
+        if (!context.Request.Path.StartsWithSegments("/assets") && !context.Request.Path.StartsWithSegments("/_healthcheck"))
         {      
             if (context.Session is not null && !context.Session.IsAvailable)
             {
