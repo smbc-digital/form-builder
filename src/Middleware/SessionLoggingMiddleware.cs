@@ -29,7 +29,7 @@ public class SessionLoggingMiddleware
 
                 if (existingSessionGuid is null)
                 {                
-                    _logger.LogWarning($"SessionLoggingMiddleware:Existing Form session was null, Browser Session: {context.Session.Id}");
+                    _logger.LogInformation($"SessionLoggingMiddleware:Existing Form session was null, Browser Session: {context.Session.Id}");
                 }
                 else {
                     _logger.LogInformation($"SessionLoggingMiddleware:Existing Form session found for {existingSessionForm}, Browser Session:{context.Session.Id}, Form Session:{existingSessionGuid}");
