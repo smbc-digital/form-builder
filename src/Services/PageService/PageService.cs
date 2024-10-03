@@ -103,6 +103,7 @@ namespace form_builder.Services.PageService
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
         {
             var session = _sessionHelper.GetSession();
+
             _logger.LogInformation($"PageService:ProcessPage: Start processing page \"{form}/{path}/{subPath}\", Browser Session:{session.Id} Form Session: {sessionGuid}");
             
             var isNewSession = false;
