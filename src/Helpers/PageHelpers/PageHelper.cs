@@ -163,8 +163,7 @@ namespace form_builder.Helpers.PageHelpers
 
             Thread.Sleep(2000);
 
-            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache - {formData}");
+            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache");
 
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var currentPageAnswers = new PageAnswers();
@@ -201,10 +200,9 @@ namespace form_builder.Helpers.PageHelpers
             convertedAnswers.Path = viewModel["Path"];
             convertedAnswers.FormName = form;
 
-            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - pre-save data - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
-
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+
+            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - answers saved");
         }
 
         public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")

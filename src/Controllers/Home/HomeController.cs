@@ -83,6 +83,7 @@ namespace form_builder.Controllers
         {
             var queryParamters = Request.Query;
             var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
+            _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: GET path = {path}");
 
             if (response is null)
                 return RedirectToAction("NotFound", "Error");
@@ -95,6 +96,7 @@ namespace form_builder.Controllers
                     .WithQueryValues(queryParamters)
                     .Build();
 
+                _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: GET redirecting to path = {response.TargetPage}");
                 return RedirectToAction("Index", routeValuesDictionary);
             }
 
@@ -144,7 +146,7 @@ namespace form_builder.Controllers
                     return Redirect(behaviour.PageSlug);
 
                 case EBehaviourType.GoToPage:
-                    _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: RedirectToAction path = {behaviour.PageSlug}");
+                    _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: POST RedirectToAction path = {behaviour.PageSlug}");
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
