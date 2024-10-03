@@ -121,7 +121,7 @@ namespace form_builder.Services.BookingService
             BookingInformation bookingInformation = new()
             {
                 AppointmentTypeId = appointmentType.AppointmentId,
-                Appointments = appointmentTimes,
+                Appointments = appointmentTimes.Where(appointment => appointment.HasAvailableAppointment).ToList(),
                 CurrentSearchedMonth = new DateTime(nextAvailability.DayResponse.Date.Year, nextAvailability.DayResponse.Date.Month, 1),
                 FirstAvailableMonth = new DateTime(nextAvailability.DayResponse.Date.Year, nextAvailability.DayResponse.Date.Month, 1),
                 IsFullDayAppointment = nextAvailability.DayResponse.IsFullDayAppointment
@@ -226,7 +226,7 @@ namespace form_builder.Services.BookingService
             BookingInformation bookingInformation = new()
             {
                 AppointmentTypeId = appointmentType.AppointmentId,
-                Appointments = appointmentTimes,
+                Appointments = appointmentTimes.Where(appointment => appointment.HasAvailableAppointment).ToList(),
                 CurrentSearchedMonth = requestedMonth,
                 FirstAvailableMonth = cachedBookingInformation.FirstAvailableMonth,
                 IsFullDayAppointment = cachedBookingInformation.IsFullDayAppointment,

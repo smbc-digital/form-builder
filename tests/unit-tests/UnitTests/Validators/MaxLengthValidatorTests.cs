@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             var result = _validator.Validate(element, viewModel, new form_builder.Models.FormSchema());
             Assert.False(result.IsValid);
-            Assert.Equal("Label has a maximum length of 20", result.Message);
+            Assert.Equal("Shorten the text so it's no longer than 20 characters", result.Message);
         }
 
         [Fact]
