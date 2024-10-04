@@ -89,7 +89,7 @@ namespace form_builder.Controllers
 
             var queryParameters = Request.Query;
 
-            _logger.LogInformation($"HomeController:Index:Get: Processing request - {form}/{path}/{subPath}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
+            _logger.LogInformation($"HomeController:Index:Get: Processing page - {form}/{path}/{subPath}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
             var response = await _pageService.ProcessPage(form, path, subPath, queryParameters);
 
             if (response is null)
@@ -106,6 +106,7 @@ namespace form_builder.Controllers
                     .WithQueryValues(queryParameters)
                     .Build();
 
+                _logger.LogInformation($"HomeController:Index:Get: Redirecting to page - {form}/{response.TargetPage}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
                 return RedirectToAction("Index", routeValuesDictionary);
             }
 
