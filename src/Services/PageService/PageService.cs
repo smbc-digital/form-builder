@@ -103,8 +103,9 @@ namespace form_builder.Services.PageService
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
         {
             var session = _sessionHelper.GetSession();
+
             _logger.LogInformation($"PageService:ProcessPage: Start processing page \"{form}/{path}/{subPath}\", Browser Session:{session.Id}");
-            
+
             var isNewSession = false;
             var currentForm = _sessionHelper.GetSessionForm(); 
                                 
@@ -116,6 +117,7 @@ namespace form_builder.Services.PageService
             if (string.IsNullOrEmpty(path) || (!string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm)))
             {
                 _logger.LogInformation($"PageService:ProcessPage: Form path is empty or current and requested form do not match, clearing form session {form}, Browser Session:{session.Id}");
+
                 _sessionHelper.Clear();
             }
             
