@@ -161,9 +161,10 @@ namespace form_builder.Helpers.PageHelpers
         {
             var formData = _distributedCache.GetString(guid);
 
-            Thread.Sleep(2000);
-
-            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache");
+            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache - {formData}");
+            else
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache");
 
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
             var currentPageAnswers = new PageAnswers();
@@ -202,7 +203,10 @@ namespace form_builder.Helpers.PageHelpers
 
             _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
 
-            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - answers saved");
+            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - answers saved - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
+            else
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - answers saved");
         }
 
         public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
