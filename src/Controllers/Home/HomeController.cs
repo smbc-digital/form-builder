@@ -4,6 +4,7 @@ using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Extensions;
+using form_builder.Helpers.Session;
 using form_builder.Mappers.Structure;
 using form_builder.Models;
 using form_builder.Services.FileUploadService;
@@ -34,6 +35,7 @@ namespace form_builder.Controllers
         private readonly IStructureMapper _structureMapper;
         private readonly DataStructureConfiguration _dataStructureConfiguration;
         private readonly ILogger<HomeController> _logger;
+        private readonly ISessionHelper _sessionHelper;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
@@ -46,7 +48,7 @@ namespace form_builder.Controllers
             ISuccessWorkflow successWorkflow,
             IStructureMapper structureMapper,
             IOptions<DataStructureConfiguration> dataStructureConfiguration,
-            ILogger<HomeController> logger)
+            ILogger<HomeController> logger, ISessionHelper sessionHelper)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -60,6 +62,7 @@ namespace form_builder.Controllers
             _logger = logger;
             _dataStructureConfiguration = dataStructureConfiguration.Value;
             _emailWorkFlow = emailWorkFlow;
+            _sessionHelper = sessionHelper;
         }
 
         [HttpGet]
@@ -81,18 +84,26 @@ namespace form_builder.Controllers
             string path,
             string subPath = "")
         {
-            var queryParamters = Request.Query;
-            var response = await _pageService.ProcessPage(form, path, subPath, queryParamters);
+            var session = _sessionHelper.GetSession();
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            var queryParameters = Request.Query;
+
+            _logger.LogInformation($"HomeController:Index:Get: Processing request - {form}/{path}/{subPath}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
+            var response = await _pageService.ProcessPage(form, path, subPath, queryParameters);
 
             if (response is null)
+            {
+                _logger.LogInformation($"HomeController:Index:Get: Form or path not found - {form}/{path}/{subPath}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
                 return RedirectToAction("NotFound", "Error");
+            }
 
             if (response.ShouldRedirect)
             {
                 var routeValuesDictionary = new RouteValueDictionaryBuilder()
                     .WithValue("path", response.TargetPage)
                     .WithValue("form", form)
-                    .WithQueryValues(queryParamters)
+                    .WithQueryValues(queryParameters)
                     .Build();
 
                 return RedirectToAction("Index", routeValuesDictionary);
@@ -112,7 +123,12 @@ namespace form_builder.Controllers
             Dictionary<string, string[]> formData,
             IEnumerable<CustomFormFile> fileUpload,
             string subPath = "")
-        {
+        {   
+            var session = _sessionHelper.GetSession();
+            var sessionGuid = _sessionHelper.GetSessionGuid();
+
+            _logger.LogInformation($"HomeController:Index:Post: Processing request - {form}/{path}/{subPath}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
+
             var viewModel = formData.ToNormaliseDictionary(subPath);
 
             if (fileUpload is not null && fileUpload.Any())

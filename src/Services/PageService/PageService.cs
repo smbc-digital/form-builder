@@ -120,7 +120,7 @@ namespace form_builder.Services.PageService
             }
             
             var sessionGuid = _sessionHelper.GetSessionGuid();
-
+    
             if (string.IsNullOrEmpty(sessionGuid))
             {
                 sessionGuid = Guid.NewGuid().ToString();
