@@ -107,6 +107,7 @@ namespace form_builder.Controllers
                     .Build();
 
                 _logger.LogInformation($"HomeController:Index:Get: Redirecting to page - {form}/{response.TargetPage}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
+
                 return RedirectToAction("Index", routeValuesDictionary);
             }
 
@@ -161,7 +162,7 @@ namespace form_builder.Controllers
                     return Redirect(behaviour.PageSlug);
 
                 case EBehaviourType.GoToPage:
-                    _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: RedirectToAction path = {behaviour.PageSlug}");
+                    _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: POST RedirectToAction path = {behaviour.PageSlug}");
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
