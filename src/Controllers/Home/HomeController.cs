@@ -162,7 +162,7 @@ namespace form_builder.Controllers
                     return Redirect(behaviour.PageSlug);
 
                 case EBehaviourType.GoToPage:
-                    _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: POST RedirectToAction path = {behaviour.PageSlug}");
+                    _logger.LogInformation($"{nameof(HomeController)}::{nameof(Index)}: POST RedirectToAction path = {behaviour.PageSlug}, , Browser Session:{session.Id}, Form Session: {sessionGuid}");
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug
@@ -195,7 +195,7 @@ namespace form_builder.Controllers
                     });
 
                 default:
-                    throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid");
+                    throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid, Browser Session:{session.Id}, Form Session: {sessionGuid}");
             }
         }
 
