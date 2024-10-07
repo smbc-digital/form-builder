@@ -18,6 +18,7 @@ using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace form_builder.Controllers
 {
@@ -89,12 +90,12 @@ namespace form_builder.Controllers
 
             var queryParameters = Request.Query;
 
-            _logger.LogInformation($"HomeController:Index:Get: Processing page - {form}/{path}/{subPath}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
+            _logger.LogInformation($"HomeController:Index:Get: Processing page - {form}/{path}/{subPath}, {JsonConvert.SerializeObject(queryParameters)}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
             var response = await _pageService.ProcessPage(form, path, subPath, queryParameters);
 
             if (response is null)
             {
-                _logger.LogInformation($"HomeController:Index:Get: Form or path not found - {form}/{path}/{subPath}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
+                _logger.LogInformation($"HomeController:Index:Get: Form or path not found - {form}/{path}/{subPath}, {JsonConvert.SerializeObject(queryParameters)}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
                 return RedirectToAction("NotFound", "Error");
             }
 
@@ -106,7 +107,7 @@ namespace form_builder.Controllers
                     .WithQueryValues(queryParameters)
                     .Build();
 
-                _logger.LogInformation($"HomeController:Index:Get: Redirecting to page - {form}/{response.TargetPage}, {queryParameters}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
+                _logger.LogInformation($"HomeController:Index:Get: Redirecting to page - {form}/{response.TargetPage}, {JsonConvert.SerializeObject(queryParameters)}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
 
                 return RedirectToAction("Index", routeValuesDictionary);
             }
