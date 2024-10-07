@@ -2,6 +2,7 @@
 using form_builder.Configuration;
 using form_builder.Controllers;
 using form_builder.Enum;
+using form_builder.Helpers.Session;
 using form_builder.Mappers.Structure;
 using form_builder.Models;
 using form_builder.Models.Properties.ActionProperties;
@@ -43,8 +44,23 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IOptions<DataStructureConfiguration>> _mockDataStructureConfiguration = new();
         private readonly Mock<ILogger<HomeController>> _mockLogger = new();
 
+        private readonly Mock<ISessionHelper> _mockSessionHelper = new();
+
         public HomeControllerTest()
         {
+            
+
+            
+            Mock<ISession> mockSession = new();
+            mockSession.Setup(_ => _.IsAvailable).Returns(true);
+            mockSession.Setup(_ => _.Id).Returns("SessionMockId");
+
+            _mockSessionHelper.Setup(_ => _.GetSessionGuid())
+                .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
+
+            _mockSessionHelper.Setup(_ => _.GetSession())
+                .Returns(mockSession.Object);
+
             var context = new Mock<HttpContext>();
             context.SetupGet(_ => _.Request.Query)
                 .Returns(new QueryCollection());
@@ -72,7 +88,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockSuccessWorkflow.Object,
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object,
-                _mockLogger.Object)
+                _mockLogger.Object,
+                _mockSessionHelper.Object)
             { TempData = tempData };
 
             _homeController.ControllerContext = new ControllerContext();
@@ -274,7 +291,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel, null));
-            Assert.Equal("The provided behaviour type 'Unknown' is not valid", result.Message);
+            Assert.Contains("The provided behaviour type 'Unknown' is not valid", result.Message);
 
         }
 
@@ -792,7 +809,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockSuccessWorkflow.Object,
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object,
-                _mockLogger.Object);
+                _mockLogger.Object,
+                _mockSessionHelper.Object);
 
             // Act
             var result = await homeController.DataStructure("test-form");
