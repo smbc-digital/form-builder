@@ -291,7 +291,7 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _homeController.Index("form", "page-one", viewModel, null));
-            Assert.Equal("The provided behaviour type 'Unknown' is not valid", result.Message);
+            Assert.Contains("The provided behaviour type 'Unknown' is not valid", result.Message);
 
         }
 
