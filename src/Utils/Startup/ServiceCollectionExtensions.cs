@@ -263,6 +263,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
             services.AddSingleton<IAddressProvider, SHGAddressProvider>();
+            services.AddSingleton<IAddressProvider, OSPlacesAddressProvider>();
 
             return services;
         }
@@ -520,6 +521,7 @@ namespace form_builder.Utils.Startup
             services.Configure<StylesheetConfiguration>(stylesheetConfig => stylesheetConfig.Stylesheet = configuration.GetValue<string>(StylesheetConfiguration.ConfigValue));
             services.Configure<JavascriptConfiguration>(javascriptConfig => javascriptConfig.Javascript = configuration.GetValue<string>(JavascriptConfiguration.ConfigValue));
             services.Configure<SHGAddressProviderConfiguration>(configuration.GetSection(SHGAddressProviderConfiguration.ConfigValue));
+            services.Configure<OSPlacesAddressProviderConfiguration>(configuration.GetSection(OSPlacesAddressProviderConfiguration.ConfigValue));
             services.Configure<PowerAutomateConfiguration>(configuration.GetSection(PowerAutomateConfiguration.ConfigValue));
             return services;
         }
