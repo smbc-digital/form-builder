@@ -31,9 +31,6 @@ namespace form_builder.Providers.Address
             var result = await response.Content.ReadAsStringAsync();
             var addresses = JsonConvert.DeserializeObject<OSProperty>(result);
 
-            
-
-
             try
             {
                 return addresses.results.Select(address => new AddressSearchResult
@@ -43,7 +40,10 @@ namespace form_builder.Providers.Address
                     AddressLine3 = address.LPI.TOWN_NAME,
                     Postcode = address.LPI.POSTCODE_LOCATOR,
                     UniqueId = address.LPI.UPRN
-                });
+                }).OrderBy(_ => _.UniqueId);
+
+
+
             }
             catch (Exception)
             {
