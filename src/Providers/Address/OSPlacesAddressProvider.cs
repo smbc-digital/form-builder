@@ -1,12 +1,8 @@
 ﻿using form_builder.Models;
 using Microsoft.Extensions.Options;
-using MimeKit;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.Models.Addresses;
-using StockportGovUK.NetStandard.Gateways.VerintService;
-using ThirdParty.Json.LitJson;
 
 namespace form_builder.Providers.Address
 {
@@ -21,7 +17,6 @@ namespace form_builder.Providers.Address
         public OSPlacesAddressProvider(IGateway gateway, IOptions<OSPlacesAddressProviderConfiguration> oSPlacesAddressProviderConfiguration)
         {
             _gateway = gateway;
-            //_gateway.ChangeAuthenticationHeader(oSPlacesAddressProviderConfig.Value.Key);
             _oSPlacesAddressProviderConfiguration = oSPlacesAddressProviderConfiguration.Value;
         }
 
@@ -45,10 +40,8 @@ namespace form_builder.Providers.Address
             }
             catch (Exception)
             {
-                  return new List<AddressSearchResult>();
+                return new List<AddressSearchResult>();
             }
-
-
         }
     }
 }
