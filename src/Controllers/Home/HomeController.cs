@@ -7,6 +7,7 @@ using form_builder.Extensions;
 using form_builder.Helpers.Session;
 using form_builder.Mappers.Structure;
 using form_builder.Models;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.ViewModels;
@@ -37,6 +38,7 @@ namespace form_builder.Controllers
         private readonly DataStructureConfiguration _dataStructureConfiguration;
         private readonly ILogger<HomeController> _logger;
         private readonly ISessionHelper _sessionHelper;
+        private readonly IDistributedCacheWrapper _distributedCache;
 
         public HomeController(IPageService pageService,
             ISubmitWorkflow submitWorkflow,
@@ -49,7 +51,9 @@ namespace form_builder.Controllers
             ISuccessWorkflow successWorkflow,
             IStructureMapper structureMapper,
             IOptions<DataStructureConfiguration> dataStructureConfiguration,
-            ILogger<HomeController> logger, ISessionHelper sessionHelper)
+            ILogger<HomeController> logger,
+            ISessionHelper sessionHelper,
+            IDistributedCacheWrapper distributedCache)
         {
             _pageService = pageService;
             _submitWorkflow = submitWorkflow;
@@ -64,6 +68,7 @@ namespace form_builder.Controllers
             _dataStructureConfiguration = dataStructureConfiguration.Value;
             _emailWorkFlow = emailWorkFlow;
             _sessionHelper = sessionHelper;
+            _distributedCache = distributedCache;
         }
 
         [HttpGet]
@@ -112,6 +117,10 @@ namespace form_builder.Controllers
                 return RedirectToAction("Index", routeValuesDictionary);
             }
 
+            if (subPath is "clearData")
+            {
+                _distributedCache.Remove(sessionGuid);
+            }
             return View(response.ViewName, response.ViewModel);
         }
 
@@ -196,10 +205,22 @@ namespace form_builder.Controllers
                     });
 
                 case EBehaviourType.GoToEndpoint:
-                    return RedirectToAction("GoToEndpoint", new
+                    //return RedirectToAction("GoToEndpoint", new
+                    //{
+                    //    form
+                    //});
+                    //return RedirectToAction("Index", new
+                    //{
+                    //    path = behaviour.PageSlug
+                    //});
+                    //_redirectWorkflow.GoToEndpoint(form, path);
+                    return RedirectToAction("Index", new
                     {
-                        form
+                        path = behaviour.PageSlug,
+                        subPath = "clearData"
                     });
+                    
+                //return Redirect(behaviour.PageSlug);
 
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid, Browser Session:{session.Id}, Form Session: {sessionGuid}");
