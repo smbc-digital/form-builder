@@ -117,10 +117,11 @@ namespace form_builder.Controllers
                 return RedirectToAction("Index", routeValuesDictionary);
             }
 
-            if (subPath is "clearData")
+            if (queryParameters.TryGetValue("clearCache", out var clearCacheValue) && string.Equals(clearCacheValue, "True"))
             {
                 _distributedCache.Remove(sessionGuid);
             }
+
             return View(response.ViewName, response.ViewModel);
         }
 
@@ -205,22 +206,11 @@ namespace form_builder.Controllers
                     });
 
                 case EBehaviourType.GoToEndpoint:
-                    //return RedirectToAction("GoToEndpoint", new
-                    //{
-                    //    form
-                    //});
-                    //return RedirectToAction("Index", new
-                    //{
-                    //    path = behaviour.PageSlug
-                    //});
-                    //_redirectWorkflow.GoToEndpoint(form, path);
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug,
-                        subPath = "clearData"
+                        clearCache = true
                     });
-                    
-                //return Redirect(behaviour.PageSlug);
 
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid, Browser Session:{session.Id}, Form Session: {sessionGuid}");
