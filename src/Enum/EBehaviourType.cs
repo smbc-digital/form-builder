@@ -9,6 +9,7 @@
         SubmitAndPay,
         SubmitAndRedirect,
         SubmitAndEmail,
-        SubmitWithoutSubmission
+        SubmitWithoutSubmission,
+        GoToEndpoint
     }
 }

@@ -195,6 +195,12 @@ namespace form_builder.Controllers
                         form
                     });
 
+                case EBehaviourType.GoToEndpoint:
+                    return RedirectToAction("GoToEndpoint", new
+                    {
+                        form
+                    });
+
                 default:
                     throw new ApplicationException($"The provided behaviour type '{behaviour.BehaviourType}' is not valid, Browser Session:{session.Id}, Form Session: {sessionGuid}");
             }
