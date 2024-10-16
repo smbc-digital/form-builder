@@ -119,6 +119,7 @@ namespace form_builder.Controllers
 
             if (queryParameters.TryGetValue("clearCache", out var clearCacheValue) && string.Equals(clearCacheValue, "True"))
             {
+                _sessionHelper.Clear();
                 _distributedCache.Remove(sessionGuid);
             }
 

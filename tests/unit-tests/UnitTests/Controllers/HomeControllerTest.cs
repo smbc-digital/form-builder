@@ -6,6 +6,7 @@ using form_builder.Helpers.Session;
 using form_builder.Mappers.Structure;
 using form_builder.Models;
 using form_builder.Models.Properties.ActionProperties;
+using form_builder.Providers.StorageProvider;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
 using form_builder.Services.PageService.Entities;
@@ -20,6 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -43,14 +45,12 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IStructureMapper> _mockStructureMapper = new();
         private readonly Mock<IOptions<DataStructureConfiguration>> _mockDataStructureConfiguration = new();
         private readonly Mock<ILogger<HomeController>> _mockLogger = new();
+        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
 
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
 
         public HomeControllerTest()
-        {
-            
-
-            
+        {   
             Mock<ISession> mockSession = new();
             mockSession.Setup(_ => _.IsAvailable).Returns(true);
             mockSession.Setup(_ => _.Id).Returns("SessionMockId");
@@ -89,7 +89,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object,
                 _mockLogger.Object,
-                _mockSessionHelper.Object)
+                _mockSessionHelper.Object,
+                _mockDistributedCache.Object)
             { TempData = tempData };
 
             _homeController.ControllerContext = new ControllerContext();
@@ -190,6 +191,44 @@ namespace form_builder_tests.UnitTests.Controllers
             Assert.True(viewResult.RouteValues.ContainsKey("path"));
             Assert.True(viewResult.RouteValues.Values.Contains("page-two"));
             Assert.Equal("Index", viewResult.ActionName);
+        }
+
+        [Fact]
+        public async Task Index_ShouldRunBehaviourForRedirect_GoToEndpoint()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+              .WithType(EElementType.H1)
+              .WithQuestionId("test-id")
+              .WithPropertyText("test-text")
+              .Build();
+
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToEndpoint)
+                .WithPageSlug("page-one")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithPageSlug("page-one")
+                .WithValidatedModel(true)
+                .WithBehaviour(behaviour)
+                .Build();
+
+            _pageService.Setup(_ => _.ProcessRequest(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>()))
+                .ReturnsAsync(new ProcessRequestEntity { Page = page });
+            _pageService.Setup(_ => _.GetBehaviour(It.IsAny<ProcessRequestEntity>())).ReturnsAsync(new Behaviour { BehaviourType = EBehaviourType.GoToExternalPage, PageSlug = "page-two" });
+
+            var viewModel = new Dictionary<string, string[]>();
+
+            // Act
+            var result = await _homeController.Index("form", "page-one", viewModel, null);
+
+            // Assert
+            var viewResult = Assert.IsType<RedirectResult>(result);
+            Assert.Equal("page-two", viewResult.Url);
+
+            _mockDistributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -810,7 +849,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object,
                 _mockLogger.Object,
-                _mockSessionHelper.Object);
+                _mockSessionHelper.Object,
+                _mockDistributedCache.Object);
 
             // Act
             var result = await homeController.DataStructure("test-form");
