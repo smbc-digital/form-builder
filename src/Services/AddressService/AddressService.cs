@@ -198,6 +198,11 @@ namespace form_builder.Services.AddressService
             {
                 try
                 {
+                    bool fullUKPostcode = addressElement.Properties.FullUKPostcode;
+                    if (fullUKPostcode)
+                    {
+                        postcode = postcode + ":full";
+                    }
                     addressResults = (await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode)).ToList<object>();
                 }
                 catch (Exception e)

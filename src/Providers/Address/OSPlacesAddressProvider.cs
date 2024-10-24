@@ -22,7 +22,29 @@ namespace form_builder.Providers.Address
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
         {
-            var response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?query={streetOrPostcode}&fq=local_custodian_code:{_oSPlacesAddressProviderConfiguration.LocalCustodianCode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
+            string classificationCode;
+            if (streetOrPostcode.Contains(":full"))
+            {
+                classificationCode = string.Empty;
+            }
+            else
+            {
+                classificationCode = "&fq=local_custodian_code:" + _oSPlacesAddressProviderConfiguration.LocalCustodianCode;
+            }
+
+            string postcode = streetOrPostcode.Replace(":full", "");
+
+            HttpResponseMessage response = null;
+                        
+            if (streetOrPostcode.Contains(":full"))
+            {
+                response = await _gateway.GetAsync($"https://api.os.uk/search/places/v1/postcode?postcode={postcode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
+            }
+            else
+            {
+                response = await _gateway.GetAsync($"https://api.os.uk/search/places/v1/postcode?postcode={postcode}&fq=local_custodian_code:{_oSPlacesAddressProviderConfiguration.LocalCustodianCode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
+            }
+            
             var result = await response.Content.ReadAsStringAsync();
             var addresses = JsonConvert.DeserializeObject<OSProperty>(result);
 
