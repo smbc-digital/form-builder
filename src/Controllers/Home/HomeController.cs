@@ -117,7 +117,7 @@ namespace form_builder.Controllers
                 return RedirectToAction("Index", routeValuesDictionary);
             }
 
-            if (queryParameters.TryGetValue("clearCache", out var clearCacheValue) && string.Equals(clearCacheValue, "True"))
+            if (queryParameters.TryGetValue("cc", out var clearCacheValue) && string.Equals(clearCacheValue.ToString().ToLower(), "true"))
             {
                 _sessionHelper.Clear();
                 _distributedCache.Remove(sessionGuid);
@@ -210,7 +210,7 @@ namespace form_builder.Controllers
                     return RedirectToAction("Index", new
                     {
                         path = behaviour.PageSlug,
-                        clearCache = true
+                        cc = true
                     });
 
                 default:
