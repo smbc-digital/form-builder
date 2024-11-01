@@ -91,7 +91,7 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/payment-failure")]
         public async Task<IActionResult> PaymentFailure(string form, [FromQuery] string reference)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var sessionGuid = _sessionHelper.GetBrowserSessionId();
             var data = await _mappingService.Map(sessionGuid, form);
             var url = await _payService.ProcessPayment(data, form, "payment", reference, sessionGuid);
 
@@ -112,7 +112,7 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/payment-declined")]
         public async Task<IActionResult> PaymentDeclined(string form, [FromQuery] string reference)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var sessionGuid = _sessionHelper.GetBrowserSessionId();
 
             var data = await _mappingService.Map(sessionGuid, form);
             var url = await _payService.ProcessPayment(data, form, "payment", reference, sessionGuid);
@@ -133,7 +133,7 @@ namespace form_builder.Controllers.Payment
         [Route("{form}/callback-failure")]
         public async Task<IActionResult> CallbackFailure(string form, [FromQuery] string reference)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var sessionGuid = _sessionHelper.GetBrowserSessionId();
             _logger.LogWarning($"PaymentController:PaymentFailure:{sessionGuid} {form} Payment failure {reference}");
 
             var data = await _mappingService.Map(sessionGuid, form);

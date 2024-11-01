@@ -18,7 +18,7 @@ namespace form_builder.Providers
 
         public FormAnswers GetFormAnswers()
         {
-            string sessionGuid = _sessionHelper.GetSessionGuid();
+            string sessionGuid = _sessionHelper.GetBrowserSessionId();
             string cachedAnswers = _distributedCache.GetString(sessionGuid);
             return cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }

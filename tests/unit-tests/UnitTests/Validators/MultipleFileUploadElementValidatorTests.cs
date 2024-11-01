@@ -57,7 +57,7 @@ namespace form_builder_tests.UnitTests.Validators
 
             // Assert
             Assert.True(result.IsValid);
-            _mockSessionHelper.Verify(_ => _.GetSessionGuid(), Times.Never);
+            _mockSessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Never);
             _mockDistributedCacheWrapper.Verify(_ => _.GetString(It.IsAny<string>()), Times.Never);
         }
 
@@ -96,7 +96,7 @@ namespace form_builder_tests.UnitTests.Validators
                 { "Path", "page-one"}
             };
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("12345");
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "12345")))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = "fileUpload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel> { new FileUploadModel { FileSize = 2048576 } }) } } } } }));
 

@@ -22,17 +22,18 @@ namespace form_builder.Workflows.PaymentWorkflow
 
         public async Task<string> Submit(string form, string path)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
-            if (string.IsNullOrEmpty(sessionGuid))
+            if (string.IsNullOrEmpty(formSessionId))
                 throw new ApplicationException("A Session GUID was not provided.");
 
-            await _submitService.PreProcessSubmission(form, sessionGuid);
+            await _submitService.PreProcessSubmission(form, formSessionId);
 
-            var data = await _mappingService.Map(sessionGuid, form);
-            var paymentReference = await _submitService.PaymentSubmission(data, form, sessionGuid);
+            var data = await _mappingService.Map(formSessionId, form);
+            var paymentReference = await _submitService.PaymentSubmission(data, form, formSessionId);
 
-            return await _payService.ProcessPayment(data, form, path, paymentReference, sessionGuid);
+            return await _payService.ProcessPayment(data, form, path, paymentReference, formSessionId);
         }
     }
 }

@@ -38,8 +38,9 @@ namespace form_builder.Validators
 
             if (value is null)
             {
-                var sessionGuid = _sessionHelper.GetSessionGuid();
-                var cachedAnswers = _distributedCache.GetString(sessionGuid);
+                ISession browserSessionId = _sessionHelper.GetSession();
+                string formSessionId = $"{baseForm.FormName}::{browserSessionId.Id}";
+                var cachedAnswers = _distributedCache.GetString(formSessionId);
 
                 var convertedAnswers = cachedAnswers is null
                     ? new FormAnswers { Pages = new List<PageAnswers>() }

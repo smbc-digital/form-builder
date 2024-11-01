@@ -58,7 +58,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(() => tagParserItems.GetEnumerator());
 
             _sessionHelper
-                 .Setup(_ => _.GetSessionGuid())
+                 .Setup(_ => _.GetBrowserSessionId())
                  .Returns("123454");
 
             _mappingService

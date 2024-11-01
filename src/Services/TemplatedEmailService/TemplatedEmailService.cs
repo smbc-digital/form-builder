@@ -28,14 +28,15 @@ namespace form_builder.Services.TemplatedEmailService
             _distributedCache = distributedCache;
         }
 
-        public Task ProcessTemplatedEmail(List<IAction> actions)
+        public Task ProcessTemplatedEmail(List<IAction> actions, string form)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
-            if (string.IsNullOrEmpty(sessionGuid))
+            if (string.IsNullOrEmpty(formSessionId))
                 throw new Exception("TemplatedEmailService::Process: Session has expired");
 
-            var formData = _distributedCache.GetString(sessionGuid);
+            var formData = _distributedCache.GetString(formSessionId);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             foreach (var action in actions)

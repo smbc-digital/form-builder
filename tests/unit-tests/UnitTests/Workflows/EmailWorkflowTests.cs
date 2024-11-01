@@ -43,7 +43,7 @@ namespace form_builder_tests.UnitTests.Workflows
         {
             // Arrange
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns("123454");
             _mappingService
                 .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))

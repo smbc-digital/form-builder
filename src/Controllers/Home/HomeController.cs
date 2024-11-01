@@ -86,7 +86,7 @@ namespace form_builder.Controllers
             string subPath = "")
         {
             var session = _sessionHelper.GetSession();
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var sessionGuid = _sessionHelper.GetBrowserSessionId();
 
             var queryParameters = Request.Query;
 
@@ -128,7 +128,7 @@ namespace form_builder.Controllers
             string subPath = "")
         {   
             var session = _sessionHelper.GetSession();
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var sessionGuid = _sessionHelper.GetBrowserSessionId();
 
             _logger.LogInformation($"HomeController:Index:Post: Processing request - {form}/{path}/{subPath}, Browser Session:{session.Id}, Form Session: {sessionGuid}");
 
@@ -155,7 +155,7 @@ namespace form_builder.Controllers
             if (currentPageResult.Page.HasPageActionsPostValues)
                 await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form);
 
-            var behaviour = await _pageService.GetBehaviour(currentPageResult);
+            var behaviour = await _pageService.GetBehaviour(currentPageResult, form);
 
             switch (behaviour.BehaviourType)
             {

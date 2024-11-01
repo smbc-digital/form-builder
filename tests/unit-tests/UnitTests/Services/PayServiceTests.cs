@@ -118,7 +118,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(() => paymentProviderItems.GetEnumerator());
 
             _mockSessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
 
             _mockMappingService

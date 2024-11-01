@@ -21,30 +21,32 @@ namespace form_builder.Workflows.SubmitWorkflow
 
         public async Task<string> Submit(string form)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
-            if (string.IsNullOrEmpty(sessionGuid))
+            if (string.IsNullOrEmpty(formSessionId))
                 throw new ApplicationException("A Session GUID was not provided.");
 
-            await _submitService.PreProcessSubmission(form, sessionGuid);
+            await _submitService.PreProcessSubmission(form, formSessionId);
 
-            var data = await _mappingService.Map(sessionGuid, form);
+            var data = await _mappingService.Map(formSessionId, form);
 
-            return await _submitService.ProcessSubmission(data, form, sessionGuid);
+            return await _submitService.ProcessSubmission(data, form, formSessionId);
         }
 
         public async Task SubmitWithoutSubmission(string form)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
-            if (string.IsNullOrEmpty(sessionGuid))
+            if (string.IsNullOrEmpty(formSessionId))
                 throw new ApplicationException("A Session GUID was not provided.");
 
-            await _submitService.PreProcessSubmission(form, sessionGuid);
+            await _submitService.PreProcessSubmission(form, formSessionId);
 
-            var data = await _mappingService.Map(sessionGuid, form);
+            var data = await _mappingService.Map(formSessionId, form);
 
-            await _submitService.ProcessWithoutSubmission(data, form, sessionGuid);
+            await _submitService.ProcessWithoutSubmission(data, form, formSessionId);
         }
     }
 }

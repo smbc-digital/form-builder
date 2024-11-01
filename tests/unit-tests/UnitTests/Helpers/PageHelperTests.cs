@@ -1022,7 +1022,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 }
             });
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("guid");
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(mockData);
 
             // Act
@@ -1066,7 +1066,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 page2
             };
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("guid");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("guid");
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(It.IsAny<string>());
 
             // Act

@@ -23,14 +23,15 @@ namespace form_builder.Workflows.EmailWorkflow
 
         public async Task<string> Submit(string form)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
-            if (string.IsNullOrEmpty(sessionGuid))
+            if (string.IsNullOrEmpty(formSessionId))
                 throw new ApplicationException($"A Session GUID was not provided.");
 
-            var data = await _mappingService.Map(sessionGuid, form);
+            var data = await _mappingService.Map(formSessionId, form);
 
-            return await _emailSubmitService.EmailSubmission(data, form, sessionGuid);
+            return await _emailSubmitService.EmailSubmission(data, form, formSessionId);
         }
     }
 }

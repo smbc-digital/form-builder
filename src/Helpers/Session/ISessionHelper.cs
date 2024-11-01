@@ -3,6 +3,7 @@
     public interface ISessionHelper
     {
         ISession GetSession();
+        string GetBrowserSessionId();
         string GetSessionGuid();
         void RemoveSessionGuid();
         void SetSessionGuid(string value);

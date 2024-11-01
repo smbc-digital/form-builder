@@ -70,12 +70,13 @@ namespace form_builder.Services.PayService
         {
             _logger.LogInformation($"PayService::ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
 
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
-            if (string.IsNullOrWhiteSpace(sessionGuid))
+            if (string.IsNullOrWhiteSpace(formSessionId))
                 _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Session expired for {reference}");
 
-            var mappingEntity = await _mappingService.Map(sessionGuid, form);
+            var mappingEntity = await _mappingService.Map(formSessionId, form);
             if (mappingEntity is null)
                 throw new Exception($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)} No mapping entity found for {form}");
 
@@ -124,7 +125,7 @@ namespace form_builder.Services.PayService
                 throw new PaymentCallbackException(ex.Message);
             }
 
-            _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
+            _pageHelper.SavePaymentAmount(formSessionId, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
             return reference;
         }
 

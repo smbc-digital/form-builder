@@ -34,7 +34,7 @@ namespace form_builder.Helpers.PaymentHelpers
 
         public async Task<PaymentInformation> GetFormPaymentInformation(string form)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var sessionGuid = _sessionHelper.GetBrowserSessionId();
             var mappingEntity = await _mappingService.Map(sessionGuid, form);
             if (mappingEntity is null)
                 throw new Exception($"PayService:: No mapping entity found for {form}");

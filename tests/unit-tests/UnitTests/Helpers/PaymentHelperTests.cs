@@ -97,7 +97,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithData(new object())
                 .Build();
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
             _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
                 .ReturnsAsync(mappingEntity);
             _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "nonexistanceform"))

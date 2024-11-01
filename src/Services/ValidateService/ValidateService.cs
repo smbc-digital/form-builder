@@ -39,8 +39,9 @@ namespace form_builder.Services.ValidateService
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
             List<Answers> answers = new();
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            var mappingData = await _mappingService.Map(sessionGuid, formName);
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{formName}::{browserSessionId.Id}";
+            var mappingData = await _mappingService.Map(formSessionId, formName);
 
             foreach (var action in actions)
             {
@@ -66,7 +67,7 @@ namespace form_builder.Services.ValidateService
 
                 mappingData.FormAnswers.AdditionalFormData.Add(ValidateConstants.ValidateId, responseAnswer);
 
-                await _distributedCache.SetStringAsync(sessionGuid, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
+                await _distributedCache.SetStringAsync(formSessionId, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
 
                 if (!response.IsSuccessStatusCode)
                     throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");

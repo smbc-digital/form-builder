@@ -27,16 +27,17 @@ namespace form_builder.Workflows.RedirectWorkflow
 
         public async Task<string> Submit(string form, string path)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
-            if (string.IsNullOrEmpty(sessionGuid))
+            if (string.IsNullOrEmpty(formSessionId))
                 throw new ApplicationException("RedirectWorkflow:Submit: Session GUID is null");
 
-            var data = await _mappingService.Map(sessionGuid, form);
-            var redirectUrl = await _submitService.RedirectSubmission(data, form, sessionGuid);
+            var data = await _mappingService.Map(formSessionId, form);
+            var redirectUrl = await _submitService.RedirectSubmission(data, form, formSessionId);
 
-            _logger.LogInformation($"RedirectWorkflow:Submit:{sessionGuid}: Disposing session");
-            _distributedCache.Remove(sessionGuid);
+            _logger.LogInformation($"RedirectWorkflow:Submit:{formSessionId}: Disposing session");
+            _distributedCache.Remove(formSessionId);
 
             return redirectUrl;
         }

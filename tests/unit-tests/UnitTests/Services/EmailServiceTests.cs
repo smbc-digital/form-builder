@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Services
             var emailProviderItems = new List<IEmailProvider> { _mockEmailProvider.Object };
             _mockEmailProviders.Setup(m => m.GetEnumerator()).Returns(() => emailProviderItems.GetEnumerator());
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("sessionGuid");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("sessionGuid");
 
             var formData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
 
@@ -54,14 +54,14 @@ namespace form_builder_tests.UnitTests.Services
             await _emailService.Process(new List<IAction> { action });
 
             // Assert
-            _mockSessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _mockSessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
         }
 
         [Fact]
         public async Task Process_ShouldThrowException_IfSessionIsNull()
         {
             // Arrange
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("");
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<Exception>(() => _emailService.Process(new List<IAction> { new UserEmail() }));

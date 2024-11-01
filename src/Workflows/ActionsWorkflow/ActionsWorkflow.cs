@@ -45,7 +45,7 @@ namespace form_builder.Workflows.ActionsWorkflow
                 await _validateService.Process(actions.Where(_ => _.Type.Equals(EActionType.Validate)).ToList(), formSchema, formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.TemplatedEmail)))
-                _ = _templatedEmailService.ProcessTemplatedEmail(actions.Where(_ => _.Type.Equals(EActionType.TemplatedEmail)).ToList());
+                _ = _templatedEmailService.ProcessTemplatedEmail(actions.Where(_ => _.Type.Equals(EActionType.TemplatedEmail)).ToList(), formName);
         }
     }
 }

@@ -55,7 +55,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
             {
                 _logger.LogInformation($"SuccessPageFactory:Build:{sessionGuid} Disposing session");
                 _distributedCache.Remove(sessionGuid);
-                _sessionHelper.RemoveSessionGuid();
+                //_sessionHelper.RemoveSessionGuid();
 
                 return new SuccessPageEntity
                 {
@@ -75,7 +75,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
             _logger.LogInformation($"SuccessPageFactory:Build:{sessionGuid} Disposing session");
             _distributedCache.Remove(sessionGuid);
-            _sessionHelper.RemoveSessionGuid();
+            //_sessionHelper.RemoveSessionGuid();
 
             return new SuccessPageEntity
             {
@@ -97,7 +97,7 @@ namespace form_builder.ContentFactory.SuccessPageFactory
 
         public async Task<SuccessPageEntity> BuildBooking(string form, FormSchema baseForm, string sessionGuid, FormAnswers formAnswers)
         {
-            _sessionHelper.RemoveSessionGuid();
+            //_sessionHelper.RemoveSessionGuid();
 
             var page = GenerateGenericBookingPage(baseForm);
 

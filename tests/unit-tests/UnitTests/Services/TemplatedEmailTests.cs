@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockTemplatedEmailProviders = new List<ITemplatedEmailProvider> { _mockTemplatedEmailProvider.Object };
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("sessionGuid");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("sessionGuid");
 
             _templatedEmailService = new TemplatedEmailService(_mockTemplatedEmailProviders, _mockActionHelper.Object, _mockSessionHelper.Object, _mockDistributedCache.Object);
         }
@@ -37,7 +37,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldThrowException_IfSessionIsNull()
         {
             // Arrange
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("");
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<Exception>(() => _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { new UserEmail() }));

@@ -55,7 +55,7 @@ namespace form_builder_tests.UnitTests.Controllers
             mockSession.Setup(_ => _.IsAvailable).Returns(true);
             mockSession.Setup(_ => _.Id).Returns("SessionMockId");
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid())
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId())
                 .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
 
             _mockSessionHelper.Setup(_ => _.GetSession())

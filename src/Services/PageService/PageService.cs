@@ -102,67 +102,79 @@ namespace form_builder.Services.PageService
 
         public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
         {
-            var session = _sessionHelper.GetSession();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
+            //var session = _sessionHelper.GetSession();
 
-            _logger.LogInformation($"PageService:ProcessPage: Start processing page \"{form}/{path}/{subPath}\", Browser Session:{session.Id}");
+            _logger.LogInformation($"PageService:ProcessPage: Start processing page \"{form}/{path}/{subPath}\", Browser Session:{formSessionId}");
 
-            var isNewSession = false;
-            var currentForm = _sessionHelper.GetSessionForm(); 
+            var formData = _distributedCache.GetString(formSessionId);
+            var isNewSession = formData is null;
+            //var currentForm = _sessionHelper.GetSessionForm(); 
                                 
-            if(session is null)
-            {
-                _logger.LogInformation($"PageService:ProcessPage: Browser session was empty {form} {path} {subPath}");
-            }
+            //if (session is null)
+            //{
+            //    _logger.LogInformation($"PageService:ProcessPage: Browser session was empty {form} {path} {subPath}");
+            //}
 
-            if (string.IsNullOrEmpty(path) || (!string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm)))
-            {
-                _logger.LogInformation($"PageService:ProcessPage: Form path is empty or current and requested form do not match, clearing form session {form}, Browser Session:{session.Id}");
+            //if (string.IsNullOrEmpty(path) || (!string.IsNullOrEmpty(currentForm) && !form.Equals(currentForm)))
+            //{
+            //    _logger.LogInformation($"PageService:ProcessPage: Form path is empty or current and requested form do not match, clearing form session {form}, Browser Session:{session.Id}");
 
-                _sessionHelper.Clear();
-            }
+            //    _sessionHelper.Clear();
+            //}
             
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-    
-            if (string.IsNullOrEmpty(sessionGuid))
+            //var sessionGuid = _sessionHelper.GetBrowserSessionId();
+
+            if (isNewSession)
             {
-                sessionGuid = Guid.NewGuid().ToString();
-                _sessionHelper.Set(sessionGuid, form);
-                isNewSession = true;    
-                _logger.LogInformation($"PageService:ProcessPage: Form SessionID was empty, new form session created for {form}, Browser Session:{session.Id} Form Session: {sessionGuid}");
+                _logger.LogInformation($"PageService:ProcessPage: FormSessionID was empty, new form session created for {form}, Browser Session:{browserSessionId}");
+                await _distributedCache.SetStringAsync(formSessionId, JsonConvert.SerializeObject(new FormAnswers()));
             }
 
+            //if (string.IsNullOrEmpty(sessionGuid))
+            //{
+            //    sessionGuid = Guid.NewGuid().ToString();
+            //    _sessionHelper.Set(sessionGuid, form);
+            //    isNewSession = true;    
+            //    _logger.LogInformation($"PageService:ProcessPage: Form SessionID was empty, new form session created for {form}, Browser Session:{session.Id} Form Session: {sessionGuid}");
+            //}
+
+            var formData2 = _distributedCache.GetString(formSessionId);
             var baseForm = await _schemaFactory.Build(form);
             if (baseForm is null)
             {
-                _logger.LogWarning($"PageService:ProcessPage: Base form was null, {form}, Browser Session:{session.Id} Form Session: {sessionGuid}");
-                _sessionHelper.Clear();
+                _logger.LogWarning($"PageService:ProcessPage: Base form was null, {form}, Browser Session:{browserSessionId}");
+                _distributedCache.Remove(formSessionId);
+                //_sessionHelper.Clear();
                 return null;
             }
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
             {
-                _logger.LogWarning($"PageService:ProcessPage:Form {form} is not available in environment {_environment.EnvironmentName.ToS3EnvPrefix()}, Browser Session:{session.Id} Form Session: {sessionGuid}");
-                _sessionHelper.Clear();
+                _logger.LogWarning($"PageService:ProcessPage:Form {form} is not available in environment {_environment.EnvironmentName.ToS3EnvPrefix()}, Browser Session:{browserSessionId}");
+                _distributedCache.Remove(formSessionId);
                 return null;
             }
 
             if (isNewSession && !_formAvailabilityService.IsFormAccessApproved(baseForm))
             {
-                _logger.LogInformation($"PageService:ProcessPage:Access to {form} was not approved, Browser Session:{session.Id} Form Session: {sessionGuid}");
-                _sessionHelper.Clear();
+                _logger.LogInformation($"PageService:ProcessPage:Access to {form} was not approved, Browser Session:{browserSessionId}");
+                _distributedCache.Remove(formSessionId);
+                //_sessionHelper.Clear();
                 return null;
             }
 
             if (string.IsNullOrEmpty(path))
             {
-                _logger.LogInformation($"PageService:ProcessPage:Path was empty, redirect to first page of form {form}, Browser Session:{session.Id} Form Session: {sessionGuid}");
+                _logger.LogInformation($"PageService:ProcessPage:Path was empty, redirect to first page of form {form}, Browser Session:{browserSessionId}");
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
             }
                 
-            var formData = _distributedCache.GetString(sessionGuid);
+            //var formData = _distributedCache.GetString(sessionGuid);
             if (string.IsNullOrEmpty(formData) && !path.Equals(baseForm.FirstPageSlug) && (!baseForm.HasDocumentUpload || !path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)))
             {
-                _logger.LogInformation($"PageService:ProcessPage:Form data was empty and path was not the first page redirect to first page of form {form}, Browser Session:{session.Id} Form Session: {sessionGuid}");
+                _logger.LogInformation($"PageService:ProcessPage:Form data was empty and path was not the first page redirect to first page of form {form}, Browser Session:{browserSessionId}");
                 return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
             }
 
@@ -171,14 +183,14 @@ namespace form_builder.Services.PageService
                 var convertedFormData = JsonConvert.DeserializeObject<FormAnswers>(formData);
                 if (!form.Equals(convertedFormData.FormName, StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.LogWarning($"PageService:ProcessPage: Disposing session form names do not match {form}, {convertedFormData.FormName},  Browser Session:{session.Id} Form Session: {sessionGuid}");
-                    _distributedCache.Remove(sessionGuid);
+                    _logger.LogWarning($"PageService:ProcessPage: Disposing session form names do not match {form}, {convertedFormData.FormName},  Browser Session:{browserSessionId}");
+                    _distributedCache.Remove(formSessionId);
                 }
             }
 
             var page = baseForm.GetPage(_pageHelper, path);
             if (page is null)
-                throw new ApplicationException($"PageService:ProcessPage: Requested path '{path}' object could not be found for in '{form}', Browser Session:{session.Id} Form Session: {sessionGuid}");
+                throw new ApplicationException($"PageService:ProcessPage: Requested path '{path}' object could not be found for in '{form}', Browser Session:{browserSessionId}");
 
             List<object> searchResults = null;
             var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
@@ -206,7 +218,7 @@ namespace form_builder.Services.PageService
             if (page.HasIncomingGetValues)
             {
                 var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParameters, convertedAnswers);
-                _pageHelper.SaveNonQuestionAnswers(result, form, path, sessionGuid);
+                _pageHelper.SaveNonQuestionAnswers(result, form, path, formSessionId);
             }
 
             var validCaseRef = convertedAnswers.AdditionalFormData.ContainsKey(ValidateConstants.ValidateId);
@@ -226,7 +238,7 @@ namespace form_builder.Services.PageService
                     await tagParser.Parse(page, convertedAnswers);
                 }
 
-                var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, sessionGuid);
+                var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, formSessionId);
 
                 if (bookingProcessEntity.BookingHasNoAvailableAppointments)
                 {
@@ -240,8 +252,8 @@ namespace form_builder.Services.PageService
                 searchResults = bookingProcessEntity.BookingInfo;
             }
 
-            var viewModel = await GetViewModel(page, baseForm, path, sessionGuid, subPath, searchResults);
-            _logger.LogInformation($"PageService:ProcessPage: Finish processing page \"{form}/{path}/{subPath}\", Browser Session:{session.Id} Form Session: {sessionGuid}"); 
+            var viewModel = await GetViewModel(page, baseForm, path, formSessionId, subPath, searchResults);
+            _logger.LogInformation($"PageService:ProcessPage: Finish processing page \"{form}/{path}/{subPath}\", Browser Session:{browserSessionId}"); 
             return new ProcessPageEntity { ViewModel = viewModel };
         }
 
@@ -253,20 +265,21 @@ namespace form_builder.Services.PageService
             bool modelStateIsValid)
         {
             FormSchema baseForm = await _schemaFactory.Build(form);
-            var session = _sessionHelper.GetSession();
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            //var session = _sessionHelper.GetSession();
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
 
             if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
-                throw new ApplicationException($"PageService:ProcessRequest: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}, Browser Session:{session.Id} Form Session: {sessionGuid}");
+                throw new ApplicationException($"PageService:ProcessRequest: {form} is not available in this Environment: {_environment.EnvironmentName.ToS3EnvPrefix()}, Browser Session:{formSessionId}");
             
-            if (sessionGuid is null)
-                throw new NullReferenceException($"PageService:ProcessRequest: {form} Form Session guid is null, Browser Session:{session.Id} Form Session: {sessionGuid}");
+            //if (sessionGuid is null)
+            //    throw new NullReferenceException($"PageService:ProcessRequest: {form} Form Session guid is null, Browser Session:{session.Id} Form Session: {sessionGuid}");
 
             var currentPage = baseForm.GetPage(_pageHelper, path);
             if (currentPage is null)
-                throw new NullReferenceException($"PageService:ProcessRequest: {form} Current page '{path}' object could not be found, Browser Session:{session.Id} Form Session: {sessionGuid}");
+                throw new NullReferenceException($"PageService:ProcessRequest: {form} Current page '{path}' object could not be found, Browser Session:{formSessionId}");
 
-            var formData = _distributedCache.GetString(sessionGuid);
+            var formData = _distributedCache.GetString(formSessionId);
             var convertedAnswers = !string.IsNullOrEmpty(formData) ? JsonConvert.DeserializeObject<FormAnswers>(formData) : new FormAnswers();
             await _schemaFactory.TransformPage(currentPage, convertedAnswers);
 
@@ -277,28 +290,28 @@ namespace form_builder.Services.PageService
             currentPage.Validate(viewModel, _validators, baseForm);
 
             if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.AddAnother)))
-                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _addAnotherService.ProcessAddAnother(viewModel, currentPage, baseForm, formSessionId, path);
 
             if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Address)))
-                return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _addressService.ProcessAddress(viewModel, currentPage, baseForm, formSessionId, path);
 
             if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Street)))
-                return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _streetService.ProcessStreet(viewModel, currentPage, baseForm, formSessionId, path);
 
             if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Organisation)))
-                return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _organisationService.ProcessOrganisation(viewModel, currentPage, baseForm, formSessionId, path);
 
             if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.MultipleFileUpload)))
-                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, sessionGuid, path, files, modelStateIsValid);
+                return await _fileUploadService.ProcessFile(viewModel, currentPage, baseForm, formSessionId, path, files, modelStateIsValid);
 
             if (currentPage.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
-                return await _bookingService.ProcessBooking(viewModel, currentPage, baseForm, sessionGuid, path);
+                return await _bookingService.ProcessBooking(viewModel, currentPage, baseForm, formSessionId, path);
 
-            _pageHelper.SaveAnswers(viewModel, sessionGuid, baseForm.BaseURL, files, currentPage.IsValid);
+            _pageHelper.SaveAnswers(viewModel, formSessionId, baseForm.BaseURL, files, currentPage.IsValid);
 
             if (!currentPage.IsValid)
             {
-                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, sessionGuid);
+                var formModel = await _pageContentFactory.Build(currentPage, viewModel, baseForm, formSessionId);
                 return new ProcessRequestEntity { Page = currentPage, ViewModel = formModel };
             }
 
@@ -317,11 +330,12 @@ namespace form_builder.Services.PageService
             return viewModel;
         }
 
-        public async Task<Behaviour> GetBehaviour(ProcessRequestEntity currentPageResult)
+        public async Task<Behaviour> GetBehaviour(ProcessRequestEntity currentPageResult, string form)
         {
             var answers = new Dictionary<string, dynamic>();
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            var cachedAnswers = _distributedCache.GetString(sessionGuid);
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
+            var cachedAnswers = _distributedCache.GetString(formSessionId);
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             convertedAnswers.Pages
@@ -339,21 +353,19 @@ namespace form_builder.Services.PageService
 
         public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema baseForm)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-
-            var session = _sessionHelper.GetSession();
-            if(session is null)
-            {
+            var browserSessionId = _sessionHelper.GetSession();
+            if(browserSessionId is null)
                 _logger.LogInformation($"PageService:FinalisePageJourney: Browser session was empty {form}");
-            }
 
-            if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException($"PageService::FinalisePageJourney:{session.Id} - {sessionGuid} Session has expired");
+            if (string.IsNullOrEmpty(browserSessionId.Id))
+                throw new ApplicationException($"PageService::FinalisePageJourney:{browserSessionId.Id} - Session has expired");
 
-            var formData = _distributedCache.GetString(sessionGuid);
+            string formSessionId = $"{form}::{browserSessionId.Id}";
+
+            var formData = _distributedCache.GetString(formSessionId);
 
             if (formData is null)
-                throw new ApplicationException($"PageService::FinalisePageJourney:{session.Id} - {sessionGuid} Session data is null");
+                throw new ApplicationException($"PageService::FinalisePageJourney:{browserSessionId.Id} - {formSessionId} Session data is null");
 
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
@@ -377,16 +389,17 @@ namespace form_builder.Services.PageService
                 });
 
             if (baseForm.Pages.Where(_ => _.PageSlug.ToLower().Equals("success")).Any() && baseForm.GetPage(_pageHelper, "success").Elements.Where(_ => _.Type.Equals(EElementType.DocumentDownload)).Any())
-                await _distributedCache.SetStringAsync($"document-{sessionGuid}", JsonConvert.SerializeObject(formAnswers), _distributedCacheExpirationConfiguration.Document);
+                await _distributedCache.SetStringAsync($"document-{formSessionId}", JsonConvert.SerializeObject(formAnswers), _distributedCacheExpirationConfiguration.Document);
 
-            return await _successPageContentFactory.Build(form, baseForm, sessionGuid, formAnswers, behaviourType);
+            return await _successPageContentFactory.Build(form, baseForm, formSessionId, formAnswers, behaviourType);
         }
 
         public async Task<SuccessPageEntity> GetCancelBookingSuccessPage(string form)
         {
             var baseForm = await _schemaFactory.Build(form);
-            var sessionGuid = _sessionHelper.GetSessionGuid();
-            return await _successPageContentFactory.BuildBooking(form, baseForm, sessionGuid, new FormAnswers());
+            ISession browserSessionId = _sessionHelper.GetSession();
+            string formSessionId = $"{form}::{browserSessionId.Id}";
+            return await _successPageContentFactory.BuildBooking(form, baseForm, formSessionId, new FormAnswers());
         }
     }
 }

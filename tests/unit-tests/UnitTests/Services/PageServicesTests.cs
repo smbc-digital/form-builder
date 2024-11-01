@@ -213,7 +213,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessPage_ShouldGenerateGuidWhenGuidIsEmpty()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -243,7 +243,7 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.IsType<ProcessPageEntity>(result);
 
-            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
             _sessionHelper.Verify(_ => _.Set(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -252,7 +252,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns(string.Empty);
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
@@ -271,7 +271,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns(string.Empty);
 
             _sessionHelper
@@ -371,7 +371,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "other-form" }));
 
             var element = new ElementBuilder()
@@ -405,7 +405,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldNotCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "new-form" }));
 
             var element = new ElementBuilder()
@@ -663,7 +663,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(false);
 
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             var schema = new FormSchemaBuilder()
                 .WithEnvironmentAvailability("local", false)
@@ -682,7 +682,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCallSchemaFactory_TransformPage()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -722,7 +722,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallAddressService_WhenAddressElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _addressService.Setup(_ => _.ProcessAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -767,7 +767,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallStreetService_WhenStreetElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _streetService.Setup(_ => _.ProcessStreet(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -812,7 +812,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ApplicationShould_ThrowApplicationException_WhenGenerateHtml_ThrowsException()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .Throws<ApplicationException>();
@@ -895,7 +895,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallProcessOrganisation_WhenOrganisationElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _organisationService.Setup(_ => _.ProcessOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -965,7 +965,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _sessionHelper.Setup(_ => _.GetSessionGuid())
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId())
                 .Returns("guid");
 
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
@@ -985,7 +985,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldNot_CallIncomingDataHelper_WhenPageContains_NoInboundValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -1013,7 +1013,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_Should_CallIncomingDataHelper_WhenPageContains_InboundValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -1046,7 +1046,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_Should_CallPageHelper_ToSanitizeViewModel()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -1074,7 +1074,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallFileUploadService_WhenMultipleFileUploadElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _fileUploadService
                 .Setup(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
@@ -1133,7 +1133,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldNotCallFileUploadService_WhenNoMultipleFileUploadElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
@@ -1168,7 +1168,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCall_IncomingDataHelper_WhenFormHasIncomingGetValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -1208,7 +1208,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCall_IncomingDataHelper_AndSaveData_WhenFormHasIncomingGetValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
             _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
                 .Returns(new Dictionary<string, dynamic> { { "test", "testdata" } });
 
@@ -1251,7 +1251,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCall_ActionsWorkflow_WithGetActions_WhenFormHasGetPageActions()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
             _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
                 .Returns(new Dictionary<string, dynamic> { { "test", "testdata" } });
 
@@ -1297,7 +1297,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldRedirect_WhenBookingService_ReturnsEntity_WithNoAppointments()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
             _bookingService.Setup(_ => _.Get(It.IsAny<string>(), It.IsAny<Page>(), It.IsAny<string>()))
                 .ReturnsAsync(new BookingProcessEntity { BookingHasNoAvailableAppointments = true });
 
@@ -1332,7 +1332,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCall_BookingService_WhenPAge_ContainsBookingElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
             _bookingService.Setup(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -1395,7 +1395,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
@@ -1424,7 +1424,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public void GetBehaviour_ShouldCallSession_And_DistributedCache_And_TagParsers()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("12345");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
 
             var behaviour = new BehaviourBuilder()
@@ -1438,7 +1438,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _service.GetBehaviour(new ProcessRequestEntity { Page = page });
 
-            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
             _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
         }
@@ -1447,7 +1447,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task FinalisePageJourney_ShouldThrow_ApplicationException_WhenNoSessionGuid()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
 
             var page = new PageBuilder()
                 .WithPageSlug("page-one")
@@ -1469,7 +1469,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns((string)null);
 
@@ -1494,7 +1494,7 @@ namespace form_builder_tests.UnitTests.Services
             var questionIDTwo = "fileUploadtwo";
             var fileOneKey = $"file-{questionIDOne}-12345";
             var fileTwoKey = $"file-{questionIDTwo}-12345";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var cacheData = new FormAnswers
             {
@@ -1574,7 +1574,7 @@ namespace form_builder_tests.UnitTests.Services
             var fileTwoKey = $"file-{questionIDOne}-456";
             var fileThreeKey = $"file-{questionIDOne}-789";
             var fileFourKey = $"file-{questionIDTwo}-123";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var cacheData = new FormAnswers
             {
@@ -1664,7 +1664,7 @@ namespace form_builder_tests.UnitTests.Services
             var fileTwoKey = $"file-{questionIDOne}-456";
             var fileThreeKey = $"file-{questionIDOne}-789";
             var fileFourKey = $"file-{questionIDTwo}-123";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var cacheData = new FormAnswers
             {
@@ -1727,7 +1727,7 @@ namespace form_builder_tests.UnitTests.Services
             var guid = Guid.NewGuid();
             var questionIDOne = "questionOne";
             var questionIDTwo = "docDownloadButton";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)

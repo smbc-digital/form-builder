@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             _service = new RetrieveExternalDataService(_mockGateway.Object, _mockSessionHelper.Object, _mockDistributedCacheWrapper.Object, _mockMappingService.Object, _mockActionHelper.Object, _mockHostingEnv.Object);
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123456");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123456");
             _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(_mappingEntity);
             _mockGateway.Setup(_ => _.PostAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(_successResponse);

@@ -25,7 +25,7 @@ namespace form_builder.Services.EmailService
 
         public async Task Process(List<IAction> actions)
         {
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            var sessionGuid = _sessionHelper.GetBrowserSessionId();
 
             if (string.IsNullOrEmpty(sessionGuid))
                 throw new Exception("EmailService::Process: Session has expired");

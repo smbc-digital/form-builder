@@ -163,7 +163,7 @@ namespace form_builder.Services.BookingService
             if (currentPage is null)
                 throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
-            var guid = _sessionHelper.GetSessionGuid();
+            var guid = _sessionHelper.GetBrowserSessionId();
 
             if (string.IsNullOrEmpty(guid))
                 throw new ApplicationException("BookingService::ProcessMonthRequest Session has expired");

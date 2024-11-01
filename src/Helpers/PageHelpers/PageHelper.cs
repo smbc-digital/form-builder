@@ -346,7 +346,7 @@ namespace form_builder.Helpers.PageHelpers
 
         public Page GetPageWithMatchingRenderConditions(List<Page> pages)
         {
-            var guid = _sessionHelper.GetSessionGuid();
+            var guid = _sessionHelper.GetBrowserSessionId();
             var formData = _distributedCache.GetString(guid);
             var convertedAnswers = !string.IsNullOrEmpty(formData)
                 ? JsonConvert.DeserializeObject<FormAnswers>(formData)
