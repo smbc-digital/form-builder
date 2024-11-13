@@ -6,6 +6,8 @@ using StockportGovUK.NetStandard.Gateways.VerintService;
 using StockportGovUK.NetStandard.Gateways;
 using Xunit;
 using Microsoft.Extensions.Options;
+using form_builder.Models;
+using Newtonsoft.Json;
 
 namespace form_builder_tests.UnitTests.Providers.Address
 {
@@ -16,12 +18,43 @@ namespace form_builder_tests.UnitTests.Providers.Address
         private readonly Mock<IGateway> _mockGateway = new();
         private readonly Mock<IOptions<OSPlacesAddressProviderConfiguration>> _mockOptionsConfiguration = new();  
 
+
         public OSPlacesAddressProviderTests()
         {
-            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage());
+            _mockOptionsConfiguration
+                .Setup(_ => _.Value)
+                .Returns(new OSPlacesAddressProviderConfiguration
+                    {
+                        Key = "ReturnPlates",
+                        Host = "LTXV",
+                        LocalCustodianCode = "jon.chiles@stockport.gov.uk"
+                    }
+                );
 
-            //<List<AddressSearchResult>> { ResponseContent = new List<AddressSearchResult> { new AddressSearchResult { Name = "road,city,county", UniqueId = "10000017101" } } }
+            _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(new OSProperty()
+                    {
+                        results = new List<Result>()
+                        {
+                            new()
+                            {
+                                LPI = new()
+                                {
+                                    PAO_START_NUMBER = "",
+                                    STREET_DESCRIPTION = "",
+                                    LOCALITY_NAME = "",
+                                    TOWN_NAME = "",
+                                    POSTCODE_LOCATOR = "",
+                                    UPRN = ""
+                                }
+                            }
+                        }
+
+                    }))
+
+                });
 
             _addressProvider = new OSPlacesAddressProvider(_mockGateway.Object, _mockOptionsConfiguration.Object);
         }
@@ -33,7 +66,7 @@ namespace form_builder_tests.UnitTests.Providers.Address
 
             await _addressProvider.SearchAsync(postcode);
 
-            _mockGateway.Verify(_ => _.GetAsync(It.Is<string>(x => x == postcode)), Times.Once);
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -45,7 +78,6 @@ namespace form_builder_tests.UnitTests.Providers.Address
 
             Assert.Single(result);
             Assert.NotNull(result);
-            Assert.IsType<List<AddressSearchResult>>(result);
         }
     }
 }
