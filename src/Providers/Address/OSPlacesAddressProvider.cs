@@ -1,23 +1,25 @@
-﻿using form_builder.Models;
+﻿using form_builder.Controllers.Document;
+using form_builder.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 
 namespace form_builder.Providers.Address
-{
-
+{    
     public class OSPlacesAddressProvider : IAddressProvider
     {
+        private readonly ILogger<OSPlacesAddressProvider> _logger;
         public string ProviderName => "OSPlaces";
 
         private readonly IGateway _gateway;
         private readonly OSPlacesAddressProviderConfiguration _oSPlacesAddressProviderConfiguration;
 
-        public OSPlacesAddressProvider(IGateway gateway, IOptions<OSPlacesAddressProviderConfiguration> oSPlacesAddressProviderConfiguration)
+        public OSPlacesAddressProvider(IGateway gateway, IOptions<OSPlacesAddressProviderConfiguration> oSPlacesAddressProviderConfiguration, ILogger<OSPlacesAddressProvider> logger)
         {
             _gateway = gateway;
             _oSPlacesAddressProviderConfiguration = oSPlacesAddressProviderConfiguration.Value;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
@@ -46,6 +48,8 @@ namespace form_builder.Providers.Address
             }
             
             var result = await response.Content.ReadAsStringAsync();
+            _logger.LogWarning($"OSPlaces Address provider:: response {response.StatusCode}, content  = {result}");
+            
             var addresses = JsonConvert.DeserializeObject<OSProperty>(result);
 
             try
