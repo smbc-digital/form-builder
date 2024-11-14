@@ -57,8 +57,7 @@ namespace form_builder.Providers.Address
             }           
 
             var result = await response.Content.ReadAsStringAsync();            
-            response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=local_custodian_code:{_oSPlacesAddressProviderConfiguration.LocalCustodianCode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
-
+            
             var addresses = JsonConvert.DeserializeObject<OSProperty>(result);
 
             try
