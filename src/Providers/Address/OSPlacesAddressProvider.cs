@@ -40,6 +40,8 @@ namespace form_builder.Providers.Address
 
             try
             {
+
+                _logger.LogWarning($"OSPlaces Address provider:: about to run the GetAsync: postcode {postcode} key {_oSPlacesAddressProviderConfiguration.Key} ");
                 if (streetOrPostcode.Contains(":full"))
                 {
                     response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
@@ -50,9 +52,9 @@ namespace form_builder.Providers.Address
                 }
                 _logger.LogWarning($"OSPlaces Address provider:: response {response.StatusCode} {response.RequestMessage}");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _logger.LogError($"OSPlaces Address provider:: response {response.StatusCode} {response.RequestMessage}");
+                _logger.LogError($"OSPlaces Address provider:: response {response.StatusCode} {response.RequestMessage} ex : {ex}");
             }           
 
             var result = await response.Content.ReadAsStringAsync();            
