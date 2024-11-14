@@ -165,8 +165,7 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection AddGateways(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IS3Gateway, S3Gateway>();
-
-            services.AddHttpClient<IGateway, Gateway>(configuration);
+            services.AddHttpClient<IGateway, Gateway>(configuration, "IGatewayConfig");
             services.AddHttpClient<ICivicaPayGateway, CivicaPayGateway>(configuration);
             services.AddHttpClient<IVerintServiceGateway, VerintServiceGateway>(configuration);
             services.AddHttpClient<IAddressServiceGateway, AddressServiceGateway>(configuration);
