@@ -8,6 +8,7 @@ using Xunit;
 using Microsoft.Extensions.Options;
 using form_builder.Models;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace form_builder_tests.UnitTests.Providers.Address
 {
@@ -16,6 +17,7 @@ namespace form_builder_tests.UnitTests.Providers.Address
         private readonly OSPlacesAddressProvider _addressProvider;
 
         private readonly Mock<IGateway> _mockGateway = new();
+        private readonly Mock<ILogger<OSPlacesAddressProvider>> _logger = new();
         private readonly Mock<IOptions<OSPlacesAddressProviderConfiguration>> _mockOptionsConfiguration = new();  
 
 
@@ -56,7 +58,7 @@ namespace form_builder_tests.UnitTests.Providers.Address
 
                 });
 
-            _addressProvider = new OSPlacesAddressProvider(_mockGateway.Object, _mockOptionsConfiguration.Object);
+            _addressProvider = new OSPlacesAddressProvider(_mockGateway.Object, _mockOptionsConfiguration.Object, _logger.Object);
         }
 
         [Fact]
