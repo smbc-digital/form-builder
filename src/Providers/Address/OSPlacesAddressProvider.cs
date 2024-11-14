@@ -24,6 +24,7 @@ namespace form_builder.Providers.Address
 
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode)
         {
+            _logger.LogWarning($"OSPlaces Address provider:: about to run the GetAsync: postcode {streetOrPostcode} key {_oSPlacesAddressProviderConfiguration.Key} ");
             string classificationCode;
             if (streetOrPostcode.Contains(":full"))
             {
@@ -39,9 +40,7 @@ namespace form_builder.Providers.Address
             HttpResponseMessage response = null;
 
             try
-            {
-
-                _logger.LogWarning($"OSPlaces Address provider:: about to run the GetAsync: postcode {postcode} key {_oSPlacesAddressProviderConfiguration.Key} ");
+            {                
                 if (streetOrPostcode.Contains(":full"))
                 {
                     response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
@@ -54,12 +53,11 @@ namespace form_builder.Providers.Address
             }
             catch (Exception ex)
             {
-                _logger.LogError($"OSPlaces Address provider:: response {response.StatusCode} {response.RequestMessage} ex : {ex}");
+                throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider key: '{_oSPlacesAddressProviderConfiguration.Key}' with searchterm '{postcode}' Exception: {ex.Message}", ex);
             }           
 
             var result = await response.Content.ReadAsStringAsync();            
-            response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=local_custodian_code:{_oSPlacesAddressProviderConfiguration.LocalCustodianCode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
-
+            
             var addresses = JsonConvert.DeserializeObject<OSProperty>(result);
 
             try
