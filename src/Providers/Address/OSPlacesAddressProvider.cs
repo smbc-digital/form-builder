@@ -38,17 +38,25 @@ namespace form_builder.Providers.Address
 
             HttpResponseMessage response = null;
 
-            if (streetOrPostcode.Contains(":full"))
+            try
             {
-                response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
+                if (streetOrPostcode.Contains(":full"))
+                {
+                    response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
+                }
+                else
+                {
+                    response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=local_custodian_code:{_oSPlacesAddressProviderConfiguration.LocalCustodianCode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
+                }
+                _logger.LogWarning($"OSPlaces Address provider:: response {response.StatusCode} {response.RequestMessage}");
             }
-            else
+            catch (Exception)
             {
-                response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=local_custodian_code:{_oSPlacesAddressProviderConfiguration.LocalCustodianCode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
-            }
+                _logger.LogError($"OSPlaces Address provider:: response {response.StatusCode} {response.RequestMessage}");
+            }           
 
-            var result = await response.Content.ReadAsStringAsync();
-            _logger.LogWarning($"OSPlaces Address provider:: response {response.StatusCode} {response.RequestMessage}, content  = {result}");
+            var result = await response.Content.ReadAsStringAsync();            
+            response = await _gateway.GetAsync($"{_oSPlacesAddressProviderConfiguration.Host}?postcode={postcode}&fq=local_custodian_code:{_oSPlacesAddressProviderConfiguration.LocalCustodianCode}&fq=CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:R*%20CLASSIFICATION_CODE:C*&key={_oSPlacesAddressProviderConfiguration.Key}&dataset=LPI");
 
             var addresses = JsonConvert.DeserializeObject<OSProperty>(result);
 
