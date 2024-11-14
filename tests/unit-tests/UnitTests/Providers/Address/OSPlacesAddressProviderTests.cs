@@ -68,7 +68,7 @@ namespace form_builder_tests.UnitTests.Providers.Address
 
             await _addressProvider.SearchAsync(postcode);
 
-            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Once);
+            _mockGateway.Verify(_ => _.GetAsync(It.IsAny<string>()), Times.Exactly(2));
         }
 
         [Fact]
