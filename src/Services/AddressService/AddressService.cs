@@ -203,11 +203,21 @@ namespace form_builder.Services.AddressService
                     {
                         postcode = postcode + ":full";
                     }
-                    addressResults = (await _addressProviders.Get(addressElement.Properties.AddressProvider).SearchAsync(postcode)).ToList<object>();
+                    var addressProv = _addressProviders.Get(addressElement.Properties.AddressProvider);
+
+                    if (addressProv is null)
+                    {
+                        throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to get address provider = '{addressElement.Properties.AddressProvider}'");
+
+                    }
+
+                    addressResults = new List<object>(await addressProv.SearchAsync(postcode));
+
                 }
                 catch (Exception e)
                 {
-                    throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception: {e.Message}", e);
+                    throw e;
+                    //throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception: {e.Message}", e);
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
