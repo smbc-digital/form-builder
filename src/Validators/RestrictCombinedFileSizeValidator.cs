@@ -37,8 +37,8 @@ namespace form_builder.Validators
 
             var maxCombinedFileSize = element.Properties.MaxCombinedFileSize > 0 ? element.Properties.MaxCombinedFileSize * SystemConstants.OneMBInBinaryBytes : SystemConstants.DefaultMaxCombinedFileSize;
 
-            ISession browserSessionId = _sessionHelper.GetSession();
-            string formSessionId = $"{baseForm.FormName}::{browserSessionId.Id}";
+            string browserSessionId = _sessionHelper.GetBrowserSessionId();
+            string formSessionId = $"{baseForm.FormName}::{browserSessionId}";
             var cachedAnswers = _distributedCache.GetString(formSessionId);
 
             var convertedAnswers = cachedAnswers is null

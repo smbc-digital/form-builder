@@ -7,36 +7,35 @@ using JsonSubTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace form_builder.Models.Elements
+namespace form_builder.Models.Elements;
+
+[JsonConverter(typeof(JsonSubtypes), "Type")]
+public interface IElement
 {
-    [JsonConverter(typeof(JsonSubtypes), "Type")]
-    public interface IElement
-    {
-        [JsonConverter(typeof(StringEnumConverter))]
-        EElementType Type { get; set; }
+    [JsonConverter(typeof(StringEnumConverter))]
+    EElementType Type { get; set; }
 
-        BaseProperty Properties { get; set; }
+    BaseProperty Properties { get; set; }
 
-        string Lookup { get; set; }
+    string Lookup { get; set; }
 
-        bool IsValid { get; }
+    bool IsValid { get; }
 
-        void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm);
+    void Validate(Dictionary<string, dynamic> viewModel, IEnumerable<IElementValidator> validators, FormSchema baseForm);
 
-        Task<string> RenderAsync(IViewRender viewRender,
-            IElementHelper elementHelper,
-            string guid,
-            Dictionary<string, dynamic> viewModel,
-            Page page,
-            FormSchema formSchema,
-            IWebHostEnvironment environment,
-            FormAnswers formAnswers,
-            List<object> results = null);
+    Task<string> RenderAsync(IViewRender viewRender,
+        IElementHelper elementHelper,
+        string cacheKey,
+        Dictionary<string, dynamic> viewModel,
+        Page page,
+        FormSchema formSchema,
+        IWebHostEnvironment environment,
+        FormAnswers formAnswers,
+        List<object> results = null);
 
-        Dictionary<string, dynamic> GenerateElementProperties(string type = "");
+    Dictionary<string, dynamic> GenerateElementProperties(string type = "");
 
-        string GenerateFieldsetProperties();
+    string GenerateFieldsetProperties();
 
-        string GetLabelText(string pageTitle);
-    }
+    string GetLabelText(string pageTitle);
 }

@@ -7,6 +7,8 @@
         string GetSessionGuid();
         void RemoveSessionGuid();
         void SetSessionGuid(string value);
+        void SetSessionFormName(string key, string value);
+        string GetSessionFormName(string key);
         void SetSessionForm(string value);
         string GetSessionForm();
         void RemoveSessionForm();

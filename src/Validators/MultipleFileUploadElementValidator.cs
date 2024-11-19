@@ -38,8 +38,8 @@ namespace form_builder.Validators
 
             if (value is null)
             {
-                ISession browserSessionId = _sessionHelper.GetSession();
-                string formSessionId = $"{baseForm.FormName}::{browserSessionId.Id}";
+                string browserSessionId = _sessionHelper.GetBrowserSessionId();
+                string formSessionId = $"{baseForm.FormName}::{browserSessionId}";
                 var cachedAnswers = _distributedCache.GetString(formSessionId);
 
                 var convertedAnswers = cachedAnswers is null

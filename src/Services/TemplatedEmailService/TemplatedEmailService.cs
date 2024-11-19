@@ -30,8 +30,8 @@ namespace form_builder.Services.TemplatedEmailService
 
         public Task ProcessTemplatedEmail(List<IAction> actions, string form)
         {
-            ISession browserSessionId = _sessionHelper.GetSession();
-            string formSessionId = $"{form}::{browserSessionId.Id}";
+            string browserSessionId = _sessionHelper.GetBrowserSessionId();
+            string formSessionId = $"{form}::{browserSessionId}";
 
             if (string.IsNullOrEmpty(formSessionId))
                 throw new Exception("TemplatedEmailService::Process: Session has expired");

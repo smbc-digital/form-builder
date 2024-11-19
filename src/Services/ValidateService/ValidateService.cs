@@ -39,8 +39,8 @@ namespace form_builder.Services.ValidateService
         public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
         {
             List<Answers> answers = new();
-            ISession browserSessionId = _sessionHelper.GetSession();
-            string formSessionId = $"{formName}::{browserSessionId.Id}";
+            string browserSessionId = _sessionHelper.GetBrowserSessionId();
+            string formSessionId = $"{formName}::{browserSessionId}";
             var mappingData = await _mappingService.Map(formSessionId, formName);
 
             foreach (var action in actions)

@@ -16,7 +16,7 @@ namespace form_builder.Providers.PaymentProvider
             _httpContextAccessor = httpContextAccessor;
             _environment = environment;
         }
-        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string sessionGuid, PaymentInformation paymentInformation)
+        public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string cacheKey, PaymentInformation paymentInformation)
         {
             string url = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/fake-payment?reference={reference}&amount={paymentInformation.Settings.Amount}";
             return url;
