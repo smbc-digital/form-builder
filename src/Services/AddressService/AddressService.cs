@@ -17,17 +17,20 @@ namespace form_builder.Services.AddressService
         private readonly IPageHelper _pageHelper;
         private readonly IEnumerable<IAddressProvider> _addressProviders;
         private readonly IPageFactory _pageFactory;
+        private readonly ILogger<AddressService> _logger;
 
         public AddressService(
             IDistributedCacheWrapper distributedCache,
             IPageHelper pageHelper,
             IEnumerable<IAddressProvider> addressProviders,
-            IPageFactory pageFactory)
+            IPageFactory pageFactory,
+            ILogger<AddressService> logger)
         {
             _distributedCache = distributedCache;
             _pageHelper = pageHelper;
             _addressProviders = addressProviders;
             _pageFactory = pageFactory;
+            _logger = logger;
         }
 
         public async Task<ProcessRequestEntity> ProcessAddress(
@@ -190,6 +193,7 @@ namespace form_builder.Services.AddressService
                 .Response;
 
             List<object> addressResults = new();
+            IAddressProvider addressProv;
             if (postcode.Equals(foundPostCode))
             {
                 addressResults = (convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>).ToList();
@@ -198,24 +202,33 @@ namespace form_builder.Services.AddressService
             {
                 try
                 {
-                    bool fullUKPostcode = addressElement.Properties.FullUKPostcode;
-                    if (fullUKPostcode)
-                    {
-                        postcode = postcode + ":full";
-                    }
-                    var addressProv = _addressProviders.Get(addressElement.Properties.AddressProvider);
+                    addressProv = _addressProviders.Get(addressElement.Properties.AddressProvider);
 
                     if (addressProv is null)
                     {
+                        _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider could not be set for {addressElement.Properties.AddressProvider}");
                         throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to get address provider = '{addressElement.Properties.AddressProvider}'");
 
                     }
 
+                    _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider set successfully for {addressElement.Properties.AddressProvider}");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected exception getting address provider {addressElement.Properties.AddressProvider}");
+                    throw e;
+                    //throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception: {e.Message}", e);
+                }
+
+                try
+                {
+                    _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Starting search async {postcode}");
                     addressResults = new List<object>(await addressProv.SearchAsync(postcode));
 
                 }
                 catch (Exception e)
                 {
+                    _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected error occurred searching for {postcode}");
                     throw e;
                     //throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception: {e.Message}", e);
                 }

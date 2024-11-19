@@ -8,8 +8,10 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -22,6 +24,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IAddressProvider> _addressProvider = new();
         private readonly Mock<IPageFactory> _mockPageContentFactory = new();
         private readonly IEnumerable<IAddressProvider> _addressProviders;
+        private readonly Mock<ILogger<AddressService>> _mockLogger = new();
 
         public AddressServiceTests()
         {
@@ -31,7 +34,7 @@ namespace form_builder_tests.UnitTests.Services
                 _addressProvider.Object
             };
 
-            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object);
+            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object, _mockLogger.Object);
         }
 
         [Fact]
