@@ -208,7 +208,6 @@ namespace form_builder.Services.AddressService
                     {
                         _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider could not be set for {addressElement.Properties.AddressProvider}");
                         throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to get address provider = '{addressElement.Properties.AddressProvider}'");
-
                     }
 
                     _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider set successfully for {addressElement.Properties.AddressProvider}");
