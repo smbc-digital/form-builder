@@ -202,6 +202,12 @@ namespace form_builder.Services.AddressService
             {
                 try
                 {
+                    bool fullUKPostcode = addressElement.Properties.FullUKPostcode;
+                    if (fullUKPostcode)
+                    {
+                        postcode = postcode + ":full";
+                    }
+
                     addressProv = _addressProviders.Get(addressElement.Properties.AddressProvider);
 
                     if (addressProv is null)
@@ -216,7 +222,6 @@ namespace form_builder.Services.AddressService
                 {
                     _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected exception getting address provider {addressElement.Properties.AddressProvider}");
                     throw e;
-                    //throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception: {e.Message}", e);
                 }
 
                 try
@@ -229,7 +234,6 @@ namespace form_builder.Services.AddressService
                 {
                     _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected error occurred searching for {postcode}");
                     throw e;
-                    //throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressElement.Properties.AddressProvider}' with searchterm '{postcode}' Exception: {e.Message}", e);
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
