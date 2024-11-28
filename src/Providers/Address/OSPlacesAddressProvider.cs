@@ -42,7 +42,6 @@ namespace form_builder.Providers.Address
             }
             catch (Exception ex)
             {
-                _logger.LogWarning($"OSPlaces Address provider:: exception thrown  {ex.Message}");
                 throw new ApplicationException($"OSPlacesAddressService::OSPlaces provider Address search, An exception has occurred while attempting to perform postcode lookup with Provider key: '{_oSPlacesAddressProviderConfiguration.Key}' with searchterm '{postcode}' Exception: {ex.Message}", ex);
             }
 

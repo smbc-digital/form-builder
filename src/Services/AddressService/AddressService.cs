@@ -203,10 +203,8 @@ namespace form_builder.Services.AddressService
                 try
                 {
                     bool fullUKPostcode = addressElement.Properties.FullUKPostcode;
-                    if (fullUKPostcode)
-                    {
+                    if (fullUKPostcode) 
                         postcode = postcode + ":full";
-                    }
 
                     addressProv = _addressProviders.Get(addressElement.Properties.AddressProvider);
 
@@ -218,10 +216,10 @@ namespace form_builder.Services.AddressService
 
                     _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider set successfully for {addressElement.Properties.AddressProvider}");
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
                     _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected exception getting address provider {addressElement.Properties.AddressProvider}");
-                    throw e;
+                    throw exception;
                 }
 
                 try
@@ -230,10 +228,10 @@ namespace form_builder.Services.AddressService
                     addressResults = new List<object>(await addressProv.SearchAsync(postcode));
 
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
                     _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected error occurred searching for {postcode}");
-                    throw e;
+                    throw exception;
                 }
 
                 _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
