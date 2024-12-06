@@ -37,10 +37,12 @@ namespace form_builder_tests.UnitTests.Services
         public async Task Process_ShouldThrowException_IfSessionIsNull()
         {
             // Arrange
-            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("");
+            _mockDistributedCache
+                .Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns("");
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { new UserEmail() }));
+            var result = await Assert.ThrowsAsync<Exception>(() => _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { new UserEmail() }, "form"));
             Assert.Contains("TemplatedEmailService::Process: Session has expired", result.Message);
         }
 
@@ -62,7 +64,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(formData);
 
             // Act
-            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
+            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action }, "form");
 
             // Assert
             _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(
@@ -116,7 +118,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Callback<string, string, Dictionary<string, dynamic>>((emailAddress, templateId, personalisation) => personalisationSent = personalisation);
 
             // Act
-            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
+            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action }, "form");
 
             // Assert
             Assert.Equal(personalisationSent["reference"], "test-ref");
@@ -166,7 +168,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Callback<string, string, Dictionary<string, dynamic>>((emailAddress, templateId, personalisation) => personalisationSent = personalisation);
 
             // Act
-            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action });
+            _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action }, "form");
 
             // Assert
             Assert.Equal(personalisationSent["firstname"], "test");

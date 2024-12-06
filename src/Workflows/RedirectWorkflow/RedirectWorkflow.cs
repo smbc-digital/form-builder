@@ -28,10 +28,10 @@ namespace form_builder.Workflows.RedirectWorkflow
         public async Task<string> Submit(string form, string path)
         {
             string browserSessionId = _sessionHelper.GetBrowserSessionId();
-            string formSessionId = $"{form}::{browserSessionId}";
-
-            if (string.IsNullOrEmpty(formSessionId))
+            if (string.IsNullOrEmpty(browserSessionId))
                 throw new ApplicationException("RedirectWorkflow:Submit: Session GUID is null");
+
+            string formSessionId = $"{form}::{browserSessionId}";
 
             var data = await _mappingService.Map(formSessionId, form);
             var redirectUrl = await _submitService.RedirectSubmission(data, form, formSessionId);

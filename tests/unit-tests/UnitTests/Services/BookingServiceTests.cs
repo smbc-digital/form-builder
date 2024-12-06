@@ -499,7 +499,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
-            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     FormData = new Dictionary<string, object> { { bookingCacheKey, cachedBookingInfo } }
@@ -562,7 +562,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
-            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     FormData = new Dictionary<string, object> { { bookingCacheKey, cachedBookingInfo } }
@@ -735,7 +735,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
             BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
-            _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(JsonConvert.SerializeObject(new FormAnswers
                 {
                     FormData = new Dictionary<string, object> { { bookingCacheKey, cachedBookingInfo } }
@@ -953,8 +953,8 @@ namespace form_builder_tests.UnitTests.Services
             _sessionHelper.Setup(_ => _.GetBrowserSessionId())
                 .Returns("guid");
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-                .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
+            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
 
             _schemaFactory.Setup(_ => _.Build("form"))
                 .ReturnsAsync(formSchema);
@@ -966,7 +966,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessMonthRequest(model, "form", "path");
 
             _bookingProvider.Verify(_ => _.GetAvailability(It.IsAny<AvailabilityRequest>()), Times.Once);
-            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.Is<string>(_ => _.Equals("guid")), It.Is<string>(_ => _.Equals("form"))), Times.Once);
+            _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.Is<string>(_ => _.Equals("form"))), Times.Once);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
         }
 
@@ -1368,7 +1368,7 @@ namespace form_builder_tests.UnitTests.Services
                 _service.ValidateCancellationRequest("test-form", new Guid(), "testHash"));
 
             //Assert
-            Assert.Equal($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity", result.Message);
+            Assert.Equal($"BookingService::ValidateCancellationRequest,Booking Guid does not match hash, unable to verify request integrity", result.Message);
         }
 
         [Fact]
@@ -1476,7 +1476,7 @@ namespace form_builder_tests.UnitTests.Services
                 _service.ValidateCancellationRequest("test-form", new Guid(), "testHash"));
 
             //Assert
-            Assert.Equal($"BookingService::ValidateCancellationRequest,Booking guid does not match hash, unable to verify request integrity", result.Message);
+            Assert.Equal($"BookingService::ValidateCancellationRequest,Booking Guid does not match hash, unable to verify request integrity", result.Message);
         }
 
         [Fact]

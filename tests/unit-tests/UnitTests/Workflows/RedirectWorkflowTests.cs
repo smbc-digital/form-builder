@@ -74,7 +74,7 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x.Equals(guid))), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
         }
     }
 }

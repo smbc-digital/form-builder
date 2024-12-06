@@ -203,7 +203,7 @@ namespace form_builder_tests.UnitTests.Validators
             _mockSessionHelper.Setup(_ => _.GetBrowserSessionId())
                 .Returns("12345");
 
-            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "12345")))
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = $"fileuploadquestion{FileUploadConstants.SUFFIX}", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel> { new FileUploadModel { FileSize = 2048576 } }) } } } } }));
 
             var element = new ElementBuilder()

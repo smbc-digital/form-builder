@@ -94,7 +94,7 @@ namespace form_builder_tests.UnitTests.Workflows
             await _actionsWorkflow.Process(page.PageActions, new FormSchema(), "form");
 
             // Assert
-            _mockTemplatedEmailService.Verify(_ => _.ProcessTemplatedEmail(page.PageActions), Times.Once);
+            _mockTemplatedEmailService.Verify(_ => _.ProcessTemplatedEmail(page.PageActions, "form"), Times.Once);
         }
     }
 }

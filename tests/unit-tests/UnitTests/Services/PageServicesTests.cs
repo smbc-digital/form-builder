@@ -210,10 +210,10 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldGenerateGuidWhenGuidIsEmpty()
+        public async Task ProcessPage_ShouldGenerateGuidWhenFormSessionIsEmpty()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetSessionFormName(It.IsAny<string>())).Returns(string.Empty);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -234,7 +234,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -244,7 +244,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.IsType<ProcessPageEntity>(result);
 
             _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
-            _sessionHelper.Verify(_ => _.Set(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _sessionHelper.Verify(_ => _.SetSessionFormName(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -262,7 +262,6 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessPage("form", "", "", new QueryCollection());
 
             // Assert
-            _sessionHelper.Verify(_ => _.Clear(), Times.Once);
             _mockFormAvailabilityService.Verify(_ => _.IsFormAccessApproved(It.IsAny<FormSchema>()), Times.Once);
         }
 
@@ -298,10 +297,9 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
             
             // Act
-            await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+            await _service.ProcessPage("form", "", "", new QueryCollection());
 
             // Assert
-            _sessionHelper.Verify(_ => _.Clear(), Times.Once);
             _mockFormAvailabilityService.Verify(_ => _.IsFormAccessApproved(It.IsAny<FormSchema>()), Times.Once);
         }
 
@@ -330,7 +328,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns((Page)null);
 
             // Act
@@ -359,7 +357,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var result = await _service.ProcessPage("form", "page-one", LookUpConstants.Manual, new QueryCollection());
@@ -394,7 +392,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessPage("new-form", "page-one", "", new QueryCollection());
@@ -428,7 +426,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessPage("new-form", "page-one", "", new QueryCollection());
@@ -468,7 +466,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             //Act
@@ -521,7 +519,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             //Act
@@ -745,7 +743,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -790,7 +788,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -836,7 +834,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -876,7 +874,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -918,7 +916,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -972,7 +970,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             //Act
@@ -1002,7 +1000,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
@@ -1035,7 +1033,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>(), true);
@@ -1063,7 +1061,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
@@ -1105,7 +1103,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -1151,7 +1149,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
@@ -1194,7 +1192,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -1236,7 +1234,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -1284,7 +1282,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -1366,7 +1364,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
@@ -1436,7 +1434,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _service.GetBehaviour(new ProcessRequestEntity { Page = page });
+            _service.GetBehaviour(new ProcessRequestEntity { Page = page }, "form");
 
             _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
             _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
@@ -1461,7 +1459,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
 
             // Assert
-            Assert.EndsWith("Session has expired", result.Message);
+            Assert.EndsWith("Browser Session is null", result.Message);
         }
 
         [Fact]
@@ -1760,7 +1758,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitForm, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

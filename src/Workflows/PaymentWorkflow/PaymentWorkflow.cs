@@ -23,10 +23,10 @@ namespace form_builder.Workflows.PaymentWorkflow
         public async Task<string> Submit(string form, string path)
         {
             string browserSessionId = _sessionHelper.GetBrowserSessionId();
-            string formSessionId = $"{form}::{browserSessionId}";
-
-            if (string.IsNullOrEmpty(formSessionId))
+            if (string.IsNullOrEmpty(browserSessionId))
                 throw new ApplicationException("A Session GUID was not provided.");
+
+            string formSessionId = $"{form}::{browserSessionId}";
 
             await _submitService.PreProcessSubmission(form, formSessionId);
 

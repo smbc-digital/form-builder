@@ -33,10 +33,11 @@ namespace form_builder.Services.TemplatedEmailService
             string browserSessionId = _sessionHelper.GetBrowserSessionId();
             string formSessionId = $"{form}::{browserSessionId}";
 
-            if (string.IsNullOrEmpty(formSessionId))
+            var formData = _distributedCache.GetString(formSessionId);
+
+            if (string.IsNullOrEmpty(formData))
                 throw new Exception("TemplatedEmailService::Process: Session has expired");
 
-            var formData = _distributedCache.GetString(formSessionId);
             var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
             foreach (var action in actions)

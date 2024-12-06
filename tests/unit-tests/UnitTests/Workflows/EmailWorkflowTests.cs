@@ -26,7 +26,6 @@ namespace form_builder_tests.UnitTests.Workflows
             );
         }
 
-
         [Fact]
         public async Task Submit_ShouldThrowApplicationException_WhenNoSessionGuid()
         {
