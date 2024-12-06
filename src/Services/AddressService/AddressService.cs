@@ -188,7 +188,7 @@ namespace form_builder.Services.AddressService
             }
 
             var foundPostCode = convertedAnswers
-                .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+                .Pages?.FirstOrDefault(_ => _.PageSlug.Equals(path))?
                 .Answers?.FirstOrDefault(_ => _.QuestionId.Equals($"{addressElement.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))?
                 .Response;
 
