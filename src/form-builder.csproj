@@ -45,6 +45,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="fonts\**\*.*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
