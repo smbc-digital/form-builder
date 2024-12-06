@@ -332,6 +332,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithFullUKPostcode(bool isFullUKPostCode)
+        {
+            _property.FullUKPostcode = isFullUKPostCode;
+
+            return this;
+        }
+
         public ElementBuilder WithDisableManualAddress(bool disableManualAddress)
         {
             _property.DisableManualAddress = disableManualAddress;
