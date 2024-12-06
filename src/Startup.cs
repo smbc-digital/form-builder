@@ -4,6 +4,7 @@ using form_builder.Middleware;
 using form_builder.ModelBinders.Providers;
 using form_builder.Utils.Startup;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using StockportGovUK.AspNetCore.Middleware.App;
 
 namespace form_builder
@@ -105,6 +106,12 @@ namespace form_builder
                 .UseSession()
                 .UseMiddleware<SessionLoggingMiddleware>()
                 .UseStaticFiles()
+                .UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(
+                        Path.Combine(env.ContentRootPath, "fonts")),
+                    RequestPath = "/fonts"
+                })
                 .UseRouting()
                 .UseEndpoints(endpoints =>
                 endpoints.MapControllerRoute(
