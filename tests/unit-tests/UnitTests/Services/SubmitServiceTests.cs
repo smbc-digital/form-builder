@@ -125,7 +125,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -161,7 +161,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ThrowsAsync(new Exception("error"));
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act & Assert
@@ -200,7 +200,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             _mockSubmitProvider
@@ -245,7 +245,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             _mockSubmitProvider
@@ -337,7 +337,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Build();
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             _mockSchemaFactory
@@ -410,7 +410,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -453,7 +453,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -494,7 +494,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -534,7 +534,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -576,7 +576,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -685,7 +685,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -724,7 +724,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -765,7 +765,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -806,7 +806,7 @@ namespace form_builder_tests.UnitTests.Services
                 });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act

@@ -4,6 +4,6 @@ namespace form_builder.Providers
 {
     public interface IFormAnswersProvider
     {
-        FormAnswers GetFormAnswers();
+        FormAnswers GetFormAnswers(string form);
     }
 }

@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
         }
 
 
@@ -109,7 +109,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
@@ -148,7 +148,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
@@ -181,7 +181,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
@@ -219,7 +219,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
@@ -264,7 +264,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 
@@ -305,7 +305,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateBeforeValidator = new IsDateBeforeValidator(_mockFormAnswersProvider.Object);
 

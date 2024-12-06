@@ -210,10 +210,10 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldGenerateGuidWhenGuidIsEmpty()
+        public async Task ProcessPage_ShouldGenerateGuidWhenFormSessionIsEmpty()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetSessionFormName(It.IsAny<string>())).Returns(string.Empty);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -234,7 +234,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -243,8 +243,8 @@ namespace form_builder_tests.UnitTests.Services
             // Assert
             Assert.IsType<ProcessPageEntity>(result);
 
-            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
-            _sessionHelper.Verify(_ => _.Set(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
+            _sessionHelper.Verify(_ => _.SetSessionFormName(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -252,7 +252,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns(string.Empty);
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
@@ -262,7 +262,6 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessPage("form", "", "", new QueryCollection());
 
             // Assert
-            _sessionHelper.Verify(_ => _.Clear(), Times.Once);
             _mockFormAvailabilityService.Verify(_ => _.IsFormAccessApproved(It.IsAny<FormSchema>()), Times.Once);
         }
 
@@ -271,7 +270,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns(string.Empty);
 
             _sessionHelper
@@ -298,10 +297,9 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
             
             // Act
-            await _service.ProcessPage("form", "page-one", "", new QueryCollection());
+            await _service.ProcessPage("form", "", "", new QueryCollection());
 
             // Assert
-            _sessionHelper.Verify(_ => _.Clear(), Times.Once);
             _mockFormAvailabilityService.Verify(_ => _.IsFormAccessApproved(It.IsAny<FormSchema>()), Times.Once);
         }
 
@@ -330,7 +328,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns((Page)null);
 
             // Act
@@ -359,7 +357,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var result = await _service.ProcessPage("form", "page-one", LookUpConstants.Manual, new QueryCollection());
@@ -371,7 +369,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "other-form" }));
 
             var element = new ElementBuilder()
@@ -394,7 +392,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessPage("new-form", "page-one", "", new QueryCollection());
@@ -405,7 +403,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldNotCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "new-form" }));
 
             var element = new ElementBuilder()
@@ -428,7 +426,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessPage("new-form", "page-one", "", new QueryCollection());
@@ -468,7 +466,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             //Act
@@ -521,7 +519,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             //Act
@@ -663,7 +661,7 @@ namespace form_builder_tests.UnitTests.Services
             _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(false);
 
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             var schema = new FormSchemaBuilder()
                 .WithEnvironmentAvailability("local", false)
@@ -682,7 +680,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task ProcessRequest_ShouldCallSchemaFactory_TransformPage()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -722,7 +720,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallAddressService_WhenAddressElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _addressService.Setup(_ => _.ProcessAddress(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -745,7 +743,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -767,7 +765,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallStreetService_WhenStreetElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _streetService.Setup(_ => _.ProcessStreet(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -790,7 +788,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -812,7 +810,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ApplicationShould_ThrowApplicationException_WhenGenerateHtml_ThrowsException()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .Throws<ApplicationException>();
@@ -836,7 +834,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -876,7 +874,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -895,7 +893,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallProcessOrganisation_WhenOrganisationElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _organisationService.Setup(_ => _.ProcessOrganisation(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ProcessRequestEntity());
 
@@ -918,7 +916,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -965,14 +963,14 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
 
-            _sessionHelper.Setup(_ => _.GetSessionGuid())
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId())
                 .Returns("guid");
 
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             //Act
@@ -985,7 +983,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldNot_CallIncomingDataHelper_WhenPageContains_NoInboundValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -1002,7 +1000,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
@@ -1013,7 +1011,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_Should_CallIncomingDataHelper_WhenPageContains_InboundValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -1035,7 +1033,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), It.IsAny<IEnumerable<CustomFormFile>>(), true);
@@ -1046,7 +1044,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_Should_CallPageHelper_ToSanitizeViewModel()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
 
@@ -1063,7 +1061,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
@@ -1074,7 +1072,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCallFileUploadService_WhenMultipleFileUploadElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _fileUploadService
                 .Setup(_ => _.ProcessFile(It.IsAny<Dictionary<string, dynamic>>(),
@@ -1105,7 +1103,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var viewModel = new Dictionary<string, dynamic>
@@ -1133,7 +1131,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldNotCallFileUploadService_WhenNoMultipleFileUploadElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _mockPageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
@@ -1151,7 +1149,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             await _service.ProcessRequest("form", "page-one", new Dictionary<string, dynamic>(), null, true);
@@ -1168,7 +1166,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCall_IncomingDataHelper_WhenFormHasIncomingGetValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
 
             var element = new ElementBuilder()
                 .WithType(EElementType.H1)
@@ -1194,7 +1192,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -1208,7 +1206,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCall_IncomingDataHelper_AndSaveData_WhenFormHasIncomingGetValues()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
             _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
                 .Returns(new Dictionary<string, dynamic> { { "test", "testdata" } });
 
@@ -1236,7 +1234,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -1251,7 +1249,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldCall_ActionsWorkflow_WithGetActions_WhenFormHasGetPageActions()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
             _mockIncomingDataHelper.Setup(_ => _.AddIncomingFormDataValues(It.IsAny<Page>(), It.IsAny<QueryCollection>(), It.IsAny<FormAnswers>()))
                 .Returns(new Dictionary<string, dynamic> { { "test", "testdata" } });
 
@@ -1284,7 +1282,7 @@ namespace form_builder_tests.UnitTests.Services
                 .ReturnsAsync(schema);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             // Act
@@ -1297,7 +1295,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessPage_ShouldRedirect_WhenBookingService_ReturnsEntity_WithNoAppointments()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
             _bookingService.Setup(_ => _.Get(It.IsAny<string>(), It.IsAny<Page>(), It.IsAny<string>()))
                 .ReturnsAsync(new BookingProcessEntity { BookingHasNoAvailableAppointments = true });
 
@@ -1332,7 +1330,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public async Task ProcessRequest_ShouldCall_BookingService_WhenPAge_ContainsBookingElement()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
             _mockPageFactory.Setup(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
                 .ReturnsAsync(new FormBuilderViewModel());
             _bookingService.Setup(_ => _.ProcessBooking(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<Page>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -1366,7 +1364,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(viewModel);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(page);
 
             var result = await _service.ProcessRequest("form", "page-one", viewModel, null, true);
@@ -1395,7 +1393,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithPage(page)
                 .Build();
 
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("1234567");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
 
             _mockSchemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
                 .ReturnsAsync(schema);
@@ -1424,7 +1422,7 @@ namespace form_builder_tests.UnitTests.Services
         [Fact]
         public void GetBehaviour_ShouldCallSession_And_DistributedCache_And_TagParsers()
         {
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("12345");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("12345");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
 
             var behaviour = new BehaviourBuilder()
@@ -1436,9 +1434,9 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _service.GetBehaviour(new ProcessRequestEntity { Page = page });
+            _service.GetBehaviour(new ProcessRequestEntity { Page = page }, "form");
 
-            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
             _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
         }
@@ -1447,7 +1445,7 @@ namespace form_builder_tests.UnitTests.Services
         public async Task FinalisePageJourney_ShouldThrow_ApplicationException_WhenNoSessionGuid()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(string.Empty);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(string.Empty);
 
             var page = new PageBuilder()
                 .WithPageSlug("page-one")
@@ -1461,7 +1459,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
 
             // Assert
-            Assert.EndsWith("Session has expired", result.Message);
+            Assert.EndsWith("Browser Session is null", result.Message);
         }
 
         [Fact]
@@ -1469,7 +1467,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             var guid = Guid.NewGuid();
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns((string)null);
 
@@ -1494,7 +1492,7 @@ namespace form_builder_tests.UnitTests.Services
             var questionIDTwo = "fileUploadtwo";
             var fileOneKey = $"file-{questionIDOne}-12345";
             var fileTwoKey = $"file-{questionIDTwo}-12345";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var cacheData = new FormAnswers
             {
@@ -1574,7 +1572,7 @@ namespace form_builder_tests.UnitTests.Services
             var fileTwoKey = $"file-{questionIDOne}-456";
             var fileThreeKey = $"file-{questionIDOne}-789";
             var fileFourKey = $"file-{questionIDTwo}-123";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var cacheData = new FormAnswers
             {
@@ -1664,7 +1662,7 @@ namespace form_builder_tests.UnitTests.Services
             var fileTwoKey = $"file-{questionIDOne}-456";
             var fileThreeKey = $"file-{questionIDOne}-789";
             var fileFourKey = $"file-{questionIDTwo}-123";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var cacheData = new FormAnswers
             {
@@ -1727,7 +1725,7 @@ namespace form_builder_tests.UnitTests.Services
             var guid = Guid.NewGuid();
             var questionIDOne = "questionOne";
             var questionIDTwo = "docDownloadButton";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             var element = new ElementBuilder()
                 .WithType(EElementType.Textbox)
@@ -1760,7 +1758,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.FinalisePageJourney("form", EBehaviourType.SubmitForm, schema);
 
             // Assert
-            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x == $"document-{guid}"), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

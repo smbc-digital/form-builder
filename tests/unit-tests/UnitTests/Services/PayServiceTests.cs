@@ -118,23 +118,11 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns(() => paymentProviderItems.GetEnumerator());
 
             _mockSessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
 
             _mockMappingService
-                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
-                .ReturnsAsync(mappingEntity);
-
-            _mockMappingService
-                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "nonexistanceform"))
-                .ReturnsAsync(mappingEntity);
-
-            _mockMappingService
-                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "complexCalculationForm"))
-                .ReturnsAsync(mappingEntity);
-
-            _mockMappingService
-                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testFormWithNoValidPayment"))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(mappingEntity);
 
             _mockHostingEnvironment
@@ -566,7 +554,7 @@ namespace form_builder_tests.UnitTests.Services
             mappingEntity.BaseForm.ProcessPaymentCallbackResponse = true;
 
             _mockMappingService
-                .Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(mappingEntity);
 
             _mockPaymentHelper

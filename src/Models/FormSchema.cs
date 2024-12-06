@@ -59,7 +59,7 @@ namespace form_builder.Models
             EnvironmentAvailabilities = new List<EnvironmentAvailability>();
         }
 
-        public Page GetPage(IPageHelper pageHelper, string path)
+        public Page GetPage(IPageHelper pageHelper, string path, string form)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace form_builder.Models
                 if (pages.Count.Equals(1))
                     return pages.First();
 
-                var page = pageHelper.GetPageWithMatchingRenderConditions(pages);
+                var page = pageHelper.GetPageWithMatchingRenderConditions(pages, form);
 
                 return page;
             }

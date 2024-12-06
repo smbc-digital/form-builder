@@ -28,7 +28,7 @@ namespace form_builder_tests.UnitTests.Services
             var emailProviderItems = new List<IEmailProvider> { _mockEmailProvider.Object };
             _mockEmailProviders.Setup(m => m.GetEnumerator()).Returns(() => emailProviderItems.GetEnumerator());
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("sessionGuid");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("sessionGuid");
 
             var formData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
 
@@ -51,20 +51,20 @@ namespace form_builder_tests.UnitTests.Services
             _mockEmailProvider.Setup(_ => _.SendEmail(It.IsAny<EmailMessage>())).ReturnsAsync(HttpStatusCode.OK);
 
             // Act
-            await _emailService.Process(new List<IAction> { action });
+            await _emailService.Process(new List<IAction> { action }, "form");
 
             // Assert
-            _mockSessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _mockSessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
         }
 
         [Fact]
         public async Task Process_ShouldThrowException_IfSessionIsNull()
         {
             // Arrange
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("");
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("");
 
             // Act & Assert
-            var result = await Assert.ThrowsAsync<Exception>(() => _emailService.Process(new List<IAction> { new UserEmail() }));
+            var result = await Assert.ThrowsAsync<Exception>(() => _emailService.Process(new List<IAction> { new UserEmail() }, "form"));
             Assert.Contains("EmailService::Process: Session has expired", result.Message);
         }
 
@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("test@testemail.com");
 
             // Act
-            await _emailService.Process(new List<IAction> { action });
+            await _emailService.Process(new List<IAction> { action }, "form");
 
             // Assert
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
@@ -95,7 +95,7 @@ namespace form_builder_tests.UnitTests.Services
                .Build();
 
             // Act
-            await _emailService.Process(new List<IAction> { action });
+            await _emailService.Process(new List<IAction> { action }, "form");
 
             // Assert
             _mockEmailProvider.Verify(_ => _.SendEmail(It.IsAny<EmailMessage>()), Times.Once);
@@ -110,7 +110,7 @@ namespace form_builder_tests.UnitTests.Services
               .Build();
 
             // Act
-            await _emailService.Process(new List<IAction> { action });
+            await _emailService.Process(new List<IAction> { action }, "form");
 
             // Assert
             _mockActionHelper.Verify(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()), Times.Once);
@@ -123,7 +123,7 @@ namespace form_builder_tests.UnitTests.Services
             var action = new ActionBuilder().WithActionType(EActionType.UserEmail).Build();
 
             // Act
-            await _emailService.Process(new List<IAction> { action });
+            await _emailService.Process(new List<IAction> { action }, "form");
 
             // Assert
             _mockActionHelper.Verify(_ => _.GetEmailContent(It.IsAny<IAction>(), It.IsAny<FormAnswers>()), Times.Once);

@@ -48,7 +48,7 @@ namespace form_builder.Models.Elements
 
         public override async Task<string> RenderAsync(IViewRender viewRender,
             IElementHelper elementHelper,
-            string guid,
+            string cacheKey,
             Dictionary<string, dynamic> viewModel,
             Page page,
             FormSchema formSchema,
@@ -64,7 +64,7 @@ namespace form_builder.Models.Elements
                     {
                         Properties = Properties
                     };
-                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, guid, viewModel, page, formSchema, environment, formAnswers, results);
+                    return await manualAddressElement.RenderAsync(viewRender, elementHelper, cacheKey, viewModel, page, formSchema, environment, formAnswers, results);
 
                 case LookUpConstants.Automatic:
                     if (results is null)

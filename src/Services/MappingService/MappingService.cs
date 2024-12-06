@@ -40,9 +40,9 @@ namespace form_builder.Services.MappingService
             _logger = logger;
         }
 
-        public async Task<MappingEntity> Map(string sessionGuid, string form)
+        public async Task<MappingEntity> Map(string cacheKey, string form)
         {
-            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
 
             return new MappingEntity
             {
@@ -52,9 +52,9 @@ namespace form_builder.Services.MappingService
             };
         }
 
-        public async Task<BookingRequest> MapBookingRequest(string sessionGuid, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
+        public async Task<BookingRequest> MapBookingRequest(string cacheKey, IElement bookingElement, Dictionary<string, dynamic> viewModel, string form)
         {
-            var (convertedAnswers, baseForm) = await GetFormAnswers(form, sessionGuid);
+            var (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
 
             AppointmentType appointmentType = bookingElement.Properties.AppointmentTypes
                 .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
@@ -80,16 +80,16 @@ namespace form_builder.Services.MappingService
             appointmentType.AppointmentId = new Guid((string)value.Response);
         }
 
-        private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string sessionGuid)
+        private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string cacheKey)
         {
             var baseForm = await _schemaFactory.Build(form);
 
-            if (string.IsNullOrEmpty(sessionGuid))
-                throw new ApplicationException($"MappingService::GetFormAnswers:{sessionGuid}, Session has expired");
+            if (string.IsNullOrEmpty(cacheKey))
+                throw new ApplicationException($"MappingService::GetFormAnswers:{cacheKey}, Session has expired");
 
-            var sessionData = _distributedCache.GetString(sessionGuid);
+            var sessionData = _distributedCache.GetString(cacheKey);
             if (sessionData is null)
-                throw new ApplicationException($"MappingService::GetFormAnswer:{sessionGuid}, Session data is null");
+                throw new ApplicationException($"MappingService::GetFormAnswer:{cacheKey}, Session data is null");
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
@@ -101,12 +101,12 @@ namespace form_builder.Services.MappingService
             IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);
             foreach (var pageSlug in visitedPageSlugs)
             {
-                await _schemaFactory.TransformPage(baseForm.GetPage(_pageHelper, pageSlug), convertedAnswers);
+                await _schemaFactory.TransformPage(baseForm.GetPage(_pageHelper, pageSlug, form), convertedAnswers);
             }
 
             convertedAnswers.FormName = form;
             if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
-                _logger.LogInformation($"MappingService::GetFormAnswers:: Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {sessionGuid}");
+                _logger.LogInformation($"MappingService::GetFormAnswers:: Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {cacheKey}");
 
             return (convertedAnswers, baseForm);
         }

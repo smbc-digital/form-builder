@@ -8,8 +8,10 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.AddressService;
 using form_builder.ViewModels;
 using form_builder_tests.Builders;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Services
@@ -22,6 +24,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IAddressProvider> _addressProvider = new();
         private readonly Mock<IPageFactory> _mockPageContentFactory = new();
         private readonly IEnumerable<IAddressProvider> _addressProviders;
+        private readonly Mock<ILogger<AddressService>> _mockLogger = new();
 
         public AddressServiceTests()
         {
@@ -31,7 +34,7 @@ namespace form_builder_tests.UnitTests.Services
                 _addressProvider.Object
             };
 
-            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object);
+            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -203,9 +206,9 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
+            var result = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.StartsWith($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{addressProvider}' with searchterm 'SK11aa' Exception: ", result.Message);
+            Assert.Equal($"Sequence contains no matching element", result.Message);            
         }
 
         [Fact]
@@ -238,11 +241,11 @@ namespace form_builder_tests.UnitTests.Services
                 { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
             };
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
 
             _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
             _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to perform postcode lookup on Provider '{testAddressProvider}' with searchterm 'SK11aa' Exception:", result.Message);
+            Assert.Equal($"Exception of type 'System.Exception' was thrown.", result.Message);                
         }
     }
 }

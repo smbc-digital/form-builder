@@ -53,33 +53,34 @@ namespace form_builder.Services.PayService
             _tagParsers = tagParsers;
         }
 
-        public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string sessionGuid)
+        public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string cacheKey)
         {
-            var formAnswers = _pageHelper.GetSavedAnswers(sessionGuid);
+            var formAnswers = _pageHelper.GetSavedAnswers(cacheKey);
             var paymentInformation = JsonConvert.SerializeObject(await _paymentHelper.GetFormPaymentInformation(form));
             paymentInformation = _tagParsers.Aggregate(paymentInformation, (current, tagParser) => tagParser.ParseString(current, formAnswers));
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-            _logger.LogInformation($"PayService::ProcessPayment:{sessionGuid} {form} - Creating payment request - for {reference}");
+            _logger.LogInformation($"PayService::ProcessPayment:{cacheKey} {form} - Creating payment request - for {reference}");
 
-            return await paymentProvider.GeneratePaymentUrl(form, path, reference, sessionGuid, parsedPaymentInformation);
+            return await paymentProvider.GeneratePaymentUrl(form, path, reference, cacheKey, parsedPaymentInformation);
         }
 
         public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
         {
             _logger.LogInformation($"PayService::ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
 
-            var sessionGuid = _sessionHelper.GetSessionGuid();
+            string browserSessionId = _sessionHelper.GetBrowserSessionId();
+            string formSessionId = $"{form}::{browserSessionId}";
 
-            if (string.IsNullOrWhiteSpace(sessionGuid))
+            if (string.IsNullOrWhiteSpace(formSessionId))
                 _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Session expired for {reference}");
 
-            var mappingEntity = await _mappingService.Map(sessionGuid, form);
+            var mappingEntity = await _mappingService.Map(formSessionId, form);
             if (mappingEntity is null)
                 throw new Exception($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)} No mapping entity found for {form}");
 
-            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path);
+            var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
             var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form);
 
             _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
@@ -124,7 +125,7 @@ namespace form_builder.Services.PayService
                 throw new PaymentCallbackException(ex.Message);
             }
 
-            _pageHelper.SavePaymentAmount(sessionGuid, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
+            _pageHelper.SavePaymentAmount(formSessionId, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
             return reference;
         }
 
@@ -141,13 +142,13 @@ namespace form_builder.Services.PayService
 
                 return result;
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
                 _logger.LogError(
                     $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
                     $"Payment callback to url {callbackUrl} failed. " +
                     $"Payment status was {paymentStatus}, " +
-                    $"failed with Exception: {e.Message}, Payment reference {reference}");
+                    $"failed with Exception: {exception.Message}, Payment reference {reference}");
 
                 return new HttpResponseMessage(HttpStatusCode.FailedDependency);
             }

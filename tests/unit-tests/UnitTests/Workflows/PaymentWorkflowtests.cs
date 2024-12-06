@@ -39,7 +39,7 @@ namespace form_builder_tests.UnitTests.Workflows
         public async Task Submit_ShouldCallMapping_Submit_And_PayService()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123454");
 
             // Act
             await _workflow.Submit("form", "page");

@@ -39,13 +39,13 @@ namespace form_builder.Workflows.ActionsWorkflow
                 await _retrieveExternalDataService.Process(actions.Where(_ => _.Type.Equals(EActionType.RetrieveExternalData)).ToList(), formSchema, formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.UserEmail) || _.Type.Equals(EActionType.BackOfficeEmail)))
-                await _emailService.Process(actions.Where(_ => _.Type.Equals(EActionType.UserEmail) || _.Type.Equals(EActionType.BackOfficeEmail)).ToList());
+                await _emailService.Process(actions.Where(_ => _.Type.Equals(EActionType.UserEmail) || _.Type.Equals(EActionType.BackOfficeEmail)).ToList(), formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.Validate)))
                 await _validateService.Process(actions.Where(_ => _.Type.Equals(EActionType.Validate)).ToList(), formSchema, formName);
 
             if (actions.Any(_ => _.Type.Equals(EActionType.TemplatedEmail)))
-                _ = _templatedEmailService.ProcessTemplatedEmail(actions.Where(_ => _.Type.Equals(EActionType.TemplatedEmail)).ToList());
+                _ = _templatedEmailService.ProcessTemplatedEmail(actions.Where(_ => _.Type.Equals(EActionType.TemplatedEmail)).ToList(), formName);
         }
     }
 }

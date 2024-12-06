@@ -15,7 +15,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var guid = Guid.NewGuid();
 
             // Act
-            var result = _mockSession.Setup(_ => _.GetSessionGuid()).Returns(guid.ToString());
+            var result = _mockSession.Setup(_ => _.GetBrowserSessionId()).Returns(guid.ToString());
 
             // Assert
             Assert.NotNull(result);

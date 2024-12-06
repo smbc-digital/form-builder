@@ -11,9 +11,9 @@ namespace form_builder.Services.PageService
 
         Task<ProcessRequestEntity> ProcessRequest(string form, string path, Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> file, bool modelStateIsValid);
 
-        Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string sessionGuid, string subPath, List<object> results);
+        Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string cacheKey, string subPath, List<object> results);
 
-        Task<Behaviour> GetBehaviour(ProcessRequestEntity currentPageResult);
+        Task<Behaviour> GetBehaviour(ProcessRequestEntity currentPageResult, string form);
 
         Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema formSchema);
 
