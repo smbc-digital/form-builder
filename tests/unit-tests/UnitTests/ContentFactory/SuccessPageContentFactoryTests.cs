@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         public async Task Build_ShouldReturn_SuccessPageEntity_WithSubmitViewName_WhenNoSuccessPage_Configured()
         {
             // Arrange
-            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns((Page)null);
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>())).Returns((Page)null);
 
             // Act 
             var result = await _factory.Build(string.Empty, new FormSchema { BaseURL = "base-test", FirstPageSlug = "page-one", Pages = new List<Page>() }, string.Empty, new FormAnswers(), EBehaviourType.SubmitForm);
@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, List<object>>((a, b, c, d, e, f) => callBack = a);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns((Page)null);
 
             // Act 
@@ -114,7 +114,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .Callback<Page, Dictionary<string, dynamic>, FormSchema, string, FormAnswers, List<object>>((a, b, c, d, e, f) => callBack = a);
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(Page);
 
             // Act 
@@ -151,7 +151,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .ReturnsAsync(new FormBuilderViewModel { IsInPreviewMode = true });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns(formSchema.Pages.FirstOrDefault());
 
             // Act 
@@ -185,7 +185,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .ReturnsAsync(new FormBuilderViewModel());
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns((Page)null);
 
             // Act 
@@ -196,7 +196,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         }
 
         [Fact]
-        public async Task Build_ShouldReturn_IsInPreviewMode_True_When_PreviewMode_Enabeld_And_Matching_BaseUrl_With_Generic_SuccessPage()
+        public async Task Build_ShouldReturn_IsInPreviewMode_True_When_PreviewMode_Enabled_And_Matching_BaseUrl_With_Generic_SuccessPage()
         {
             _mockPreviewModeConfiguration
                 .Setup(_ => _.Value)
@@ -223,7 +223,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
                 .ReturnsAsync(new FormBuilderViewModel { IsInPreviewMode = true });
 
             _mockPageHelper
-                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>()))
+                .Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>()))
                 .Returns((Page)null);
 
             // Act 
@@ -268,7 +268,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
             await _factory.Build(string.Empty, formSchema, guid.ToString(), new FormAnswers(), EBehaviourType.SubmitForm);
 
             // Assert
-            _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
             _mockDistributedCache.Verify(_ => _.Remove(It.Is<string>(x => x.Equals(guid.ToString()))), Times.Once);
         }
 
@@ -294,7 +293,6 @@ namespace form_builder_tests.UnitTests.ContentFactory
 
             // Assert
             Assert.IsType<SuccessPageEntity>(result);
-            _mockSessionHelper.Verify(_ => _.RemoveSessionGuid(), Times.Once);
             _mockPageContentFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Once);
             Assert.Single(pageCallback.Elements);
             Assert.Equal("booking-cancel-success", pageCallback.PageSlug);

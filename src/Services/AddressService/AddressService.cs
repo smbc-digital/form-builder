@@ -203,7 +203,7 @@ namespace form_builder.Services.AddressService
                 try
                 {
                     bool fullUKPostcode = addressElement.Properties.FullUKPostcode;
-                    if (fullUKPostcode) 
+                    if (fullUKPostcode)
                         postcode = postcode + ":full";
 
                     addressProv = _addressProviders.Get(addressElement.Properties.AddressProvider);

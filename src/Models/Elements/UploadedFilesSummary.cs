@@ -5,39 +5,38 @@ using form_builder.Helpers.ViewRender;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace form_builder.Models.Elements
+namespace form_builder.Models.Elements;
+
+public class UploadedFilesSummary : Element
 {
-    public class UploadedFilesSummary : Element
+    public UploadedFilesSummary() => Type = EElementType.UploadedFilesSummary;
+
+    public override Task<string> RenderAsync(IViewRender viewRender,
+        IElementHelper elementHelper,
+        string cacheKey,
+        Dictionary<string, dynamic> viewModel,
+        Page page,
+        FormSchema formSchema,
+        IWebHostEnvironment environment,
+        FormAnswers formAnswers,
+        List<object> results = null)
     {
-        public UploadedFilesSummary() => Type = EElementType.UploadedFilesSummary;
+        Properties.ClassName ??= "smbc-!-font-word-break";
 
-        public override Task<string> RenderAsync(IViewRender viewRender,
-            IElementHelper elementHelper,
-            string guid,
-            Dictionary<string, dynamic> viewModel,
-            Page page,
-            FormSchema formSchema,
-            IWebHostEnvironment environment,
-            FormAnswers formAnswers,
-            List<object> results = null)
+        if (Properties.FileUploadQuestionIds.Any())
         {
-            Properties.ClassName ??= "smbc-!-font-word-break";
-
-            if (Properties.FileUploadQuestionIds.Any())
+            Properties.FileUploadQuestionIds.ForEach((questionId) =>
             {
-                Properties.FileUploadQuestionIds.ForEach((questionId) =>
+                var model = elementHelper.CurrentValue<JArray>(questionId, viewModel, formAnswers, FileUploadConstants.SUFFIX);
+
+                if (model is not null && model.Any())
                 {
-                    var model = elementHelper.CurrentValue<JArray>(questionId, viewModel, formAnswers, FileUploadConstants.SUFFIX);
-
-                    if (model is not null && model.Any())
-                    {
-                        List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(model.ToString());
-                        Properties.ListItems.AddRange(response.Select(_ => _.TrustedOriginalFileName));
-                    }
-                });
-            }
-
-            return viewRender.RenderAsync(Type.ToString(), this);
+                    List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(model.ToString());
+                    Properties.ListItems.AddRange(response.Select(_ => _.TrustedOriginalFileName));
+                }
+            });
         }
+
+        return viewRender.RenderAsync(Type.ToString(), this);
     }
 }

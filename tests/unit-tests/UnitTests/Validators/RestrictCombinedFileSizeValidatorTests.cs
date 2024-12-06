@@ -116,7 +116,7 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturn_True_ValidationResult_WhenTotalFiles_AreBelow_MaxLimit_When_GettingAdditonalFiles_FromSavedAnswers()
         {
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid())
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId())
                 .Returns("12345");
 
             _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "12345")))
@@ -200,10 +200,10 @@ namespace form_builder_tests.UnitTests.Validators
         [Fact]
         public void Validate_ShouldReturn_False_ValidationResult_WhenTotalFiles_AreOver_MaxLimit_When_GettingAdditonalFiles_FromSavedAnswers()
         {
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid())
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId())
                 .Returns("12345");
 
-            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.Is<string>(_ => _ == "12345")))
+            _mockDistributedCacheWrapper.Setup(_ => _.GetString(It.IsAny<string>()))
                 .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers> { new Answers { QuestionId = $"fileuploadquestion{FileUploadConstants.SUFFIX}", Response = Newtonsoft.Json.JsonConvert.SerializeObject(new List<FileUploadModel> { new FileUploadModel { FileSize = 2048576 } }) } } } } }));
 
             var element = new ElementBuilder()

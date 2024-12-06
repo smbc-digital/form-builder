@@ -53,7 +53,7 @@ namespace form_builder.Helpers.PageHelpers
             Page page,
             Dictionary<string, dynamic> viewModel,
             FormSchema baseForm,
-            string guid,
+            string cacheKey,
             FormAnswers formAnswers,
             List<object> results = null)
         {
@@ -67,16 +67,12 @@ namespace form_builder.Helpers.PageHelpers
 
             foreach (var element in page.Elements)
             {
-                string html = await element.RenderAsync(_viewRender, _elementHelper, guid, viewModel, page, baseForm, _environment, formAnswers, results);
+                string html = await element.RenderAsync(_viewRender, _elementHelper, cacheKey, viewModel, page, baseForm, _environment, formAnswers, results);
 
                 if (element.Properties is not null && element.Properties.isConditionalElement)
-                {
                     formModel.RawHTML = formModel.RawHTML.Replace($"{SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT}{element.Properties.QuestionId}", html);
-                }
                 else
-                {
                     formModel.RawHTML += html;
-                }
             }
 
             return formModel;
@@ -84,7 +80,7 @@ namespace form_builder.Helpers.PageHelpers
 
         public void RemoveFieldset(Dictionary<string, dynamic> viewModel,
             string form,
-            string guid,
+            string cacheKey,
             string path,
             string removeKey)
         {
@@ -123,18 +119,18 @@ namespace form_builder.Helpers.PageHelpers
                 }
             }
 
-            SaveAnswers(updatedViewModel, guid, form, null, true);
+            SaveAnswers(updatedViewModel, cacheKey, form, null, true);
         }
 
-        public FormAnswers GetSavedAnswers(string guid)
+        public FormAnswers GetSavedAnswers(string cacheKey)
         {
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            string rawFormData = _distributedCache.GetString(cacheKey);
+            FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            if (!string.IsNullOrEmpty(rawFormData))
+                formAnswers = JsonConvert.DeserializeObject<FormAnswers>(rawFormData);
 
-            return convertedAnswers;
+            return formAnswers;
         }
 
         public Dictionary<string, dynamic> SanitizeViewModel(Dictionary<string, dynamic> viewModel)
@@ -151,31 +147,36 @@ namespace form_builder.Helpers.PageHelpers
                         sanitizedViewModel.Add(item.Key, item.Value);
                 }
                 else
+                {
                     sanitizedViewModel.Add(item.Key, item.Value);
+                }
             }
 
             return sanitizedViewModel;
         }
 
-        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string guid, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
+        public void SaveAnswers(Dictionary<string, dynamic> viewModel, string cacheKey, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
         {
-            var formData = _distributedCache.GetString(guid);
+            var rawFormData = _distributedCache.GetString(cacheKey);
 
             if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache - {formData}");
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache - {rawFormData}");
             else
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - raw data retrieved from cache");
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache");
 
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
             var currentPageAnswers = new PageAnswers();
 
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            if (!string.IsNullOrEmpty(rawFormData))
+                formAnswers = JsonConvert.DeserializeObject<FormAnswers>(rawFormData);
 
-            if (convertedAnswers.Pages is not null && convertedAnswers.Pages.Any(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)))
+            if (formAnswers.Pages is null)
+                formAnswers.Pages = new();
+
+            if (formAnswers.Pages is not null && formAnswers.Pages.Any(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)))
             {
-                currentPageAnswers = convertedAnswers.Pages.Where(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList().FirstOrDefault();
-                convertedAnswers.Pages = convertedAnswers.Pages.Where(_ => !_.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList();
+                currentPageAnswers = formAnswers.Pages.Where(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList().FirstOrDefault();
+                formAnswers.Pages = formAnswers.Pages.Where(_ => !_.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             List<Answers> answers = new();
@@ -192,109 +193,109 @@ namespace form_builder.Helpers.PageHelpers
             if (files is not null && files.Any() && isPageValid)
                 answers = SaveFormFileAnswers(answers, files, appendMultipleFileUploadParts, currentPageAnswers);
 
-            convertedAnswers.Pages?.Add(new PageAnswers
+            formAnswers.Pages?.Add(new PageAnswers
             {
                 PageSlug = viewModel["Path"].ToLower(),
                 Answers = answers
             });
 
-            convertedAnswers.Path = viewModel["Path"];
-            convertedAnswers.FormName = form;
+            formAnswers.Path = viewModel["Path"];
+            formAnswers.FormName = form;
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
 
             if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - answers saved - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - answers saved - {JsonConvert.SerializeObject(formAnswers.Pages)}");
             else
-                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{guid} - answers saved");
+                _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - answers saved");
         }
 
-        public void SaveCaseReference(string guid, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
+        public void SaveCaseReference(string cacheId, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
         {
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            string rawFormData = _distributedCache.GetString(cacheId);
+            FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            if (!string.IsNullOrEmpty(rawFormData))
+                formAnswers = JsonConvert.DeserializeObject<FormAnswers>(rawFormData);
 
             if (isGenerated)
             {
-                if (convertedAnswers.AdditionalFormData.ContainsKey(generatedReferenceMappingId))
-                    convertedAnswers.AdditionalFormData.Remove(generatedReferenceMappingId);
+                if (formAnswers.AdditionalFormData.ContainsKey(generatedReferenceMappingId))
+                    formAnswers.AdditionalFormData.Remove(generatedReferenceMappingId);
 
-                convertedAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
+                formAnswers.AdditionalFormData.Add(generatedReferenceMappingId, caseReference);
             }
             
-            convertedAnswers.CaseReference = caseReference;
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            formAnswers.CaseReference = caseReference;
+            _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(formAnswers));
         }
 
-        public void SavePaymentAmount(string guid, string paymentAmount, string targetMapping)
+        public void SavePaymentAmount(string cacheId, string paymentAmount, string targetMapping)
         {
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            string rawFormData = _distributedCache.GetString(cacheId);
+            FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            if (!string.IsNullOrEmpty(rawFormData))
+                formAnswers = JsonConvert.DeserializeObject<FormAnswers>(rawFormData);
 
-            convertedAnswers.PaymentAmount = paymentAmount;
+            formAnswers.PaymentAmount = paymentAmount;
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(formAnswers));
         }
 
-        public void SaveFormData(string key, object value, string guid, string formName)
+        public void SaveFormData(string key, object value, string cacheKey, string form)
         {
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
+            string rawFormData = _distributedCache.GetString(cacheKey);
+            FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            if (!string.IsNullOrEmpty(rawFormData))
+                formAnswers = JsonConvert.DeserializeObject<FormAnswers>(rawFormData);
 
-            if (convertedAnswers.FormData.ContainsKey(key))
-                convertedAnswers.FormData.Remove(key);
+            if (formAnswers.FormData.ContainsKey(key))
+                formAnswers.FormData.Remove(key);
 
-            convertedAnswers.FormData.Add(key, value);
-            convertedAnswers.FormName = formName;
+            formAnswers.FormData.Add(key, value);
+            formAnswers.FormName = form;
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
         }
 
-        public void RemoveFormData(string key, string guid, string formName)
+        public void RemoveFormData(string key, string cacheKey, string form)
         {
-            var convertedAnswers = GetSavedAnswers(guid);
+            FormAnswers formAnswers = GetSavedAnswers(cacheKey);
 
-            if (convertedAnswers.FormData.ContainsKey(key))
-                convertedAnswers.FormData.Remove(key);
+            if (formAnswers.FormData.ContainsKey(key))
+                formAnswers.FormData.Remove(key);
 
-            convertedAnswers.FormName = formName;
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            formAnswers.FormName = form;
+            _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
         }
 
-        public void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string guid)
+        public void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string cacheKey)
         {
             if (!values.Any())
                 return;
 
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = new FormAnswers
+            string rawFormData = _distributedCache.GetString(cacheKey);
+            FormAnswers formAnswers = new()
             {
                 Pages = new List<PageAnswers>(),
                 FormName = form,
                 Path = path
             };
 
-            if (!string.IsNullOrEmpty(formData))
-                convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+            if (!string.IsNullOrEmpty(rawFormData))
+                formAnswers = JsonConvert.DeserializeObject<FormAnswers>(rawFormData);
 
-            values.ToList().ForEach((_) =>
+            values.ToList().ForEach(_ =>
             {
-                if (convertedAnswers.AdditionalFormData.ContainsKey(_.Key))
-                    convertedAnswers.AdditionalFormData.Remove(_.Key);
+                if (formAnswers.AdditionalFormData.ContainsKey(_.Key))
+                    formAnswers.AdditionalFormData.Remove(_.Key);
 
-                convertedAnswers.AdditionalFormData.Add(_.Key, _.Value);
+                formAnswers.AdditionalFormData.Add(_.Key, _.Value);
             });
 
-            _distributedCache.SetStringAsync(guid, JsonConvert.SerializeObject(convertedAnswers));
+            _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
         }
 
         public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
@@ -344,12 +345,13 @@ namespace form_builder.Helpers.PageHelpers
             return answers;
         }
 
-        public Page GetPageWithMatchingRenderConditions(List<Page> pages)
+        public Page GetPageWithMatchingRenderConditions(List<Page> pages, string form)
         {
-            var guid = _sessionHelper.GetSessionGuid();
-            var formData = _distributedCache.GetString(guid);
-            var convertedAnswers = !string.IsNullOrEmpty(formData)
-                ? JsonConvert.DeserializeObject<FormAnswers>(formData)
+            string browserSessionId = _sessionHelper.GetBrowserSessionId();
+            string cacheKey = $"{form}::{browserSessionId}";
+            string rawFormData = _distributedCache.GetString(cacheKey);
+            var convertedAnswers = !string.IsNullOrEmpty(rawFormData)
+                ? JsonConvert.DeserializeObject<FormAnswers>(rawFormData)
                 : new FormAnswers { Pages = new List<PageAnswers>() };
 
             var answers = convertedAnswers.Pages.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);

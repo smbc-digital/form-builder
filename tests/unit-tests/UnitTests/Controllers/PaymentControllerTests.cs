@@ -25,7 +25,7 @@ namespace form_builder_tests.UnitTests.Controllers
         public PaymentControllerTests()
         {
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns("123");
 
             _mappingService
@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _controller.CallbackFailure("form", "123456");
 
             // Assert
-            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
         }
 
         [Fact]

@@ -27,10 +27,10 @@ namespace form_builder_tests.UnitTests.Models
                 }
             };
 
-            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns((Page)null);
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>())).Returns((Page)null);
 
             // Act & Assert
-            var result = Assert.Throws<ApplicationException>(() => formSchema.GetPage(_mockPageHelper.Object, "path"));
+            var result = Assert.Throws<ApplicationException>(() => formSchema.GetPage(_mockPageHelper.Object, "path", "form"));
             Assert.Contains("Requested path 'path' object could not be found or was not unique", result.Message);
         }
 
@@ -79,10 +79,10 @@ namespace form_builder_tests.UnitTests.Models
                 .WithPage(page2)
                 .Build();
 
-            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(page);
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>())).Returns(page);
 
             // Act
-            var result = formSchema.GetPage(_mockPageHelper.Object, "success");
+            var result = formSchema.GetPage(_mockPageHelper.Object, "success", "form");
 
             // Assert
             Assert.Equal(page, result);
@@ -121,10 +121,10 @@ namespace form_builder_tests.UnitTests.Models
                 .WithPage(page2)
                 .Build();
 
-            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>())).Returns(page);
+            _mockPageHelper.Setup(_ => _.GetPageWithMatchingRenderConditions(It.IsAny<List<Page>>(), It.IsAny<string>())).Returns(page);
 
             // Act
-            var result = formSchema.GetPage(_mockPageHelper.Object, "success");
+            var result = formSchema.GetPage(_mockPageHelper.Object, "success", "form");
 
             // Assert
             Assert.Equal(page, result);

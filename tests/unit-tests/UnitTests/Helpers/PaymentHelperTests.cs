@@ -7,6 +7,7 @@ using form_builder.Helpers.Session;
 using form_builder.Models;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
+using form_builder.Services.MappingService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
@@ -23,6 +24,8 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
         private readonly Mock<IMappingService> _mockMappingService = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnvironment = new();
+
+        private readonly MappingEntity _mappingEntity;
 
         public PaymentHelperTests()
         {
@@ -91,21 +94,15 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithPage(page)
                 .Build();
 
-            var mappingEntity = new MappingEntityBuilder()
+            _mappingEntity = new MappingEntityBuilder()
                 .WithBaseForm(formSchema)
                 .WithFormAnswers(formAnswers)
                 .WithData(new object())
                 .Build();
 
-            _mockSessionHelper.Setup(_ => _.GetSessionGuid()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testForm"))
-                .ReturnsAsync(mappingEntity);
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "nonexistanceform"))
-                .ReturnsAsync(mappingEntity);
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "complexCalculationForm"))
-                .ReturnsAsync(mappingEntity);
-            _mockMappingService.Setup(_ => _.Map("d96bceca-f5c6-49f8-98ff-2d823090c198", "testFormWithNoValidPayment"))
-                .ReturnsAsync(mappingEntity);
+            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
+            _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(_mappingEntity);
             _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
             _paymentHelper = new PaymentHelper(_mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object, _mockHostingEnvironment.Object, _mockPaymentConfigProvider.Object);
         }

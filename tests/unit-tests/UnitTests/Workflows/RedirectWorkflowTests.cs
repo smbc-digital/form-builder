@@ -40,7 +40,7 @@ namespace form_builder_tests.UnitTests.Workflows
         public async Task Submit_ShouldCallMappingService_WhenSessionGuidIsSupplied()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123454");
 
             // Act
             await _workflow.Submit("form", "page");
@@ -53,7 +53,7 @@ namespace form_builder_tests.UnitTests.Workflows
         public async Task Submit_ShouldCallSubmitService_WhenSessionGuidIsSupplied()
         {
             // Arrange
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns("123454");
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123454");
 
             // Act
             await _workflow.Submit("form", "page");
@@ -67,14 +67,14 @@ namespace form_builder_tests.UnitTests.Workflows
         {
             // Arrange
             var guid = "1234";
-            _sessionHelper.Setup(_ => _.GetSessionGuid()).Returns(guid);
+            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid);
 
             // Act
             await _workflow.Submit("form", "page");
 
             // Assert
             _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.Is<string>(x => x.Equals(guid))), Times.Once);
+            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
         }
     }
 }

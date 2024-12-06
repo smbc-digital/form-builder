@@ -33,7 +33,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateAfterValidator = new IsDateAfterValidator(_mockFormAnswersProvider.Object);
             var viewModel = new Dictionary<string, dynamic>
@@ -143,7 +143,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateAfterValidator = new IsDateAfterValidator(_mockFormAnswersProvider.Object);
             var viewModel = new Dictionary<string, dynamic>
@@ -175,7 +175,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateAfterValidator = new IsDateAfterValidator(_mockFormAnswersProvider.Object);
 
@@ -212,7 +212,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateAfterValidator = new IsDateAfterValidator(_mockFormAnswersProvider.Object);
             var viewModel = new Dictionary<string, dynamic>
@@ -255,7 +255,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateAfterValidator = new IsDateAfterValidator(_mockFormAnswersProvider.Object);
             var viewModel = new Dictionary<string, dynamic>
@@ -294,7 +294,7 @@ namespace form_builder_tests.UnitTests.Validators
                 }
             };
 
-            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers()).Returns(formAnswers);
+            _mockFormAnswersProvider.Setup(_ => _.GetFormAnswers(It.IsAny<string>())).Returns(formAnswers);
 
             var isDateAfterValidator = new IsDateAfterValidator(_mockFormAnswersProvider.Object);
             var viewModel = new Dictionary<string, dynamic>

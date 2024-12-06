@@ -19,7 +19,7 @@ namespace form_builder_tests.UnitTests.Workflows
         public SubmitWorkflowTests()
         {
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns("123454");
 
             _mappingService
@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Workflows
         {
             // Arrange
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns("");
 
             // Act
@@ -64,7 +64,7 @@ namespace form_builder_tests.UnitTests.Workflows
             await _workflow.SubmitWithoutSubmission("form");
 
             // Assert
-            _sessionHelper.Verify(_ => _.GetSessionGuid(), Times.Once);
+            _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace form_builder_tests.UnitTests.Workflows
         {
             // Arrange
             _sessionHelper
-                .Setup(_ => _.GetSessionGuid())
+                .Setup(_ => _.GetBrowserSessionId())
                 .Returns("");
 
             // Act
