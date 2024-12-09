@@ -27,7 +27,7 @@ namespace form_builder.Validators
             DateTime? comparisonElementValue = GetElementValue(comparisonElement, viewModel);
             if (!comparisonElementValue.HasValue)
             {
-                FormAnswers answers = _formAnswersProvider.GetFormAnswers(baseForm.FormName);
+                FormAnswers answers = _formAnswersProvider.GetFormAnswers(baseForm.BaseURL);
                 comparisonElementValue = GetElementValue(comparisonElement, answers);
             }
 
