@@ -131,7 +131,7 @@ public class StreetService : IStreetService
         }
 
         var foundStreet = convertedAnswers
-            .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+            .Pages?.FirstOrDefault(_ => _.PageSlug.Equals(path))?
             .Answers?.FirstOrDefault(_ => _.QuestionId.Equals(streetElement.Properties.QuestionId))?
             .Response;
 

@@ -132,7 +132,7 @@ public class OrganisationService : IOrganisationService
         }
 
         var foundOrganisationSearchTerm = convertedAnswers
-            .Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?
+            .Pages?.FirstOrDefault(_ => _.PageSlug.Equals(path))?
             .Answers?.FirstOrDefault(_ => _.QuestionId.Equals(organisationElement.Properties.QuestionId))?
             .Response;
 
