@@ -559,8 +559,8 @@ namespace form_builder.Utils.Startup
                                 { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
                             },
                             ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
-                            SyncTimeout = 30000,
-                            AsyncTimeout = 30000
+                            SyncTimeout = 60000,
+                            AsyncTimeout = 60000
                         };
                     });
 
