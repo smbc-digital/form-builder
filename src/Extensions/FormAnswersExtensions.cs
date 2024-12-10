@@ -9,7 +9,7 @@ namespace form_builder.Extensions
         public static List<PageAnswers> GetReducedAnswers(this FormAnswers answer, FormSchema schema)
             => RecursivelyReduceAnswers(
                 answer.Pages,
-                answer.Pages.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
+                answer.Pages?.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
                 schema.Pages,
                 !String.IsNullOrEmpty(answer.Path) && answer.Path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) ? answer.Path : schema.FirstPageSlug,
                 new List<PageAnswers>());
@@ -22,7 +22,7 @@ namespace form_builder.Extensions
             List<PageAnswers> reducedAnswers)
         {
             var page = new Page();
-            var currentAnswer = answers.Find(_ => _.PageSlug.Equals(currentPageSlug));
+            var currentAnswer = answers?.Find(_ => _.PageSlug.Equals(currentPageSlug));
             if (currentAnswer is null)
                 return reducedAnswers;
 
