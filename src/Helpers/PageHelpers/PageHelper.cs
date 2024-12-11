@@ -173,7 +173,7 @@ namespace form_builder.Helpers.PageHelpers
             if (formAnswers.Pages is null)
                 formAnswers.Pages = new();
 
-            if (formAnswers.Pages is not null && formAnswers.Pages.Any(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)))
+            if (formAnswers.Pages.Any(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)))
             {
                 currentPageAnswers = formAnswers.Pages.Where(_ => _.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList().FirstOrDefault();
                 formAnswers.Pages = formAnswers.Pages.Where(_ => !_.PageSlug.Equals(viewModel["Path"], StringComparison.OrdinalIgnoreCase)).ToList();
@@ -354,7 +354,7 @@ namespace form_builder.Helpers.PageHelpers
                 ? JsonConvert.DeserializeObject<FormAnswers>(rawFormData)
                 : new FormAnswers { Pages = new List<PageAnswers>() };
 
-            var answers = convertedAnswers.Pages.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
+            var answers = convertedAnswers.Pages?.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
 
             return pages.FirstOrDefault(page => page.CheckPageMeetsConditions(answers));
         }
