@@ -7,7 +7,7 @@ namespace form_builder.Extensions
     {
         public static List<Page> GetReducedPages(this FormSchema schema, FormAnswers answers)
             => RecursivelyReducePages(
-                answers.Pages.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
+                answers.Pages?.SelectMany(_ => _.Answers).ToDictionary(x => x.QuestionId, x => x.Response),
                 schema.Pages,
                 !string.IsNullOrEmpty(answers.Path) && answers.Path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH) ? answers.Path : schema.FirstPageSlug,
                 new List<Page>());

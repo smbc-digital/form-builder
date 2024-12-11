@@ -78,7 +78,7 @@ public class FileUploadService : IFileUploadService
             ? new FormAnswers { Pages = new List<PageAnswers>() }
             : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-        var currentPageAnswers = convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
+        var currentPageAnswers = convertedAnswers.Pages?.FirstOrDefault(_ => _.PageSlug.Equals(path))?.Answers.FirstOrDefault();
         List<FileUploadModel> response = JsonConvert.DeserializeObject<List<FileUploadModel>>(currentPageAnswers.Response.ToString());
 
         var fileToRemove = response.FirstOrDefault(_ => _.TrustedOriginalFileName.Equals(viewModel[FileUploadConstants.FILE_TO_DELETE]));

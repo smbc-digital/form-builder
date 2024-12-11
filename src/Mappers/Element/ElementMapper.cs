@@ -81,7 +81,7 @@ namespace form_builder.Mappers
                     if (element.Properties.Decimal)
                         return GetDecimalElementValue(key, formAnswers);
 
-                    var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+                    var value = formAnswers.Pages?.SelectMany(_ => _.Answers)
                        .Where(_ => _.QuestionId.Equals(key))
                        .ToList()
                        .FirstOrDefault();
@@ -92,7 +92,7 @@ namespace form_builder.Mappers
 
         private object GetDeclarationElementValue(string key, FormAnswers formAnswers)
         {
-            var value = formAnswers.Pages
+            var value = formAnswers.Pages?
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
@@ -106,7 +106,7 @@ namespace form_builder.Mappers
         {
             if (question.Type.Equals(EElementType.FileUpload) || question.Type.Equals(EElementType.MultipleFileUpload))
             {
-                var fileInput = formAnswers.Pages
+                var fileInput = formAnswers.Pages?
                     .ToList()
                     .SelectMany(_ => _.Answers)
                     .ToList()
@@ -174,7 +174,7 @@ namespace form_builder.Mappers
 
             List<File> listOfFiles = new();
 
-            var value = formAnswers.Pages
+            var value = formAnswers.Pages?
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
@@ -216,13 +216,13 @@ namespace form_builder.Mappers
             var appointmentEndTime = $"{key}-{BookingConstants.RESERVED_BOOKING_END_TIME}";
             var appointmentLocation = $"{key}-{BookingConstants.APPOINTMENT_LOCATION}";
 
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+            var value = formAnswers.Pages?.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId.Equals(appointmentId) || _.QuestionId.Equals(appointmentDate) ||
                             _.QuestionId.Equals(appointmentStartTime) || _.QuestionId.Equals(appointmentEndTime) ||
                             _.QuestionId.Equals(appointmentLocation))
                 .ToList();
 
-            if (!value.Any())
+            if (value is null || !value.Any())
                 return null;
 
             var bookingId = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentId))?.Response;
@@ -251,7 +251,7 @@ namespace form_builder.Mappers
             var manualAddressLineTown = $"{key}-{AddressManualConstants.TOWN}";
             var manualAddressLinePostcode = $"{key}-{AddressManualConstants.POSTCODE}";
 
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+            var value = formAnswers.Pages?.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId.Equals(manualAddressLineOne) || _.QuestionId.Equals(manualAddressLineTwo) ||
                             _.QuestionId.Equals(manualAddressLineTown) || _.QuestionId.Equals(manualAddressLinePostcode) ||
                             _.QuestionId.Equals(uprnKey) || _.QuestionId.Equals(addressDescription))
@@ -274,7 +274,7 @@ namespace form_builder.Mappers
             var usrnKey = $"{key}{StreetConstants.SELECT_SUFFIX}";
             var streetDescription = $"{key}{StreetConstants.DESCRIPTION_SUFFIX}";
 
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+            var value = formAnswers.Pages?.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId.Equals(usrnKey) || _.QuestionId.Equals(streetDescription))
                 .ToList();
 
@@ -312,7 +312,7 @@ namespace form_builder.Mappers
             var timeHoursKey = $"{key}{TimeConstants.HOURS_SUFFIX}";
             var timeAmPmKey = $"{key}{TimeConstants.AM_PM_SUFFIX}";
 
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+            var value = formAnswers.Pages?.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId.Equals(timeMinutesKey) || _.QuestionId.Equals(timeHoursKey) ||
                             _.QuestionId.Equals(timeAmPmKey))
                 .ToList();
@@ -336,7 +336,7 @@ namespace form_builder.Mappers
             var organisationKey = $"{key}{OrganisationConstants.SELECT_SUFFIX}";
             var organisationDescriptionKey = $"{key}{OrganisationConstants.DESCRIPTION_SUFFIX}";
 
-            var value = formAnswers.Pages.SelectMany(_ => _.Answers)
+            var value = formAnswers.Pages?.SelectMany(_ => _.Answers)
                 .Where(_ => _.QuestionId.Equals(organisationKey) || _.QuestionId.Equals(organisationDescriptionKey))
                 .ToList();
 
@@ -347,7 +347,7 @@ namespace form_builder.Mappers
         }
         private int? GetNumericElementValue(string key, FormAnswers formAnswers)
         {
-            var value = formAnswers.Pages
+            var value = formAnswers.Pages?
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
@@ -359,7 +359,7 @@ namespace form_builder.Mappers
 
         private decimal? GetDecimalElementValue(string key, FormAnswers formAnswers)
         {
-            var value = formAnswers.Pages
+            var value = formAnswers.Pages?
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
@@ -371,7 +371,7 @@ namespace form_builder.Mappers
 
         private DateTime? GetDatePickerElementValue(string key, FormAnswers formAnswers)
         {
-            var value = formAnswers.Pages
+            var value = formAnswers.Pages?
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 
@@ -382,7 +382,7 @@ namespace form_builder.Mappers
         }
         private List<string> GetCheckboxElementValue(string key, FormAnswers formAnswers)
         {
-            var value = formAnswers.Pages
+            var value = formAnswers.Pages?
                 .SelectMany(_ => _.Answers)
                 .FirstOrDefault(_ => _.QuestionId.Equals(key));
 

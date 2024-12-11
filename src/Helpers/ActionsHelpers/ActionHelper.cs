@@ -95,7 +95,7 @@ namespace form_builder.Helpers.ActionsHelpers
         private string Replace(Match match, string current, FormAnswers formAnswers)
         {
             var splitTargets = match.Value.Split(".");
-            var formAnswerDictionary = formAnswers.Pages.SelectMany(_ => _.Answers).Select(x => new Answers { QuestionId = x.QuestionId, Response = x.Response }).ToList();
+            var formAnswerDictionary = formAnswers.Pages?.SelectMany(_ => _.Answers).Select(x => new Answers { QuestionId = x.QuestionId, Response = x.Response }).ToList();
             formAnswerDictionary.AddRange(formAnswers.AdditionalFormData.Select(x => new Answers { QuestionId = x.Key, Response = x.Value }).ToList());
 
             var answer = formAnswerDictionary.Any(a => a.QuestionId.Equals(splitTargets[0]))
