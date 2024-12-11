@@ -118,13 +118,13 @@ public class PageService : IPageService
         if (pathIsEmpty)
         {
             _logger.LogInformation($"PageService:ProcessPage: New Cache created for {cacheId}");
-            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers()));
+            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
         }
 
         if (cacheIsEmpty)
         {
             _logger.LogInformation($"PageService:ProcessPage: Cache Id was not found in Cache, new Cache created for {cacheId}");
-            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers()));
+            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
         }
 
         var baseForm = await _schemaFactory.Build(form);
@@ -262,7 +262,7 @@ public class PageService : IPageService
             throw new NullReferenceException($"PageService:ProcessRequest: {form} Current page '{path}' object could not be found, Cache Id: {cacheId}");
 
         var formData = _distributedCache.GetString(cacheId);
-        var convertedAnswers = !string.IsNullOrEmpty(formData) ? JsonConvert.DeserializeObject<FormAnswers>(formData) : new FormAnswers();
+        var convertedAnswers = !string.IsNullOrEmpty(formData) ? JsonConvert.DeserializeObject<FormAnswers>(formData) : new FormAnswers { Pages = new List<PageAnswers>() };
         await _schemaFactory.TransformPage(currentPage, convertedAnswers);
 
         if (currentPage.HasIncomingPostValues)

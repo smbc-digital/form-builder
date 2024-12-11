@@ -98,7 +98,7 @@ namespace form_builder.Services.MappingService
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
 
-            IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages.Select(page => page.PageSlug);
+            IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages?.Select(page => page.PageSlug);
             foreach (var pageSlug in visitedPageSlugs)
             {
                 await _schemaFactory.TransformPage(baseForm.GetPage(_pageHelper, pageSlug, form), convertedAnswers);
