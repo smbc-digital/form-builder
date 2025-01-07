@@ -53,10 +53,6 @@
   <ItemGroup>
     <None Include="License.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="wwwroot\assets\fonts\" />
-  </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties />
