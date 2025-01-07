@@ -58,7 +58,7 @@ namespace form_builder_tests.UnitTests.Validators
             var viewModel = new Dictionary<string, dynamic>();
             viewModel.Add("test-day", "01");
             viewModel.Add("test-month", "01");
-            viewModel.Add("test-year", "2007");
+            viewModel.Add("test-year", "2010");
 
             // Act
             var result = _dateInputOutsideRangeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());

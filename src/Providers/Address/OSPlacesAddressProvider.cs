@@ -54,7 +54,8 @@ namespace form_builder.Providers.Address
                 return addresses.results
                     .Select(address => new AddressSearchResult
                     {
-                        AddressLine1 = address.LPI.PAO_START_NUMBER + " " + address.LPI.STREET_DESCRIPTION,
+                        //AddressLine1 = address.LPI.PAO_START_NUMBER + " " + address.LPI.STREET_DESCRIPTION,
+                        AddressLine1 = address.LPI.ADDRESS,
                         AddressLine2 = address.LPI.LOCALITY_NAME,
                         AddressLine3 = address.LPI.TOWN_NAME,
                         Postcode = address.LPI.POSTCODE_LOCATOR,
