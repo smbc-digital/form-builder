@@ -55,9 +55,6 @@ namespace form_builder.Providers.Address
                     .Select(address => new AddressSearchResult
                     {
                         AddressLine1 = address.LPI.ADDRESS,
-                        AddressLine2 = address.LPI.LOCALITY_NAME,
-                        AddressLine3 = address.LPI.TOWN_NAME,
-                        Postcode = address.LPI.POSTCODE_LOCATOR,
                         UniqueId = address.LPI.UPRN
                     }).OrderBy(_ => _.UniqueId);
             }
