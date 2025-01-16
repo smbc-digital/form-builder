@@ -28,11 +28,11 @@
             }
             else
             {
-                headers["Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://int-iag-stockportgov.smbcdigital.net/ https://qa-iag-stockportgov.smbcdigital.net/ https://stage-iag-stockportgov.smbcdigital.net/ {testUrls}";
-                headers["X-Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://int-iag-stockportgov.smbcdigital.net https://qa-iag-stockportgov.smbcdigital.net/ https://stage-iag-stockportgov.smbcdigital.net/ {testUrls}";
+                headers["Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://int-webplatform-stockportgov.smbcdigital.net/ https://qa-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ {testUrls}";
+                headers["X-Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://int-webplatform-stockportgov.smbcdigital.net https://qa-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ {testUrls}";
             }
 
-            headers["Access-Control-Allow-Origin"] = $"http://www.stockport.gov.uk https://www.stockport.gov.uk https://int-iag-stockportgov.smbcdigital.net https://qa-iag-stockportgov.smbcdigital.net/ https://stage-iag-stockportgov.smbcdigital.net/ {testUrls}";
+            headers["Access-Control-Allow-Origin"] = $"http://www.stockport.gov.uk https://www.stockport.gov.uk https://int-webplatform-stockportgov.smbcdigital.net https://qa-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ {testUrls}";
             headers["X-Content-Type-Options"] = "nosniff";
             headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
 
