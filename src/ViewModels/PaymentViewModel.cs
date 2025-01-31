@@ -15,5 +15,7 @@ namespace form_builder.ViewModels
         public bool DisplayBreadCrumbs { get; set; }
         public List<Breadcrumb> BreadCrumbs { get; set; }
         public bool IsInPreviewMode { get; set; }
+        public string PaymentIssueButtonUrl { get; set; }
+        public string PaymentIssueButtonLabel { get; set; }
     }
 }
