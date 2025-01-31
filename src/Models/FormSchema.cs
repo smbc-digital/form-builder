@@ -40,6 +40,10 @@ namespace form_builder.Models
 
         public string CallbackFailureContactNumber { get; set; }
 
+        public string PaymentIssueButtonUrl { get; set; } = "https://www.stockport.gov.uk";
+
+        public string PaymentIssueButtonLabel { get; set; } = "Go to the homepage";
+
         public string ReferencePrefix { get; set; }
 
         public List<Breadcrumb> BreadCrumbs { get; set; }
