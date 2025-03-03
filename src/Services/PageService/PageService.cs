@@ -335,17 +335,19 @@ public class PageService : IPageService
 
     public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema baseForm)
     {
+        _logger.LogInformation($"PageService:FinalisePageJourney: finalising success page journey for {form} with behaviour type {behaviourType}");
+
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
 
         if (string.IsNullOrEmpty(browserSessionId))
-            throw new ApplicationException($"PageService::FinalisePageJourney:{form} - Browser Session is null");
+            throw new ApplicationException($"PageService::FinalisePageJourney:{form} - Browser Session is null for {form} with behaviour type {behaviourType}");
 
         string formSessionId = $"{form}::{browserSessionId}";
 
         var formData = _distributedCache.GetString(formSessionId);
 
         if (formData is null)
-            throw new ApplicationException($"PageService::FinalisePageJourney: {formSessionId} Session data is null");
+            throw new ApplicationException($"PageService::FinalisePageJourney: {formSessionId} Session data is null for {form} with behaviour type {behaviourType}");
 
         var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
