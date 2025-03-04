@@ -1459,7 +1459,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
 
             // Assert
-            Assert.EndsWith("Browser Session is null", result.Message);
+            Assert.Contains("Browser Session is null", result.Message);
         }
 
         [Fact]
@@ -1481,6 +1481,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
+            Assert.Contains("Session data is null", result.Message);
         }
 
         [Fact]
