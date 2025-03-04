@@ -159,7 +159,7 @@ namespace form_builder.Helpers.PageHelpers
         {
             var rawFormData = _distributedCache.GetString(cacheKey);
 
-            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
+            if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection") || form.Equals("garden-waste-permit"))
                 _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache - {rawFormData}");
             else
                 _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache");

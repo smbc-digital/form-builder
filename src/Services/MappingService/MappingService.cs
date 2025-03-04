@@ -93,7 +93,7 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
-            _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}: " +
+            _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}:{cacheKey} " +
                                    $"Cached Form Answers before processing Reduced Answers - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
