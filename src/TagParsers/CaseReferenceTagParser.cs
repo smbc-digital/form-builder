@@ -10,7 +10,7 @@ namespace form_builder.TagParsers
 
         public Regex Regex => new Regex("(?<={{)CASEREFERENCE.*?(?=}})", RegexOptions.Compiled);
 
-        public async Task<Page> Parse(Page page, FormAnswers formAnswers)
+        public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
         {
             var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
             var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text is not null && Regex.IsMatch(_.Properties.Text));

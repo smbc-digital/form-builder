@@ -56,7 +56,7 @@ namespace form_builder.Services.PayService
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string cacheKey)
         {
             var formAnswers = _pageHelper.GetSavedAnswers(cacheKey);
-            var paymentInformation = JsonConvert.SerializeObject(await _paymentHelper.GetFormPaymentInformation(form));
+            var paymentInformation = JsonConvert.SerializeObject(await _paymentHelper.GetFormPaymentInformation(formData.FormAnswers, formData.BaseForm));
             paymentInformation = _tagParsers.Aggregate(paymentInformation, (current, tagParser) => tagParser.ParseString(current, formAnswers));
             var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
             var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
@@ -76,14 +76,14 @@ namespace form_builder.Services.PayService
             if (string.IsNullOrWhiteSpace(formSessionId))
                 _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Session expired for {reference}");
 
-            var mappingEntity = await _mappingService.Map(formSessionId, form);
+            var mappingEntity = await _mappingService.Map(formSessionId, form, null, null);
             if (mappingEntity is null)
                 throw new Exception($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)} No mapping entity found for {form}");
 
             var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
-            var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form);
+            var paymentInformation = await _paymentHelper.GetFormPaymentInformation(mappingEntity.FormAnswers, mappingEntity.BaseForm);
 
-            _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
+            _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers, mappingEntity.BaseForm));
 
             var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             

@@ -68,7 +68,7 @@ public class SubmitService : ISubmitService
             _pageHelper.SaveCaseReference(cacheKey, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
 
         if (baseForm.SavePaymentAmount)
-            _pageHelper.SavePaymentAmount(cacheKey, _paymentHelper.GetFormPaymentInformation(baseForm.BaseURL).Result.Settings.Amount, baseForm.PaymentAmountMapping);
+            _pageHelper.SavePaymentAmount(cacheKey, _paymentHelper.GetFormPaymentInformation(null, baseForm).Result.Settings.Amount, baseForm.PaymentAmountMapping);
     }
 
     public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string cacheKey)
@@ -105,7 +105,7 @@ public class SubmitService : ISubmitService
     private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string cacheKey, string reference)
     {
         var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
-        _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers));
+        _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers, mappingEntity.BaseForm));
         var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
 
         _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{cacheKey} {form} Posting Request");

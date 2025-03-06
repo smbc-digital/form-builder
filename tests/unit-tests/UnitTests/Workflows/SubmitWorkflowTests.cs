@@ -23,7 +23,7 @@ namespace form_builder_tests.UnitTests.Workflows
                 .Returns("123454");
 
             _mappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null))
                 .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
 
             _workflow = new SubmitWorkflow(_submitService.Object, _mappingService.Object, _sessionHelper.Object);
@@ -42,7 +42,7 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             Assert.Equal("A Session GUID was not provided.", result.Message);
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Never);
             _submitService.Verify(_ => _.ProcessSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -53,7 +53,7 @@ namespace form_builder_tests.UnitTests.Workflows
             await _workflow.Submit("form");
 
             // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Once);
             _submitService.Verify(_ => _.ProcessSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -80,7 +80,7 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             Assert.Equal("A Session GUID was not provided.", result.Message);
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Never);
             _submitService.Verify(_ => _.ProcessSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -101,7 +101,7 @@ namespace form_builder_tests.UnitTests.Workflows
             await _workflow.SubmitWithoutSubmission("form");
 
             // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Once);
         }
 
         [Fact]

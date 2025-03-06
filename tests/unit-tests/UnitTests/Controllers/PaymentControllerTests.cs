@@ -29,7 +29,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 .Returns("123");
 
             _mappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null))
                 .ReturnsAsync(new MappingEntity
                 {
                     BaseForm = new FormSchema
@@ -134,7 +134,7 @@ namespace form_builder_tests.UnitTests.Controllers
             await _controller.CallbackFailure("form", "123456");
 
             // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Once);
         }
     }
 }

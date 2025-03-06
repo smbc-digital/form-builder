@@ -41,7 +41,7 @@ public class RetrieveExternalDataService : IRetrieveExternalDataService
         List<Answers> answers = new();
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
         string formSessionId = $"{formName}::{browserSessionId}";
-        var mappingData = await _mappingService.Map(formSessionId, formName);
+        var mappingData = await _mappingService.Map(formSessionId, formName, null, formSchema);
 
         foreach (var action in actions)
         {

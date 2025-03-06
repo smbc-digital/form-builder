@@ -20,7 +20,7 @@ namespace form_builder_tests.UnitTests.TagParsers
         public PaymentAmountTagParserTests()
         {
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation { Settings = new Settings { Amount = "10.00" } });
 
             _tagParser = new PaymentAmountTagParser(_mockFormatters.Object, _mockPaymentHelper.Object);
@@ -70,7 +70,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             _tagParser.Parse(page, formAnswer);
 
-            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             _tagParser.Parse(page, formAnswer);
 
-            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Never);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Never);
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             _tagParser.ParseString(text, formAnswer);
 
-            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
@@ -124,7 +124,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             _tagParser.ParseString(text, formAnswer);
 
-            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Never);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Never);
         }
     }
 }

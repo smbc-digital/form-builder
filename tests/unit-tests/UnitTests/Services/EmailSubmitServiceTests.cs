@@ -62,7 +62,7 @@ namespace form_builder_tests.UnitTests.Services
                  .Returns("123454");
 
             _mappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null))
                 .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
 
             _documentSummaryService
