@@ -40,9 +40,10 @@ namespace form_builder.Services.MappingService
             _logger = logger;
         }
 
-        public async Task<MappingEntity> Map(string cacheKey, string form)
+        public async Task<MappingEntity> Map(string cacheKey, string form, FormAnswers convertedAnswers = null, FormSchema baseForm = null)
         {
-            var (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
+            if (convertedAnswers is null || baseForm is null)
+                (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
 
             return new MappingEntity
             {

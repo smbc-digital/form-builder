@@ -1,6 +1,7 @@
 ﻿using form_builder.Configuration;
 using form_builder.Constants;
 using form_builder.Helpers.Session;
+using form_builder.Models;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
@@ -32,19 +33,19 @@ public class PaymentHelper : IPaymentHelper
         _paymentConfigProvider = paymentConfigProvider;
     }
 
-    public async Task<PaymentInformation> GetFormPaymentInformation(string form)
+    public async Task<PaymentInformation> GetFormPaymentInformation(FormAnswers formAnswers, FormSchema baseForm)
     {
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
-        string cacheKey = $"{form}::{browserSessionId}";
-        MappingEntity mappingEntity = await _mappingService.Map(cacheKey, form);
+        string cacheKey = $"{formAnswers.FormName}::{browserSessionId}";
+        MappingEntity mappingEntity = await _mappingService.Map(cacheKey, formAnswers.FormName, formAnswers, baseForm);
         if (mappingEntity is null)
-            throw new Exception($"PayService:: No mapping entity found for {form}");
+            throw new Exception($"PayService:: No mapping entity found for {formAnswers.FormName}");
 
         List<PaymentInformation> paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-        PaymentInformation formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(form)));
+        PaymentInformation formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(formAnswers.FormName)));
 
         if (formPaymentConfig is null)
-            throw new Exception($"PayService:: No payment information found for {form}");
+            throw new Exception($"PayService:: No payment information found for {formAnswers.FormName}");
 
         if (!string.IsNullOrEmpty(formPaymentConfig.Settings.AddressReference))
             formPaymentConfig.Settings.AddressReference = formPaymentConfig.Settings.AddressReference.Insert(formPaymentConfig.Settings.AddressReference.Length - 2, AddressConstants.DESCRIPTION_SUFFIX);

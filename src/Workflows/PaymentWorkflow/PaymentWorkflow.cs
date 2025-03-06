@@ -30,7 +30,7 @@ namespace form_builder.Workflows.PaymentWorkflow
 
             await _submitService.PreProcessSubmission(form, formSessionId);
 
-            var data = await _mappingService.Map(formSessionId, form);
+            var data = await _mappingService.Map(formSessionId, form, null, null);
             var paymentReference = await _submitService.PaymentSubmission(data, form, formSessionId);
 
             return await _payService.ProcessPayment(data, form, path, paymentReference, formSessionId);
