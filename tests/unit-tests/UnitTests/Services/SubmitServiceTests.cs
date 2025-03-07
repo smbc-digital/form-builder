@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("TEST123456");
 
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation { Settings = new Settings { Amount = "10.00" } });
 
             _mockSubmitProvider

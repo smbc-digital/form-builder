@@ -32,7 +32,7 @@ namespace form_builder.TagParsers
                 }
                 else
                 {
-                    var paymentInformation = await _paymentHelper.GetFormPaymentInformation(formAnswers, baseForm);
+                    var paymentInformation = await _paymentHelper.GetFormPaymentInformation(formAnswers.FormName, formAnswers, baseForm);
                     paymentAmount = paymentInformation.Settings.Amount;
                 }
 
@@ -73,7 +73,7 @@ namespace form_builder.TagParsers
             {
                 var paymentAmount = !string.IsNullOrEmpty(formAnswers.PaymentAmount)
                     ? formAnswers.PaymentAmount
-                    : _paymentHelper.GetFormPaymentInformation(formAnswers, null).Result.Settings.Amount;
+                    : _paymentHelper.GetFormPaymentInformation(formAnswers.FormName, formAnswers, null).Result.Settings.Amount;
 
                 return Parse(content, paymentAmount, Regex);
             }

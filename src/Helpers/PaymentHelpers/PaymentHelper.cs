@@ -33,19 +33,19 @@ public class PaymentHelper : IPaymentHelper
         _paymentConfigProvider = paymentConfigProvider;
     }
 
-    public async Task<PaymentInformation> GetFormPaymentInformation(FormAnswers formAnswers, FormSchema baseForm)
+    public async Task<PaymentInformation> GetFormPaymentInformation(string formName, FormAnswers formAnswers, FormSchema baseForm)
     {
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
-        string cacheKey = $"{formAnswers.FormName}::{browserSessionId}";
-        MappingEntity mappingEntity = await _mappingService.Map(cacheKey, formAnswers.FormName, formAnswers, baseForm);
+        string cacheKey = $"{formName}::{browserSessionId}";
+        MappingEntity mappingEntity = await _mappingService.Map(cacheKey, formName, formAnswers, baseForm);
         if (mappingEntity is null)
-            throw new Exception($"PayService:: No mapping entity found for {formAnswers.FormName}");
+            throw new Exception($"PayService:: No mapping entity found for {formName}");
 
         List<PaymentInformation> paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
-        PaymentInformation formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(formAnswers.FormName)));
+        PaymentInformation formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(formName)));
 
         if (formPaymentConfig is null)
-            throw new Exception($"PayService:: No payment information found for {formAnswers.FormName}");
+            throw new Exception($"PayService:: No payment information found for {formName}");
 
         if (!string.IsNullOrEmpty(formPaymentConfig.Settings.AddressReference))
             formPaymentConfig.Settings.AddressReference = formPaymentConfig.Settings.AddressReference.Insert(formPaymentConfig.Settings.AddressReference.Length - 2, AddressConstants.DESCRIPTION_SUFFIX);

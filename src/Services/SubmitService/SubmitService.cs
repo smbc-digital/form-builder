@@ -68,7 +68,7 @@ public class SubmitService : ISubmitService
             _pageHelper.SaveCaseReference(cacheKey, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
 
         if (baseForm.SavePaymentAmount)
-            _pageHelper.SavePaymentAmount(cacheKey, _paymentHelper.GetFormPaymentInformation(null, baseForm).Result.Settings.Amount, baseForm.PaymentAmountMapping);
+            _pageHelper.SavePaymentAmount(cacheKey, _paymentHelper.GetFormPaymentInformation(form, null, baseForm).Result.Settings.Amount, baseForm.PaymentAmountMapping);
     }
 
     public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string cacheKey)
