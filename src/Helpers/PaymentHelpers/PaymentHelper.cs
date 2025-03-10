@@ -63,21 +63,21 @@ public class PaymentHelper : IPaymentHelper
             var postUrl = formPaymentConfig.Settings.CalculationSlug;
 
             if (postUrl.URL is null || postUrl.AuthToken is null)
-                throw new Exception($"PayService::CalculateAmountAsync, slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
+                throw new Exception($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
             _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
             var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
 
             if (!response.IsSuccessStatusCode)
-                throw new Exception($"PayService::CalculateAmountAsync, Gateway returned unsuccessful status code {response.StatusCode}, Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
+                throw new Exception($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: Gateway returned unsuccessful status code {response.StatusCode}; Request: {JsonConvert.SerializeObject(formData.Data)}; Response: {JsonConvert.SerializeObject(response)}");
 
             if (response.Content is null)
-                throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with null content");
+                throw new ApplicationException($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: Gateway {postUrl.URL} responded with null content");
 
             var content = await response.Content.ReadAsStringAsync();
 
             if (string.IsNullOrWhiteSpace(content))
-                throw new ApplicationException($"PayService::CalculateAmountAsync, Gateway {postUrl.URL} responded with empty payment amount within content");
+                throw new ApplicationException($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: Gateway {postUrl.URL} responded with empty payment amount within content");
 
             return JsonConvert.DeserializeObject<string>(content);
         }
