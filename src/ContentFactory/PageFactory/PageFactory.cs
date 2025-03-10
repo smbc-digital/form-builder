@@ -43,7 +43,7 @@ public class PageFactory : IPageFactory
 
         foreach (var tagParser in _tagParsers)
         {
-            await tagParser.Parse(page, formAnswers);
+            await tagParser.Parse(page, formAnswers, baseForm);
         }
 
         var result = await _pageHelper.GenerateHtml(page, viewModel, baseForm, cacheKey, formAnswers, results);

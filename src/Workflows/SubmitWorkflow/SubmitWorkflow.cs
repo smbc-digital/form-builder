@@ -29,7 +29,7 @@ public class SubmitWorkflow : ISubmitWorkflow
 
         await _submitService.PreProcessSubmission(form, formSessionId);
 
-        var data = await _mappingService.Map(formSessionId, form);
+        var data = await _mappingService.Map(formSessionId, form, null, null);
 
         return await _submitService.ProcessSubmission(data, form, formSessionId);
     }
@@ -44,7 +44,7 @@ public class SubmitWorkflow : ISubmitWorkflow
 
         await _submitService.PreProcessSubmission(form, formSessionId);
 
-        var data = await _mappingService.Map(formSessionId, form);
+        var data = await _mappingService.Map(formSessionId, form, null, null);
 
         await _submitService.ProcessWithoutSubmission(data, form, formSessionId);
     }

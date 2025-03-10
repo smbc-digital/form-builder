@@ -67,7 +67,7 @@ namespace form_builder_tests.UnitTests.Services
                 _bookingProvider.Object
             };
 
-            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new Page());
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());

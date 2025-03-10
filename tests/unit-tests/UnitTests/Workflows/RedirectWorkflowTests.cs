@@ -32,7 +32,7 @@ namespace form_builder_tests.UnitTests.Workflows
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _workflow.Submit("form", "page"));
 
             // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Never);
             _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -46,7 +46,7 @@ namespace form_builder_tests.UnitTests.Workflows
             await _workflow.Submit("form", "page");
 
             // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Once);
         }
 
         [Fact]

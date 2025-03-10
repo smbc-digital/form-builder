@@ -179,7 +179,7 @@ public class BookingService : IBookingService
         await _schemaFactory.TransformPage(currentPage, convertedAnswers);
         foreach (var tagParser in _tagParsers)
         {
-            await tagParser.Parse(currentPage, convertedAnswers);
+            await tagParser.Parse(currentPage, convertedAnswers, baseForm);
         }
 
         if (!viewModel.ContainsKey(BookingConstants.BOOKING_MONTH_REQUEST))
@@ -351,7 +351,7 @@ public class BookingService : IBookingService
             await _schemaFactory.TransformPage(currentPage, convertedAnswers);
             foreach (var tagParser in _tagParsers)
             {
-                await tagParser.Parse(currentPage, convertedAnswers);
+                await tagParser.Parse(currentPage, convertedAnswers, baseForm);
             }
 
             var bookingInformationCacheKey = $"{element.Properties.QuestionId}:{appointmentType.AppointmentId}:" +

@@ -34,7 +34,7 @@ namespace form_builder_tests.UnitTests.Workflows
 
             // Assert
             Assert.Equal("A Session GUID was not provided.", result.Message);
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Never);
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Workflows
                 .Setup(_ => _.GetBrowserSessionId())
                 .Returns("123454");
             _mappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null))
                 .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
             _emailSubmitService
                 .Setup(_ => _.EmailSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -55,7 +55,7 @@ namespace form_builder_tests.UnitTests.Workflows
             var result = await _emailWorkflow.Submit("form");
 
             // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Once);
             _emailSubmitService.Verify(_ => _.EmailSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.Equal("12345678", _emailWorkflow.Submit("form").Result);
         }
