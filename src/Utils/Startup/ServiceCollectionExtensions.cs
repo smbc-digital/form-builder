@@ -248,6 +248,7 @@ namespace form_builder.Utils.Startup
                 options.AddDefaultPolicy(policy =>
                 {
                     policy.WithOrigins("https://int-webplatform-stockportgov.smbcdigital.net/",
+                                        "https://int-webplatform-stockroom.smbcdigital.net/",
                                         "https://qa-webplatform-stockportgov.smbcdigital.net/",
                                         "https://stage-webplatform-stockportgov.smbcdigital.net/",
                                         "https://www.stockport.gov.uk/");
