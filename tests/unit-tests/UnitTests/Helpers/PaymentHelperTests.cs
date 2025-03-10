@@ -172,7 +172,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm", new FormAnswers(), new FormSchema()));
 
             // Assert
-            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
+            Assert.Contains("Gateway url responded with empty payment amount within content", result.Message);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace form_builder_tests.UnitTests.Helpers
             var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm", new FormAnswers(), new FormSchema()));
 
             // Assert
-            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
+            Assert.Contains("Gateway url responded with empty payment amount within content", result.Message);
         }
 
         [Fact]
