@@ -122,7 +122,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
 
             _mockMappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null))
                 .ReturnsAsync(mappingEntity);
 
             _mockHostingEnvironment
@@ -213,7 +213,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessPayment(GetMappingEntityData(), "testForm", "page-one", "12345", "guid");
 
             // Assert
-            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation());
 
             _paymentProvider
@@ -260,7 +260,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -283,7 +283,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -297,8 +297,8 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessPaymentResponse("testForm", "12345", "reference");
 
             // Assert
-            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>()), Times.Once);
-            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
+            _mockPaymentHelper.Verify(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
@@ -306,7 +306,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -328,7 +328,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -357,7 +357,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -387,7 +387,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -413,7 +413,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -440,7 +440,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -468,7 +468,7 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var reference = "12345abc";
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -495,7 +495,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -523,7 +523,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -554,11 +554,11 @@ namespace form_builder_tests.UnitTests.Services
             mappingEntity.BaseForm.ProcessPaymentCallbackResponse = true;
 
             _mockMappingService
-                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null))
                 .ReturnsAsync(mappingEntity);
 
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -583,7 +583,7 @@ namespace form_builder_tests.UnitTests.Services
             var reference = "REF-12345";
             PostPaymentUpdateRequest callbackModel = new();
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -614,7 +614,7 @@ namespace form_builder_tests.UnitTests.Services
             var reference = "REF-12345";
             PostPaymentUpdateRequest callbackModel = new();
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",
@@ -645,7 +645,7 @@ namespace form_builder_tests.UnitTests.Services
             var reference = "REF-12345";
             PostPaymentUpdateRequest callbackModel = new();
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation
                 {
                     PaymentProvider = "testPaymentProvider",

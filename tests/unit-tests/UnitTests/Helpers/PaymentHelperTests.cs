@@ -101,7 +101,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 .Build();
 
             _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
-            _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>()))
+            _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(_mappingEntity);
             _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
             _paymentHelper = new PaymentHelper(_mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object, _mockHostingEnvironment.Object, _mockPaymentConfigProvider.Object);
@@ -111,7 +111,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GetFormPaymentInformation_ShouldCallIPaymentConfigurationTransformProvider()
         {
             // Act
-            await _paymentHelper.GetFormPaymentInformation("testForm");
+            await _paymentHelper.GetFormPaymentInformation("testForm", new FormAnswers(), new FormSchema());
 
             // Assert
             _mockPaymentConfigProvider.Verify(_ => _.Get<List<PaymentInformation>>(), Times.Once);
@@ -128,7 +128,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 });
 
             // Act
-            var result = await _paymentHelper.GetFormPaymentInformation("complexCalculationForm");
+            var result = await _paymentHelper.GetFormPaymentInformation("complexCalculationForm", new FormAnswers(), new FormSchema());
 
             // Assert
             Assert.Equal("100.00", result.Settings.Amount);
@@ -138,7 +138,7 @@ namespace form_builder_tests.UnitTests.Helpers
         public async Task GetFormPaymentInformation_ShouldReturnAmountFromConfig()
         {
             // Act
-            var result = await _paymentHelper.GetFormPaymentInformation("testForm");
+            var result = await _paymentHelper.GetFormPaymentInformation("testForm", new FormAnswers(), new FormSchema());
 
             // Assert
             Assert.Equal("12.65", result.Settings.Amount);
@@ -155,7 +155,7 @@ namespace form_builder_tests.UnitTests.Helpers
                 });
 
             // Act
-            await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm"));
+            await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm", new FormAnswers(), new FormSchema()));
         }
 
         [Fact]
@@ -169,10 +169,10 @@ namespace form_builder_tests.UnitTests.Helpers
                 });
 
             // Act
-            var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm", new FormAnswers(), new FormSchema()));
 
             // Assert
-            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
+            Assert.Contains("Gateway url responded with empty payment amount within content", result.Message);
         }
 
         [Fact]
@@ -186,17 +186,17 @@ namespace form_builder_tests.UnitTests.Helpers
                 });
 
             // Act
-            var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm"));
+            var result = await Assert.ThrowsAsync<Exception>(() => _paymentHelper.GetFormPaymentInformation("complexCalculationForm", new FormAnswers(), new FormSchema()));
 
             // Assert
-            Assert.Equal("PayService::CalculateAmountAsync, Gateway url responded with empty payment amount within content", result.Message);
+            Assert.Contains("Gateway url responded with empty payment amount within content", result.Message);
         }
 
         [Fact]
         public async Task GetFormPaymentInformation_ShouldAddSuffixToAddress()
         {
             // Act
-            var result = await _paymentHelper.GetFormPaymentInformation("testForm");
+            var result = await _paymentHelper.GetFormPaymentInformation("testForm", new FormAnswers(), new FormSchema());
 
             // Assert
             Assert.Equal("{{addressReference-address-description}}", result.Settings.AddressReference);

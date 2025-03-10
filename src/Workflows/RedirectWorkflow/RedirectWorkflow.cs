@@ -33,7 +33,7 @@ namespace form_builder.Workflows.RedirectWorkflow
 
             string formSessionId = $"{form}::{browserSessionId}";
 
-            var data = await _mappingService.Map(formSessionId, form);
+            var data = await _mappingService.Map(formSessionId, form, null, null);
             var redirectUrl = await _submitService.RedirectSubmission(data, form, formSessionId);
 
             _logger.LogInformation($"RedirectWorkflow:Submit:{formSessionId}: Disposing session");

@@ -183,7 +183,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
         public async Task Build_ShouldCall_Parse_On_TagParsers()
         {
             // Arrange
-            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), null))
                 .ReturnsAsync(new Page());
             var tagParserItems = new List<ITagParser> { _tagParser.Object, _tagParser.Object };
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
@@ -212,7 +212,7 @@ namespace form_builder_tests.UnitTests.ContentFactory
             await _factory.Build(page, new Dictionary<string, dynamic>(), formSchema, string.Empty, formAnswers);
 
             // Assert
-            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Exactly(2));
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Exactly(2));
         }
     }
 }

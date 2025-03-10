@@ -29,7 +29,7 @@ namespace form_builder.Workflows.EmailWorkflow
 
             string formSessionId = $"{form}::{browserSessionId}";
             
-            var data = await _mappingService.Map(formSessionId, form);
+            var data = await _mappingService.Map(formSessionId, form, null, null);
 
             return await _emailSubmitService.EmailSubmission(data, form, formSessionId);
         }

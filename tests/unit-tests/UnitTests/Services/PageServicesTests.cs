@@ -82,7 +82,7 @@ namespace form_builder_tests.UnitTests.Services
             _fileStorageProviders = new List<IFileStorageProvider> { _fileStorageProvider.Object };
 
             _tagParser
-                .Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+                .Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new Page());
 
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
@@ -1438,7 +1438,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
             _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
-            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]
@@ -1459,7 +1459,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
 
             // Assert
-            Assert.EndsWith("Browser Session is null", result.Message);
+            Assert.Contains("Browser Session is null", result.Message);
         }
 
         [Fact]
@@ -1481,6 +1481,7 @@ namespace form_builder_tests.UnitTests.Services
 
             // Act & Assert
             var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.FinalisePageJourney("form", EBehaviourType.SubmitAndPay, schema));
+            Assert.Contains("Session data is null", result.Message);
         }
 
         [Fact]

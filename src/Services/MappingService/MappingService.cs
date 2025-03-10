@@ -40,9 +40,10 @@ namespace form_builder.Services.MappingService
             _logger = logger;
         }
 
-        public async Task<MappingEntity> Map(string cacheKey, string form)
+        public async Task<MappingEntity> Map(string cacheKey, string form, FormAnswers convertedAnswers = null, FormSchema baseForm = null)
         {
-            var (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
+            if (convertedAnswers is null || baseForm is null)
+                (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
 
             return new MappingEntity
             {
@@ -93,7 +94,7 @@ namespace form_builder.Services.MappingService
 
             var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
-            _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}: " +
+            _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}:{cacheKey} " +
                                    $"Cached Form Answers before processing Reduced Answers - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
 
             convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);

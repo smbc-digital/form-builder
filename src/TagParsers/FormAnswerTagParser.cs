@@ -11,7 +11,7 @@ namespace form_builder.TagParsers
 
         public Regex Regex => new Regex("(?<={{)QUESTION:.*?(?=}})", RegexOptions.Compiled);
 
-        public async Task<Page> Parse(Page page, FormAnswers formAnswers)
+        public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
         {
             var answersDictionary = formAnswers.Pages?.SelectMany(x => x.Answers).ToDictionary(x => x.QuestionId, x => x.Response);
 

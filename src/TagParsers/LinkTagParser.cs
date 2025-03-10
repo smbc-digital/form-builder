@@ -13,7 +13,7 @@ namespace form_builder.TagParsers
         public Regex Regex => new Regex("(?<={{)LINK:.*?(?=}})", RegexOptions.Compiled);
         public string _htmlContent => "<a class='govuk-link' rel='noreferrer noopener' target='_blank' href='https://{0}'>{1}</a>";
 
-        public async Task<Page> Parse(Page page, FormAnswers formAnswers)
+        public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
         {
             page.Elements.Select((element) =>
             {

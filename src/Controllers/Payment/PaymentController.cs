@@ -94,7 +94,7 @@ public class PaymentController : Controller
     {
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
         string cacheKey = $"{form}::{browserSessionId}";
-        MappingEntity data = await _mappingService.Map(cacheKey, form);
+        MappingEntity data = await _mappingService.Map(cacheKey, form, null, null);
         string url = await _payService.ProcessPayment(data, form, "payment", reference, cacheKey);
 
         PaymentFailureViewModel paymentFailureViewModel = new()
@@ -118,7 +118,7 @@ public class PaymentController : Controller
     {
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
         string cacheKey = $"{form}::{browserSessionId}";
-        MappingEntity data = await _mappingService.Map(cacheKey, form);
+        MappingEntity data = await _mappingService.Map(cacheKey, form, null, null);
         string url = await _payService.ProcessPayment(data, form, "payment", reference, cacheKey);
         PaymentFailureViewModel paymentDeclinedViewModel = new()
         {
@@ -143,7 +143,7 @@ public class PaymentController : Controller
         string cacheKey = $"{form}::{browserSessionId}";
         _logger.LogWarning($"PaymentController:PaymentFailure: {cacheKey} Payment failure {reference}");
 
-        var data = await _mappingService.Map(cacheKey, form);
+        var data = await _mappingService.Map(cacheKey, form, null, null);
 
         var callbackFailureViewModel = new CallbackFailureViewModel
         {

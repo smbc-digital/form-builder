@@ -45,7 +45,7 @@ namespace form_builder_tests.UnitTests.Services
 
         public SubmitServiceTests()
         {
-            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()))
+            _tagParser.Setup(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new Page());
             var tagParserItems = new List<ITagParser> { _tagParser.Object };
             _mockTagParsers.Setup(m => m.GetEnumerator()).Returns(() => tagParserItems.GetEnumerator());
@@ -73,7 +73,7 @@ namespace form_builder_tests.UnitTests.Services
                 .Returns("TEST123456");
 
             _mockPaymentHelper
-                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>()))
+                .Setup(_ => _.GetFormPaymentInformation(It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(new PaymentInformation { Settings = new Settings { Amount = "10.00" } });
 
             _mockSubmitProvider
@@ -256,7 +256,7 @@ namespace form_builder_tests.UnitTests.Services
             await _service.ProcessSubmission(new MappingEntity { Data = new ExpandoObject(), BaseForm = schema, FormAnswers = new FormAnswers { Path = "page-one" } }, "form", "123454");
 
             // Assert
-            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>()), Times.Once);
+            _tagParser.Verify(_ => _.Parse(It.IsAny<Page>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
         }
 
         [Fact]

@@ -10,7 +10,7 @@ namespace form_builder.TagParsers
 
         public Regex Regex => new Regex("(?<={{)FORMDATA:.*?(?=}})", RegexOptions.Compiled);
 
-        public async Task<Page> Parse(Page page, FormAnswers formAnswers)
+        public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
         {
             var answersDictionary = formAnswers.AdditionalFormData;
 

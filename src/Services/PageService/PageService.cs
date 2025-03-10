@@ -218,7 +218,7 @@ public class PageService : IPageService
         {
             foreach (var tagParser in _tagParsers)
             {
-                await tagParser.Parse(page, convertedAnswers);
+                await tagParser.Parse(page, convertedAnswers, baseForm);
             }
 
             var bookingProcessEntity = await _bookingService.Get(baseForm.BaseURL, page, cacheId);
@@ -235,7 +235,7 @@ public class PageService : IPageService
             searchResults = bookingProcessEntity.BookingInfo;
         }
 
-        var viewModel = await GetViewModel(page, baseForm, path, cacheId, subPath, searchResults);
+        var viewModel = await GetViewModel(page, baseForm, path, cacheId, subPath, searchResults, convertedAnswers);
         _logger.LogInformation($"PageService:ProcessPage: Finish processing page \"{form}/{path}/{subPath}\", Cache Id: {cacheId}"); 
         return new ProcessPageEntity { ViewModel = viewModel };
     }
@@ -300,14 +300,14 @@ public class PageService : IPageService
         return new ProcessRequestEntity { Page = currentPage };
     }
 
-    public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string cacheKey, string subPath, List<object> results)
+    public async Task<FormBuilderViewModel> GetViewModel(Page page, FormSchema baseForm, string path, string cacheKey, string subPath, List<object> results, FormAnswers convertedAnswers)
     {
         var viewModelData = new Dictionary<string, dynamic>
         {
             { LookUpConstants.SubPathViewModelKey, subPath }
         };
 
-        var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, cacheKey, null, results);
+        var viewModel = await _pageContentFactory.Build(page, viewModelData, baseForm, cacheKey, convertedAnswers, results);
 
         return viewModel;
     }
@@ -327,7 +327,7 @@ public class PageService : IPageService
 
         foreach (var tagParser in _tagParsers)
         {
-            await tagParser.Parse(currentPageResult.Page, convertedAnswers);
+            await tagParser.Parse(currentPageResult.Page, convertedAnswers, null);
         }
 
         return currentPageResult.Page.GetNextPage(answers);
@@ -335,17 +335,19 @@ public class PageService : IPageService
 
     public async Task<SuccessPageEntity> FinalisePageJourney(string form, EBehaviourType behaviourType, FormSchema baseForm)
     {
+        _logger.LogInformation($"PageService:FinalisePageJourney: finalising success page journey for {form} with behaviour type {behaviourType}");
+
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
 
         if (string.IsNullOrEmpty(browserSessionId))
-            throw new ApplicationException($"PageService::FinalisePageJourney:{form} - Browser Session is null");
+            throw new ApplicationException($"PageService::FinalisePageJourney:{form} - Browser Session is null for {form} with behaviour type {behaviourType}");
 
         string formSessionId = $"{form}::{browserSessionId}";
 
         var formData = _distributedCache.GetString(formSessionId);
 
         if (formData is null)
-            throw new ApplicationException($"PageService::FinalisePageJourney: {formSessionId} Session data is null");
+            throw new ApplicationException($"PageService::FinalisePageJourney: {formSessionId} Session data is null for {form} with behaviour type {behaviourType}");
 
         var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
 
