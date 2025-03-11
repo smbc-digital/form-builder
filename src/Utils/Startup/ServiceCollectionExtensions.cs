@@ -97,6 +97,7 @@ using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
+using StockportWebapp.Utils;
 
 namespace form_builder.Utils.Startup
 {
@@ -212,6 +213,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IPaymentHelper, PaymentHelper>();
             services.AddSingleton<IEmailHelper, EmailHelper>();
             services.AddSingleton<ICookieHelper, CookieHelper>();
+            services.AddSingleton<ICookieComplianceHelper, CookieComplianceHelper>();
             services.AddSingleton<IStructureMapper, StructureMapper>();
             services.AddSingleton<ISubmitHelper, SubmitHelper>();
             services.AddSingleton<IRelativeDateHelper, RelativeDateHelper>();

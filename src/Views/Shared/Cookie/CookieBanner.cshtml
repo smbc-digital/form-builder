@@ -1,20 +1,12 @@
-<link rel="stylesheet" type="text/css" href="//wpcc.io/lib/1.0.2/cookieconsent.min.css" />
-<script src="//wpcc.io/lib/1.0.2/cookieconsent.min.js"></script>
+<!-- Cookie Consent by FreePrivacyPolicy.com https://www.FreePrivacyPolicy.com -->
+<link href="//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js" rel=preload as=script>
+
+<script src="//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js" charset="UTF-8"></script>
 <script>
-    window.addEventListener("load", function () {
-        window.wpcc.init({
-            border: "thin",
-            corners: "small",
-            colors: {
-                popup: { background: "#285e61", text: "#ffffff", border: "#234e52" },
-                button: { background: "#ffffff", text: "#234e52" }
-            },
-            content: {
-				message: "This website uses cookies to make sure you get the best experience on our website.",
-				link: "Learn more about the cookies we use.",
-				href: "https://www.stockport.gov.uk/cookies",
-				button: "Accept cookies"
-            }
-        });
+    document.addEventListener('DOMContentLoaded', function () {
+        cookieconsent.run({ "notice_banner_type": "headline", "consent_type": "express", "palette": "light", "language": "en", "page_load_consent_levels": ["strictly-necessary"], "notice_banner_reject_button_hide": false, "preferences_center_close_button_hide": false, "page_refresh_confirmation_buttons": false, "website_name": "Stockport Council", "website_privacy_policy_url": "https://www.stockport.gov.uk/privacy-notice" });
     });
 </script>
+
+<noscript>Cookie Consent by <a href="https://www.freeprivacypolicy.com/">Free Privacy Policy Generator</a></noscript>
+<!-- End Cookie Consent by FreePrivacyPolicy.com https://www.FreePrivacyPolicy.com -->

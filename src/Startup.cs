@@ -105,6 +105,7 @@ namespace form_builder
                 .UseMiddleware<LegacyRedirect>()
                 .UseSession()
                 .UseMiddleware<SessionLoggingMiddleware>()
+                .UseMiddleware<CookiesComplianceMiddleware>()
                 .UseStaticFiles()
                 .UseStaticFiles(new StaticFileOptions
                 {
