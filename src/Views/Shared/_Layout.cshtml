@@ -21,10 +21,12 @@
     <link rel="shortcut icon" type="image/png" href="~/assets/images/favicon-sg.png" />
     <title>@ViewData["PageTitle"] - @ViewData["Title"] - Stockport Council</title>
     <link href="@StylesheetConfiguration.Value.Stylesheet" rel="stylesheet" />
-    <partial name="TagManagerHead" />
+    <link href="~/assets/css/cookie-notice.css" rel="stylesheet" />
 </head>
 
 <body class="govuk-template__body">
+    <partial name="CookieBanner" />
+    <partial name="TagManagerHead" />
     <partial name="TagManagerBody" />
 
     <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
