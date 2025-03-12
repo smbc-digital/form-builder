@@ -154,7 +154,7 @@ public class PageService : IPageService
             _logger.LogInformation($"PageService:ProcessPage:Path was empty, redirect to first page of form, Cache Id: {cacheId}");
             return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
         }
-                
+
         if (string.IsNullOrEmpty(formData) && !path.Equals(baseForm.FirstPageSlug) && (!baseForm.HasDocumentUpload || !path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)))
         {
             _logger.LogInformation($"PageService:ProcessPage:Form data was empty and path was not the first page, redirect to first page of form, Cache Id: {cacheId}");
@@ -202,6 +202,8 @@ public class PageService : IPageService
         {
             var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParameters, convertedAnswers);
             _pageHelper.SaveNonQuestionAnswers(result, form, path, cacheId);
+            formData = _distributedCache.GetString(cacheId);
+            convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
         }
 
         var validCaseRef = convertedAnswers.AdditionalFormData.ContainsKey(ValidateConstants.ValidateId);
@@ -212,6 +214,9 @@ public class PageService : IPageService
             if (actions.Any(_ => _.Type.Equals(EActionType.Validate)) && !validCaseRef ||
                 !actions.Any(_ => _.Type.Equals(EActionType.Validate)))
                 await _actionsWorkflow.Process(page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Get)).ToList(), null, form);
+
+            formData = _distributedCache.GetString(cacheId);
+            convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
         }
 
         if (page.Elements.Any(_ => _.Type.Equals(EElementType.Booking)))
