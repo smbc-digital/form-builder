@@ -102,8 +102,6 @@ public class PageService : IPageService
 
     public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
     {
-        
-        
         string browserSessionId = _sessionHelper.GetBrowserSessionId();
         
         if (string.IsNullOrEmpty(_sessionHelper.GetSessionFormName(form)))
