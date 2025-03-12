@@ -198,7 +198,7 @@ public class PageService : IPageService
                 searchResults = ((IEnumerable<object>)convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"])?.ToList();
         }
 
-        if (page.HasIncomingValues)
+        if (page.HasIncomingGetValues)
         {
             var result = _incomingDataHelper.AddIncomingFormDataValues(page, queryParameters, convertedAnswers);
             _pageHelper.SaveNonQuestionAnswers(result, form, path, cacheId);
