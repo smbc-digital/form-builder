@@ -80,5 +80,30 @@
     <script type="text/javascript" src="@JavascriptConfiguration.Value.Javascript"></script>
     <script>window.GOVUKFrontend.initAll()</script>
     <script>window.SMBCFrontend.initAll()</script>
+
+    @if (Model.Embeddable)
+    {
+        <script>
+            function sendHeight()
+            {
+                const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+                window.parent.postMessage({ iframeHeight: height }, "https://int-webplatform-stockroom.smbcdigital.net/");
+            }
+
+            window.onload = sendHeight;
+            window.onresize = sendHeight;
+        </script>
+
+        <style>
+            .freeprivacypolicy-com---nb {
+                display: none;
+            }
+
+            .govuk-width-container,
+            .govuk-grid-row {
+                margin-inline: 0;
+            }
+        </style>
+    }
 </body>
 </html>
