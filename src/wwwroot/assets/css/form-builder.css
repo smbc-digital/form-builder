@@ -150,7 +150,6 @@ fieldset.input-memorable-date, fieldset.input-time {
     }
 
 @media only screen and (max-width: 415px) {
-
     #formTitle {
         width: 100%;
         margin-top: 50px;
