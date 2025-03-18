@@ -7,7 +7,7 @@
     var displayBreadcrumbs = (bool)ViewData["DisplayBreadcrumbs"];
     var breadcrumbs = ViewData["Breadcrumbs"];
     var displayPreviewModeBanner = (bool)ViewData["PreviewMode"];
-    var embeddable = Model.Embeddable == true ? "smbc-embeddable" : String.Empty;
+    var embeddable = Model.Embeddable ? "smbc-embeddable" : string.Empty;
 }
 
 <!doctype html>
@@ -42,7 +42,7 @@
 
     <partial name="Header" />
 
-    <div class="govuk-width-container">
+    <div class="govuk-width-container @(Model.Embeddable ? "smbc-container-embeddable" : string.Empty)">
         @if (!string.IsNullOrEmpty(feedbackPhase))
         {
             <div class="govuk-phase-banner">
@@ -68,7 +68,7 @@
         }
 
         <main class="govuk-main-wrapper " id="main-content">
-            <div class="govuk-grid-row">
+            <div class="govuk-grid-row @(Model.Embeddable ? "smbc-container-embeddable" : string.Empty)">
                 <div class="govuk-grid-column-two-thirds @embeddable">
                     @RenderBody()
                 </div>
@@ -83,27 +83,7 @@
 
     @if (Model.Embeddable)
     {
-        <script>
-            function sendHeight()
-            {
-                const height = document.documentElement.scrollHeight || document.body.scrollHeight;
-                window.parent.postMessage({ iframeHeight: height }, "https://int-webplatform-stockroom.smbcdigital.net/");
-            }
-
-            window.onload = sendHeight;
-            window.onresize = sendHeight;
-        </script>
-
-        <style>
-            .freeprivacypolicy-com---nb {
-                display: none;
-            }
-
-            .govuk-width-container,
-            .govuk-grid-row {
-                margin-inline: 0;
-            }
-        </style>
+        <partial name="../Embedded/Index" />
     }
 </body>
 </html>
