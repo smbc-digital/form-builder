@@ -2,17 +2,16 @@
     function sendHeight() {
         const height = document.documentElement.scrollHeight || document.body.scrollHeight;
         const allowedOrigins = [
-            "https://int-webplatform-stockroom.smbcdigital.net/",
-            "https://qa-webplatform-stockroom.smbcdigital.net/",
-            "https://stage-webplatform-stockroom.smbcdigital.net/",
-            "https://www.stockrm.org/"
+            "https://int-webplatform-stockroom.smbcdigital.net",
+            "https://qa-webplatform-stockroom.smbcdigital.net",
+            "https://stage-webplatform-stockroom.smbcdigital.net",
+            "https://www.stockrm.org"
         ];
 
-        window.parent.postMessage({ iframeHeight: height }, allowedOrigins);
+        allowedOrigins.forEach(origin => {
+            window.parent.postMessage({ iframeHeight: height }, origin);
+        });
     }
-
-    window.onload = sendHeight;
-    window.onresize = sendHeight;
 </script>
 
 <style>
