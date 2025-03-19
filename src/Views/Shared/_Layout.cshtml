@@ -95,10 +95,10 @@
                 ]; *@
                 
                 window.parent.postMessage({ iframeHeight: height }, "https://int-webplatform-stockroom.smbcdigital.net");
-                allowedOrigins.forEach(origin => {
+                @* allowedOrigins.forEach(origin => {
                     console.log(`Sending height ${height} to ${origin}`);
                     window.parent.postMessage({ iframeHeight: height }, origin);
-                });
+                }); *@
             }
         </script>
 
