@@ -101,6 +101,9 @@
                     window.parent.postMessage({ iframeHeight: height }, origin);
                 }); *@
             }
+
+            window.onload = sendHeight;
+            window.onresize = sendHeight;
         </script>
 
         <partial name="../Embedded/Index" />
