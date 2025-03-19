@@ -100,10 +100,10 @@
                     console.log(`Sending height ${height} to ${origin}`);
                     window.parent.postMessage({ iframeHeight: height }, origin);
                 }); *@
-
-                window.onload = sendHeight;
-                window.onresize = sendHeight;
             }
+
+            window.onload = sendHeight;
+            window.onresize = sendHeight;
         </script>
 
         <partial name="../Embedded/Index" />
