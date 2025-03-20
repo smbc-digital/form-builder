@@ -2,7 +2,6 @@
     function sendHeight() {
         const height = document.documentElement.scrollHeight || document.body.scrollHeight;
         const parentOrigin = document.referrer.split('/').slice(0, 3).join('/') + '/';
-        console.log("parent origin ", parentOrigin)
 
         const allowedOrigins = [
             "https://int-webplatform-stockroom.smbcdigital.net/",
@@ -12,7 +11,6 @@
         ];
 
         if (allowedOrigins.includes(parentOrigin)) {
-            console.log(`Sending height ${height} to ${parentOrigin}`);
             window.parent.postMessage({ iframeHeight: height }, parentOrigin);
         }
     }
