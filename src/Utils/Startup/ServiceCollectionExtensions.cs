@@ -252,8 +252,11 @@ namespace form_builder.Utils.Startup
                     policy.WithOrigins("https://int-webplatform-stockportgov.smbcdigital.net/",
                                         "https://int-webplatform-stockroom.smbcdigital.net/",
                                         "https://qa-webplatform-stockportgov.smbcdigital.net/",
+                                        "https://qa-webplatform-stockroom.smbcdigital.net/",
                                         "https://stage-webplatform-stockportgov.smbcdigital.net/",
-                                        "https://www.stockport.gov.uk/");
+                                        "https://stage-webplatform-stockroom.smbcdigital.net/",
+                                        "https://www.stockport.gov.uk/",
+                                        "https://www.stockrm.org/");
                 });
             });
 
