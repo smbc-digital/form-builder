@@ -1,6 +1,5 @@
 <script>
     function sendHeight() {
-        console.log("sending height")
         const height = document.documentElement.scrollHeight || document.body.scrollHeight;
         const allowedOrigins = [
             "https://int-webplatform-stockroom.smbcdigital.net/",
@@ -8,9 +7,9 @@
             "https://stage-webplatform-stockroom.smbcdigital.net/",
             "https://www.stockrm.org/"
         ];
-                
-        for (let i = 0; i < allowedOrigins.length; i++) {
-            window.parent.postMessage({ iframeHeight: height}, allowedOrigins[i])
+        
+        for (let index = 0; index < allowedOrigins.length; index++) {
+            window.parent.postMessage({ iframeHeight: height}, allowedOrigins[index])
         }
     }
 
