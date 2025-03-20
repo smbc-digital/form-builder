@@ -14,14 +14,13 @@
         if (allowedOrigins.includes(parentOrigin)) {
             console.log(`Sending height ${height} to ${parentOrigin}`);
             window.parent.postMessage({ iframeHeight: height }, parentOrigin);
-        } else
+        }
     }
 
     window.onload = sendHeight;
     window.onresize = sendHeight;
 </script>
 
-        ﻿
 <style>
     .freeprivacypolicy-com---nb {
         display: none;
