@@ -88,18 +88,16 @@
             function sendHeight() {
                 console.log("sending height")
                 const height = document.documentElement.scrollHeight || document.body.scrollHeight;
-                @* const allowedOrigins = [
-                    "https://int-webplatform-stockroom.smbcdigital.net",
-                    "https://qa-webplatform-stockroom.smbcdigital.net",
-                    "https://stage-webplatform-stockroom.smbcdigital.net",
-                    "https://www.stockrm.org"
-                ]; *@
+                const allowedOrigins = [
+                    "https://int-webplatform-stockroom.smbcdigital.net/",
+                    "https://qa-webplatform-stockroom.smbcdigital.net/",
+                    "https://stage-webplatform-stockroom.smbcdigital.net/",
+                    "https://www.stockrm.org/"
+                ];
                 
-                window.parent.postMessage({ iframeHeight: height }, "https://int-webplatform-stockroom.smbcdigital.net/");
-                @* allowedOrigins.forEach(origin => {
-                    console.log(`Sending height ${height} to ${origin}`);
-                    window.parent.postMessage({ iframeHeight: height }, origin);
-                }); *@
+                for (var i = 0; i < allowedOrigins.length; i++) {
+                    window.parent.postMessage({ iframeHeight: height}, allowedOrigins[i])
+                }
             }
 
             window.onload = sendHeight;
