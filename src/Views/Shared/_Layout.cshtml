@@ -95,7 +95,7 @@
                     "https://www.stockrm.org/"
                 ];
                 
-                for (var i = 0; i < allowedOrigins.length; i++) {
+                for (let i = 0; i < allowedOrigins.length; i++) {
                     window.parent.postMessage({ iframeHeight: height}, allowedOrigins[i])
                 }
             }
