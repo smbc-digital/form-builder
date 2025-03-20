@@ -83,27 +83,6 @@
 
     @if (Model.Embeddable)
     {
-        <script>
-            console.log("testing script functionality")
-            function sendHeight() {
-                console.log("sending height")
-                const height = document.documentElement.scrollHeight || document.body.scrollHeight;
-                const allowedOrigins = [
-                    "https://int-webplatform-stockroom.smbcdigital.net/",
-                    "https://qa-webplatform-stockroom.smbcdigital.net/",
-                    "https://stage-webplatform-stockroom.smbcdigital.net/",
-                    "https://www.stockrm.org/"
-                ];
-                
-                for (let i = 0; i < allowedOrigins.length; i++) {
-                    window.parent.postMessage({ iframeHeight: height}, allowedOrigins[i])
-                }
-            }
-
-            window.onload = sendHeight;
-            window.onresize = sendHeight;
-        </script>
-
         <partial name="../Embedded/Index" />
     }
 </body>
