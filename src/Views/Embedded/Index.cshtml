@@ -12,7 +12,7 @@
 
         if (allowedOrigins.includes(parentOrigin)) {
             window.parent.postMessage({ iframeHeight: height }, parentOrigin);
-        } else
+        }
     }
 
     window.onload = sendHeight;
