@@ -1,21 +1,24 @@
 <script>
     function sendHeight() {
         const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+        const parentOrigin = window.location.ancestorOrigins ? window.location.ancestorOrigins[0] : document.referrer.split('/').slice(0, 3).join('/') + '/';
+
         const allowedOrigins = [
             "https://int-webplatform-stockroom.smbcdigital.net/",
             "https://qa-webplatform-stockroom.smbcdigital.net/",
             "https://stage-webplatform-stockroom.smbcdigital.net/",
             "https://www.stockrm.org/"
         ];
-        
-        for (let index = 0; index < allowedOrigins.length; index++) {
-            window.parent.postMessage({ iframeHeight: height}, allowedOrigins[index])
-        }
+
+        if (allowedOrigins.includes(parentOrigin)) {
+            window.parent.postMessage({ iframeHeight: height }, parentOrigin);
+        } else
     }
 
     window.onload = sendHeight;
     window.onresize = sendHeight;
 </script>
+
         ﻿
 <style>
     .freeprivacypolicy-com---nb {
