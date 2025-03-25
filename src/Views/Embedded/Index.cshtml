@@ -4,8 +4,6 @@
         if (!element) return;
 
         const height = element.offsetHeight;
-        console.log("Height:", height);
-
         const parentOrigin = document.referrer.split('/').slice(0, 3).join('/') + '/';
 
         const allowedOrigins = [
