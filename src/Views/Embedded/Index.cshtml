@@ -1,6 +1,11 @@
 <script>
     function sendHeight() {
-        const height = document.documentElement.scrollHeight || document.body.scrollHeight;
+        const element = document.querySelector('.smbc-embeddable');
+        if (!element) return;
+
+        const height = element.offsetHeight;
+        console.log("Height:", height);
+
         const parentOrigin = document.referrer.split('/').slice(0, 3).join('/') + '/';
 
         const allowedOrigins = [
@@ -17,6 +22,10 @@
 
     window.onload = sendHeight;
     window.onresize = sendHeight;
+
+    const smbcEmbeddable = document.querySelector('.smbc-embeddable');
+    if (smbcEmbeddable)
+        new ResizeObserver(sendHeight).observe(smbcEmbeddable);
 </script>
 
 <style>
