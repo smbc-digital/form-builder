@@ -1,0 +1,37 @@
+<script>
+    function sendHeight() {
+        const element = document.querySelector('.smbc-embeddable');
+        if (!element) return;
+
+        const height = element.offsetHeight;
+        const parentOrigin = document.referrer.split('/').slice(0, 3).join('/') + '/';
+
+        const allowedOrigins = [
+            "https://int-webplatform-stockroom.smbcdigital.net/",
+            "https://qa-webplatform-stockroom.smbcdigital.net/",
+            "https://stage-webplatform-stockroom.smbcdigital.net/",
+            "https://www.stockrm.org/"
+        ];
+
+        if (allowedOrigins.includes(parentOrigin)) {
+            window.parent.postMessage({ iframeHeight: height }, parentOrigin);
+        }
+    }
+
+    window.onload = sendHeight;
+    window.onresize = sendHeight;
+
+    const smbcEmbeddable = document.querySelector('.smbc-embeddable');
+    if (smbcEmbeddable)
+        new ResizeObserver(sendHeight).observe(smbcEmbeddable);
+</script>
+
+<style>
+    .freeprivacypolicy-com---nb {
+        display: none;
+    }
+
+    .smbc-container-embeddable {
+        margin-inline: 0;
+    }
+</style>
