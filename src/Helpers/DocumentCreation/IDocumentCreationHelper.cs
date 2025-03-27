@@ -6,5 +6,6 @@ namespace form_builder.Helpers.DocumentCreation
     {
         Task<List<string>> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema);
         Task<List<string>> GenerateQuestionAndAnswersListForPdf(FormAnswers formAnswers, FormSchema formSchema);
+        Task<List<string>> GenerateQuestionAndAnswersListForWord(FormAnswers formAnswers, FormSchema formSchema);
     }
 }

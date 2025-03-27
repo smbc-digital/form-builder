@@ -31,6 +31,7 @@ namespace form_builder.Services.DocumentService
                 EDocumentType.Txt => await GenerateTextFile(entity.PreviousAnswers, entity.FormSchema),
                 EDocumentType.Html => await GenerateHtmlFile(entity.PreviousAnswers, entity.FormSchema),
                 EDocumentType.Pdf => await GeneratePdfFile(entity.PreviousAnswers, entity.FormSchema),
+                EDocumentType.Word => await GenerateWordFile(entity.PreviousAnswers, entity.FormSchema),
                 _ => throw new Exception("DocumentSummaryService::GenerateDocument, Unknown Document type request for Summary"),
             };
 
@@ -53,6 +54,19 @@ namespace form_builder.Services.DocumentService
             var data = await _documentCreationHelper.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
 
             return _textfileProvider.CreatePdfDocument(data, formSchema.FormName);
+        }
+
+        private async Task<byte[]> GenerateWordFile(FormAnswers formAnswers, FormSchema formSchema)
+        {
+            var data = await _documentCreationHelper.GenerateQuestionAndAnswersListForWord(formAnswers, formSchema);
+
+            // data.Add("Sd") ;
+
+
+            // var stuff =
+
+            return _textfileProvider.MakeWordAttachment(data, formSchema.FormName);
+            //return _textfileProvider.CreateWordDocument(data, formSchema.FormName);
         }
     }
 }

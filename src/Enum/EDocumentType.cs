@@ -9,6 +9,7 @@ namespace form_builder.Enum
         Unknown,
         Txt,
         Html,
-        Pdf
+        Pdf,
+        Word
     }
 }

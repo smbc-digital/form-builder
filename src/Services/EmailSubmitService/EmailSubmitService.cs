@@ -179,6 +179,36 @@ public class EmailSubmitService : IEmailSubmitService
                 );
         }
 
+        if (email.AttachWord)
+        {
+            var pdfdoc = _documentSummaryService.GenerateDocument(
+                new DocumentSummaryEntity
+                {
+                    DocumentType = EDocumentType.Word,
+                    PreviousAnswers = data.FormAnswers,
+                    FormSchema = data.BaseForm
+                });
+
+            emailMessage = fileUploads.Any() ?
+                emailMessage = new EmailMessage(
+                    subject,
+                    body,
+                    email.Sender,
+                    string.Join(",", email.Recipient),
+                    pdfdoc.Result,
+                    $"{data.FormAnswers.CaseReference}_data.docx",
+                    fileUploads
+                )
+                : emailMessage = new EmailMessage(
+                    subject,
+                    body,
+                    email.Sender,
+                    string.Join(",", email.Recipient),
+                    pdfdoc.Result,
+                    $"{data.FormAnswers.CaseReference}_data.docx"
+                );
+        }
+
         var result = _emailProvider.SendEmail(emailMessage).Result;
 
         if (!result.Equals(System.Net.HttpStatusCode.OK))

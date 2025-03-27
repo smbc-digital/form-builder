@@ -1,4 +1,5 @@
 using form_builder.Enum;
+using form_builder.Models;
 
 namespace form_builder.Providers.DocumentCreation
 {
@@ -13,5 +14,7 @@ namespace form_builder.Providers.DocumentCreation
         byte[] CreateHtmlDocument(List<string> fileContent, string formName);
 
         byte[] CreatePdfDocument(List<string> fileContent, string formName);
+
+        byte[] MakeWordAttachment(List<string> fileContent, string formName);
     }
 }

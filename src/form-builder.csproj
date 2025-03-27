@@ -12,6 +12,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.402.12" />
     <PackageReference Include="AWSSDK.SimpleEmail" Version="3.7.401.11" />
+    <PackageReference Include="FileFormat.Words" Version="24.12.0" />
     <PackageReference Include="GovukNotify" Version="7.2.0" />
     <PackageReference Include="JsonSubTypes" Version="2.0.1" />
     <PackageReference Include="MailKit" Version="4.7.1.1" />
@@ -41,6 +42,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="DSL\missing-from-care-return.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="wwwroot\assets\javascript\govuk-frontend-3.7.0.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
