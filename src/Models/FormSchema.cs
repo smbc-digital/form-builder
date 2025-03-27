@@ -24,6 +24,8 @@ namespace form_builder.Models
         
         public bool Embeddable { get; set; }
 
+        public string Branding { get; set; } = "SMBC";
+
         public string FeedbackForm { get; set; }
 
         public string FeedbackPhase { get; set; }

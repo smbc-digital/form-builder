@@ -1,12 +1,16 @@
 ﻿@{
     var currentYear = DateTime.Now.Year;
-    
+
     var embeddable = Model is null 
         ? false 
         : Model.Embeddable;
+
+    var branding = Model is null
+        ? "SMBC"
+        : Model.Branding;
 }
 
-@if(!embeddable)
+@if(!embeddable && branding.Equals("SMBC"))
 {
     <footer class="smbc-footer">
         <div class="govuk-width-container">
@@ -77,4 +81,283 @@
             </div>
         </div>
     </footer>
+}
+
+@if(branding.Equals("Stockroom"))
+{
+    <footer class="smbc-footer footer grid-container-full-width footer--stockroom">
+        <div class="grid-container">
+            <div class="footer_top">
+                <div class="grid-100 tablet-grid-100 mobile-grid-100">
+                    <div class="footer_logo">
+                        <div class="grid-50 tablet-grid-50 footer_logo--no-padding">
+                            <img src="//images.ctfassets.net/6jh3uby2vw58/1Qj2a3ymG2YTLAfh0jgbaB/0d4476744fcdd060eba829ebbfac1b0f/stockroom_logo_base.png?fm=webp" alt="Stockroom logo" loading="lazy" width="275" height="50">
+                        </div>
+
+                        <div class="grid-50 tablet-grid-50 footer_logo--no-padding">
+                            <a href="https://www.stockport.gov.uk" target="_blank">
+                                <img src='//images.ctfassets.net/6jh3uby2vw58/3Kwy628r0DVTbvjLvFXtvQ/7e5b603433f18ffda095968e9370a7c0/SMBC_Logo_Black_2x.png?fm=webp'
+                                     alt="Stockport Council logo homepage link"
+                                     loading="lazy"
+                                     class="footer_logo--float-right"
+                                     width="275"
+                                     height="60">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer__info">
+                    <div class="grid-25 tablet-grid-25 mobile-grid-100 footer__info--padding">
+                        <h2>Opening hours</h2>
+                        <p>Coming soon!</p>
+                    </div>
+
+                    <div class="grid-25 tablet-grid-25 mobile-grid-100 footer__info--padding">
+                        <div class="footer__info-container">
+                            <h2>Visit us</h2>
+                            <p>
+                                Stockroom<br>
+                                Merseyway Shopping Centre<br>
+                                Stockport<br>
+                                SK1 1PR
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid-25 tablet-grid-25 mobile-grid-100 footer__info--padding">
+                        <div class="footer__info-container">
+                            <h2>Contact us</h2>
+                            <p>Library Enquiries: <a href="tel:01612123500">0161 217 6009</a></p>
+                        </div>
+                    </div>
+
+                    <div class="grid-25 tablet-grid-25 mobile-grid-100 footer__info--padding">
+                        <div class="footer__info-container">
+                            <h2>Follow</h2>
+
+                            <ul class="footer_links footer__social">
+                                <li>
+                                    <a href="https://www.instagram.com/stockr__m/" aria-label="Instagram" target="_blank" data-cy="social-media-links">
+                                        Instagram
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="grid-100 tablet-grid-100 mobile-grid-100 footer__info--border">
+                        <ul class="footer_links footer_links--bottom">
+                            <li class="grid-25 tablet-grid-25 mobile-grid-100">
+                                <div class="footer__info-container">
+                                    <a data-cy="footer-links" href="/terms-and-conditions">Terms and conditions</a>
+                                </div>
+                            </li>
+                            <li class="grid-25 tablet-grid-25 mobile-grid-100">
+                                <div class="footer__info-container">
+                                    <a data-cy="footer-links" href="/data-protection">Data protection</a>
+                                </div>
+                            </li>
+                            <li class="grid-25 tablet-grid-25 mobile-grid-100">
+                                <div class="footer__info-container">
+                                    <a data-cy="footer-links" href="/freedom-of-information">Freedom of Information</a>
+                                </div>
+                            </li>
+                            <li class="grid-25 tablet-grid-25 mobile-grid-100">
+                                <div class="footer__info-container">
+                                    <a data-cy="footer-links" href="/accessibility">Accessibility Statement</a>
+                                </div>
+                            </li>
+                            <li class="grid-25 tablet-grid-25 mobile-grid-100">
+                                <div class="footer__info-container">
+                                    <a data-cy="footer-links" href="/privacy-notice">Privacy Notice</a>
+                                </div>
+                            </li>
+                            <li class="grid-25 tablet-grid-25 mobile-grid-100">
+                                <div class="footer__info-container">
+                                    <a data-cy="footer-links" href="/cookies">Cookies</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="grid-50 tablet-grid-50 footer_copyright">
+                        <p>
+                            &#xA9; @DateTime.Now.Year Stockroom
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .footer {
+            background-color: rgb(138, 165, 255);
+	        padding: 2em 0 1em 0;
+	        width: 100%;
+	        position: relative;
+	        z-index: 5;
+	        color: black;
+
+	        h2, h3, h4 {
+		        margin-bottom: 1em;
+		        font-weight: 400;
+	        }
+	
+	        ul {
+		        list-style: none;
+	        }
+
+	        @@media only screen and (max-width: 47.99375em) {
+		        padding: 0 0 1em;
+
+                h2 {
+                    margin-bottom: 0.5em;
+                }
+	        }
+
+	        a {
+		        color: black;
+		        text-underline-offset: 0.1em;
+	        }
+
+            a:hover {
+                text-decoration-thickness: 3px;
+                text-decoration-skip-ink: none;
+            }
+        }
+
+        .footer_links {
+            margin-top: 2em;
+            
+            li {
+                box-sizing: border-box;
+                margin: 0;
+                padding-bottom: 0.5em;
+
+                @@media only screen and (max-width: 47.99375em)
+                {
+                    padding-left: 0;
+                }
+            }
+
+            a {
+                text-decoration: underline;
+                color: black;
+            }
+
+            a:hover {
+                text-decoration-thickness: 3px;
+            }
+        }
+
+        .footer_links--bottom {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            
+            li {
+                &:nth-child(4n+1) .footer__info-container {
+                    padding-inline-start: 0;
+                }
+            }
+        }
+
+        .footer_logo {
+            margin-top: 0;
+
+            @@media only screen and (max-width: 47.99375em) {
+                padding-inline: 0.416em;
+            }
+
+            img {
+                height: auto;
+                width: 100%;
+                max-width: 275px;
+
+                @@media only screen and (max-width: 47.99375em) {
+                    padding-top: 30px;
+                }
+
+                @@media only screen and (max-width: 47.99375em) {
+                    margin-top: 25px;
+                    padding-bottom: 0.833em;
+                }
+            }
+        }
+
+        .footer_logo--float-right {
+            float: right;
+
+            @@media only screen and (max-width: 47.99375em) {
+                float: none;
+            }
+        }
+
+        .footer_logo--no-padding {
+            padding: 0;
+        }
+
+        .footer__info {
+            padding-block: 2em;
+
+            @@media only screen and (max-width: 47.99375em) {
+                padding-inline: 0.833em;
+                padding-block-end: 0;
+                padding-block-start: 1em;
+            }
+        }
+
+        .footer__info-container {
+            padding-left: 1em;
+
+            @@media only screen and (max-width: 47.99375em) {
+                padding-left: 0;
+            }
+        }
+
+        .footer__info--border {
+            border-top: 1px solid black;
+            padding: 0;
+        }
+
+        .footer__info&--padding {
+            padding-block-end: 1em;
+
+            @@media only screen and (max-width: 47.99375em) {
+                padding-left: 0;
+
+                &:last-of-type {
+                    padding-block-end: 2em;
+                }
+            }
+        }
+
+        .footer_copyright {
+            margin-top: 2em;
+            text-align: left;
+
+            @@media only screen and (max-width: 47.99375em) {
+                margin-top: 1em;
+                padding-left: 0;
+            }
+        }
+
+        .footer__social {
+            margin-top: 0;
+            li {
+                @@media only screen and (min-width: 48em) and (max-width: 64.05625em), only screen and (min-width: 64.0625em) {
+                    padding-bottom: 0;
+                }
+
+                @@media only screen and (max-width: 47.99375em) {
+                    &:last-of-type {
+                        margin-bottom: 1em;
+                        padding-bottom: 0;
+                    }
+                }
+            }
+        }
+    </style>
 }

@@ -11,6 +11,7 @@ namespace form_builder.ViewModels
         public string Reference { get; set; }
         public string StartPageUrl { get; set; }
         public bool Embeddable { get; set; }
+        public string Branding { get; set; }
         public bool HideBackButton { get; set; } = false;
         public bool DisplayBreadCrumbs { get; set; }
         public List<Breadcrumb> BreadCrumbs { get; set; }

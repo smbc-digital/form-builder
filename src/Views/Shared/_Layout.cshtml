@@ -8,10 +8,11 @@
     var breadcrumbs = ViewData["Breadcrumbs"];
     var displayPreviewModeBanner = (bool)ViewData["PreviewMode"];
     var embeddable = Model.Embeddable ? "smbc-embeddable" : string.Empty;
+    var branding = Model.Branding.Equals("Stockroom") ? "stockroom" : string.Empty;
 }
 
 <!doctype html>
-<html lang="en" class="govuk-template flexbox no-flexboxtweener @embeddable">
+<html lang="en" class="govuk-template flexbox no-flexboxtweener @embeddable @branding">
 
 <head>
     <meta charset="utf-8" />
@@ -69,7 +70,7 @@
 
         <main class="govuk-main-wrapper " id="main-content">
             <div class="govuk-grid-row @(Model.Embeddable ? "smbc-container-embeddable" : string.Empty)">
-                <div class="govuk-grid-column-two-thirds @embeddable">
+                <div class="govuk-grid-column-two-thirds @embeddable @branding">
                     @RenderBody()
                 </div>
             </div>

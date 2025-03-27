@@ -20,6 +20,8 @@ namespace form_builder.ViewModels
 
         public bool Embeddable { get; set; }
 
+        public string Branding { get; set; }
+
         public bool HideBackButton { get; set; }
 
         public string PageTitle { get; set; }

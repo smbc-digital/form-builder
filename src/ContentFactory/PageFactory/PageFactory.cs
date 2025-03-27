@@ -57,6 +57,7 @@ public class PageFactory : IPageFactory
         result.DisplayBreadCrumbs = page.DisplayBreadCrumbs;
         result.StartPageUrl = baseForm.StartPageUrl;
         result.Embeddable = baseForm.Embeddable;
+        result.Branding = baseForm.Branding;
         result.IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX);
         return result;
     }

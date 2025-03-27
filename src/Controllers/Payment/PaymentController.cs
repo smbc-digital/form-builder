@@ -80,6 +80,7 @@ public class PaymentController : Controller
             FormName = result.FormName,
             StartPageUrl = result.StartPageUrl,
             Embeddable = result.Embeddable,
+            Branding = result.Branding,
             PageTitle = result.PageTitle,
             BannerTitle = result.BannerTitle,
             LeadingParagraph = result.LeadingParagraph
@@ -105,6 +106,7 @@ public class PaymentController : Controller
             PaymentUrl = url,
             StartPageUrl = data.BaseForm.StartPageUrl,
             Embeddable = data.BaseForm.Embeddable,
+            Branding = data.BaseForm.Branding,
             PaymentIssueButtonUrl = data.BaseForm.PaymentIssueButtonUrl,
             PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel
         };
@@ -128,6 +130,7 @@ public class PaymentController : Controller
             PaymentUrl = url,
             StartPageUrl = data.BaseForm.StartPageUrl,
             Embeddable = data.BaseForm.Embeddable,
+            Branding = data.BaseForm.Branding,
             PaymentIssueButtonUrl = data.BaseForm.PaymentIssueButtonUrl,
             PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel
         };
@@ -152,6 +155,7 @@ public class PaymentController : Controller
             Reference = reference,
             StartPageUrl = data.BaseForm.StartPageUrl,
             Embeddable = data.BaseForm.Embeddable,
+            Branding = data.BaseForm.Branding,
             CallbackFailureContactNumber = data.BaseForm.CallbackFailureContactNumber,
             PaymentIssueButtonUrl = data.BaseForm.PaymentIssueButtonUrl,
             PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel

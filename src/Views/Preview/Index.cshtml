@@ -8,6 +8,7 @@
     ViewData["Breadcrumbs"] = Model.BreadCrumbs;
     ViewData["PreviewMode"] = Model.IsInPreviewMode;
     ViewData["Embeddable"] = Model.Embeddable;
+    ViewData["Branding"] = Model.Branding;
 }
 
 @using (Html.BeginForm("IndexPost", "Preview", new {}, FormMethod.Post, false, new { autocomplete = "on", novalidate = "novalidate", enctype = "multipart/form-data" }) )

@@ -66,6 +66,7 @@ public class SuccessPageFactory : ISuccessPageFactory
                 FormName = baseForm.FormName,
                 StartPageUrl = baseForm.StartPageUrl,
                 Embeddable = baseForm.Embeddable,
+                Branding = baseForm.Branding,
                 IsInPreviewMode = _previewModeConfiguration.Value.IsEnabled && baseForm.BaseURL.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX)
             };
         }
@@ -84,6 +85,7 @@ public class SuccessPageFactory : ISuccessPageFactory
             FormName = result.FormName,
             StartPageUrl = result.StartPageUrl,
             Embeddable = result.Embeddable,
+            Branding = result.Branding,
             PageTitle = result.PageTitle,
             BannerTitle = page.BannerTitle,
             LeadingParagraph = page.LeadingParagraph,
@@ -108,6 +110,7 @@ public class SuccessPageFactory : ISuccessPageFactory
             FormName = result.FormName,
             StartPageUrl = result.StartPageUrl,
             Embeddable = result.Embeddable,
+            Branding = result.Branding,
             PageTitle = result.PageTitle,
             BannerTitle = page.BannerTitle,
             LeadingParagraph = page.LeadingParagraph,

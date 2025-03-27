@@ -2,17 +2,21 @@
     var isError = ViewData.Any(_ => _.Key.Equals("IsError"))
         ? (bool)ViewData["IsError"] 
         : false;
-        
+
     var startPageUrl = string.IsNullOrWhiteSpace(Model?.StartPageUrl) 
         ? string.Empty 
         : Model.StartPageUrl;
-    
+
     var embeddable = Model is null 
         ? false 
         : Model.Embeddable;
+
+    var branding = Model is null
+        ? "SMBC"
+        : Model.Branding;
 }
 
-@if(!embeddable)
+@if (!embeddable && branding.Equals("SMBC"))
 {
     <header class="smbc-header" role="banner" data-module="govuk-header">
         <div class="smbc-header__container govuk-width-container">
@@ -23,6 +27,31 @@
                 @if (!isError)
                 {
                     <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name">
+                        @Model.FormName
+                    </a>
+                }
+            </div>
+        </div>
+    </header>
+}
+
+@if (branding.Equals("Stockroom"))
+{
+    <header class="smbc-header" role="banner" data-module="govuk-header" style="background-color: #f6cf60;">
+        <div class="smbc-header__container govuk-width-container" style="border-bottom: none;">
+            <div class="govuk-header__logo">
+                <a href="https://www.stockrm.org/" style="float:left" class="site-header_logo">
+                    <img src="//images.ctfassets.net/6jh3uby2vw58/1Qj2a3ymG2YTLAfh0jgbaB/0d4476744fcdd060eba829ebbfac1b0f/stockroom_logo_base.png?fm=webp"
+                         class="site-header_logo--image"
+                         width="250"
+                         height="40"
+                         alt="Stockroom logo">
+                </a>
+            </div>
+            <div class="govuk-header__content">
+                @if (!isError)
+                {
+                    <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name" style="color: black;">
                         @Model.FormName
                     </a>
                 }
