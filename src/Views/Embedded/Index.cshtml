@@ -1,11 +1,22 @@
 <script>
+    const form = document.querySelector("form");
+    let formChanged = false;
+
+    function handleChange(event) {
+        if (!formChanged) {
+            formChanged = true;
+            console.log("Form has been modified.");
+        }
+        sendHeight();
+    }
+
     function sendHeight() {
         const element = document.querySelector('.smbc-embeddable');
         if (!element) return;
 
         const height = element.offsetHeight;
         const parentOrigin = document.referrer.split('/').slice(0, 3).join('/') + '/';
-
+        console.log("height ", height)
         const allowedOrigins = [
             "https://int-webplatform-stockroom.smbcdigital.net/",
             "https://qa-webplatform-stockroom.smbcdigital.net/",
@@ -20,6 +31,9 @@
 
     window.onload = sendHeight;
     window.onresize = sendHeight;
+    document.getElementsByClassName("govuk-button")[0].onclick = sendHeight;
+    form.addEventListener("input", handleChange);
+    form.addEventListener("change", handleChange);
 
     const smbcEmbeddable = document.querySelector('.smbc-embeddable');
     if (smbcEmbeddable)
