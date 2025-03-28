@@ -1,0 +1,25 @@
+﻿@model form_builder.ViewModels.FormBuilderViewModel
+@{
+    ViewData["Title"] = "Form unavailable";
+    ViewData["IsError"] = false;
+    Layout = "./Error/_ErrorLayout";
+    var unavailableReason = string.IsNullOrEmpty(Model.UnavailableReason) ? "This form is currently unavailable." : Model.UnavailableReason;
+}
+
+<h1 class="govuk-heading-l">We're sorry, but you cannot use this form</h1>
+
+<h2 class="govuk-heading-m">Why not?</h2>
+
+<p class="smbc-body">@unavailableReason</p>
+
+<div class="govuk-button-group">
+    <a href=@Model.StartPageUrl rel="noreferrer noopener"
+       target="_blank"
+       class="govuk-button">
+        Go back to the start page
+    </a>
+</div>
+
+<p class="smbc-body">
+    <a class="govuk-link" href="https://www.stockport.gov.uk">Go back to the homepage</a>
+</p>

@@ -91,6 +91,9 @@ public class HomeController : Controller
         if (response is null)
             return RedirectToAction("NotFound", "Error");
 
+        if (response.TargetPage.Equals("unavailable"))
+            return View("Unavailable", response.ViewModel);
+
         if (response.ShouldRedirect)
         {
             var routeValuesDictionary = new RouteValueDictionaryBuilder()
