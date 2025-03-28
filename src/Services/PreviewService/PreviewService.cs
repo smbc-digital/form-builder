@@ -101,7 +101,7 @@ namespace form_builder.Services.PreviewService
             {
                 var formSchema = await _schemaFactory.Build(previewKey);
                 formSchema.BaseURL = previewKey;
-                await _distributedCache.SetStringAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", JsonConvert.SerializeObject(formSchema), _expiryMinutes);
+                await _distributedCache.SetStringAbsoluteAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", JsonConvert.SerializeObject(formSchema), _expiryMinutes);
             }
             catch (Exception e)
             {

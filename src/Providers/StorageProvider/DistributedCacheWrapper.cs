@@ -55,5 +55,14 @@ public class DistributedCacheWrapper : IDistributedCacheWrapper
         return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
     }
 
+    public Task SetStringAbsoluteAsync(string key, string value, int expiration, CancellationToken token = default)
+    {
+        var distributedCacheOptions = new DistributedCacheEntryOptions();
+
+        distributedCacheOptions.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(expiration);
+
+        return _distributedCache.SetStringAsync(key, value, distributedCacheOptions, token);
+    }
+
     public byte[] Get(string key) => _distributedCache.Get(key);
 }
