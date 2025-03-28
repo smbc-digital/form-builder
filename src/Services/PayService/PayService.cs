@@ -11,8 +11,14 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Serilog;
 using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.Enums;
+using StockportGovUK.NetStandard.Gateways.MailingService;
 using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
+using StockportGovUK.NetStandard.Gateways.Models.GenericReport;
+using StockportGovUK.NetStandard.Gateways.Models.Mail;
+using EPaymentStatus = StockportGovUK.NetStandard.Gateways.Models.FormBuilder.EPaymentStatus;
 
 namespace form_builder.Services.PayService
 {
@@ -28,6 +34,8 @@ namespace form_builder.Services.PayService
         private readonly IPaymentHelper _paymentHelper;
         private readonly PaymentConfiguration _paymentConfiguration;
         private readonly IEnumerable<ITagParser> _tagParsers;
+        private readonly IMailingServiceGateway _mailingServiceGateway;
+        private readonly ErrorEmailConfiguration _errorEmailConfiguration;
 
         public PayService(
             IEnumerable<IPaymentProvider> paymentProviders,
@@ -39,7 +47,9 @@ namespace form_builder.Services.PayService
             IPageHelper pageHelper,
             IPaymentHelper paymentHelper,
             IOptions<PaymentConfiguration> paymentConfiguration,
-            IEnumerable<ITagParser> tagParsers)
+            IEnumerable<ITagParser> tagParsers,
+            IMailingServiceGateway mailingServiceGateway,
+            IOptions<ErrorEmailConfiguration> errorEmailConfiguration)
         {
             _gateway = gateway;
             _logger = logger;
@@ -51,6 +61,8 @@ namespace form_builder.Services.PayService
             _paymentHelper = paymentHelper;
             _paymentConfiguration = paymentConfiguration.Value;
             _tagParsers = tagParsers;
+            _mailingServiceGateway = mailingServiceGateway;
+            _errorEmailConfiguration = errorEmailConfiguration.Value;
         }
 
         public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string cacheKey)
@@ -135,20 +147,54 @@ namespace form_builder.Services.PayService
             {
                 var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });
                 if (!result.IsSuccessStatusCode)
-                    _logger.LogError(
-                        $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
-                        $"Payment callback for {paymentStatus} failed with statuscode: {result.StatusCode}, " +
-                        $"Payment reference {reference}, Response: {JsonConvert.SerializeObject(result)}");
+                {
+                    string log = $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
+                                 $"Payment callback for {paymentStatus} failed with status code: {result.StatusCode}, " +
+                                 $"Payment reference {reference}, Response: {JsonConvert.SerializeObject(result)}";
+
+                    _logger.LogError(log);
+                    foreach (string recipient in _errorEmailConfiguration.Recipients)
+                    {
+                        _mailingServiceGateway.Send(new Mail
+                        {
+                            Payload = JsonConvert.SerializeObject(new GenericReportMailModel
+                            {
+                                Header = $"Payment callback failure - {_hostingEnvironment.EnvironmentName}",
+                                RecipientAddress = recipient,
+                                Reference = reference,
+                                FormText = new[] { log },
+                                Subject = $"Payment callback failure - {_hostingEnvironment.EnvironmentName}"
+                            }),
+                            Template = EMailTemplate.GenericReport
+                        });
+                    }
+                }
 
                 return result;
             }
             catch (Exception exception)
             {
-                _logger.LogError(
-                    $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
-                    $"Payment callback to url {callbackUrl} failed. " +
-                    $"Payment status was {paymentStatus}, " +
-                    $"failed with Exception: {exception.Message}, Payment reference {reference}");
+                string log = $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
+                             $"Payment callback to url {callbackUrl} failed. " +
+                             $"Payment status was {paymentStatus}, " +
+                             $"failed with Exception: {exception.Message}, Payment reference {reference}";
+
+                _logger.LogError(log);
+                foreach (string recipient in _errorEmailConfiguration.Recipients)
+                {
+                    _mailingServiceGateway.Send(new Mail
+                    {
+                        Payload = JsonConvert.SerializeObject(new GenericReportMailModel
+                        {
+                            Header = $"Payment callback exception - {_hostingEnvironment.EnvironmentName}",
+                            RecipientAddress = recipient,
+                            Reference = reference,
+                            FormText = new[] { log },
+                            Subject = $"Payment callback exception - {_hostingEnvironment.EnvironmentName}"
+                        }),
+                        Template = EMailTemplate.GenericReport
+                    });
+                }
 
                 return new HttpResponseMessage(HttpStatusCode.FailedDependency);
             }

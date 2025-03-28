@@ -94,6 +94,7 @@ using StockportGovUK.NetStandard.Gateways.AddressService;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Extensions;
+using StockportGovUK.NetStandard.Gateways.MailingService;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
@@ -173,6 +174,7 @@ namespace form_builder.Utils.Startup
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
             services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
             services.AddHttpClient<IBookingServiceGateway, BookingServiceGateway>(configuration);
+            services.AddHttpClient<IMailingServiceGateway, MailingServiceGateway>(configuration);
 
             return services;
         }
@@ -508,6 +510,7 @@ namespace form_builder.Utils.Startup
             services.Configure<CivicaPaymentConfiguration>(configuration.GetSection(CivicaPaymentConfiguration.ConfigValue));
             services.Configure<DataStructureConfiguration>(configuration.GetSection(DataStructureConfiguration.ConfigValue));
             services.Configure<DistributedCacheExpirationConfiguration>(configuration.GetSection(DistributedCacheExpirationConfiguration.ConfigValue));
+            services.Configure<ErrorEmailConfiguration>(configuration.GetSection(ErrorEmailConfiguration.ConfigValue));
             services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(FileStorageProviderConfiguration.ConfigValue));
             services.Configure<FormConfiguration>(configuration.GetSection(FormConfiguration.ConfigValue));
             services.Configure<HashConfiguration>(configuration.GetSection(HashConfiguration.ConfigValue));

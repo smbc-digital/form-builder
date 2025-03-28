@@ -215,7 +215,7 @@ namespace form_builder_tests.UnitTests.Services
             _testValidator.Verify(_ => _.Validate(It.IsAny<Element>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>()), Times.Once);
             _mockCookieHelper.Verify(_ => _.AddCookie(It.Is<string>(x => x.Equals(CookieConstants.PREVIEW_MODE)), It.Is<string>(y => y.StartsWith(PreviewConstants.PREVIEW_MODE_PREFIX))), Times.Once);
             _distributedCache.Verify(_ => _.SetAsync(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Once);
-            _distributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(30)), It.IsAny<CancellationToken>()), Times.Once);
+            _distributedCache.Verify(_ => _.SetStringAbsoluteAsync(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(30)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageFactory.Verify(_ => _.Build(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
             _distributedCache.Verify(_ => _.Remove(It.Is<string>(_ => _.StartsWith($"form-json-{PreviewConstants.PREVIEW_MODE_PREFIX}"))), Times.Never);
         }

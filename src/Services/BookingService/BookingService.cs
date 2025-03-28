@@ -326,12 +326,12 @@ public class BookingService : IBookingService
         catch (BookingNoAvailabilityException)
         {
             result = new BookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
-            await _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
+            await _distributedCache.SetStringAbsoluteAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
             return result;
         }
 
         result = new BookingNextAvailabilityEntity { DayResponse = nextAvailability };
-        await _distributedCache.SetStringAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
+        await _distributedCache.SetStringAbsoluteAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
         return result;
     }
 
