@@ -256,7 +256,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion--{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAbsoluteAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion--{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.Is<string>(_ => _.Equals(bookingCacheKey)), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -352,7 +352,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-01-01-2022-{guid}-{bookingResourceQuantity}{bookingResourceId}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAbsoluteAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion-01-01-2022-{guid}-{bookingResourceQuantity}{bookingResourceId}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.Booking)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.Is<string>(_ => _.Equals(bookingCacheKey)), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -384,7 +384,7 @@ namespace form_builder_tests.UnitTests.Services
             Assert.True(result.BookingHasNoAvailableAppointments);
             _bookingProvider.Verify(_ => _.NextAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Once);
             _bookingProvider.Verify(_ => _.GetAvailability(It.Is<AvailabilityRequest>(_ => _.AppointmentId.Equals(guid))), Times.Never);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion--{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.BookingNoAppointmentsAvailable)), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAbsoluteAsync(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion--{guid}")), It.IsAny<string>(), It.Is<int>(_ => _.Equals(_cacheConfig.BookingNoAppointmentsAvailable)), It.IsAny<CancellationToken>()), Times.Once);
             _mockPageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 

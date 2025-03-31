@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
+using StockportGovUK.NetStandard.Gateways.MailingService;
 using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
@@ -39,6 +40,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
         private readonly Mock<ITagParser> _tagParser = new();
         private readonly Mock<IOptions<PaymentConfiguration>> _mockPaymentConfiguration = new();
+        private readonly Mock<IMailingServiceGateway> _mockMailingServiceGateway = new();
+        private readonly Mock<IOptions<ErrorEmailConfiguration>> _mockErrorEmailConfiguration = new();
 
         public PayServiceTests()
         {
@@ -137,8 +140,25 @@ namespace form_builder_tests.UnitTests.Services
                         FakePayment = false
                     });
 
-            _service = new PayService(_mockPaymentProviders.Object, _mockLogger.Object, _mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object,
-                _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentHelper.Object, _mockPaymentConfiguration.Object, _mockTagParsers.Object);
+            _mockErrorEmailConfiguration
+                .Setup(configuration => configuration.Value)
+                .Returns(new ErrorEmailConfiguration
+                {
+                    Recipients = new List<string> { "email" }
+                });
+
+            _service = new PayService(_mockPaymentProviders.Object,
+                _mockLogger.Object,
+                _mockGateway.Object,
+                _mockSessionHelper.Object,
+                _mockMappingService.Object,
+                _mockHostingEnvironment.Object,
+                _mockPageHelper.Object,
+                _mockPaymentHelper.Object,
+                _mockPaymentConfiguration.Object,
+                _mockTagParsers.Object,
+                _mockMailingServiceGateway.Object,
+                _mockErrorEmailConfiguration.Object);
         }
 
         private static MappingEntity GetMappingEntityData()
@@ -670,8 +690,19 @@ namespace form_builder_tests.UnitTests.Services
         {
             _mockPaymentConfiguration.Setup(_ => _.Value).Returns(new PaymentConfiguration { FakePayment = true });
 
-            _service = new PayService(_mockPaymentProviders.Object, _mockLogger.Object, _mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object,
-                _mockHostingEnvironment.Object, _mockPageHelper.Object, _mockPaymentHelper.Object, _mockPaymentConfiguration.Object, _mockTagParsers.Object);
+            _service = new PayService(_mockPaymentProviders.Object,
+                _mockLogger.Object,
+                _mockGateway.Object,
+                _mockSessionHelper.Object,
+                _mockMappingService.Object,
+                _mockHostingEnvironment.Object,
+                _mockPageHelper.Object,
+                _mockPaymentHelper.Object,
+                _mockPaymentConfiguration.Object,
+                _mockTagParsers.Object,
+                _mockMailingServiceGateway.Object,
+                _mockErrorEmailConfiguration.Object);
+
             // Act
             var result = await _service.ProcessPayment(GetMappingEntityData(), "testForm", "page-one", "12345", "guid");
 

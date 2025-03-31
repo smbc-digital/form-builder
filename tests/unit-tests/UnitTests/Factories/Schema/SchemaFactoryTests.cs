@@ -263,7 +263,7 @@ namespace form_builder_tests.UnitTests.Factories.Schema
             Assert.IsType<FormSchema>(result);
             _mockDistributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);
             _mockFormSchemaIntegrityValidator.Verify(_ => _.Validate(It.IsAny<FormSchema>()), Times.Once);
-            _mockDistributedCache.Verify(_ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
+            _mockDistributedCache.Verify(_ => _.SetStringAbsoluteAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
