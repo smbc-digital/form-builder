@@ -168,6 +168,15 @@ namespace form_builder.Providers.DocumentCreation.Generic
 
             var rowNumber = 0;
 
+            var tableStyles = doct.GetElementStyles().TableStyles;
+
+            Table table = new(answerList.Count, 1)
+            {
+                Style = tableStyles[1]
+            };
+            table.Column.Width = 3000;
+
+
             Paragraph para = new()
             {
                 Style = Headings.Heading1,
@@ -193,6 +202,26 @@ namespace form_builder.Providers.DocumentCreation.Generic
 
                 bodyt.AppendChild(para);
             }
+            
+            rowNumber = 0;
+            
+            foreach (var row in table.Rows)
+            {
+                rowNumber++;
+                if (answerList[rowNumber - 1].Length is not 0)
+                {
+                    para = new Paragraph();
+                    para.AddRun(new Run
+                    {
+                        Text = answerList[rowNumber - 1].ToString(),
+                        Bold = true,
+                        FontSize = 16
+                    });
+                    row.Cells[0].Paragraphs.Add(para);                    
+                }
+            }
+
+            bodyt.AppendChild(table);
 
             MemoryStream memoryStream = new();
             doct.Save(memoryStream);
