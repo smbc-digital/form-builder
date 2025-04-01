@@ -71,7 +71,6 @@ namespace form_builder
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
                         _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                        _.Cookie.SameSite = SameSiteMode.None;
                     })
                 .AddSession(_ =>
                 {
