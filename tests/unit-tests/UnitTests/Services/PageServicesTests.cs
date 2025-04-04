@@ -180,7 +180,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async Task ProcessPage_ShouldReturnNull_IfFormIsNotAvailable()
+        public async Task ProcessPage_ShouldReturnTargetPageUnavailable_IfFormIsNotAvailable()
         {
             _mockFormAvailabilityService.Setup(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()))
                 .Returns(false);
@@ -195,7 +195,7 @@ namespace form_builder_tests.UnitTests.Services
             var result = await _service.ProcessPage("form", "page-one", "", new QueryCollection());
             _mockLogger.Verify(_ => _.Log(LogLevel.Warning, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(), (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.AtLeastOnce);
             _mockFormAvailabilityService.Verify(_ => _.IsAvailable(It.IsAny<List<EnvironmentAvailability>>(), It.IsAny<string>()), Times.Once);
-            Assert.Null(result);
+            Assert.Equal("unavailable", result.TargetPage);
         }
 
         [Fact]

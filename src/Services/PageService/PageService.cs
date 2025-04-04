@@ -139,7 +139,16 @@ public class PageService : IPageService
         {
             _logger.LogWarning($"PageService:ProcessPage:Form {form} is not available in environment {_environment.EnvironmentName.ToS3EnvPrefix()}");
             _distributedCache.Remove(cacheId);
-            return null;
+            return new ProcessPageEntity 
+            { 
+                TargetPage = "unavailable",
+                ViewModel = new FormBuilderViewModel
+                {
+                    StartPageUrl = baseForm.StartPageUrl,
+                    FormName = baseForm.FormName,
+                    UnavailableReason = baseForm.EnvironmentAvailabilities.First(env => env.Environment.Equals(_environment.EnvironmentName)).UnavailableReason
+                }
+            };
         }
 
         if ((pathIsEmpty || cacheIsEmpty) && !_formAvailabilityService.IsFormAccessApproved(baseForm))

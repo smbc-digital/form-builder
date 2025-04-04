@@ -27,5 +27,7 @@ namespace form_builder.ViewModels
         public List<Breadcrumb> BreadCrumbs { get; set; }
 
         public bool IsInPreviewMode { get; set; }
+
+        public string UnavailableReason { get; set; }
     }
 }
