@@ -12,5 +12,7 @@ namespace form_builder.Models
         public bool IsAvailable { get; set; }
 
         public List<EnabledForBase> EnabledFor { get; set; }
+
+        public string UnavailableReason { get; set; }
     }
 }

@@ -49,9 +49,6 @@ namespace form_builder_tests.UnitTests.Controllers
 
         public HomeControllerTest()
         {
-            
-
-            
             Mock<ISession> mockSession = new();
             mockSession.Setup(_ => _.IsAvailable).Returns(true);
             mockSession.Setup(_ => _.Id).Returns("SessionMockId");
@@ -471,6 +468,21 @@ namespace form_builder_tests.UnitTests.Controllers
 
             // Assert
             Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task Index_ShouldReturnUnavailableViewResult_IfFormUnavailable()
+        {
+            // Arrange
+            _pageService.Setup(_ => _.ProcessPage(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IQueryCollection>()))
+                .ReturnsAsync(new ProcessPageEntity { TargetPage = "unavailable" });
+
+            // Act
+            var result = await _homeController.Index("form", "path");
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            Assert.Equal("Unavailable", ((ViewResult)result).ViewName);
         }
 
         [Fact]
