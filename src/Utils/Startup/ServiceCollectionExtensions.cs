@@ -95,6 +95,7 @@ using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Extensions;
 using StockportGovUK.NetStandard.Gateways.MailingService;
+using StockportGovUK.NetStandard.Gateways.MailingServiceProxy;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
@@ -174,7 +175,7 @@ namespace form_builder.Utils.Startup
             services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
             services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
             services.AddHttpClient<IBookingServiceGateway, BookingServiceGateway>(configuration);
-            services.AddHttpClient<IMailingServiceGateway, MailingServiceGateway>(configuration);
+            services.AddHttpClient<IMailingServiceProxyGateway, MailingServiceProxyGateway>(configuration);
 
             return services;
         }

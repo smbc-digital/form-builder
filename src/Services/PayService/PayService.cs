@@ -15,6 +15,7 @@ using Serilog;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.Enums;
 using StockportGovUK.NetStandard.Gateways.MailingService;
+using StockportGovUK.NetStandard.Gateways.MailingServiceProxy;
 using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using StockportGovUK.NetStandard.Gateways.Models.GenericReport;
 using StockportGovUK.NetStandard.Gateways.Models.Mail;
@@ -34,7 +35,7 @@ namespace form_builder.Services.PayService
         private readonly IPaymentHelper _paymentHelper;
         private readonly PaymentConfiguration _paymentConfiguration;
         private readonly IEnumerable<ITagParser> _tagParsers;
-        private readonly IMailingServiceGateway _mailingServiceGateway;
+        private readonly IMailingServiceProxyGateway _mailingServiceGateway;
         private readonly ErrorEmailConfiguration _errorEmailConfiguration;
 
         public PayService(
@@ -48,7 +49,7 @@ namespace form_builder.Services.PayService
             IPaymentHelper paymentHelper,
             IOptions<PaymentConfiguration> paymentConfiguration,
             IEnumerable<ITagParser> tagParsers,
-            IMailingServiceGateway mailingServiceGateway,
+            IMailingServiceProxyGateway mailingServiceGateway,
             IOptions<ErrorEmailConfiguration> errorEmailConfiguration)
         {
             _gateway = gateway;
