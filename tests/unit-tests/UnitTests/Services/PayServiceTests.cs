@@ -19,6 +19,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.MailingService;
+using StockportGovUK.NetStandard.Gateways.MailingServiceProxy;
 using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
@@ -40,7 +41,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
         private readonly Mock<ITagParser> _tagParser = new();
         private readonly Mock<IOptions<PaymentConfiguration>> _mockPaymentConfiguration = new();
-        private readonly Mock<IMailingServiceGateway> _mockMailingServiceGateway = new();
+        private readonly Mock<IMailingServiceProxyGateway> _mockMailingServiceGateway = new();
         private readonly Mock<IOptions<ErrorEmailConfiguration>> _mockErrorEmailConfiguration = new();
 
         public PayServiceTests()
