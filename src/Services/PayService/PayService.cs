@@ -146,23 +146,6 @@ namespace form_builder.Services.PayService
         {
             try
             {
-                // This is temp to test that the emails are getting through the netscalar
-                foreach (string recipient in _errorEmailConfiguration.Recipients)
-                {
-                    _mailingServiceGateway.Send(new Mail
-                    {
-                        Payload = JsonConvert.SerializeObject(new GenericReportMailModel
-                        {
-                            Header = $"Payment callback - {_hostingEnvironment.EnvironmentName}",
-                            RecipientAddress = recipient,
-                            Reference = reference,
-                            FormText = new[] { "Submitting post payment callback request" },
-                            Subject = $"Payment callback - {_hostingEnvironment.EnvironmentName}"
-                        }),
-                        Template = EMailTemplate.GenericReport
-                    });
-                }
-
                 var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });
                 if (!result.IsSuccessStatusCode)
                 {
