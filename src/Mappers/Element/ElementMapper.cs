@@ -140,8 +140,10 @@ namespace form_builder.Mappers
                     return convertDateTime.Date.ToString("dd/MM/yyyy");
                 case EElementType.Select:
                 case EElementType.Radio:
-                    var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value.Equals(value.ToString()));
-                    return selectValue?.Text ?? string.Empty;
+                    var selectValue = question.Properties.Options.FirstOrDefault(_ => _.Value.Equals(value.ToString()));                    
+                    return question.Properties.UseValueForEmail
+                        ? (selectValue?.Value ?? string.Empty)
+                        : (selectValue?.Text ?? string.Empty);
                 case EElementType.Checkbox:
                     var answerCheckbox = string.Empty;
                     var list = (List<string>)value;
