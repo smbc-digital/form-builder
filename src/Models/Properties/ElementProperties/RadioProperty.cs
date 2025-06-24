@@ -4,5 +4,6 @@
     {
         public bool AllowSingleOption { get; set; } = false;
         public bool UseValueForEmail { get; set; } = false;
+        public bool Inline { get; set; } = false;
     }
 }

@@ -391,7 +391,28 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.True(result);
         }
 
-        [Theory]
+        [Fact]
+        public void CheckForRadioOptions_ShouldBeInline_Inline_True()
+        {
+            //Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Radio)
+                .WithQuestionId("questionId")
+                .WithLabel("Label")
+                .WithInline(true)
+                .WithOptions(new List<Option>
+				{ new Option { Value = "option1", Text = "Option 1", Hint = "Option 1 Hint" },
+				  new Option { Value = "option2", Text = "Option 2", Hint = "Option 2 Hint" } })
+				.Build();
+
+			// Act & Assert
+			var result = _elementHelper.CheckForRadioOptions(element);
+
+			// Assert
+			Assert.True(result);
+		}
+
+		[Theory]
         [InlineData(EElementType.P, "paragraph")]
         [InlineData(EElementType.H1, "Header 1")]
         [InlineData(EElementType.H2, "Header 2")]

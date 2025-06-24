@@ -86,7 +86,14 @@ namespace form_builder.Builders
             return this;
         }
 
-        public ElementBuilder WithAddressLabel(string label)
+		public ElementBuilder WithInline(bool inline)
+		{
+			_property.Inline = inline;
+
+			return this;
+		}
+
+		public ElementBuilder WithAddressLabel(string label)
         {
             _property.AddressLabel = label;
 
