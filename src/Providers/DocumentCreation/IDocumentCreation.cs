@@ -10,8 +10,8 @@ namespace form_builder.Providers.DocumentCreation
 
         byte[] CreateDocument(List<string> fileContent);
 
-        byte[] CreateHtmlDocument(List<string> fileContent, string formName);
+        byte[] CreateHtmlDocument(List<string> fileContent, string formName, string answersTitle);
 
-        byte[] CreatePdfDocument(List<string> fileContent, string formName);
+        byte[] CreatePdfDocument(List<string> fileContent, string formName, string answersTitle);
     }
 }

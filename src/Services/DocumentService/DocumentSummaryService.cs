@@ -1,7 +1,9 @@
+using form_builder.Configuration;
 using form_builder.Enum;
 using form_builder.Extensions;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.DocumentCreation;
+using form_builder.Helpers.EmailHelpers;
 using form_builder.Models;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Services.DocumentService.Entities;
@@ -13,8 +15,10 @@ namespace form_builder.Services.DocumentService
         private readonly IDocumentCreation _textfileProvider;
         private readonly IDocumentCreationHelper _documentCreationHelper;
         private readonly ISchemaFactory _schemaFactory;
+		private readonly IEmailHelper _emailHelper;
 
-        public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers, ISchemaFactory schemaFactory)
+
+		public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers, ISchemaFactory schemaFactory, IEmailHelper emailHelper)
         {
             _textfileProvider = providers
                                     .Where(_ => _.DocumentType.Equals(EDocumentType.Txt))
@@ -23,6 +27,7 @@ namespace form_builder.Services.DocumentService
 
             _documentCreationHelper = documentCreationHelper;
             _schemaFactory = schemaFactory;
+            _emailHelper = emailHelper;
         }
 
         public async Task<byte[]> GenerateDocument(DocumentSummaryEntity entity) =>
@@ -43,16 +48,20 @@ namespace form_builder.Services.DocumentService
 
         private async Task<byte[]> GenerateHtmlFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+			EmailConfiguration emailConfig = await _emailHelper.GetEmailInformation(formSchema.BaseURL);
 
-            return _textfileProvider.CreateHtmlDocument(data, formSchema.FormName);
+			var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+
+            return _textfileProvider.CreateHtmlDocument(data, formSchema.FormName, emailConfig.AnswersTitle);
         }
 
         private async Task<byte[]> GeneratePdfFile(FormAnswers formAnswers, FormSchema formSchema)
         {
-            var data = await _documentCreationHelper.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
+			EmailConfiguration emailConfig = await _emailHelper.GetEmailInformation(formSchema.BaseURL);
 
-            return _textfileProvider.CreatePdfDocument(data, formSchema.FormName);
+			var data = await _documentCreationHelper.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
+
+            return _textfileProvider.CreatePdfDocument(data, formSchema.FormName, emailConfig.AnswersTitle);
         }
     }
 }

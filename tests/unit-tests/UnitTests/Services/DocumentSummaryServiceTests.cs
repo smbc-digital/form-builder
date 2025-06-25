@@ -2,6 +2,7 @@
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.DocumentCreation;
+using form_builder.Helpers.EmailHelpers;
 using form_builder.Models;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Services.DocumentService;
@@ -17,7 +18,8 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDocumentCreationHelper> _mockDocumentCreationHelper = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IDocumentCreation> _mockProvider = new();
-        private readonly DocumentSummaryService _documentSummaryService;
+		private readonly Mock<IEmailHelper> _mockEmailHelper = new();
+		private readonly DocumentSummaryService _documentSummaryService;
         private readonly FormSchema _formSchema;
         private readonly FormAnswers _formAnswers;
 
@@ -68,7 +70,7 @@ namespace form_builder_tests.UnitTests.Services
 
             _mockProvider.Setup(_ => _.CreateDocument(It.IsAny<List<string>>())).Returns(new byte[1]);
 
-            _documentSummaryService = new DocumentSummaryService(_mockDocumentCreationHelper.Object, providers, _mockSchemaFactory.Object);
+            _documentSummaryService = new DocumentSummaryService(_mockDocumentCreationHelper.Object, providers, _mockSchemaFactory.Object, _mockEmailHelper.Object);
         }
 
         [Fact]
