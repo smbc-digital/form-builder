@@ -329,7 +329,94 @@ namespace form_builder_tests.UnitTests.Helpers
             Assert.Equal($"<b>{labelText3}</b><br/>{value}", result[4]);
         }
 
-        [Fact]
+		[Fact]
+		public async Task GenerateQuestionAndAnswersListWithPageTitles_ShouldReturn_Summary_With_SingleAnswer_And_NewLine_And_PageTitle()
+		{
+			// Arrange
+			_mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).ReturnsAsync("test value");
+			var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() } } };
+
+			var element = new ElementBuilder()
+				.WithType(EElementType.Textarea)
+				.WithQuestionId("QuestionId")
+				.WithLabel("I am a label")
+				.Build();
+
+			var behaviour = new BehaviourBuilder()
+				.WithBehaviourType(EBehaviourType.SubmitForm)
+				.Build();
+
+			var page = new PageBuilder()
+                .WithPageTitle("Page one")
+				.WithPageSlug("page-one")
+				.WithElement(element)
+				.WithBehaviour(behaviour)
+				.Build();
+
+			var formSchema = new FormSchemaBuilder()
+				.WithPage(page)
+				.Build();
+
+			// Act
+			var result = await _documentCreation.GenerateQuestionAndAnswersListWithPageTitles(formAnswers, formSchema);
+
+			Assert.Equal(3, result.Count);
+		}
+
+		[Fact]
+		public async Task GenerateQuestionAndAnswersListWithPageTitles_ShouldReturn_Summary_With_SingleAnswer_And_NewLine_And_PageTitle_Testing_TwoPages()
+		{
+			// Arrange
+			_mockElementMapper.Setup(_ => _.GetAnswerStringValue(It.IsAny<IElement>(), It.IsAny<FormAnswers>())).ReturnsAsync("test value");
+			var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { PageSlug = "page-one", Answers = new List<Answers>() }, new PageAnswers { PageSlug = "page-two", Answers = new List<Answers>() } } };
+
+			Element elementOne = new ElementBuilder()
+				.WithType(EElementType.Textarea)
+				.WithQuestionId("QuestionIdOne")
+				.WithLabel("I am a label")
+				.Build();
+
+			Element elementTwo = new ElementBuilder()
+				.WithType(EElementType.Textarea)
+				.WithQuestionId("QuestionIdTwo")
+				.WithLabel("I am also a label")
+				.Build();
+
+			Behaviour behaviourNextPage = new BehaviourBuilder()
+				.WithBehaviourType(EBehaviourType.GoToPage)
+				.WithPageSlug("page-two")
+				.Build();
+
+			Behaviour behaviourSubmit = new BehaviourBuilder()
+				.WithBehaviourType(EBehaviourType.SubmitForm)
+				.Build();
+
+			Page pageOne = new PageBuilder()
+				.WithPageTitle("Page one")
+				.WithPageSlug("page-one")
+				.WithElement(elementOne)
+				.WithBehaviour(behaviourNextPage)
+				.Build();
+
+			Page pageTwo = new PageBuilder()
+				.WithPageTitle("Page two")
+				.WithPageSlug("page-two")
+				.WithElement(elementTwo)
+				.WithBehaviour(behaviourSubmit)
+				.Build();
+
+			var formSchema = new FormSchemaBuilder()
+				.WithPage(pageOne)
+				.WithPage(pageTwo)
+				.Build();
+
+			// Act
+			var result = await _documentCreation.GenerateQuestionAndAnswersListWithPageTitles(formAnswers, formSchema);
+
+			Assert.Equal(6, result.Count);
+		}
+
+		[Fact]
         public async Task GenerateQuestionAndAnswersListForPdf_ShouldReturn_Summary_With_Label_SingleAnswer_And_NewLine()
         {
             // Arrange
