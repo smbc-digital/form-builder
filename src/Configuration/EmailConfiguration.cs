@@ -9,6 +9,6 @@
         public string Sender { get; set; } = "noreply@stockport.gov.uk";
         public string Subject { get; set; }
         public string AnswersTitle { get; set; }
-
+        public bool UsePageTitlesInEmailGeneration { get; set; } = false;
 	}
 }

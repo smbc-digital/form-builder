@@ -47,5 +47,10 @@ namespace form_builder.Builders.Document
         {
             _data.Add(string.Empty);
         }
-    }
+
+		public void AddPageTitle(string pageTitle)
+		{
+			_data.Add($"<h2>{pageTitle}</h2>");
+		}
+	}
 }
