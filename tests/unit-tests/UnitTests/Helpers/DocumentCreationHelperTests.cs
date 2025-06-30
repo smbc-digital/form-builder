@@ -413,6 +413,7 @@ namespace form_builder_tests.UnitTests.Helpers
 			// Act
 			var result = await _documentCreation.GenerateQuestionAndAnswersListWithPageTitles(formAnswers, formSchema);
 
+            Assert.Contains("Page one", result[0]);
 			Assert.Equal(6, result.Count);
 		}
 
