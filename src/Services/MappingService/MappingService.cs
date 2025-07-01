@@ -42,8 +42,16 @@ namespace form_builder.Services.MappingService
 
         public async Task<MappingEntity> Map(string cacheKey, string form, FormAnswers convertedAnswers = null, FormSchema baseForm = null)
         {
-            if (convertedAnswers is null || baseForm is null)
-                (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
+            try
+            {
+				if (convertedAnswers is null || baseForm is null)
+					(convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
+			}
+            catch (Exception ex)
+            {
+				throw new ApplicationException($"MappingService::GetFormAnswer:{cacheKey}, Session data is null");
+			}
+
 
             return new MappingEntity
             {

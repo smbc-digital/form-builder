@@ -74,7 +74,7 @@ namespace form_builder
                     })
                 .AddSession(_ =>
                 {
-                    _.IdleTimeout = TimeSpan.FromMinutes(60);
+                    _.IdleTimeout = TimeSpan.FromMinutes(1); //60
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
                     _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;

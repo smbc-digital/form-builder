@@ -13,6 +13,7 @@ using form_builder.Services.MappingService.Entities;
 using form_builder.TagParsers;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using NuGet.DependencyResolver;
 using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.SubmitService;
@@ -107,6 +108,16 @@ public class SubmitService : ISubmitService
         var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
         _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers, mappingEntity.BaseForm));
         var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+
+        // check if the FormAnswers are empty. Error if it is.
+        if (mappingEntity.FormAnswers.Pages[0].Answers[0].Response is not null)
+        {
+            //all good
+        }
+        else
+        {
+            //error
+        }
 
         _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{cacheKey} {form} Posting Request");
 
