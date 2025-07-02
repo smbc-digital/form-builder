@@ -49,6 +49,8 @@ namespace form_builder.Services.MappingService
 			}
             catch (Exception ex)
             {
+                //Action to error/timeout
+
 				throw new ApplicationException($"MappingService::GetFormAnswer:{cacheKey}, Session data is null");
 			}
 
