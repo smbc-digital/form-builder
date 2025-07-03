@@ -42,17 +42,17 @@ namespace form_builder.Services.MappingService
 
         public async Task<MappingEntity> Map(string cacheKey, string form, FormAnswers convertedAnswers = null, FormSchema baseForm = null)
         {
-            try
-            {
+            //try
+            //{
 				if (convertedAnswers is null || baseForm is null)
 					(convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
-			}
-            catch (Exception ex)
-            {
-                //Action to error/timeout
-
-				throw new ApplicationException($"MappingService::GetFormAnswer:{cacheKey}, Session data is null");
-			}
+			//}
+            //catch (Exception ex)
+            //{
+			//	//Action to error/timeout
+			//	//return RedirectToAction("Timeout", "Error");
+			//	throw new ApplicationException($"MappingService::GetFormAnswer:{cacheKey}, Session data is null");
+			//}
 
 
             return new MappingEntity

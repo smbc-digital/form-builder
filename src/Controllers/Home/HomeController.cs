@@ -191,7 +191,14 @@ public class HomeController : Controller
     [Route("{form}/submit")]
     public async Task<IActionResult> Submit(string form)
     {
-        await _submitWorkflow.Submit(form);
+        try
+        {
+			await _submitWorkflow.Submit(form);
+		}
+        catch (Exception ex)
+        {
+			return RedirectToAction("TimeOut", "Error");
+        }        
 
         return RedirectToAction("Success", new
         {
