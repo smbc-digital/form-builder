@@ -21,7 +21,7 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Summary_ShouldRedirect_ToError_WhenInvalidIdProviderXX()
+        public async Task Summary_ShouldRedirect_ToError_WhenInvalidIdProvider()
         {
             var result = await _controller.Summary(EDocumentType.Txt, null);
 
