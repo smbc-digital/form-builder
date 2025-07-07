@@ -27,11 +27,11 @@ namespace form_builder.Workflows.DocumentWorkflow
 
         public async Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, string id)
         {
-            var previousAnswers = _pageHelper.GetSavedAnswers(id.ToString());
+            var previousAnswers = _pageHelper.GetSavedAnswers(id);
 
             if (previousAnswers.FormName is null)
             {
-                var formData = _distributedCache.GetString($"document-{id.ToString()}");
+                var formData = _distributedCache.GetString($"document-{id}");
 
                 if (formData is null)
                     throw new DocumentExpiredException($"DocumentWorkflow::GenerateSummaryDocument, Previous answers has expired, unable to generate {documentType.ToString()} document for summary");
