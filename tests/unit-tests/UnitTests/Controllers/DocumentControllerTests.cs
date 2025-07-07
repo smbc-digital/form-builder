@@ -21,39 +21,39 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Summary_ShouldRedirect_ToError_WhenInvalidIdProvider()
+        public async Task Summary_ShouldRedirect_ToError_WhenInvalidIdProviderXX()
         {
-            var result = await _controller.Summary(EDocumentType.Txt, Guid.Empty);
+            var result = await _controller.Summary(EDocumentType.Txt, null);
 
             Assert.IsType<RedirectToActionResult>(result);
-            _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<Guid>()), Times.Never);
+            _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()), Times.Never);
         }
-
-        [Fact]
+        	
+		[Fact]
         public async Task Summary_ShouldRedirect_ToExpired_When_ServiceThrows_DocumentExpiredExceptionException()
         {
-            _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<Guid>()))
+            _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()))
                 .ThrowsAsync(new DocumentExpiredException("an exception"));
 
-            var result = await _controller.Summary(EDocumentType.Txt, Guid.NewGuid());
+            var result = await _controller.Summary(EDocumentType.Txt, "This is some text");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Expired", redirectResult.ActionName);
-            _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<Guid>()), Times.Once);
+            _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
         public async Task Summary_ShouldReturnFile_OnSuccess()
         {
-            _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<Guid>()))
+            _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()))
                 .ReturnsAsync(new byte[0]);
 
-            var result = await _controller.Summary(EDocumentType.Txt, Guid.NewGuid());
+            var result = await _controller.Summary(EDocumentType.Txt, "This is some text");
 
             var fileContentResult = Assert.IsType<FileContentResult>(result);
             Assert.Equal("summary.txt", fileContentResult.FileDownloadName);
             Assert.Equal("text/plain", fileContentResult.ContentType);
-            _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<Guid>()), Times.Once);
+            _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()), Times.Once);
         }
     }
 }

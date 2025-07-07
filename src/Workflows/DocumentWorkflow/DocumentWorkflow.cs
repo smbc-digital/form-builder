@@ -25,7 +25,7 @@ namespace form_builder.Workflows.DocumentWorkflow
             _pageHelper = pageHelper;
         }
 
-        public async Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, Guid id)
+        public async Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, string id)
         {
             var previousAnswers = _pageHelper.GetSavedAnswers(id.ToString());
 
