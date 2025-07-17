@@ -1,0 +1,36 @@
+﻿@model HomeViewModel;
+@{
+    ViewData["Title"] = "Welcome to FormBuilder";
+    ViewData["PageTitle"] = "Welcome to FormBuilder";
+    ViewData["DisplayBreadcrumbs"] = false;
+    ViewData["PreviewMode"] = false;
+    ViewData["Embeddable"] = false;
+}
+
+<h1 class="govuk-heading-l">Welcome to FormBuilder</h1>
+
+<h2 class="govuk-heading-m">Preview a form</h2>
+<p class="smbc-body">Upload a JSON file to test and preview.</a></p>
+<a href="/preview" class="govuk-button">Preview a form</a>
+
+<hr style="margin: 2em 0em 2em 0em;" />
+
+<h2 class="govuk-heading-m">Links</h2>
+<ul>
+    <li><span class="smbc-body"><a href="https://github.com/smbc-digital/form-builder/wiki">FormBuilder wiki</a></span></li>
+    <li><span class="smbc-body"><a href="https://github.com/smbc-digital/form-builder">FormBuilder github</a></span></li>
+    <li><span class="smbc-body"><a href="https://github.com/smbc-digital/form-builder-json">FormBuilder JSON defenitions</a></span></li>
+</ul>
+
+<hr style="margin: 2em 0em 2em 0em;" />
+
+<h2 class="govuk-heading-m">Forms</h2>
+<table style="width:100%">
+    @foreach(var form in Model.FormUrls)
+    {
+        <tr>
+            <td class="smbc-body"><a style="text-transform: capitalize" href="/view/@form">@form.Replace("-", " ")</a></td>
+            <td class="smbc-body" style="text-align: right"><a href="/@form/data-structure" aria-label="Preview output data structure for @form">Data structure</a></td>
+        </tr>
+    }
+</table>

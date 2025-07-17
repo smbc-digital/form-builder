@@ -26,6 +26,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
+using form_builder.Providers.SchemaProvider;
+using form_builder.Factories.Schema;
+using Microsoft.FeatureManagement;
+using NuGet.ContentModel;
+using System.Threading.Tasks;
 
 namespace form_builder_tests.UnitTests.Controllers
 {
@@ -33,6 +38,8 @@ namespace form_builder_tests.UnitTests.Controllers
     {
         private readonly HomeController _homeController;
         private readonly Mock<IPageService> _pageService = new();
+        private readonly Mock<ISchemaProvider> _mockSchemaProvider = new();
+        private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<ISubmitWorkflow> _submitWorkflow = new();
         private readonly Mock<IEmailWorkflow> _emailWorkflow = new();
         private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new();
@@ -44,6 +51,7 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<IStructureMapper> _mockStructureMapper = new();
         private readonly Mock<IOptions<DataStructureConfiguration>> _mockDataStructureConfiguration = new();
         private readonly Mock<ILogger<HomeController>> _mockLogger = new();
+        private readonly Mock<IFeatureManager> _mockFeatureManager = new();
 
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
 
@@ -74,8 +82,17 @@ namespace form_builder_tests.UnitTests.Controllers
                 .Setup(_ => _.CreateBaseFormDataStructure(It.IsAny<string>()))
                 .ReturnsAsync(new Dictionary<string, dynamic>());
 
+            _mockFeatureManager
+                .Setup(_ => _.IsEnabledAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            _mockSchemaProvider.Setup(_ => _.IndexSchema())
+                .ReturnsAsync(new List<string> { "test-form" });
+
             _homeController = new HomeController(
                 _pageService.Object,
+                _mockSchemaProvider.Object,
+                _mockSchemaFactory.Object,
                 _submitWorkflow.Object,
                 _paymentWorkflow.Object,
                 _redirectWorkflow.Object,
@@ -87,7 +104,9 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object,
                 _mockLogger.Object,
-                _mockSessionHelper.Object)
+                _mockSessionHelper.Object,
+                _mockFeatureManager.Object)
+
             { TempData = tempData };
 
             _homeController.ControllerContext = new ControllerContext();
@@ -103,17 +122,17 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public void Home_ShouldRedirectTo_www_When_Prod_Env_ForHomeRoute()
+        public async Task Home_ShouldViewResult_IFeatureToggleIsSet_ForHomeRoute()
         {
             // Arrange
             _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("prod");
-
+            
             // Act
-            var result = _homeController.Home();
+            var result = await _homeController.Home();
 
             // Assert
-            var redirectResult = Assert.IsType<RedirectResult>(result);
-            Assert.Equal("https://www.stockport.gov.uk", redirectResult.Url);
+            _mockSchemaProvider.Verify(_ => _.IndexSchema(), Times.Once);
+            Assert.IsType<ViewResult>(result);
         }
 
         [Fact]
@@ -816,6 +835,8 @@ namespace form_builder_tests.UnitTests.Controllers
 
             var homeController = new HomeController(
                 _pageService.Object,
+                _mockSchemaProvider.Object,
+                _mockSchemaFactory.Object,
                 _submitWorkflow.Object,
                 _paymentWorkflow.Object,
                 _redirectWorkflow.Object,
@@ -827,7 +848,8 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object,
                 _mockLogger.Object,
-                _mockSessionHelper.Object);
+                _mockSessionHelper.Object,
+                _mockFeatureManager.Object);
 
             // Act
             var result = await homeController.DataStructure("test-form");
