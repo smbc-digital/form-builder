@@ -9,5 +9,6 @@ namespace form_builder.Models
         public bool Optional { get; set; }
         public EHttpActionType HttpActionType { get; set; }
         public bool Base64Encoded { get; set; }
+        public string GetExampleValue() => Base64Encoded ? $"{Name}=YourBase64EncodedValueHere" : $"{Name}=YourValueHere";
     }
 }

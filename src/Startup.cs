@@ -5,6 +5,7 @@ using form_builder.ModelBinders.Providers;
 using form_builder.Utils.Startup;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.FeatureManagement;
 using StockportGovUK.AspNetCore.Middleware.App;
 
 namespace form_builder
@@ -87,6 +88,9 @@ namespace form_builder
                     options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     options.ModelBinderProviders.Insert(0, new CustomFormFileModelBinderProvider());
                 });
+
+            services
+                .AddFeatureManagement();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

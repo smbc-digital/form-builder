@@ -1,0 +1,36 @@
+@model HomeViewModel;
+@{
+    ViewData["Title"] = "Welcome to FormBuilder - Incoming values expected";
+    ViewData["PageTitle"] = "Welcome to FormBuilder - Incoming values expected";
+    ViewData["DisplayBreadcrumbs"] = false;
+    ViewData["PreviewMode"] = false;
+    ViewData["Embeddable"] = false;
+
+    string exampleValues = string.Join("&", Model.IncomingValues.Select(incomingValue => incomingValue.GetExampleValue()));
+
+    string exampleGetUrl = $"/{Model.FormName}?{exampleValues}";
+
+    string examplePostContent = $@"POST /{Model.FormName} HTTP/1.1
+                                    Host: example.com   
+                                    Content-Type: application/x-www-form-urlencoded
+                                    Content-Length: {exampleValues.Length}
+                                    {exampleValues}";
+
+}
+<style>
+    pre {background-color: lightgrey; border:gray 1px solid; padding: 20px; text-align: left; }
+</style>
+
+<h1 class="govuk-heading-l">This form expects Incomming Values</h1>
+
+@if(Model.IncomingValues.First().HttpActionType == EHttpActionType.Get)
+{
+    <p class="smbc-body">This form expects the following Incoming Values as a HTTP GET request.</p>
+    <pre>@exampleGetUrl</pre>
+}
+
+@if(Model.IncomingValues.First().HttpActionType == EHttpActionType.Post)
+{
+    <p class="smbc-body">This form expects the following Incoming Values as a HTTP POST request.</p>
+    <pre>@examplePostContent</pre>
+}
