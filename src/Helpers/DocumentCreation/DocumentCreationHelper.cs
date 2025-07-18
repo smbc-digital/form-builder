@@ -11,7 +11,7 @@ namespace form_builder.Helpers.DocumentCreation
         private readonly IElementMapper _elementMapper;
         public DocumentCreationHelper(IElementMapper elementMapper) => _elementMapper = elementMapper;
 
-        public async Task<List<string>> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
+        public async Task<List<string>> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema, bool withPageTitles = false)
         {
             var summaryBuilder = new SummaryAnswerBuilder();
             var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
@@ -28,7 +28,12 @@ namespace form_builder.Helpers.DocumentCreation
                     .Where(_ => _ is not null)
                     .ToList();
 
-                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
+				if (withPageTitles && formSchemaQuestions.Any())
+				{
+					summaryBuilder.AddPageTitle(page.Title);
+				}
+
+				if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
                     continue;
 
                 formSchemaQuestions.ForEach(async question =>
@@ -43,7 +48,44 @@ namespace form_builder.Helpers.DocumentCreation
             return summaryBuilder.Build();
         }
 
-        public async Task<List<string>> GenerateQuestionAndAnswersListForPdf(FormAnswers formAnswers, FormSchema formSchema)
+		//public async Task<List<string>> GenerateQuestionAndAnswersListWithPageTitles(FormAnswers formAnswers, FormSchema formSchema)
+		//{
+		//	var summaryBuilder = new SummaryAnswerBuilder();
+		//	var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
+
+		//	if (!string.IsNullOrEmpty(formAnswers.CaseReference))
+		//	{
+		//		summaryBuilder.Add("Case Reference", formAnswers.CaseReference, Enum.EElementType.Textbox);
+		//		summaryBuilder.AddBlankLine();
+		//	}
+
+		//	foreach (var page in formSchema.Pages.ToList())
+		//	{
+		//		var formSchemaQuestions = page.ValidatableElements
+		//			.Where(_ => _ is not null)
+		//			.ToList();
+
+		//		if (formSchemaQuestions.Any())
+		//		{
+		//			summaryBuilder.AddPageTitle(page.Title);
+		//		}
+
+		//		if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
+		//			continue;
+
+		//		formSchemaQuestions.ForEach(async question =>
+		//		{
+		//			var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
+		//			summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
+
+		//			summaryBuilder.AddBlankLine();
+		//		});
+		//	}
+
+		//	return summaryBuilder.Build();
+		//}
+
+		public async Task<List<string>> GenerateQuestionAndAnswersListForPdf(FormAnswers formAnswers, FormSchema formSchema)
         {
             var summaryBuilder = new SummaryAnswerBuilder();
             var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
