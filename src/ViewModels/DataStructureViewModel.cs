@@ -25,5 +25,13 @@ namespace form_builder.ViewModels
         public bool IsInPreviewMode { get; set; }
 
         public object DataStructure { get; set; }
+
+        public List<LanguageObjectExample> ObjectExamples { get; set; }
+    }
+
+    public class LanguageObjectExample
+    {
+        public string LanguageName { get; set; }
+        public string ObjectCode { get; set;  }
     }
 }

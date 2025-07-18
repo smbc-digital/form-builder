@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Xml.Schema;
 using form_builder.Attributes;
 using form_builder.Builders;
@@ -10,6 +11,7 @@ using form_builder.Factories.Schema;
 using form_builder.Helpers.Session;
 using form_builder.Mappers.Structure;
 using form_builder.Models;
+using form_builder.ObjectGenerators;
 using form_builder.Providers.SchemaProvider;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService;
@@ -25,6 +27,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Schema;
+using NJsonSchema;
+using NJsonSchema.CodeGeneration.CSharp;
+using StockportGovUK.NetStandard.Gateways.Enums.Whitespace;
 
 namespace form_builder.Controllers.Home;
 
@@ -307,6 +313,7 @@ public class HomeController : Controller
             return RedirectToAction("Index", new { form });
 
         object dataStructure = await _structureMapper.CreateBaseFormDataStructure(form);
+
         var viewModel = new DataStructureViewModel
         {
             FormName = form,
@@ -318,7 +325,8 @@ public class HomeController : Controller
             DisplayBreadcrumbs = false,
             Breadcrumbs = null,
             IsInPreviewMode = false,
-            DataStructure = dataStructure
+            DataStructure = dataStructure,
+            ObjectExamples = new List<LanguageObjectExample> { new LanguageObjectExample { LanguageName = "C#", ObjectCode = CSharpObjectGenerator.Generate(dataStructure, form) } }
         };
 
         return View("DataStructure", viewModel);

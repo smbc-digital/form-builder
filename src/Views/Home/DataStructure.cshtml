@@ -5,8 +5,18 @@
     ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadcrumbs;
     ViewData["PreviewMode"] = Model.IsInPreviewMode;
 }
+<style>
+    pre {background-color: lightgrey; border:gray 1px solid; padding: 20px; text-align: left; margin-bottom: 20px; text-wrap: wrap; width: 960px; }
+</style>
 
 <h1 class="govuk-heading-l">Data structure preview</h1>
 <div class="smbc-body">
+    <h2 class="govuk-heading-m">JSON</h2>
     <pre>@JsonConvert.SerializeObject(Model.DataStructure, Formatting.Indented)</pre>
+
+    @foreach(LanguageObjectExample objectExample in Model.ObjectExamples)
+    {
+        <h2 class="govuk-heading-m">@objectExample.LanguageName</h2>
+        <pre>@objectExample.ObjectCode</pre>
+    }    
 </div>
