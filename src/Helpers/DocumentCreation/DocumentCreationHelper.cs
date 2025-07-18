@@ -28,7 +28,16 @@ namespace form_builder.Helpers.DocumentCreation
                     .Where(_ => _ is not null)
                     .ToList();
 
-				if (withPageTitles && formSchemaQuestions.Any())
+                string answers = string.Empty;
+				
+				formSchemaQuestions.ForEach(async question =>
+				{
+					answers += await _elementMapper.GetAnswerStringValue(question, formAnswers);
+				});
+
+                answers = answers.Trim();
+
+				if (withPageTitles && !string.IsNullOrEmpty(answers))
 				{
 					summaryBuilder.AddPageTitle(page.Title);
 				}
