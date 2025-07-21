@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Xml.Schema;
-using form_builder.Attributes;
+﻿using form_builder.Attributes;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -26,11 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Schema;
 using NJsonSchema;
-using NJsonSchema.CodeGeneration.CSharp;
-using StockportGovUK.NetStandard.Gateways.Enums.Whitespace;
 
 namespace form_builder.Controllers.Home;
 
