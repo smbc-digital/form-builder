@@ -28,18 +28,20 @@ namespace form_builder.Helpers.DocumentCreation
                     .Where(_ => _ is not null)
                     .ToList();
 
-                string answers = string.Empty;
+                string AllPageAnswers = string.Empty;
+                string pageTitle = string.Empty;
 				
 				formSchemaQuestions.ForEach(async question =>
 				{
-					answers += await _elementMapper.GetAnswerStringValue(question, formAnswers);
+					AllPageAnswers += await _elementMapper.GetAnswerStringValue(question, formAnswers);
 				});
 
-                answers = answers.Trim();
+				AllPageAnswers = AllPageAnswers.Trim();
 
-				if (withPageTitles && !string.IsNullOrEmpty(answers))
+				if (withPageTitles && !string.IsNullOrEmpty(AllPageAnswers))
 				{
 					summaryBuilder.AddPageTitle(page.Title);
+                    pageTitle = page.Title;
 				}
 
 				if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
@@ -48,51 +50,17 @@ namespace form_builder.Helpers.DocumentCreation
                 formSchemaQuestions.ForEach(async question =>
                 {
                     var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
-                    summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
+                    if (!question.GetLabelText(page.Title).Equals(pageTitle))
+                        summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
+                    else
+						summaryBuilder.Add("", answer, question.Type);
 
-                    summaryBuilder.AddBlankLine();
+					summaryBuilder.AddBlankLine();
                 });
             }
 
             return summaryBuilder.Build();
         }
-
-		//public async Task<List<string>> GenerateQuestionAndAnswersListWithPageTitles(FormAnswers formAnswers, FormSchema formSchema)
-		//{
-		//	var summaryBuilder = new SummaryAnswerBuilder();
-		//	var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
-
-		//	if (!string.IsNullOrEmpty(formAnswers.CaseReference))
-		//	{
-		//		summaryBuilder.Add("Case Reference", formAnswers.CaseReference, Enum.EElementType.Textbox);
-		//		summaryBuilder.AddBlankLine();
-		//	}
-
-		//	foreach (var page in formSchema.Pages.ToList())
-		//	{
-		//		var formSchemaQuestions = page.ValidatableElements
-		//			.Where(_ => _ is not null)
-		//			.ToList();
-
-		//		if (formSchemaQuestions.Any())
-		//		{
-		//			summaryBuilder.AddPageTitle(page.Title);
-		//		}
-
-		//		if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
-		//			continue;
-
-		//		formSchemaQuestions.ForEach(async question =>
-		//		{
-		//			var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
-		//			summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
-
-		//			summaryBuilder.AddBlankLine();
-		//		});
-		//	}
-
-		//	return summaryBuilder.Build();
-		//}
 
 		public async Task<List<string>> GenerateQuestionAndAnswersListForPdf(FormAnswers formAnswers, FormSchema formSchema)
         {

@@ -16,7 +16,10 @@ namespace form_builder.Builders.Document
 			if (type.Equals(EElementType.FileUpload) || type.Equals(EElementType.MultipleFileUpload))
 				_filesData.Add($"<b>{question.Replace("(optional)", "")}</b><br/>{answer}");
 			else
-				_data.Add($"<b>{question.Replace("(optional)", "")}</b><br/>{answer}");
+				if(!question.Equals(""))
+					_data.Add($"<b>{question.Replace("(optional)", "")}</b><br/>{answer}");
+				else
+					_data.Add($"{answer}");
 		}
 
 		public void AddQuestion(string question)
