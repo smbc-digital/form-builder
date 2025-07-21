@@ -2,6 +2,7 @@
 using form_builder.Enum;
 using form_builder.Factories.Schema;
 using form_builder.Helpers.DocumentCreation;
+using form_builder.Helpers.EmailHelpers;
 using form_builder.Models;
 using form_builder.Providers.DocumentCreation;
 using form_builder.Services.DocumentService;
@@ -17,6 +18,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IDocumentCreationHelper> _mockDocumentCreationHelper = new();
         private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
         private readonly Mock<IDocumentCreation> _mockProvider = new();
+        private readonly Mock<IEmailHelper> _mockEmailHelper = new();
         private readonly DocumentSummaryService _documentSummaryService;
         private readonly FormSchema _formSchema;
         private readonly FormAnswers _formAnswers;
@@ -63,12 +65,12 @@ namespace form_builder_tests.UnitTests.Services
             _mockSchemaFactory.Setup(_ => _.TransformPage(page2, It.IsAny<FormAnswers>())).ReturnsAsync(page2);
 
             _mockDocumentCreationHelper
-                .Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
+                .Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>(), It.IsAny<bool>()))
                 .ReturnsAsync(new List<string>());
 
             _mockProvider.Setup(_ => _.CreateDocument(It.IsAny<List<string>>())).Returns(new byte[1]);
 
-            _documentSummaryService = new DocumentSummaryService(_mockDocumentCreationHelper.Object, providers, _mockSchemaFactory.Object);
+            _documentSummaryService = new DocumentSummaryService(_mockDocumentCreationHelper.Object, providers, _mockSchemaFactory.Object, _mockEmailHelper.Object);
         }
 
         [Fact]
@@ -78,7 +80,7 @@ namespace form_builder_tests.UnitTests.Services
             await _documentSummaryService.GenerateDocument(new DocumentSummaryEntity { FormSchema = _formSchema, DocumentType = EDocumentType.Txt, PreviousAnswers = _formAnswers });
 
             // Assert
-            _mockDocumentCreationHelper.Verify(_ => _.GenerateQuestionAndAnswersList(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()), Times.Once);
+            _mockDocumentCreationHelper.Verify(_ => _.GenerateQuestionAndAnswersList(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>(), It.IsAny<bool>()), Times.Once);
         }
 
         [Fact]

@@ -11,7 +11,7 @@ namespace form_builder.Helpers.DocumentCreation
         private readonly IElementMapper _elementMapper;
         public DocumentCreationHelper(IElementMapper elementMapper) => _elementMapper = elementMapper;
 
-        public async Task<List<string>> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
+        public async Task<List<string>> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema, bool withPageTitles = false)
         {
             var summaryBuilder = new SummaryAnswerBuilder();
             var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
@@ -28,22 +28,41 @@ namespace form_builder.Helpers.DocumentCreation
                     .Where(_ => _ is not null)
                     .ToList();
 
-                if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
+                string AllPageAnswers = string.Empty;
+                string pageTitle = string.Empty;
+				
+				formSchemaQuestions.ForEach(async question =>
+				{
+					AllPageAnswers += await _elementMapper.GetAnswerStringValue(question, formAnswers);
+				});
+
+				AllPageAnswers = AllPageAnswers.Trim();
+
+				if (withPageTitles && !string.IsNullOrEmpty(AllPageAnswers))
+				{
+					summaryBuilder.AddPageTitle(page.Title);
+                    pageTitle = page.Title;
+				}
+
+				if (!formSchemaQuestions.Any() || !reducedAnswers.Where(p => p.PageSlug.Equals(page.PageSlug)).Select(p => p).Any())
                     continue;
 
                 formSchemaQuestions.ForEach(async question =>
                 {
                     var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
-                    summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
+                    if (!question.GetLabelText(page.Title).Equals(pageTitle))
+                        summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
+                    else
+						summaryBuilder.Add("", answer, question.Type);
 
-                    summaryBuilder.AddBlankLine();
+					summaryBuilder.AddBlankLine();
                 });
             }
 
             return summaryBuilder.Build();
         }
 
-        public async Task<List<string>> GenerateQuestionAndAnswersListForPdf(FormAnswers formAnswers, FormSchema formSchema)
+		public async Task<List<string>> GenerateQuestionAndAnswersListForPdf(FormAnswers formAnswers, FormSchema formSchema)
         {
             var summaryBuilder = new SummaryAnswerBuilder();
             var reducedAnswers = formAnswers.GetReducedAnswers(formSchema);
