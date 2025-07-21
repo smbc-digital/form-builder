@@ -5,8 +5,36 @@
     ViewData["DisplayBreadcrumbs"] = Model.DisplayBreadcrumbs;
     ViewData["PreviewMode"] = Model.IsInPreviewMode;
 }
+<style>
+    pre {background-color: lightgrey; border:gray 1px solid; padding: 20px; text-align: left; margin-bottom: 20px; text-wrap: wrap; width: 960px; }
+</style>
+
+<script>   
+function copyPreContent(elementId) {
+    const pre = document.getElementById(elementId);
+    const text = pre.innerText;
+
+    navigator.clipboard.writeText(text)
+            .then(() => {
+                alert("Code copied to clipboard!");
+            })
+            .catch(err => {
+                console.error("Failed to copy: ", err);
+            });
+}
+</script>
 
 <h1 class="govuk-heading-l">Data structure preview</h1>
 <div class="smbc-body">
-    <pre>@JsonConvert.SerializeObject(Model.DataStructure, Formatting.Indented)</pre>
+    <h2 class="govuk-heading-m">JSON</h2>
+    <pre id="json">@JsonConvert.SerializeObject(Model.DataStructure, Formatting.Indented)</pre>
+    <button class="govuk-button" onclick="copyPreContent('json')">Copy JSON code</button>  
+
+    @foreach(LanguageObjectExample objectExample in Model.ObjectExamples)
+    {
+        <h2 class="govuk-heading-m">@objectExample.LanguageName</h2>
+        <pre id="@objectExample.LanguageName">@objectExample.ObjectCode</pre>
+        
+        <button class="govuk-button" onclick="copyPreContent('@objectExample.LanguageName')">Copy @objectExample.LanguageName code</button>
+    }    
 </div>
