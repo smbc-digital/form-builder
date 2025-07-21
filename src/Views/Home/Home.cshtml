@@ -5,6 +5,7 @@
     ViewData["DisplayBreadcrumbs"] = false;
     ViewData["PreviewMode"] = false;
     ViewData["Embeddable"] = false;
+    var formCount = 1;
 }
 
 <h1 class="govuk-heading-l">Welcome to FormBuilder</h1>
@@ -24,13 +25,16 @@
 
 <hr style="margin: 2em 0em 2em 0em;" />
 
-<h2 class="govuk-heading-m">Forms</h2>
+<h2 class="govuk-heading-m">Forms (@Model.FormUrls.Count())</h2>
 <table style="width:100%">
     @foreach(var form in Model.FormUrls)
     {
         <tr>
-            <td class="smbc-body"><a style="text-transform: capitalize" href="/view/@form">@form.Replace("-", " ")</a></td>
+            <td class="smbc-body">@formCount</td>
+            <td class="smbc-body"><a style="text-transform: capitalize" href="/view/@form"> @form.Replace("-", " ")</a></td>
             <td class="smbc-body" style="text-align: right"><a href="/@form/data-structure" aria-label="Preview output data structure for @form">Data structure</a></td>
         </tr>
+
+        formCount++;
     }
 </table>

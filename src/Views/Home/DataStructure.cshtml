@@ -9,14 +9,32 @@
     pre {background-color: lightgrey; border:gray 1px solid; padding: 20px; text-align: left; margin-bottom: 20px; text-wrap: wrap; width: 960px; }
 </style>
 
+<script>   
+function copyPreContent(elementId) {
+    const pre = document.getElementById(elementId);
+    const text = pre.innerText;
+
+    navigator.clipboard.writeText(text)
+            .then(() => {
+                alert("Code copied to clipboard!");
+            })
+            .catch(err => {
+                console.error("Failed to copy: ", err);
+            });
+}
+</script>
+
 <h1 class="govuk-heading-l">Data structure preview</h1>
 <div class="smbc-body">
     <h2 class="govuk-heading-m">JSON</h2>
-    <pre>@JsonConvert.SerializeObject(Model.DataStructure, Formatting.Indented)</pre>
+    <pre id="json">@JsonConvert.SerializeObject(Model.DataStructure, Formatting.Indented)</pre>
+    <button class="govuk-button" onclick="copyPreContent('json')">Copy JSON code</button>  
 
     @foreach(LanguageObjectExample objectExample in Model.ObjectExamples)
     {
         <h2 class="govuk-heading-m">@objectExample.LanguageName</h2>
-        <pre>@objectExample.ObjectCode</pre>
+        <pre id="@objectExample.LanguageName">@objectExample.ObjectCode</pre>
+        
+        <button class="govuk-button" onclick="copyPreContent('@objectExample.LanguageName')">Copy @objectExample.LanguageName code</button>
     }    
 </div>
