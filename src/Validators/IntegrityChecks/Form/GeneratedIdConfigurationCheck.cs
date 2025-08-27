@@ -15,15 +15,6 @@ namespace form_builder.Validators.IntegrityChecks.Form
                     "Generated Id Configuration Check, " +
                     "'GeneratedReferenceNumberMapping' and 'ReferencePrefix' must both have a value.");
 
-            if (!schema.GenerateReferenceNumber &&
-                schema.Pages is not null &&
-                schema.Pages.Any(page => page.Behaviours is not null &&
-                                         page.Behaviours.Any(behaviour => behaviour.BehaviourType.Equals(EBehaviourType.SubmitWithoutSubmission))))
-            {
-                result.AddFailureMessage(
-                    "Generated Id Configuration Check, if using SubmitFormNoAction then 'GeneratedReferenceNumber' must be true.");
-            }
-
             return result;
         }
 
