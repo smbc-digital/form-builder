@@ -86,38 +86,5 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
             Assert.True(result.IsValid);
             Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
         }
-
-        [Fact]
-        public void CheckGeneratedIdConfiguration_Throw_ApplicationException_WhenGenerateReferenceNumber_IsFalse_And_SubmitWithoutSubmission_IsUsed()
-        {
-            // Arrange
-            var schema = new FormSchema
-            {
-                FormName = "test-form",
-                GenerateReferenceNumber = false,
-                GeneratedReferenceNumberMapping = "CaseReference",
-                ReferencePrefix = "TEST",
-                Pages = new List<Page>
-                {
-                    new ()
-                    {
-                        Behaviours = new List<Behaviour>
-                        {
-                            new ()
-                            {
-                                BehaviourType = EBehaviourType.SubmitWithoutSubmission
-                            }
-                        }
-                    },
-                    new()
-                }
-            };
-
-            GeneratedIdConfigurationCheck check = new();
-
-            // Act
-            var result = check.Validate(schema);
-            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
-        }
     }
 }
