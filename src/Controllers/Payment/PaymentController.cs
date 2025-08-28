@@ -106,7 +106,8 @@ public class PaymentController : Controller
             StartPageUrl = data.BaseForm.StartPageUrl,
             Embeddable = data.BaseForm.Embeddable,
             PaymentIssueButtonUrl = data.BaseForm.PaymentIssueButtonUrl,
-            PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel
+            PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel,
+            HideBackButton = true
         };
 
         return View("./Failure", paymentFailureViewModel);
@@ -129,7 +130,8 @@ public class PaymentController : Controller
             StartPageUrl = data.BaseForm.StartPageUrl,
             Embeddable = data.BaseForm.Embeddable,
             PaymentIssueButtonUrl = data.BaseForm.PaymentIssueButtonUrl,
-            PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel
+            PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel,
+            HideBackButton = true
         };
 
         return View("./Declined", paymentDeclinedViewModel);
@@ -154,7 +156,8 @@ public class PaymentController : Controller
             Embeddable = data.BaseForm.Embeddable,
             CallbackFailureContactNumber = data.BaseForm.CallbackFailureContactNumber,
             PaymentIssueButtonUrl = data.BaseForm.PaymentIssueButtonUrl,
-            PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel
+            PaymentIssueButtonLabel = data.BaseForm.PaymentIssueButtonLabel,
+            HideBackButton = true
         };
 
         return View("./CallbackFailure", callbackFailureViewModel);
