@@ -17,7 +17,7 @@ namespace form_builder.Conditions
             var newComparisonDate = GetComparisonDate(dateComparison, condition.Unit, isBefore);
             var dateValue = GetDateValue(condition.QuestionId, viewModel);
 
-            return DateTime.Compare(dateValue, newComparisonDate) <= 0;
+            return DateTime.Compare(dateValue, newComparisonDate) < 0;
         }
 
         public static bool DateIsAfter(Condition condition, Dictionary<string, dynamic> viewModel)
