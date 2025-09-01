@@ -163,7 +163,7 @@ namespace form_builder.Models
         {
             SubmitSlug submitBehaviour = new();
 
-            var pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
+            List<Behaviour> pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitForm);
 
             if (pageSubmitBehaviours.Count.Equals(0))
                 pageSubmitBehaviours = GetBehavioursByType(EBehaviourType.SubmitAndPay);
@@ -173,18 +173,17 @@ namespace form_builder.Models
 
             if (Behaviours.Count > 1)
             {
-                var previousPage = formAnswers.Pages
-                    .SelectMany(_ => _.Answers)
+                List<Answers> previousPage = formAnswers.Pages
+                    .SelectMany(page => page.Answers)
                     .ToList();
 
-                var viewModel = new Dictionary<string, dynamic>();
-                previousPage.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
+                Dictionary<string, dynamic> viewModel = new();
+                previousPage.ForEach(answer => viewModel.Add(answer.QuestionId, answer.Response));
                 viewModel.AddRange(formAnswers.AdditionalFormData);
-                var foundSubmitBehaviour = GetNextPage(viewModel);
+                Behaviour foundSubmitBehaviour = GetNextPage(viewModel);
 
                 submitBehaviour = foundSubmitBehaviour.SubmitSlugs
-                    .ToList()
-                    .FirstOrDefault(x => x.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefault(slug => slug.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
             }
             else
             {
@@ -194,11 +193,11 @@ namespace form_builder.Models
                 }
                 else
                 {
-                    var behaviour = pageSubmitBehaviours
-                        .SelectMany(x => x.SubmitSlugs)
-                        .FirstOrDefault(x => x.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
+                    var submitSlug = pageSubmitBehaviours
+                        .SelectMany(behaviour => behaviour.SubmitSlugs)
+                        .FirstOrDefault(slug => slug.Environment.Equals(environment, StringComparison.OrdinalIgnoreCase));
 
-                    submitBehaviour = behaviour ?? throw new NullReferenceException("Page model::GetSubmitFormEndpoint, No Url supplied for submit form");
+                    submitBehaviour = submitSlug ?? throw new NullReferenceException("Page model::GetSubmitFormEndpoint, No Url supplied for submit form");
                 }
             }
 

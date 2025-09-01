@@ -123,7 +123,7 @@ public class PageService : IPageService
             await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
-                AdditionalFormData = queryParameters.ToDictionary<KeyValuePair<string, StringValues>, string, object>(p => p.Key, p => p.Value.ToString())
+                AdditionalFormData = queryParameters.ToDictionary<KeyValuePair<string, StringValues>, string, object>(pair => pair.Key, pair => pair.Value.ToString())
             }));
         }
 
@@ -133,7 +133,7 @@ public class PageService : IPageService
             await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
-                AdditionalFormData = queryParameters.ToDictionary<KeyValuePair<string, StringValues>, string, object>(p => p.Key, p => p.Value.ToString())
+                AdditionalFormData = queryParameters.ToDictionary<KeyValuePair<string, StringValues>, string, object>(pair => pair.Key, pair => pair.Value.ToString())
             }));
         }
 

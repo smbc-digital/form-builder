@@ -355,7 +355,10 @@ namespace form_builder.Helpers.PageHelpers
                 ? JsonConvert.DeserializeObject<FormAnswers>(rawFormData)
                 : new FormAnswers { Pages = new List<PageAnswers>() };
 
-            var answers = convertedAnswers.Pages?.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
+            var answers = convertedAnswers.Pages?
+                .SelectMany(page => page.Answers)
+                .ToDictionary(answer => answer.QuestionId, answer => answer.Response);
+
             answers.AddRange(convertedAnswers.AdditionalFormData);
 
             return pages.FirstOrDefault(page => page.CheckPageMeetsConditions(answers));
