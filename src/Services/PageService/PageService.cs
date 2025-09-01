@@ -24,7 +24,9 @@ using form_builder.Validators;
 using form_builder.ViewModels;
 using form_builder.Workflows.ActionsWorkflow;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
+using NuGet.Packaging;
 
 namespace form_builder.Services.PageService;
 
@@ -118,13 +120,21 @@ public class PageService : IPageService
         if (pathIsEmpty)
         {
             _logger.LogInformation($"PageService:ProcessPage: New Cache created for {cacheId}");
-            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
+            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers
+            {
+                Pages = new List<PageAnswers>(),
+                AdditionalFormData = queryParameters.ToDictionary<KeyValuePair<string, StringValues>, string, object>(p => p.Key, p => p.Value.ToString())
+            }));
         }
 
         if (cacheIsEmpty)
         {
             _logger.LogInformation($"PageService:ProcessPage: Cache Id was not found in Cache, new Cache created for {cacheId}");
-            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
+            await _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(new FormAnswers
+            {
+                Pages = new List<PageAnswers>(),
+                AdditionalFormData = queryParameters.ToDictionary<KeyValuePair<string, StringValues>, string, object>(p => p.Key, p => p.Value.ToString())
+            }));
         }
 
         var baseForm = await _schemaFactory.Build(form);
@@ -343,6 +353,8 @@ public class PageService : IPageService
         {
             await tagParser.Parse(currentPageResult.Page, convertedAnswers, null);
         }
+
+        answers.AddRange(convertedAnswers.AdditionalFormData);
 
         return currentPageResult.Page.GetNextPage(answers);
     }

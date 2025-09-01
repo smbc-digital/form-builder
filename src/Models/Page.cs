@@ -7,6 +7,7 @@ using form_builder.Models.Elements;
 using form_builder.Models.Properties.ElementProperties;
 using form_builder.Validators;
 using Newtonsoft.Json;
+using NuGet.Packaging;
 
 namespace form_builder.Models
 {
@@ -178,6 +179,7 @@ namespace form_builder.Models
 
                 var viewModel = new Dictionary<string, dynamic>();
                 previousPage.ForEach(_ => viewModel.Add(_.QuestionId, _.Response));
+                viewModel.AddRange(formAnswers.AdditionalFormData);
                 var foundSubmitBehaviour = GetNextPage(viewModel);
 
                 submitBehaviour = foundSubmitBehaviour.SubmitSlugs

@@ -13,6 +13,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.ViewModels;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using NuGet.Packaging;
 
 namespace form_builder.Helpers.PageHelpers
 {
@@ -355,6 +356,7 @@ namespace form_builder.Helpers.PageHelpers
                 : new FormAnswers { Pages = new List<PageAnswers>() };
 
             var answers = convertedAnswers.Pages?.SelectMany(_ => _.Answers).ToDictionary(_ => _.QuestionId, _ => _.Response);
+            answers.AddRange(convertedAnswers.AdditionalFormData);
 
             return pages.FirstOrDefault(page => page.CheckPageMeetsConditions(answers));
         }
