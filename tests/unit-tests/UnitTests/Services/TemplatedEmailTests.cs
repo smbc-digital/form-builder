@@ -24,11 +24,15 @@ namespace form_builder_tests.UnitTests.Services
 
         public TemplatedEmailTests()
         {
-            _mockTemplatedEmailProvider.Setup(_ => _.ProviderName).Returns("Notify");
+            _mockTemplatedEmailProvider
+                .Setup(mock => mock.ProviderName)
+                .Returns("Fake");
 
             _mockTemplatedEmailProviders = new List<ITemplatedEmailProvider> { _mockTemplatedEmailProvider.Object };
 
-            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("sessionGuid");
+            _mockSessionHelper
+                .Setup(mock => mock.GetBrowserSessionId())
+                .Returns("sessionGuid");
 
             _templatedEmailService = new TemplatedEmailService(_mockTemplatedEmailProviders, _mockActionHelper.Object, _mockSessionHelper.Object, _mockDistributedCache.Object);
         }
@@ -38,7 +42,7 @@ namespace form_builder_tests.UnitTests.Services
         {
             // Arrange
             _mockDistributedCache
-                .Setup(_ => _.GetString(It.IsAny<string>()))
+                .Setup(mock => mock.GetString(It.IsAny<string>()))
                 .Returns("");
 
             // Act & Assert
@@ -52,22 +56,24 @@ namespace form_builder_tests.UnitTests.Services
             // Arrange
             var action = new ActionBuilder()
                .WithActionType(EActionType.TemplatedEmail)
-               .WithProvider("Notify")
+               .WithProvider("Fake")
                .Build();
 
             _mockActionHelper
-                .Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
+                .Setup(mock => mock.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
                 .Returns("test@testemail.com");
 
             var formData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(formData);
+            _mockDistributedCache
+                .Setup(mock => mock.GetString(It.IsAny<string>()))
+                .Returns(formData);
 
             // Act
             _templatedEmailService.ProcessTemplatedEmail(new List<IAction> { action }, "form");
 
             // Assert
-            _mockTemplatedEmailProvider.Verify(_ => _.SendEmailAsync(
+            _mockTemplatedEmailProvider.Verify(mock => mock.SendEmailAsync(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, dynamic>>()), Times.Once);
@@ -81,11 +87,12 @@ namespace form_builder_tests.UnitTests.Services
                .WithActionType(EActionType.TemplatedEmail)
                .WithTo("test@abc.com")
                .WithTemplateId("123")
-               .WithProvider("Notify")
+               .WithProvider("Fake")
                .WithCaseReference(true)
                .Build();
 
-            _mockActionHelper.Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper
+                .Setup(mock => mock.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
                 .Returns("test@testemail.com");
 
             var cacheData = new FormAnswers
@@ -108,12 +115,14 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+            _mockDistributedCache
+                .Setup(mock => mock.GetString(It.IsAny<string>()))
+                .Returns(JsonConvert.SerializeObject(cacheData));
 
             var personalisationSent = new Dictionary<string, dynamic>();
 
             _mockTemplatedEmailProvider
-                .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(),
+                .Setup(mock => mock.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<Dictionary<string, dynamic>>()))
                 .Callback<string, string, Dictionary<string, dynamic>>((emailAddress, templateId, personalisation) => personalisationSent = personalisation);
 
@@ -133,11 +142,12 @@ namespace form_builder_tests.UnitTests.Services
                .WithActionType(EActionType.TemplatedEmail)
                .WithTo("test@abc.com")
                .WithTemplateId("123")
-               .WithProvider("Notify")
+               .WithProvider("Fake")
                .WithPersonalisation(new List<string> { "firstname" })
                .Build();
 
-            _mockActionHelper.Setup(_ => _.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
+            _mockActionHelper
+                .Setup(mock => mock.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
                 .Returns("test@testemail.com");
 
             var cacheData = new FormAnswers
@@ -160,11 +170,12 @@ namespace form_builder_tests.UnitTests.Services
                     }
                 }
             };
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+
+            _mockDistributedCache.Setup(mock => mock.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
             var personalisationSent = new Dictionary<string, dynamic>();
             _mockTemplatedEmailProvider
-                .Setup(_ => _.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
+                .Setup(mock => mock.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>()))
                 .Callback<string, string, Dictionary<string, dynamic>>((emailAddress, templateId, personalisation) => personalisationSent = personalisation);
 
             // Act
