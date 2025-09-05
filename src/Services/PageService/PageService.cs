@@ -354,7 +354,21 @@ public class PageService : IPageService
             await tagParser.Parse(currentPageResult.Page, convertedAnswers, null);
         }
 
-        answers.AddRange(convertedAnswers.AdditionalFormData);
+        if (answers.Count > 0)
+        {
+            Dictionary<string, object> newFormData = new();
+            foreach (var answer in convertedAnswers.AdditionalFormData)
+            {
+                if (!answers.ContainsKey(answer.Key))
+                    newFormData.Add(answer.Key, answer.Value);
+            }
+
+            answers.AddRange(newFormData);
+        }
+        else
+        {
+            answers.AddRange(convertedAnswers.AdditionalFormData);
+        }
 
         return currentPageResult.Page.GetNextPage(answers);
     }

@@ -359,7 +359,21 @@ namespace form_builder.Helpers.PageHelpers
                 .SelectMany(page => page.Answers)
                 .ToDictionary(answer => answer.QuestionId, answer => answer.Response);
 
-            answers.AddRange(convertedAnswers.AdditionalFormData);
+            if (answers is not null && answers.Count > 0)
+            {
+                Dictionary<string, object> newFormData = new();
+                foreach (var answer in convertedAnswers.AdditionalFormData)
+                {
+                    if (!answers.ContainsKey(answer.Key))
+                        newFormData.Add(answer.Key, answer.Value);
+                }
+
+                answers.AddRange(newFormData);
+            }
+            else
+            {
+                answers.AddRange(convertedAnswers.AdditionalFormData);
+            }
 
             return pages.FirstOrDefault(page => page.CheckPageMeetsConditions(answers));
         }
