@@ -86,15 +86,12 @@ using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Notify.Client;
-using Notify.Interfaces;
 using StackExchange.Redis;
 using StockportGovUK.NetStandard.Gateways;
 using StockportGovUK.NetStandard.Gateways.AddressService;
 using StockportGovUK.NetStandard.Gateways.BookingService;
 using StockportGovUK.NetStandard.Gateways.CivicaPay;
 using StockportGovUK.NetStandard.Gateways.Extensions;
-using StockportGovUK.NetStandard.Gateways.MailingService;
 using StockportGovUK.NetStandard.Gateways.MailingServiceProxy;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
@@ -302,7 +299,6 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection ConfigureEmailTemplateProviders(this IServiceCollection services)
         {
             services.AddSingleton<ITemplatedEmailProvider, FakeTemplatedEmailProvider>();
-            services.AddSingleton<ITemplatedEmailProvider, NotifyTemplatedEmailProvider>();
 
             return services;
         }
@@ -515,7 +511,6 @@ namespace form_builder.Utils.Startup
             services.Configure<FileStorageProviderConfiguration>(configuration.GetSection(FileStorageProviderConfiguration.ConfigValue));
             services.Configure<FormConfiguration>(configuration.GetSection(FormConfiguration.ConfigValue));
             services.Configure<HashConfiguration>(configuration.GetSection(HashConfiguration.ConfigValue));
-            services.Configure<NotifyConfiguration>(configuration.GetSection(NotifyConfiguration.ConfigValue));
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
             services.Configure<PaymentConfiguration>(configuration.GetSection(PaymentConfiguration.ConfigValue));
@@ -532,16 +527,6 @@ namespace form_builder.Utils.Startup
             services.Configure<SHGAddressProviderConfiguration>(configuration.GetSection(SHGAddressProviderConfiguration.ConfigValue));
             services.Configure<OSPlacesAddressProviderConfiguration>(configuration.GetSection(OSPlacesAddressProviderConfiguration.ConfigValue));
             services.Configure<PowerAutomateConfiguration>(configuration.GetSection(PowerAutomateConfiguration.ConfigValue));
-            return services;
-        }
-
-        public static IServiceCollection AddGovUkServices(this IServiceCollection services, IConfiguration configuration)
-        {
-            var clientHandler = new HttpClientHandler();
-            var client = new HttpClient(clientHandler);
-            services.AddSingleton<IAsyncNotificationClient, NotificationClient>(_ =>
-            new NotificationClient(new HttpClientWrapper(client), configuration.GetSection(NotifyConfiguration.ConfigValue)["Key"]));
-
             return services;
         }
 

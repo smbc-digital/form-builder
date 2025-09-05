@@ -43,7 +43,6 @@ namespace form_builder
                 .AddAmazonS3Client(Configuration.GetSection("AmazonS3Configuration")["AccessKey"], Configuration.GetSection("AmazonS3Configuration")["SecretKey"])
                 .AddSesEmailConfiguration(Configuration.GetSection("Ses")["Accesskey"], Configuration.GetSection("Ses")["Secretkey"])
                 .AddGateways(Configuration)
-                .AddGovUkServices(Configuration)
                 .AddIOptionsConfiguration(Configuration)
                 .AddUtilities()
                 .AddAnalyticsProviders()
