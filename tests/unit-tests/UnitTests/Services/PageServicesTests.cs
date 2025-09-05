@@ -1435,7 +1435,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public void GetBehaviour_ShouldCallSession_And_DistributedCache_And_TagParsers()
+        public async Task GetBehaviour_ShouldCallSession_And_DistributedCache_And_TagParsers()
         {
             _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("12345");
             _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
@@ -1449,7 +1449,7 @@ namespace form_builder_tests.UnitTests.Services
                 .WithBehaviour(behaviour)
                 .Build();
 
-            _service.GetBehaviour(new ProcessRequestEntity { Page = page }, "form");
+            await _service.GetBehaviour(new ProcessRequestEntity { Page = page }, "form");
 
             _sessionHelper.Verify(_ => _.GetBrowserSessionId(), Times.Once);
             _distributedCache.Verify(_ => _.GetString(It.IsAny<string>()), Times.Once);

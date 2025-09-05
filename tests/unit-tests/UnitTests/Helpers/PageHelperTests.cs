@@ -1008,22 +1008,95 @@ namespace form_builder_tests.UnitTests.Helpers
                 Path = "page-one",
                 Pages = new List<PageAnswers>
                 {
-                    new PageAnswers
+                    new()
                     {
                         Answers = new List<Answers>
                         {
-                            new Answers
+                            new()
                             {
                                 Response = "yes",
                                 QuestionId = "testRadio"
+                            },
+                            new()
+                            {
+                                Response = "yes",
+                                QuestionId = "incomingDataIncludedInSubmission"
                             }
                         }
                     }
+                },
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "incomingDataIncludedInSubmission", "yes" }
                 }
             });
 
-            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("guid");
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(mockData);
+            _mockSessionHelper
+                .Setup(mock => mock.GetBrowserSessionId())
+                .Returns("guid");
+
+            _mockDistributedCache
+                .Setup(mock => mock.GetString(It.IsAny<string>()))
+                .Returns(mockData);
+
+            // Act
+            var result = _pageHelper.GetPageWithMatchingRenderConditions(pages, "form");
+
+            // Assert
+            Assert.Equal(page, result);
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void GetPageWithMatchingRenderConditions_ShouldReturnPageWithRenderConditions_If_ItMeetsTheIncomingDataConditions()
+        {
+            // Arrange
+            var behaviour = new BehaviourBuilder()
+                .WithBehaviourType(EBehaviourType.GoToPage)
+                .WithPageSlug("test-test")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .WithRenderConditions(new Condition
+                {
+                    QuestionId = "incomingDataIncludedInSubmission",
+                    ConditionType = ECondition.EqualTo,
+                    ComparisonValue = "yes"
+                })
+                .Build();
+
+            var page2 = new PageBuilder()
+                .WithBehaviour(behaviour)
+                .WithPageSlug("success")
+                .Build();
+
+            page2.RenderConditions = new List<Condition>();
+
+            var pages = new List<Page>
+            {
+                page,
+                page2
+            };
+
+            var mockData = JsonConvert.SerializeObject(new FormAnswers
+            {
+                Path = "page-one",
+                Pages = new List<PageAnswers>(),
+                AdditionalFormData = new Dictionary<string, object>
+                {
+                    { "incomingDataIncludedInSubmission", "yes" }
+                }
+            });
+
+            _mockSessionHelper
+                .Setup(mock => mock.GetBrowserSessionId())
+                .Returns("guid");
+
+            _mockDistributedCache
+                .Setup(mock => mock.GetString(It.IsAny<string>()))
+                .Returns(mockData);
 
             // Act
             var result = _pageHelper.GetPageWithMatchingRenderConditions(pages, "form");
@@ -1066,8 +1139,13 @@ namespace form_builder_tests.UnitTests.Helpers
                 page2
             };
 
-            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("guid");
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(It.IsAny<string>());
+            _mockSessionHelper
+                .Setup(mock => mock.GetBrowserSessionId())
+                .Returns("guid");
+
+            _mockDistributedCache
+                .Setup(mock => mock.GetString(It.IsAny<string>()))
+                .Returns(It.IsAny<string>());
 
             // Act
             var result = _pageHelper.GetPageWithMatchingRenderConditions(pages, "form");
