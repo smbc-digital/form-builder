@@ -22,12 +22,12 @@ namespace form_builder.Validators.IntegrityChecks.Elements
 
             if (element.Properties.MinLength is not null && element.Properties.MinLength < 0)
                 result.AddFailureMessage(
-                    $"Textbox element {element.Properties.QuestionId} cannot have have a minLength of less than 0, " +
+                    $"Textbox element {element.Properties.QuestionId} cannot have a minLength of less than 0, " +
                     "increase the minLength.");
 
             if (element.Properties.Optional && element.Properties.MinLength is not null)
                 result.AddFailureMessage(
-                    $"Textbox element {element.Properties.QuestionId} cannot have have a minLength and Optional set to 'true', " +
+                    $"Textbox element {element.Properties.QuestionId} cannot have a minLength value and Optional set to 'true', " +
                     "remove the minLength or change Optional to 'false'.");
 
             if (!element.Properties.Optional && element.Properties.MinLength is 0)
