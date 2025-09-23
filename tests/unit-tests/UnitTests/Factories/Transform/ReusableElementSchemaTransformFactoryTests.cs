@@ -254,6 +254,50 @@ namespace form_builder_tests.UnitTests.Factories.Transform
         }
 
         [Fact]
+        public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_MinLength_WhenSupplied()
+        {
+            // Arrange
+            _transformDataProvider
+                .Setup(mock => mock.Get(It.IsAny<string>()))
+                .ReturnsAsync(new Textbox
+                {
+                    Properties = new BaseProperty
+                    {
+                        QuestionId = "ReusableTest"
+                    }
+                });
+
+            ReusableElementSchemaTransformFactory = new ReusableElementSchemaTransformFactory(_transformDataProvider.Object);
+
+            var element = (Reusable)new ElementBuilder()
+                .WithType(EElementType.Reusable)
+                .WithQuestionId("ReusableTest")
+                .WithMinLength(30)
+                .Build();
+
+            element.ElementRef = "test";
+
+            // Act
+            var result = await ReusableElementSchemaTransformFactory.Transform(new FormSchema
+            {
+                Pages = new List<Page> 
+                {
+                    new()
+                    {
+                        Elements = new List<IElement>
+                        {
+                            element
+                        }
+                    }
+                }
+            });
+
+            // Assert
+            Assert.IsType<FormSchema>(result);
+            Assert.Equal(30, result.Pages.First().Elements.First().Properties.MinLength);
+        }
+
+        [Fact]
         public async Task Transform_ShouldCall_TransformDataProvider_And_ShouldUpdate_SummaryLabel_WhenSupplied()
         {
             // Arrange

@@ -28,6 +28,8 @@ namespace form_builder.Models.Properties.ElementProperties
 
         public int MaxLength { get; set; } = 200;
 
+        public int? MinLength { get; set; }
+
         public string Value { get; set; } = string.Empty;
 
         public string Hint { get; set; } = string.Empty;

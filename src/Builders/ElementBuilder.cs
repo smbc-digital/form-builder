@@ -128,6 +128,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithMinLength(int minLength)
+        {
+            _property.MinLength = minLength;
+
+            return this;
+        }
+
         public ElementBuilder WithOptions(List<Option> options)
         {
             _property.Options = options;
