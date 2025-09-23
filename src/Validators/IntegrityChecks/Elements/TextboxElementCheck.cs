@@ -32,7 +32,7 @@ namespace form_builder.Validators.IntegrityChecks.Elements
 
             if (!element.Properties.Optional && element.Properties.MinLength is 0)
                 result.AddFailureMessage(
-                    $"Textbox element {element.Properties.QuestionId} cannot have have a minLength of 0 and Optional set to 'false', " +
+                    $"Textbox element {element.Properties.QuestionId} cannot have a minLength of 0 and Optional set to 'false', " +
                     "increase the minLength or change Optional to 'true'.");
 
             return result;
