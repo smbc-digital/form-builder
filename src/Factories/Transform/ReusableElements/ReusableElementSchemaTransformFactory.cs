@@ -86,6 +86,9 @@ namespace form_builder.Factories.Transform.ReusableElements
             if (!reusableElement.Properties.MaxLength.Equals(200))
                 substituteElement.Properties.MaxLength = reusableElement.Properties.MaxLength;
 
+            if (reusableElement.Properties.MinLength is not null)
+                substituteElement.Properties.MinLength = reusableElement.Properties.MinLength;
+
             if (!string.IsNullOrEmpty(reusableElement.Properties.Hint))
                 substituteElement.Properties.Hint = reusableElement.Properties.Hint;
 

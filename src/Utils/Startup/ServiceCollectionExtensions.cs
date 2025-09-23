@@ -134,6 +134,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<IElementValidator, RequiredIfValidator>();
             services.AddTransient<IElementValidator, TimeInputValidator>();
             services.AddTransient<IElementValidator, MaxLengthValidator>();
+            services.AddTransient<IElementValidator, MinLengthValidator>();
             services.AddTransient<IElementValidator, AddressPostcodeValidator>();
             services.AddTransient<IElementValidator, RestrictMimeTypeValidator>();
             services.AddTransient<IElementValidator, RestrictFileSizeValidator>();

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
 {
-    public class TextboxElementChecks
+    public class TextboxElementCheckTests
     {
         private readonly TextboxElementCheck _integrityCheck = new();
 
@@ -50,6 +50,56 @@ namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
                 .WithQuestionId("mixed")
                 .WithDecimal(true)
                 .WithNumeric(true)
+                .Build();
+
+            // Act & Assert
+            var result = _integrityCheck.Validate(element);
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturn_False_When__MinLength_Property_Less_Than_Zero()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("lessThanZero")
+                .WithMinLength(-1)
+                .Build();
+
+            // Act & Assert
+            var result = _integrityCheck.Validate(element);
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturn_False_When__MinLength_Property_Is_Zero_And_Not_Optional()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("lessThanZero")
+                .WithMinLength(0)
+                .WithOptional(false)
+                .Build();
+
+            // Act & Assert
+            var result = _integrityCheck.Validate(element);
+
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public void Validate_ShouldReturn_False_When__MinLength_Property_Is_Not_Null_And_Optional()
+        {
+            // Arrange
+            var element = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithQuestionId("lessThanZero")
+                .WithMinLength(5)
+                .WithOptional(true)
                 .Build();
 
             // Act & Assert
