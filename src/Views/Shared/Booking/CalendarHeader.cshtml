@@ -7,13 +7,14 @@
         <button class="smbc-calendar__header__button"
                 name="@BookingConstants.BOOKING_MONTH_REQUEST"
                 value="@Model.PreviousSelectableMonth"
-                formaction="@Model.MonthSelectionPostUrl">
+                formaction="@Model.MonthSelectionPostUrl"
+                aria-label="previous month">
             <span class="smbc-calendar__header__chevron smbc-calendar__header__chevron--left"></span>
         </button>
     }
     else
     {
-        <button type="button" class="smbc-calendar__header__button smbc-calendar__header__button--disabled" disabled></button>
+        <button type="button" role="presentation" class="smbc-calendar__header__button smbc-calendar__header__button--disabled" disabled></button>
     }
 
     <p class="smbc-body smbc-calendar__header__text">
@@ -25,13 +26,14 @@
         <button class="smbc-calendar__header__button"
                 name="@BookingConstants.BOOKING_MONTH_REQUEST"
                 value="@Model.NextSelectableMonth"
-                formaction="@Model.MonthSelectionPostUrl">
+                formaction="@Model.MonthSelectionPostUrl"
+                aria-label="next month">
             <span class="smbc-calendar__header__chevron smbc-calendar__header__chevron--right"></span>
         </button>
     }
     else
     {
-        <button type="button" class="smbc-calendar__header__button smbc-calendar__header__button--disabled" disabled></button>
+        <button type="button" role="presentation" class="smbc-calendar__header__button smbc-calendar__header__button--disabled" disabled></button>
     }
 
 </div>

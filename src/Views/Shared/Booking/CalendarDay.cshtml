@@ -15,10 +15,8 @@ else
 
         <input type="radio" data-aria-controls="@Model.InputId-conditional" class="smbc-calendar__input" value="@Model.Day.Date" name="@Model.QuestionId" id="@Model.InputId" aria-describedby="@Model.GetCalendarHint()" @(Model.Day.Checked ? "checked" : string.Empty) />
 
-        <label aria-hidden="true" class="smbc-calendar__label" for="@Model.InputId">
+        <label aria-label="@Model.Day.Date.ToString("dddd dd MMMM")" class="smbc-calendar__label" for="@Model.InputId">
             @Model.Day.Date.Day
         </label>
-
-        <span class="govuk-visually-hidden" id="@Model.GetCalendarHint()">@Model.Day.Date.ToString("dddd dd MMMM")</span>
     </td>
 }

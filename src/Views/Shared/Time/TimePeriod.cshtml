@@ -1,4 +1,4 @@
-@model TimePeriod
+    @model TimePeriod
 
 <div class="smbc-time__body smbc-time__body__conditional smbc-time__body__conditional--hidden" id="@Model.Id">
     @if (!Model.HasAppointments)
@@ -19,9 +19,7 @@
                        name='@Model.Id'
                        aria-describedby="@Model.GetTimeInputHint(i)"
                        id="@Model.Value(startTime)" />
-                <label aria-hidden="true" class="smbc-time__time__label @Model.GetClassNameForDivsPosition(i)" for="@Model.Value(startTime)">@Model.Value(startTime).ToTimeFormat()</label>
-
-                <span class="govuk-visually-hidden" id="@Model.GetTimeInputHint(i)">@Model.ToFullDateFormat(startTime)</span>
+                <label aria-label="@Model.ToFullDateFormat(startTime)" class="smbc-time__time__label @Model.GetClassNameForDivsPosition(i)" for="@Model.Value(startTime)">@Model.Value(startTime).ToTimeFormat()</label>
             </div>
         }
 
