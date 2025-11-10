@@ -43,6 +43,9 @@
     <partial name="Header" />
 
     <div class="govuk-width-container @(Model.Embeddable ? "smbc-container-embeddable" : string.Empty)">
+
+        <partial name="ReciteMe" />
+
         @if (!string.IsNullOrEmpty(feedbackPhase))
         {
             <div class="govuk-phase-banner">

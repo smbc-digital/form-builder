@@ -1,0 +1,80 @@
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds smbc-!-alignment-right">
+        <a href="#" class="govuk-button govuk-button--secondary smbc-!-alignment-right" style="margin-top:10px"><span class="fa fa-headphones hide-on-mobile" aria-hidden="true"></span> Accessibility</a>
+    </div>
+</div>
+
+<script>
+    const ReciteScript = {
+        Init: function () {
+            const serviceUrl = "//api.reciteme.com/asset/js?key=";
+            const serviceKey = "d5e58f0ff7e6ac28ad6f1a13023a9930f7f1e066";
+            const options = {};
+            const autoLoad = false;
+            const enableFragment = "#reciteEnable";
+            const loaded = [];
+            let frag = false;
+
+            if (window.location.hash === enableFragment) frag = true;
+
+            function loadScript(src, callback) {
+                const script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = src;
+
+                script.onload = () => callback && callback();
+                script.onreadystatechange = () => {
+                    if (script.readyState === "loaded" || script.readyState === "complete") {
+                        script.onreadystatechange = null;
+                        callback && callback();
+                    }
+                };
+
+                document.head.appendChild(script);
+            }
+
+            function getCookieValue(name) {
+                const nameEQ = name + "=";
+                const cookies = document.cookie.split(";");
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.indexOf(nameEQ) === 0)
+                        return cookie.substring(nameEQ.length, cookie.length);
+                }
+                return null;
+            }
+
+            function loadService(callback) {
+                const src = serviceUrl + serviceKey;
+                if (loaded.includes(src)) return;
+                loaded.push(src);
+
+                loadScript(src, function () {
+                    if (typeof _reciteLoaded === "function") _reciteLoaded();
+                    if (typeof callback === "function") callback();
+
+                    Recite.load(options);
+                    Recite.Event.subscribe("Recite:load", function () {
+                        Recite.enable();
+                    });
+                });
+            }
+
+            if (getCookieValue("Recite.Persist") === "true") loadService();
+            if ((autoLoad && getCookieValue("Recite.Persist") !== "false") || frag)
+                loadService();
+
+            const reciteButton = document.getElementById("reciteMe");
+            if (reciteButton) {
+                reciteButton.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    loadService();
+                });
+            }
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+        ReciteScript.Init();
+    });
+</script>
