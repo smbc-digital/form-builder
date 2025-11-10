@@ -64,7 +64,6 @@
             if ((autoLoad && getCookieValue("Recite.Persist") !== "false") || frag)
                 loadService();
 
-            // ?? Replace jQuery click with vanilla JS
             const reciteButton = document.getElementById("reciteMe");
             if (reciteButton) {
                 reciteButton.addEventListener("click", function (event) {
@@ -75,7 +74,6 @@
         }
     };
 
-    // Initialize once DOM is ready
     document.addEventListener("DOMContentLoaded", function () {
         ReciteScript.Init();
     });
