@@ -278,7 +278,7 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<ILookupProvider, FakeLookupProvider>();
             services.AddSingleton<ILookupProvider, JsonLookupProvider>();
-
+            string s = "Hello World!";
             return services;
         }
 
