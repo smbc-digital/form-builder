@@ -44,8 +44,6 @@
 
     <div class="govuk-width-container @(Model.Embeddable ? "smbc-container-embeddable" : string.Empty)">
 
-        <partial name="ReciteMe" />
-
         @if (!string.IsNullOrEmpty(feedbackPhase))
         {
             <div class="govuk-phase-banner">
@@ -64,6 +62,8 @@
         {
             <partial name="Breadcrumbs" model="@breadcrumbs" />
         }
+
+        <partial name="ReciteMe" />
 
         @if (!Model.HideBackButton)
         {
