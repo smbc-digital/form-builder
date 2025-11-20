@@ -21,10 +21,10 @@ namespace form_builder.Restrictions
                 return false;
 
             var context = _httpContextAccessor.HttpContext;
-            if (!context.Request.Query.Any(keyValuePair => keyValuePair.Key.Equals(baseForm.FormAccessKeyName)))
+            if (!context.Request.Query.Any(keyValuePair => keyValuePair.Key.Equals(baseForm.FormAccessKeyName, StringComparison.OrdinalIgnoreCase)))
                 return true;
             
-            var keyValuePair = context.Request.Query.Single(keyValuePair => keyValuePair.Key.Equals(baseForm.FormAccessKeyName));
+            var keyValuePair = context.Request.Query.Single(keyValuePair => keyValuePair.Key.Equals(baseForm.FormAccessKeyName, StringComparison.OrdinalIgnoreCase));
 
             if (keyValuePair.Value.Equals(_qaFormAccessToken.AccessKey))
                 return false;

@@ -11,7 +11,7 @@
 <h1 class="govuk-heading-l">Welcome to FormBuilder</h1>
 
 <h2 class="govuk-heading-m">Preview a form</h2>
-<p class="smbc-body">Upload a JSON file to test and preview.</a></p>
+<p class="smbc-body">Upload a JSON file to test and preview.</p>
 <a href="/preview" class="govuk-button">Preview a form</a>
 
 <hr style="margin: 2em 0em 2em 0em;" />
@@ -31,7 +31,7 @@
     {
         <tr>
             <td class="smbc-body">@formCount</td>
-            <td class="smbc-body"><a style="text-transform: capitalize" href="/view/@form"> @form.Replace("-", " ")</a></td>
+            <td class="smbc-body"><a style="text-transform: capitalize" href="/view/@form"> @form.Replace("-", " ").Remove(form.Length - 37)</a></td>
             <td class="smbc-body" style="text-align: right"><a href="/@form/data-structure" aria-label="Preview output data structure for @form">Data structure</a></td>
         </tr>
 

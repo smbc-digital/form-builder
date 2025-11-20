@@ -1,4 +1,5 @@
-﻿using form_builder.Attributes;
+﻿using System.Linq;
+using form_builder.Attributes;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -21,6 +22,7 @@ using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
 using NJsonSchema;
@@ -45,6 +47,7 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly ISessionHelper _sessionHelper;
     private readonly IFeatureManager _featureManager;
+    private readonly QAFormAccessTokenConfiguration _qaFormAccessToken;
 
     public HomeController(IPageService pageService,
         ISchemaProvider schemaProvider,
@@ -61,7 +64,8 @@ public class HomeController : Controller
         IOptions<DataStructureConfiguration> dataStructureConfiguration,
         ILogger<HomeController> logger,
         ISessionHelper sessionHelper,
-        IFeatureManager featureManager)
+        IFeatureManager featureManager,
+        IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken)
     {
         _pageService = pageService;
         _schemaProvider = schemaProvider;
@@ -79,6 +83,7 @@ public class HomeController : Controller
         _emailWorkFlow = emailWorkFlow;
         _sessionHelper = sessionHelper;
         _featureManager = featureManager;
+        _qaFormAccessToken = qaFormAccessToken.Value;
     }
 
     [HttpGet]
@@ -93,7 +98,8 @@ public class HomeController : Controller
             Embeddable = false,
             StartPageUrl = "/",
             FormName = "",
-            HideBackButton = true
+            HideBackButton = true,
+            QAFormAccessToken = _qaFormAccessToken.AccessKey
         };
 
         return View("Home", viewModel);
@@ -102,13 +108,16 @@ public class HomeController : Controller
     [HttpGet]
     [Route("view/{form}")]
     [FeatureGate("HomePageFormListings")]
-    public async Task<IActionResult> View(string form)
+    public async Task<IActionResult> FormView(string form)
     {
         var schema = await _schemaFactory.Build(form);
         var incomingValues = schema.Pages.First().IncomingValues;
 
         if (incomingValues.Any())
         {
+            if (Request.Query.ContainsKey("key") && string.IsNullOrEmpty(schema.FormAccessKeyName))
+                return Redirect($"/view/{form}");
+
             var viewModel = new HomeViewModel
             {
                 Embeddable = false,
@@ -121,6 +130,12 @@ public class HomeController : Controller
             return View("IncomingValues", viewModel);
         }
 
+        if (!string.IsNullOrEmpty(schema.FormAccessKeyName))
+        {
+            Dictionary<string, object> queryParams = Request.Query.ToDictionary<KeyValuePair<string, StringValues>, string, object>(pair => pair.Key, pair => pair.Value.ToString());
+            return Redirect($"/{form}?key={queryParams["key"]}");
+        }
+        
         return Redirect($"/{form}");
     }
 
