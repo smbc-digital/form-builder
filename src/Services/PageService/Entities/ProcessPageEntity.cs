@@ -16,6 +16,8 @@ namespace form_builder.Services.PageService.Entities
     {
         public bool ShouldRedirect { get; set; }
 
+        public bool RequiresAccessKey { get; set; }
+
         public string TargetPage { get; set; } = string.Empty;
     }
 

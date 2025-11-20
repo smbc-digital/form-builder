@@ -1,4 +1,5 @@
-﻿using form_builder.Attributes;
+﻿using System.Linq;
+using form_builder.Attributes;
 using form_builder.Builders;
 using form_builder.Configuration;
 using form_builder.Constants;
@@ -21,6 +22,7 @@ using form_builder.Workflows.SubmitWorkflow;
 using form_builder.Workflows.SuccessWorkflow;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
 using NJsonSchema;
@@ -45,6 +47,7 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly ISessionHelper _sessionHelper;
     private readonly IFeatureManager _featureManager;
+    private readonly QAFormAccessTokenConfiguration _qaFormAccessToken;
 
     public HomeController(IPageService pageService,
         ISchemaProvider schemaProvider,
@@ -61,7 +64,8 @@ public class HomeController : Controller
         IOptions<DataStructureConfiguration> dataStructureConfiguration,
         ILogger<HomeController> logger,
         ISessionHelper sessionHelper,
-        IFeatureManager featureManager)
+        IFeatureManager featureManager,
+        IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken)
     {
         _pageService = pageService;
         _schemaProvider = schemaProvider;
@@ -79,6 +83,7 @@ public class HomeController : Controller
         _emailWorkFlow = emailWorkFlow;
         _sessionHelper = sessionHelper;
         _featureManager = featureManager;
+        _qaFormAccessToken = qaFormAccessToken.Value;
     }
 
     [HttpGet]
@@ -93,7 +98,8 @@ public class HomeController : Controller
             Embeddable = false,
             StartPageUrl = "/",
             FormName = "",
-            HideBackButton = true
+            HideBackButton = true,
+            QAFormAccessToken = _qaFormAccessToken.AccessKey
         };
 
         return View("Home", viewModel);
@@ -121,7 +127,8 @@ public class HomeController : Controller
             return View("IncomingValues", viewModel);
         }
 
-        return Redirect($"/{form}");
+        Dictionary<string, object> queryParams = Request.Query.ToDictionary<KeyValuePair<string, StringValues>, string, object>(pair => pair.Key, pair => pair.Value.ToString());
+        return Redirect($"/{form}?key={queryParams["key"]}");
     }
 
     [HttpGet]
@@ -144,11 +151,18 @@ public class HomeController : Controller
 
         if (response.ShouldRedirect)
         {
-            var routeValuesDictionary = new RouteValueDictionaryBuilder()
-                .WithValue("path", response.TargetPage)
-                .WithValue("form", form)
-                .WithQueryValues(queryParameters)
-                .Build();
+            var routeValuesDictionary = response.RequiresAccessKey
+                ? new RouteValueDictionaryBuilder()
+                    .WithValue("path", response.TargetPage)
+                    .WithValue("form", form)
+                    .WithQueryValues(queryParameters)
+                    .Build()
+                : new RouteValueDictionaryBuilder()
+                    .WithValue("path", response.TargetPage)
+                    .WithValue("form", form)
+                    .WithQueryValues(queryParameters)
+                    .WithoutKey("key")
+                    .Build();
 
             return RedirectToAction("Index", routeValuesDictionary);
         }
