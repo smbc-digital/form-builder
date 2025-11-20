@@ -138,15 +138,12 @@ public class PageService : IPageService
         }
 
         var baseForm = await _schemaFactory.Build(form);
-        
         if (baseForm is null)
         {
             _logger.LogWarning($"PageService:ProcessPage: Base form was null, Cache Id: {cacheId}");
             _distributedCache.Remove(cacheId);
             return null;
         }
-
-        var requiresAccessKey = !string.IsNullOrEmpty(baseForm.FormAccessKeyName);
 
         if (!_formAvailabilityService.IsAvailable(baseForm.EnvironmentAvailabilities, _environment.EnvironmentName))
         {
@@ -174,13 +171,13 @@ public class PageService : IPageService
         if (string.IsNullOrEmpty(path))
         {
             _logger.LogInformation($"PageService:ProcessPage:Path was empty, redirect to first page of form, Cache Id: {cacheId}");
-            return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug, RequiresAccessKey = requiresAccessKey};
+            return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
         }
 
         if (string.IsNullOrEmpty(formData) && !path.Equals(baseForm.FirstPageSlug) && (!baseForm.HasDocumentUpload || !path.Equals(FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH)))
         {
             _logger.LogInformation($"PageService:ProcessPage:Form data was empty and path was not the first page, redirect to first page of form, Cache Id: {cacheId}");
-            return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug, RequiresAccessKey = requiresAccessKey };
+            return new ProcessPageEntity { ShouldRedirect = true, TargetPage = baseForm.FirstPageSlug };
         }
 
         if (!string.IsNullOrEmpty(formData) && path.Equals(baseForm.FirstPageSlug))
@@ -264,7 +261,7 @@ public class PageService : IPageService
 
         var viewModel = await GetViewModel(page, baseForm, path, cacheId, subPath, searchResults, convertedAnswers);
         _logger.LogInformation($"PageService:ProcessPage: Finish processing page \"{form}/{path}/{subPath}\", Cache Id: {cacheId}"); 
-        return new ProcessPageEntity { ViewModel = viewModel, RequiresAccessKey = requiresAccessKey };
+        return new ProcessPageEntity { ViewModel = viewModel };
     }
 
     public async Task<ProcessRequestEntity> ProcessRequest(

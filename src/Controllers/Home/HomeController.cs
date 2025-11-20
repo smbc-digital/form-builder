@@ -108,13 +108,16 @@ public class HomeController : Controller
     [HttpGet]
     [Route("view/{form}")]
     [FeatureGate("HomePageFormListings")]
-    public async Task<IActionResult> View(string form)
+    public async Task<IActionResult> FormView(string form)
     {
         var schema = await _schemaFactory.Build(form);
         var incomingValues = schema.Pages.First().IncomingValues;
 
         if (incomingValues.Any())
         {
+            if (Request.Query.ContainsKey("key") && string.IsNullOrEmpty(schema.FormAccessKeyName))
+                return Redirect($"/view/{form}");
+
             var viewModel = new HomeViewModel
             {
                 Embeddable = false,
@@ -127,8 +130,13 @@ public class HomeController : Controller
             return View("IncomingValues", viewModel);
         }
 
-        Dictionary<string, object> queryParams = Request.Query.ToDictionary<KeyValuePair<string, StringValues>, string, object>(pair => pair.Key, pair => pair.Value.ToString());
-        return Redirect($"/{form}?key={queryParams["key"]}");
+        if (!string.IsNullOrEmpty(schema.FormAccessKeyName))
+        {
+            Dictionary<string, object> queryParams = Request.Query.ToDictionary<KeyValuePair<string, StringValues>, string, object>(pair => pair.Key, pair => pair.Value.ToString());
+            return Redirect($"/{form}?key={queryParams["key"]}");
+        }
+        
+        return Redirect($"/{form}");
     }
 
     [HttpGet]
@@ -151,18 +159,24 @@ public class HomeController : Controller
 
         if (response.ShouldRedirect)
         {
-            var routeValuesDictionary = response.RequiresAccessKey
-                ? new RouteValueDictionaryBuilder()
-                    .WithValue("path", response.TargetPage)
-                    .WithValue("form", form)
-                    .WithQueryValues(queryParameters)
-                    .Build()
-                : new RouteValueDictionaryBuilder()
-                    .WithValue("path", response.TargetPage)
-                    .WithValue("form", form)
-                    .WithQueryValues(queryParameters)
-                    .WithoutKey("key")
-                    .Build();
+            //var routeValuesDictionary = response.RequiresAccessKey
+            //    ? new RouteValueDictionaryBuilder()
+            //        .WithValue("path", response.TargetPage)
+            //        .WithValue("form", form)
+            //        .WithQueryValues(queryParameters)
+            //        .Build()
+            //    : new RouteValueDictionaryBuilder()
+            //        .WithValue("path", response.TargetPage)
+            //        .WithValue("form", form)
+            //        .WithQueryValues(queryParameters)
+            //        .WithoutKey("key")
+            //        .Build();
+
+            var routeValuesDictionary = new RouteValueDictionaryBuilder()
+                .WithValue("path", response.TargetPage)
+                .WithValue("form", form)
+                .WithQueryValues(queryParameters)
+                .Build();
 
             return RedirectToAction("Index", routeValuesDictionary);
         }

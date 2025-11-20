@@ -11,13 +11,6 @@ namespace form_builder.Builders
             return this;
         }
 
-        public RouteValueDictionaryBuilder WithoutKey(string key)
-        {
-            _routeValueDictionary.Remove(key);
-
-            return this;
-        }
-
         public RouteValueDictionaryBuilder WithQueryValues(IQueryCollection queryCollection)
         {
             queryCollection.ToList().ForEach(key => _routeValueDictionary.Add(key.Key, key.Value));

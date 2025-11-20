@@ -7,7 +7,7 @@ namespace form_builder.ViewModels
     public class HomeViewModel
     {
         public bool Embeddable { get; set; }
-        public List<string> Forms { get; set; }
+        public List<string> Forms { get; set; } = new();
         public string QAFormAccessToken { get; set; }
         public string StartPageUrl { get; set; }
         public string FormName { get; set; }
