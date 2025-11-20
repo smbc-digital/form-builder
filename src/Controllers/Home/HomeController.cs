@@ -159,19 +159,6 @@ public class HomeController : Controller
 
         if (response.ShouldRedirect)
         {
-            //var routeValuesDictionary = response.RequiresAccessKey
-            //    ? new RouteValueDictionaryBuilder()
-            //        .WithValue("path", response.TargetPage)
-            //        .WithValue("form", form)
-            //        .WithQueryValues(queryParameters)
-            //        .Build()
-            //    : new RouteValueDictionaryBuilder()
-            //        .WithValue("path", response.TargetPage)
-            //        .WithValue("form", form)
-            //        .WithQueryValues(queryParameters)
-            //        .WithoutKey("key")
-            //        .Build();
-
             var routeValuesDictionary = new RouteValueDictionaryBuilder()
                 .WithValue("path", response.TargetPage)
                 .WithValue("form", form)
