@@ -417,6 +417,110 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
+        public async Task Parse_ShouldReturnInitialValueForLeadingParagraph_When_NoTag_MatchesRegex()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .WithPropertyText("this value {{TAG}} should be replaced with value")
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithLeadingParagraph("this value {{TAG}} should be replaced with value")
+                .Build();
+
+            var formAnswers = new FormAnswers();
+
+            var result = await _tagParser.Parse(page, formAnswers);
+
+            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(page.LeadingParagraph, result.LeadingParagraph);
+        }
+
+        [Fact]
+        public async Task Parse_ShouldReturnUpdatedValueForLeadingParagraph_WhenReplacingSingleValue()
+        {
+            var expectedString = "this value firstname should be replaced with firstname";
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with firstname")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithLeadingParagraph("this value {{QUESTION:firstname}} should be replaced with firstname")
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "firstname"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = await _tagParser.Parse(page, formAnswers);
+
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(expectedString, result.LeadingParagraph);
+        }
+
+        [Fact]
+        public async Task Parse_ShouldReturnUpdatedValueForLeadingParagraph_WhenReplacingMultipleValues()
+        {
+            var expectedString = "this value firstname should be replaced with firstname and this lastname with lastname";
+
+            var element = new ElementBuilder()
+               .WithType(EElementType.P)
+               .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
+               .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .WithLeadingParagraph("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
+                .Build();
+
+            var formAnswers = new FormAnswers
+            {
+                Pages = new List<PageAnswers>
+                {
+                    new()
+                    {
+                        Answers = new List<Answers>
+                        {
+                            new()
+                            {
+                                QuestionId = "firstname",
+                                Response = "firstname"
+                            },
+                            new()
+                            {
+                                QuestionId = "lastname",
+                                Response = "lastname"
+                            }
+                        }
+                    }
+                }
+            };            
+            
+            var result = await _tagParser.Parse(page, formAnswers);
+
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(expectedString, result.LeadingParagraph);
+        }
+
+        [Fact]
         public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
         {
             var expectedString = "this value testfirstname should be replaced with name question";
