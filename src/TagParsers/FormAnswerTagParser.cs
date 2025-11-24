@@ -15,6 +15,13 @@ namespace form_builder.TagParsers
         {
             var answersDictionary = formAnswers.Pages?.SelectMany(x => x.Answers).ToDictionary(x => x.QuestionId, x => x.Response);
 
+            var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
+
+            if (leadingParagraphRegexIsMatch)
+            {
+                page.LeadingParagraph = Parse(page.LeadingParagraph, answersDictionary, Regex);
+            }   
+
             page.Elements.Select((element) =>
             {
                 if (!string.IsNullOrEmpty(element.Properties?.Text))
