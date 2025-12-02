@@ -1,5 +1,6 @@
 ﻿@inject IOptions<StylesheetConfiguration> StylesheetConfiguration
 @inject IOptions<JavascriptConfiguration> JavascriptConfiguration
+@inject IOptions<ReciteMeConfiguration> ReciteMeConfiguration
 
 @{
     var feedbackFormUrl = (string)ViewData["FeedbackForm"];
@@ -62,8 +63,11 @@
         {
             <partial name="Breadcrumbs" model="@breadcrumbs" />
         }
-
-        <partial name="ReciteMe" />
+        
+        @if (ReciteMeConfiguration.Value.AllowReciteMe)
+        {
+            <partial name="ReciteMe" />
+        }
 
         @if (!Model.HideBackButton)
         {
