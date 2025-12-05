@@ -8,6 +8,8 @@ public class Textbox : Element
 {
     public bool HasPrefix => !string.IsNullOrEmpty(Properties.Prefix);
     public bool HasSuffix => !string.IsNullOrEmpty(Properties.Suffix);
+    public bool HasPrefixAriaLabel => !string.IsNullOrEmpty(Properties.Prefix) && !string.IsNullOrEmpty(Properties.PrefixAriaLabel);
+    public bool HasSuffixAriaLabel => !string.IsNullOrEmpty(Properties.Suffix) && !string.IsNullOrEmpty(Properties.SuffixAriaLabel);
     public Textbox() => Type = EElementType.Textbox;
 
     public override Task<string> RenderAsync(IViewRender viewRender,
