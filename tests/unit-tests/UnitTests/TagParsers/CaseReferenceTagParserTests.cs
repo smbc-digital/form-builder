@@ -21,13 +21,19 @@ namespace form_builder_tests.UnitTests.TagParsers
         [Fact]
         public async Task Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
-            var element = new ElementBuilder()
+            var pElement = new ElementBuilder()
                 .WithType(EElementType.P)
                 .WithPropertyText("this has no values to be replaced")
                 .Build();
 
+            var linkElement = new ElementBuilder()
+                .WithType(EElementType.Link)
+                .WithUrl("this url has no values to be replaced")
+                .Build();
+
             var page = new PageBuilder()
-                .WithElement(element)
+                .WithElement(pElement)
+                .WithElement(linkElement)
                 .WithLeadingParagraph("this has no values to be replaced")
                 .Build();
 
@@ -35,20 +41,27 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
 
-            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(pElement.Properties.Text, result.Elements.First(element => element.Type.Equals(EElementType.P)).Properties.Text);
+            Assert.Equal(linkElement.Properties.Url, result.Elements.First(element => element.Type.Equals(EElementType.Link)).Properties.Url);
             Assert.Equal(page.LeadingParagraph, result.LeadingParagraph);
         }
 
         [Fact]
         public async Task Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
         {
-            var element = new ElementBuilder()
+            var pElement = new ElementBuilder()
                 .WithType(EElementType.P)
                 .WithPropertyText("this value {{TAG}} should be replaced with Case Reference")
                 .Build();
 
+            var linkElement = new ElementBuilder()
+                .WithType(EElementType.Link)
+                .WithUrl("this url value {{TAG}} should be replaced with Case Reference")
+                .Build();
+
             var page = new PageBuilder()
-                .WithElement(element)
+                .WithElement(pElement)
+                .WithElement(linkElement)
                 .WithLeadingParagraph("this value {{TAG}} should be replaced with Case Reference")
                 .Build();
 
@@ -56,7 +69,8 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
 
-            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(pElement.Properties.Text, result.Elements.First(element => element.Type.Equals(EElementType.P)).Properties.Text);
+            Assert.Equal(linkElement.Properties.Url, result.Elements.First(element => element.Type.Equals(EElementType.Link)).Properties.Url);
             Assert.Equal(page.LeadingParagraph, result.LeadingParagraph);
         }
 
@@ -65,13 +79,19 @@ namespace form_builder_tests.UnitTests.TagParsers
         {
             var expectedString = "this value 123456 should be replaced with Case Reference";
 
-            var element = new ElementBuilder()
+            var pElement = new ElementBuilder()
                .WithType(EElementType.P)
                .WithPropertyText("this value {{CASEREFERENCE}} should be replaced with Case Reference")
                .Build();
 
+            var linkElement = new ElementBuilder()
+                .WithType(EElementType.Link)
+                .WithUrl("this value {{CASEREFERENCE}} should be replaced with Case Reference")
+                .Build();
+
             var page = new PageBuilder()
-                .WithElement(element)
+                .WithElement(pElement)
+                .WithElement(linkElement)
                 .WithLeadingParagraph("this value {{CASEREFERENCE}} should be replaced with Case Reference")
                 .Build();
 
@@ -82,7 +102,8 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
 
-            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(expectedString, result.Elements.First(element => element.Type.Equals(EElementType.P)).Properties.Text);
+            Assert.Equal(expectedString, result.Elements.First(element => element.Type.Equals(EElementType.Link)).Properties.Url);
             Assert.Equal(expectedString, result.LeadingParagraph);
         }
 
