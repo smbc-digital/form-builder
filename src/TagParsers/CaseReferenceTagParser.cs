@@ -13,7 +13,8 @@ namespace form_builder.TagParsers
         public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
         {
             var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
-            var pageHasElementsMatchingRegex = page.Elements.Any(_ => _.Properties.Text is not null && Regex.IsMatch(_.Properties.Text));
+            var pageHasElementsMatchingRegex = page.Elements.Any(_ => (_.Properties.Text is not null && Regex.IsMatch(_.Properties.Text))
+            || (_.Properties.Url is not null && Regex.IsMatch(_.Properties.Url)));
 
             if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex)
             {
@@ -28,6 +29,9 @@ namespace form_builder.TagParsers
                     {
                         if (!string.IsNullOrEmpty(element.Properties?.Text))
                             element.Properties.Text = Parse(element.Properties.Text, formAnswers.CaseReference, Regex);
+
+                        if (!string.IsNullOrEmpty(element.Properties?.Url))
+                            element.Properties.Url = Parse(element.Properties.Url, formAnswers.CaseReference, Regex);
 
                         return element;
                     }).ToList();
