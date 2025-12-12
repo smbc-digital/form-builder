@@ -436,7 +436,7 @@ namespace form_builder_tests.UnitTests.Models.Elements
             //Assert
             _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Summary")), It.IsAny<SummarySectionsViewModel>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
             Assert.Single(callback.Sections);
-            Assert.Empty(callback.Sections.Where(_ => _.Pages.Any(_ => _.PageSummaryId.Contains("add-another"))));
+            Assert.DoesNotContain(callback.Sections, section => section.Pages.Any(page => page.PageSummaryId.Contains("add-another")));
         }
     }
 }
