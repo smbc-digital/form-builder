@@ -33,7 +33,7 @@ namespace form_builder.Validators.IntegrityChecks.Form
             anyConditionType.ForEach(condition =>
             {
                 if (string.IsNullOrEmpty(condition.ComparisonValue))
-                    result.AddFailureMessage($"Any Condition Type Check, any condition type requires a comparison value.");
+                    result.AddFailureMessage("Any Condition Type Check, any condition type requires a comparison value.");
             });
 
             return result;
