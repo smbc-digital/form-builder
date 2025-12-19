@@ -23,6 +23,8 @@ namespace form_builder.Extensions
             {
                 case EDocumentType.Txt:
                     return "text/plain";
+                case EDocumentType.Pdf:
+                    return "application/pdf";   
                 default:
                     throw new Exception("Unknown document type");
             }
