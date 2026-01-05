@@ -24,10 +24,11 @@ namespace form_builder.Validators.IntegrityChecks.Form
             }
 
             if (_httpContextAccessor.HttpContext.Request.Path.Value.StartsWith("/Preview") ||
+                _httpContextAccessor.HttpContext.Request.Path.Value.StartsWith("/view") ||
                 _httpContextAccessor.HttpContext.Request.Path.Value.StartsWith($"/{PreviewConstants.PREVIEW_MODE_PREFIX}"))
                 return result;
 
-            if (!_httpContextAccessor.HttpContext.Request.Path.Value.StartsWith($"/{schema.BaseURL.ToLower()}"))
+            if (!_httpContextAccessor.HttpContext.Request.Path.Value.Contains($"/{schema.BaseURL.ToLower()}"))
             {
                 result.AddFailureMessage(
                     "FormSchema BaseURL Check, " +

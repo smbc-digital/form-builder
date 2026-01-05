@@ -42,4 +42,6 @@ public interface IElementHelper
     string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers);
 
     void OrderOptionsAlphabetically(Element element);
+
+    bool IsElementANonInputType(IElement element);
 }

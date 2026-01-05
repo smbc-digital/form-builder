@@ -294,4 +294,26 @@ public class ElementHelper : IElementHelper
         if (element.Properties.OrderOptionsAlphabetically)
             element.Properties.Options.Sort((x, y) => x.Text.CompareTo(y.Text));
     }
+
+    public bool IsElementANonInputType(IElement element) =>
+        element.Type is EElementType.Button ||
+        element.Type is EElementType.DocumentUpload ||
+        element.Type is EElementType.H1 ||
+        element.Type is EElementType.H2 ||
+        element.Type is EElementType.H3 ||
+        element.Type is EElementType.H4 ||
+        element.Type is EElementType.H5 ||
+        element.Type is EElementType.H6 ||
+        element.Type is EElementType.HR ||
+        element.Type is EElementType.Img ||
+        element.Type is EElementType.InlineAlert ||
+        element.Type is EElementType.Legend ||
+        element.Type is EElementType.Link ||
+        element.Type is EElementType.OL ||
+        element.Type is EElementType.P ||
+        element.Type is EElementType.Span ||
+        element.Type is EElementType.Summary ||
+        element.Type is EElementType.UL ||
+        element.Type is EElementType.UploadedFilesSummary ||
+        element.Type is EElementType.Warning;
 }

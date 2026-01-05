@@ -369,27 +369,29 @@ namespace form_builder.Utils.Startup
 
         public static IServiceCollection AddSchemaIntegrityValidation(this IServiceCollection services)
         {
+            services.AddSingleton<IFormSchemaIntegrityCheck, AnswerLookupQuestionIdExistsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, AnyConditionTypeCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, BaseUrlCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, BookingQuestionIdExistsForCustomerAddressCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ConditionalElementCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, DynamicLookupCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EmailActionsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, EmailConfigurationCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, GeneratedIdConfigurationCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, IncomingFormDataValuesCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, KeyCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, OptionalIfCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, PaymentCallbackCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, PaymentConfigurationCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, RenderConditionsValidCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, RetrieveExternalActionsCheck>();
+            services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, TemplatedEmailActionCheck>();
             services.AddSingleton<IFormSchemaIntegrityCheck, ValidateActionCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, HasDuplicateQuestionIdsCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, SummaryElementFormCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, EnabledForTimeWindowCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, DateInputRangeCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, OptionalIfCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, PaymentCallbackCheck>();
-            services.AddSingleton<IFormSchemaIntegrityCheck, KeyCheck>();
 
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, CurrentEnvironmentSubmitSlugsCheck>();
             services.AddSingleton<IBehaviourSchemaIntegrityCheck, EmptyBehaviourSlugsCheck>();

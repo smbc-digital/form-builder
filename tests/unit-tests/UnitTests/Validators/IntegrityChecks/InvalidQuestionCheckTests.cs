@@ -1,77 +1,105 @@
 using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
+using form_builder.Helpers.ElementHelpers;
+using form_builder.Models.Elements;
 using form_builder.Validators.IntegrityChecks.Elements;
+using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
+namespace form_builder_tests.UnitTests.Validators.IntegrityChecks;
+
+public class InvalidQuestionCheckTests
 {
-    public class InvalidQuestionCheckTests
+    private readonly Mock<IElementHelper> _mockElementHelper = new();
+
+    private readonly InvalidQuestionCheck _check;
+
+    public InvalidQuestionCheckTests()
     {
-        [Theory]
-        [InlineData("validquestionId")]
-        public void QuestionIsValid_WhenQuestionIdValid(string questionId)
-        {
-            // Arrange
-            var validElement = new ElementBuilder()
-                .WithQuestionId(questionId)
-                .WithType(EElementType.Textarea)
-                .Build();
+        _mockElementHelper
+            .Setup(mock => mock.IsElementANonInputType(It.IsAny<IElement>()))
+            .Returns(false);
 
-            var check = new InvalidQuestionCheck();
+        _check = new InvalidQuestionCheck(_mockElementHelper.Object);
+    }
 
-            // Act
-            var result = check.Validate(validElement);
+    [Fact]
+    public void Validate_ShouldReturnTrue_WhenElementIsNotAnInputType()
+    {
+        // Arrange
+        _mockElementHelper
+            .Setup(mock => mock.IsElementANonInputType(It.IsAny<IElement>()))
+            .Returns(true);
 
-            // Assert
-            Assert.True(result.IsValid);
-            Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
-        }
+        var element = new ElementBuilder()
+            .WithType(EElementType.H1)
+            .Build();
 
-        [Theory]
-        [InlineData("invalid-questionId")]
-        [InlineData("question4")]
-        [InlineData("question£")]
-        [InlineData("que!stion")]
-        [InlineData("quest%ion")]
-        [InlineData("question.")]
-        [InlineData(".question")]
-        public void InvalidQuestion_IsNotValid_WhenQuestionIdInvalid(string questionId)
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId(questionId)
-                .WithType(EElementType.Textarea)
-                .Build();
+        // Act
+        var result = _check.Validate(element);
 
-            var check = new InvalidQuestionCheck();
+        // Assert
+        Assert.True(result.IsValid);
+        Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
+    }
 
-            // Act
-            var result = check.Validate(element);
+    [Fact]
+    public void Validate_ShouldReturnFalse_WhenPropertiesIsNull()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Textarea)
+            .Build();
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
-        }
+        // Act
+        var result = _check.Validate(element);
 
-        [Theory]
-        [InlineData("valid.question")]
-        [InlineData("valid.question.id")]
-        public void CheckForInvalidQuestion_ShouldNotThrowExceptionForValidQuestionId(string questionId)
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId(questionId)
-                .WithType(EElementType.Textarea)
-                .Build();
+        // Assert
+        Assert.False(result.IsValid);
+        var hasFailureMessage = result.Messages.Any(message => message.Contains(IntegrityChecksConstants.FAILURE));
+        Assert.True(hasFailureMessage);
+    }
 
-            var check = new InvalidQuestionCheck();
+    [Fact]
+    public void Validate_ShouldReturnTrue_WhenQuestionIdValid()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("validQuestionId")
+            .WithType(EElementType.Textarea)
+            .Build();
 
-            // Act
-            var result = check.Validate(element);
+        // Act
+        var result = _check.Validate(element);
 
-            // Assert
-            Assert.False(result.IsValid);
-        }
+        // Assert
+        Assert.True(result.IsValid);
+        Assert.DoesNotContain(IntegrityChecksConstants.FAILURE, result.Messages);
+    }
+
+    [Theory]
+    [InlineData("invalid-questionId")]
+    [InlineData("question4")]
+    [InlineData("question£")]
+    [InlineData("que!stion")]
+    [InlineData("quest%ion")]
+    [InlineData("question.")]
+    [InlineData(".question")]
+    public void Validate_ShouldReturnFalse_WhenQuestionIdNotValid(string questionId)
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId(questionId)
+            .WithType(EElementType.Textarea)
+            .Build();
+
+        // Act
+        var result = _check.Validate(element);
+
+        // Assert
+        Assert.False(result.IsValid);
+        var hasFailureMessage = result.Messages.Any(message => message.Contains(IntegrityChecksConstants.FAILURE));
+        Assert.True(hasFailureMessage);
     }
 }

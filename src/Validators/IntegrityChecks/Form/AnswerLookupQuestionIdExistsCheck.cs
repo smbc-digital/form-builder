@@ -1,4 +1,5 @@
 using form_builder.Models;
+using form_builder.Models.Actions;
 using form_builder.Models.Elements;
 
 namespace form_builder.Validators.IntegrityChecks.Form
@@ -18,14 +19,15 @@ namespace form_builder.Validators.IntegrityChecks.Form
             foreach (var element in elements)
             {
                 string questionId = element.Lookup.TrimStart('#');
-                IElement matchingElement = schema.Pages
-                    .SelectMany(page => page.Elements)
-                    .SingleOrDefault(element =>
-                        element.Properties.QuestionId is not null &&
-                        element.Properties.QuestionId.Equals(questionId));
 
-                if (matchingElement is null)
-                    result.AddFailureMessage($"The provided json does not contain an element with questionId of '{questionId}'");
+                IAction matchingPageAction = schema.Pages
+                    .SelectMany(page => page.PageActions)
+                    .SingleOrDefault(action =>
+                        action.Properties.TargetQuestionId is not null &&
+                        action.Properties.TargetQuestionId.Equals(questionId));
+
+                if (matchingPageAction is null)
+                    result.AddFailureMessage($"The provided json does not contain a retrieve external data page action with questionId of '{questionId}'");
             }
 
             return result;
