@@ -28,9 +28,9 @@ namespace form_builder_tests.UnitTests.Controllers
             Assert.IsType<RedirectToActionResult>(result);
             _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()), Times.Never);
         }
-        	
-		[Fact]
-        public async Task Summary_ShouldRedirect_ToExpired_When_ServiceThrows_DocumentExpiredExceptionException()
+
+        [Fact]
+        public async Task Summary_ShouldRedirect_ToExpired_When_ServiceThrows_DocumentExpiredException()
         {
             _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()))
                 .ThrowsAsync(new DocumentExpiredException("an exception"));
@@ -43,16 +43,31 @@ namespace form_builder_tests.UnitTests.Controllers
         }
 
         [Fact]
-        public async Task Summary_ShouldReturnFile_OnSuccess()
+        public async Task Summary_ShouldReturnFile_OnSuccess_ForTxt()
         {
             _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()))
-                .ReturnsAsync(new byte[0]);
+                .ReturnsAsync(Array.Empty<byte>());
 
             var result = await _controller.Summary(EDocumentType.Txt, "This is some text");
 
             var fileContentResult = Assert.IsType<FileContentResult>(result);
             Assert.Equal("summary.txt", fileContentResult.FileDownloadName);
             Assert.Equal("text/plain", fileContentResult.ContentType);
+            _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Summary_ShouldReturnFile_OnSuccess_ForPdf()
+        {
+            _mockDocumentWorkflow.Setup(_ => _.GenerateSummaryDocumentAsync(
+                It.IsAny<EDocumentType>(), It.IsAny<string>()))
+                .ReturnsAsync(Array.Empty<byte>());
+
+            var result = await _controller.Summary(EDocumentType.Pdf, "This is some text");
+
+            var fileContentResult = Assert.IsType<FileContentResult>(result);
+            Assert.Equal("summary.pdf", fileContentResult.FileDownloadName);
+            Assert.Equal("application/pdf", fileContentResult.ContentType);
             _mockDocumentWorkflow.Verify(_ => _.GenerateSummaryDocumentAsync(It.IsAny<EDocumentType>(), It.IsAny<string>()), Times.Once);
         }
     }

@@ -28,7 +28,7 @@ namespace form_builder.Controllers.Document
 			{
 				var result = await _documentWorkflow.GenerateSummaryDocumentAsync(documentType, id);
 
-				return File(result, documentType.ToContentType(), "summary.txt");
+				return File(result, documentType.ToContentType(), $"summary.{documentType.ToString().ToLower()}");
 			}
 			catch (DocumentExpiredException ex)
 			{
