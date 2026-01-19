@@ -517,7 +517,6 @@ namespace form_builder.Utils.Startup
             services.Configure<ReCaptchaConfiguration>(configuration.GetSection(ReCaptchaConfiguration.ConfigValue));
             services.Configure<SubmissionServiceConfiguration>(configuration.GetSection(SubmissionServiceConfiguration.ConfigValue));
             services.Configure<PaymentConfiguration>(configuration.GetSection(PaymentConfiguration.ConfigValue));
-            services.Configure<ReciteMeConfiguration>(configuration.GetSection(ReciteMeConfiguration.ConfigValue));
             services.Configure<AnalyticsConfiguration>(configuration.GetSection(AnalyticsConfiguration.ConfigValue));
             services.Configure<GoogleAnalyticsConfiguration>(configuration.GetSection(GoogleAnalyticsConfiguration.ConfigValue));
             services.Configure<S3SchemaProviderConfiguration>(configuration.GetSection(S3SchemaProviderConfiguration.ConfigValue));
