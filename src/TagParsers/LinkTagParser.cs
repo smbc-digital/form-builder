@@ -20,6 +20,12 @@ namespace form_builder.TagParsers
                 if (!string.IsNullOrEmpty(element.Properties?.Text))
                     element.Properties.Text = Parse(element.Properties.Text, Regex, _htmlContent, FormatContent);
 
+                if (element.Properties?.ListItems is not null)
+                {
+                    element.Properties.ListItems = element.Properties.ListItems
+                        .Select(item => Parse(item, Regex, _htmlContent, FormatContent)).ToList();
+                }
+
                 return element;
             }).ToList();
 
