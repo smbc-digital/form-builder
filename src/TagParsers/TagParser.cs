@@ -73,5 +73,28 @@ namespace form_builder.TagParsers
 
             return value;
         }
+
+        public string Parse(string value, Regex regex)
+        {
+            var match = regex.Match(value);
+            if (match.Success)
+            {
+                var parser = match.Value.Split(":");
+                var parserType = parser[0];
+                var parserValue = parser[1];
+                var replacementText = new StringBuilder(value);
+                replacementText.Remove(match.Index - 2, match.Length + 4);
+                switch (parserType)
+                {
+                    case "STRONG":
+                        replacementText.Insert(match.Index - 2, $"<strong>{parserValue}</strong>");
+                        break;
+                }
+
+                return Parse(replacementText.ToString(), regex);
+            }
+
+            return value;
+        } 
     }
 }
