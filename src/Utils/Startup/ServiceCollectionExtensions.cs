@@ -160,6 +160,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, PaymentAmountTagParser>();
             services.AddTransient<ITagParser, CaseReferenceTagParser>();
             services.AddTransient<ITagParser, StrongTagParser>();
+            services.AddTransient<ITagParser, BoldTagParser>();
 
             return services;
         }
