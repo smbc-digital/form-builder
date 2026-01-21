@@ -104,6 +104,58 @@ namespace form_builder_tests.UnitTests.TagParsers
         }
 
         [Fact]
+        public async Task Parse_ShouldReturn_UpdatedList_WithReplacedValue()
+        {
+            // Arrange
+            var expected = _tagParser.FormatContent(new[] { "www.stockport.gov", "text" });
+
+            var element = new ElementBuilder()
+                .WithType(EElementType.UL)
+                .WithListItems(
+                [
+                    "first item",
+                    "link item {{LINK:www.stockport.gov:text}}",
+                    "last item"
+                ])
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            // Act
+            var result = await _tagParser.Parse(page, new FormAnswers());
+            var updatedItems = result.Elements.First().Properties.ListItems;
+
+            // Assert
+            Assert.Equal("first item", updatedItems[0]);
+            Assert.Equal($"link item {expected}", updatedItems[1]);
+            Assert.Equal("last item", updatedItems[2]);
+        }
+
+        [Fact]
+        public async Task Parse_ShouldReturn_InitialList_WhenNoTagsMatch()
+        {
+            var element = new ElementBuilder()
+                .WithType(EElementType.P)
+                .WithListItems(
+                [
+                    "first",
+                    "second",
+                    "third"
+                ])
+                .Build();
+
+            var page = new PageBuilder()
+                .WithElement(element)
+                .Build();
+
+            var result = await _tagParser.Parse(page, new FormAnswers());
+
+            Assert.Equal(element.Properties.ListItems, result.Elements.First().Properties.ListItems);
+        }
+
+        [Fact]
         public void ParseString_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
         {
             var text = "this has no values to be replaced";
