@@ -89,6 +89,9 @@ namespace form_builder.TagParsers
                     case "STRONG":
                         replacementText.Insert(match.Index - 2, $"<strong>{parserValue}</strong>");
                         break;
+                    case "BOLD":
+                        replacementText.Insert(match.Index - 2, $"<b>{parserValue}</b>");
+                        break;
                 }
 
                 return Parse(replacementText.ToString(), regex);

@@ -8,29 +8,29 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.TagParsers;
 
-public class StrongTagParserTests
+public class BoldTagParserTests
 {
     private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
-    private readonly StrongTagParser _tagParser;
+    private readonly BoldTagParser _tagParser;
 
-    public StrongTagParserTests()
+    public BoldTagParserTests()
     {
-        _tagParser = new StrongTagParser(_mockFormatters.Object);
+        _tagParser = new BoldTagParser(_mockFormatters.Object);
     }
 
     [Theory]
-    [InlineData("{{STRONG:text}}")]
-    [InlineData("{{STRONG:text of multiple words}}")]
+    [InlineData("{{BOLD:text}}")]
+    [InlineData("{{BOLD:text of multiple words}}")]
     public void Regex_ShouldReturnTrue_Result(string value)
     {
         Assert.True(_tagParser.Regex.Match(value).Success);
     }
 
     [Theory]
-    [InlineData("{{STRING:text}}")]
-    [InlineData("{{STRONGG:text}}")]
-    [InlineData("{{strong:text}}")]
-    [InlineData("{STRONG:text}")]
+    [InlineData("{{BALD:text}}")]
+    [InlineData("{{BOLDD:text}}")]
+    [InlineData("{{bold:text}}")]
+    [InlineData("{BOLD:text}")]
     [InlineData("{{TAG:text}}")]
     public void Regex_ShouldReturnFalse_Result(string value)
     {
@@ -78,11 +78,11 @@ public class StrongTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <strong>text</strong> should have strong tags";
+        var expectedString = "this <b>text</b> should have bold tags";
 
         var element = new ElementBuilder()
            .WithType(EElementType.P)
-           .WithPropertyText("this {{STRONG:text}} should have strong tags")
+           .WithPropertyText("this {{BOLD:text}} should have bold tags")
            .Build();
 
         var page = new PageBuilder()
@@ -98,11 +98,11 @@ public class StrongTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
     {
-        var expectedString = "this <strong>text</strong> should have strong tags";
+        var expectedString = "this <b>text</b> should have bold tags";
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
-            .WithHint("this {{STRONG:text}} should have strong tags")
+            .WithHint("this {{BOLD:text}} should have bold tags")
             .Build();
 
         var page = new PageBuilder()
@@ -118,11 +118,11 @@ public class StrongTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <strong>text</strong> should have strong tags, and so should <strong>this text</strong>";
+        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
 
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithPropertyText("this {{STRONG:text}} should have strong tags, and so should {{STRONG:this text}}")
+            .WithPropertyText("this {{BOLD:text}} should have bold tags, and so should {{BOLD:this text}}")
             .Build();
 
         var page = new PageBuilder()
@@ -162,8 +162,8 @@ public class StrongTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <strong>text</strong> should have strong tags";
-        var text = "this {{STRONG:text}} should have strong tags";
+        var expectedString = "this <b>text</b> should have bold tags";
+        var text = "this {{BOLD:text}} should have bold tags";
 
         var formAnswers = new FormAnswers();
 
@@ -175,8 +175,8 @@ public class StrongTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <strong>text</strong> should have strong tags, and so should <strong>this text</strong>";
-        var text = "this {{STRONG:text}} should have strong tags, and so should {{STRONG:this text}}";
+        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
+        var text = "this {{BOLD:text}} should have bold tags, and so should {{BOLD:this text}}";
 
         var formAnswers = new FormAnswers();
 
