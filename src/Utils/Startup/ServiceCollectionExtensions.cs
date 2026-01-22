@@ -161,6 +161,10 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, CaseReferenceTagParser>();
             services.AddTransient<ITagParser, StrongTagParser>();
             services.AddTransient<ITagParser, BoldTagParser>();
+            services.AddTransient<ITagParser, EmphasisTagParser>();
+            services.AddTransient<ITagParser, ItalicTagParser>();
+            services.AddTransient<ITagParser, BreakTagParser>();
+            services.AddTransient<ITagParser, ImageTagParser>();
 
             return services;
         }
@@ -411,6 +415,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, UploadedFilesSummaryQuestionsIsSetCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, CheckboxElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, TextboxElementCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, TagParserCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 

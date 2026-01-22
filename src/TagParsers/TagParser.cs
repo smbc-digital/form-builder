@@ -43,12 +43,12 @@ namespace form_builder.TagParsers
         }
 
 
-        public string Parse(string value, Regex regex, string data, Func<string[], string> formatContent)
+        public string Parse(string value, Regex regex, string data, Func<string[], string> formatContent, string split = ":")
         {
             var match = regex.Match(value);
             if (match.Success)
             {
-                var splitMatch = match.Value.Split(":");
+                var splitMatch = match.Value.Split(split);
                 var content = splitMatch.Skip(1).Take(splitMatch.Length - 1).ToArray();
 
                 var replacementText = new StringBuilder(value);
@@ -79,9 +79,12 @@ namespace form_builder.TagParsers
             var match = regex.Match(value);
             if (match.Success)
             {
-                var parser = match.Value.Split(":");
+                var parser = match.Value.Split("::");
                 var parserType = parser[0];
-                var parserValue = parser[1];
+                var parserValue = string.Empty;
+                if (parser.Length > 1)
+                    parserValue = parser[1];
+
                 var replacementText = new StringBuilder(value);
                 replacementText.Remove(match.Index - 2, match.Length + 4);
                 switch (parserType)
@@ -91,6 +94,15 @@ namespace form_builder.TagParsers
                         break;
                     case "BOLD":
                         replacementText.Insert(match.Index - 2, $"<b>{parserValue}</b>");
+                        break;
+                    case "EMPHASIS":
+                        replacementText.Insert(match.Index - 2, $"<em>{parserValue}</em>");
+                        break;
+                    case "ITALIC":
+                        replacementText.Insert(match.Index - 2, $"<i>{parserValue}</i>");
+                        break;
+                    case "BREAK":
+                        replacementText.Insert(match.Index - 2, "<br>");
                         break;
                 }
 

@@ -8,30 +8,30 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.TagParsers;
 
-public class BoldTagParserTests
+public class BreakTagParserTests
 {
     private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
-    private readonly BoldTagParser _tagParser;
+    private readonly BreakTagParser _tagParser;
 
-    public BoldTagParserTests()
+    public BreakTagParserTests()
     {
-        _tagParser = new BoldTagParser(_mockFormatters.Object);
+        _tagParser = new BreakTagParser(_mockFormatters.Object);
     }
 
     [Theory]
-    [InlineData("{{BOLD::text}}")]
-    [InlineData("{{BOLD::text of multiple words}}")]
+    [InlineData("{{BREAK}}")]
     public void Regex_ShouldReturnTrue_Result(string value)
     {
         Assert.True(_tagParser.Regex.Match(value).Success);
     }
 
     [Theory]
-    [InlineData("{{BALD::text}}")]
-    [InlineData("{{BOLDD::text}}")]
-    [InlineData("{{bold::text}}")]
-    [InlineData("{BOLD::text}")]
-    [InlineData("{{BOLD:text}}")]
+    [InlineData("{{BRAEK}}")]
+    [InlineData("{{BREAKK}}")]
+    [InlineData("{{break}}")]
+    [InlineData("{BREAK}")]
+    [InlineData("{{BREAK:text}}")]
+    [InlineData("{{BREAK::text}}")]
     [InlineData("{{TAG::text}}")]
     public void Regex_ShouldReturnFalse_Result(string value)
     {
@@ -79,11 +79,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = "this <br> should exist";
 
         var element = new ElementBuilder()
            .WithType(EElementType.P)
-           .WithPropertyText("this {{BOLD::text}} should have bold tags")
+           .WithPropertyText("this {{BREAK}} should exist")
            .Build();
 
         var page = new PageBuilder()
@@ -99,11 +99,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = "this <br> should exist";
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
-            .WithHint("this {{BOLD::text}} should have bold tags")
+            .WithHint("this {{BREAK}} should exist")
             .Build();
 
         var page = new PageBuilder()
@@ -119,11 +119,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
+        var expectedString = "this <br> should exist, and so should <br>";
 
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithPropertyText("this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}")
+            .WithPropertyText("this {{BREAK}} should exist, and so should {{BREAK}}")
             .Build();
 
         var page = new PageBuilder()
@@ -163,8 +163,8 @@ public class BoldTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
-        var text = "this {{BOLD::text}} should have bold tags";
+        var expectedString = "this <br> should exist";
+        var text = "this {{BREAK}} should exist";
 
         var formAnswers = new FormAnswers();
 
@@ -176,8 +176,8 @@ public class BoldTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
-        var text = "this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}";
+        var expectedString = "this <br> should exist, and so should <br>";
+        var text = "this {{BREAK}} should exist, and so should {{BREAK}}";
 
         var formAnswers = new FormAnswers();
 

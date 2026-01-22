@@ -8,34 +8,42 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.TagParsers;
 
-public class BoldTagParserTests
+public class ImageTagParserTests
 {
     private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
-    private readonly BoldTagParser _tagParser;
+    private readonly ImageTagParser _tagParser;
 
-    public BoldTagParserTests()
+    public ImageTagParserTests()
     {
-        _tagParser = new BoldTagParser(_mockFormatters.Object);
+        _tagParser = new ImageTagParser(_mockFormatters.Object);
     }
 
     [Theory]
-    [InlineData("{{BOLD::text}}")]
-    [InlineData("{{BOLD::text of multiple words}}")]
+    [InlineData("{{IMAGE::https://www.google.com::Alt Text}}")]
     public void Regex_ShouldReturnTrue_Result(string value)
     {
         Assert.True(_tagParser.Regex.Match(value).Success);
     }
 
     [Theory]
-    [InlineData("{{BALD::text}}")]
-    [InlineData("{{BOLDD::text}}")]
-    [InlineData("{{bold::text}}")]
-    [InlineData("{BOLD::text}")]
-    [InlineData("{{BOLD:text}}")]
-    [InlineData("{{TAG::text}}")]
+    [InlineData("{{IMAGE:https://www.google.com:Alt Text}}")]
+    [InlineData("{{IMG::https://www.google.com::Alt Text}}")]
+    [InlineData("{{IMAGE:ref}}")]
+    [InlineData("{IMAGE::https://www.google.com::Alt Text}")]
+    [InlineData("{{IMAGE::https://www.google.com::Alt Text}")]
+    [InlineData("{{TAG:firstname}")]
     public void Regex_ShouldReturnFalse_Result(string value)
     {
         Assert.False(_tagParser.Regex.Match(value).Success);
+    }
+
+    [Fact]
+    public void FormatContent_ShouldReturnValidFormattedText()
+    {
+        var url = "https://www.stockport.gov.uk";
+        var altText = "alt text";
+        var expectValue = string.Format(_tagParser._htmlContent, url, altText);
+        Assert.Equal(expectValue, _tagParser.FormatContent(new string[2] { url, altText }));
     }
 
     [Fact]
@@ -62,7 +70,7 @@ public class BoldTagParserTests
     {
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithPropertyText("this value {{TAG::firstname}} should not be replaced as it is invalid")
+            .WithPropertyText("this value {{TAG:firstname}} should be replaced with name question")
             .Build();
 
         var page = new PageBuilder()
@@ -77,70 +85,45 @@ public class BoldTagParserTests
     }
 
     [Fact]
-    public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+    public async Task Parse_ShouldReturn_UpdatedText_WithReplacedValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = $"this image {_tagParser.FormatContent(new string[2] { "https://www.stockport.gov", "alt text" })} should be replaced";
 
         var element = new ElementBuilder()
            .WithType(EElementType.P)
-           .WithPropertyText("this {{BOLD::text}} should have bold tags")
+           .WithPropertyText("this image {{IMAGE::https://www.stockport.gov::alt text}} should be replaced")
            .Build();
 
         var page = new PageBuilder()
             .WithElement(element)
             .Build();
 
-        var formAnswers = new FormAnswers();
-
-        var result = await _tagParser.Parse(page, formAnswers);
+        var result = await _tagParser.Parse(page, new FormAnswers());
         Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
     }
 
     [Fact]
-    public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
+    public async Task Parse_ShouldReturn_UpdatedHint_WithReplacedValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = $"this image {_tagParser.FormatContent(new string[2] { "https://www.stockport.gov", "alt text" })} should be replaced";
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
-            .WithHint("this {{BOLD::text}} should have bold tags")
+            .WithHint("this image {{IMAGE::https://www.stockport.gov::alt text}} should be replaced")
             .Build();
 
         var page = new PageBuilder()
             .WithElement(element)
             .Build();
 
-        var formAnswers = new FormAnswers();
-
-        var result = await _tagParser.Parse(page, formAnswers);
+        var result = await _tagParser.Parse(page, new FormAnswers());
         Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
-    }
-
-    [Fact]
-    public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
-    {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
-
-        var element = new ElementBuilder()
-            .WithType(EElementType.P)
-            .WithPropertyText("this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}")
-            .Build();
-
-        var page = new PageBuilder()
-            .WithElement(element)
-            .Build();
-
-        var formAnswers = new FormAnswers();
-
-        var result = await _tagParser.Parse(page, formAnswers);
-        Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
     }
 
     [Fact]
     public void ParseString_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
     {
         var text = "this has no values to be replaced";
-
         var formAnswers = new FormAnswers();
 
         var result = _tagParser.ParseString(text, formAnswers);
@@ -151,8 +134,7 @@ public class BoldTagParserTests
     [Fact]
     public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
     {
-        var text = "this value {{TAG::firstname}} should not be replaced as it is invalid";
-
+        var text = "this value {{TAG:firstname}} should be replaced with name question";
         var formAnswers = new FormAnswers();
 
         var result = _tagParser.ParseString(text, formAnswers);
@@ -161,28 +143,13 @@ public class BoldTagParserTests
     }
 
     [Fact]
-    public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+    public void ParseString_ShouldReturn_UpdatedText_WithReplacedValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
-        var text = "this {{BOLD::text}} should have bold tags";
+        var expectedString = $"this image {_tagParser.FormatContent(new string[2] { "https://www.stockport.gov", "alt text" })} should be replaced";
 
-        var formAnswers = new FormAnswers();
+        var text = "this image {{IMAGE::https://www.stockport.gov::alt text}} should be replaced";
 
-        var result = _tagParser.ParseString(text, formAnswers);
-
-        Assert.Equal(expectedString, result);
-    }
-
-    [Fact]
-    public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
-    {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
-        var text = "this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}";
-
-        var formAnswers = new FormAnswers();
-
-        var result = _tagParser.ParseString(text, formAnswers);
-
+        var result = _tagParser.ParseString(text, new FormAnswers());
         Assert.Equal(expectedString, result);
     }
 }
