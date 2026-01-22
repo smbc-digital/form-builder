@@ -8,30 +8,30 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.TagParsers;
 
-public class BoldTagParserTests
+public class EmphasisTagParserTests
 {
     private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
-    private readonly BoldTagParser _tagParser;
+    private readonly EmphasisTagParser _tagParser;
 
-    public BoldTagParserTests()
+    public EmphasisTagParserTests()
     {
-        _tagParser = new BoldTagParser(_mockFormatters.Object);
+        _tagParser = new EmphasisTagParser(_mockFormatters.Object);
     }
 
     [Theory]
-    [InlineData("{{BOLD::text}}")]
-    [InlineData("{{BOLD::text of multiple words}}")]
+    [InlineData("{{EMPHASIS::text}}")]
+    [InlineData("{{EMPHASIS::text of multiple words}}")]
     public void Regex_ShouldReturnTrue_Result(string value)
     {
         Assert.True(_tagParser.Regex.Match(value).Success);
     }
 
     [Theory]
-    [InlineData("{{BALD::text}}")]
-    [InlineData("{{BOLDD::text}}")]
-    [InlineData("{{bold::text}}")]
-    [InlineData("{BOLD::text}")]
-    [InlineData("{{BOLD:text}}")]
+    [InlineData("{{EMPHASOS::text}}")]
+    [InlineData("{{EMPHASISS::text}}")]
+    [InlineData("{{emphasis::text}}")]
+    [InlineData("{EMPHASIS::text}")]
+    [InlineData("{{EMPHASIS:text}}")]
     [InlineData("{{TAG::text}}")]
     public void Regex_ShouldReturnFalse_Result(string value)
     {
@@ -79,11 +79,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = "this <em>text</em> should have emphasis tags";
 
         var element = new ElementBuilder()
            .WithType(EElementType.P)
-           .WithPropertyText("this {{BOLD::text}} should have bold tags")
+           .WithPropertyText("this {{EMPHASIS::text}} should have emphasis tags")
            .Build();
 
         var page = new PageBuilder()
@@ -99,11 +99,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = "this <em>text</em> should have emphasis tags";
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
-            .WithHint("this {{BOLD::text}} should have bold tags")
+            .WithHint("this {{EMPHASIS::text}} should have emphasis tags")
             .Build();
 
         var page = new PageBuilder()
@@ -119,11 +119,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
+        var expectedString = "this <em>text</em> should have emphasis tags, and so should <em>this text</em>";
 
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithPropertyText("this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}")
+            .WithPropertyText("this {{EMPHASIS::text}} should have emphasis tags, and so should {{EMPHASIS::this text}}")
             .Build();
 
         var page = new PageBuilder()
@@ -163,8 +163,8 @@ public class BoldTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
-        var text = "this {{BOLD::text}} should have bold tags";
+        var expectedString = "this <em>text</em> should have emphasis tags";
+        var text = "this {{EMPHASIS::text}} should have emphasis tags";
 
         var formAnswers = new FormAnswers();
 
@@ -176,8 +176,8 @@ public class BoldTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
-        var text = "this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}";
+        var expectedString = "this <em>text</em> should have emphasis tags, and so should <em>this text</em>";
+        var text = "this {{EMPHASIS::text}} should have emphasis tags, and so should {{EMPHASIS::this text}}";
 
         var formAnswers = new FormAnswers();
 

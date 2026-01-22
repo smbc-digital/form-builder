@@ -8,30 +8,30 @@ using Xunit;
 
 namespace form_builder_tests.UnitTests.TagParsers;
 
-public class BoldTagParserTests
+public class ItalicTagParserTests
 {
     private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
-    private readonly BoldTagParser _tagParser;
+    private readonly ItalicTagParser _tagParser;
 
-    public BoldTagParserTests()
+    public ItalicTagParserTests()
     {
-        _tagParser = new BoldTagParser(_mockFormatters.Object);
+        _tagParser = new ItalicTagParser(_mockFormatters.Object);
     }
 
     [Theory]
-    [InlineData("{{BOLD::text}}")]
-    [InlineData("{{BOLD::text of multiple words}}")]
+    [InlineData("{{ITALIC::text}}")]
+    [InlineData("{{ITALIC::text of multiple words}}")]
     public void Regex_ShouldReturnTrue_Result(string value)
     {
         Assert.True(_tagParser.Regex.Match(value).Success);
     }
 
     [Theory]
-    [InlineData("{{BALD::text}}")]
-    [InlineData("{{BOLDD::text}}")]
-    [InlineData("{{bold::text}}")]
-    [InlineData("{BOLD::text}")]
-    [InlineData("{{BOLD:text}}")]
+    [InlineData("{{ITALOC::text}}")]
+    [InlineData("{{ITALICC::text}}")]
+    [InlineData("{{italic::text}}")]
+    [InlineData("{ITALIC::text}")]
+    [InlineData("{{ITALIC:text}}")]
     [InlineData("{{TAG::text}}")]
     public void Regex_ShouldReturnFalse_Result(string value)
     {
@@ -79,11 +79,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = "this <i>text</i> should have italic tags";
 
         var element = new ElementBuilder()
            .WithType(EElementType.P)
-           .WithPropertyText("this {{BOLD::text}} should have bold tags")
+           .WithPropertyText("this {{ITALIC::text}} should have italic tags")
            .Build();
 
         var page = new PageBuilder()
@@ -99,11 +99,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
+        var expectedString = "this <i>text</i> should have italic tags";
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
-            .WithHint("this {{BOLD::text}} should have bold tags")
+            .WithHint("this {{ITALIC::text}} should have italic tags")
             .Build();
 
         var page = new PageBuilder()
@@ -119,11 +119,11 @@ public class BoldTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
+        var expectedString = "this <i>text</i> should have italic tags, and so should <i>this text</i>";
 
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithPropertyText("this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}")
+            .WithPropertyText("this {{ITALIC::text}} should have italic tags, and so should {{ITALIC::this text}}")
             .Build();
 
         var page = new PageBuilder()
@@ -163,8 +163,8 @@ public class BoldTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
     {
-        var expectedString = "this <b>text</b> should have bold tags";
-        var text = "this {{BOLD::text}} should have bold tags";
+        var expectedString = "this <i>text</i> should have italic tags";
+        var text = "this {{ITALIC::text}} should have italic tags";
 
         var formAnswers = new FormAnswers();
 
@@ -176,8 +176,8 @@ public class BoldTagParserTests
     [Fact]
     public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "this <b>text</b> should have bold tags, and so should <b>this text</b>";
-        var text = "this {{BOLD::text}} should have bold tags, and so should {{BOLD::this text}}";
+        var expectedString = "this <i>text</i> should have italic tags, and so should <i>this text</i>";
+        var text = "this {{ITALIC::text}} should have italic tags, and so should {{ITALIC::this text}}";
 
         var formAnswers = new FormAnswers();
 

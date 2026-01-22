@@ -8,7 +8,7 @@ public class StrongTagParser : TagParser, ITagParser
 {
     public StrongTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
 
-    public Regex Regex => new Regex("(?<={{)STRONG:.*?(?=}})", RegexOptions.Compiled);
+    public Regex Regex => new Regex("(?<={{)STRONG::.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
     {
