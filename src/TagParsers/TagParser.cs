@@ -112,7 +112,7 @@ namespace form_builder.TagParsers
             return value;
         }
 
-        public string ParseList(string value, Regex regex, bool isNested)
+        public string ParseList(string value, Regex regex, bool noClasses)
         {
             var match = regex.Match(value);
             if (match.Success)
@@ -124,7 +124,7 @@ namespace form_builder.TagParsers
                 replacementText.Remove(match.Index - 2, match.Length + 4);
                 var listHtml = new StringBuilder();
 
-                if (isNested)
+                if (noClasses)
                     listHtml.Append(parserType.Equals("ULIST") ? "<ul>" : "<ol>");
                 else
                     listHtml.Append(parserType.Equals("ULIST") ? "<ul class='govuk-list govuk-list--bullet'>" : "<ol class='govuk-list govuk-list--number'>");
@@ -137,7 +137,7 @@ namespace form_builder.TagParsers
                 listHtml.Append(parserType.Equals("ULIST") ? "</ul>" : "</ol>");
                 replacementText.Insert(match.Index - 2, listHtml);
 
-                return ParseList(replacementText.ToString(), regex, isNested);
+                return ParseList(replacementText.ToString(), regex, noClasses);
             }
 
             return value;

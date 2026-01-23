@@ -21,7 +21,7 @@ public class ListTagParser : TagParser, ITagParser
                 element.Properties.IAG = ParseList(element.Properties.IAG, Regex, false);
 
             if (!string.IsNullOrEmpty(element.Properties?.Hint))
-                element.Properties.Hint = ParseList(element.Properties.Hint, Regex, false);
+                element.Properties.Hint = ParseList(element.Properties.Hint, Regex, true);
 
             if (element.Properties.ListItems.Any())
             {

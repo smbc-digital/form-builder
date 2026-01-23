@@ -103,11 +103,11 @@ public class ListTagParserTests
     }
 
     [Theory]
-    [InlineData("ULIST", "ul", "bullet")]
-    [InlineData("OLIST", "ol", "number")]
-    public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue(string type, string tagValue, string className)
+    [InlineData("ULIST", "ul")]
+    [InlineData("OLIST", "ol")]
+    public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue(string type, string tagValue)
     {
-        var expectedString = $"this <{tagValue} class='govuk-list govuk-list--{className}'><li>text</li><li>other text</li></{tagValue}> should have {tagValue} and li tags";
+        var expectedString = $"this <{tagValue}><li>text</li><li>other text</li></{tagValue}> should have {tagValue} and li tags";
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
@@ -147,7 +147,7 @@ public class ListTagParserTests
     [Fact]
     public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
     {
-        var expectedString = "<ul class='govuk-list govuk-list--bullet'><li>text</li></ul><ol class='govuk-list govuk-list--number'><li>text</li></ol>";
+        var expectedString = "<ul><li>text</li></ul><ol><li>text</li></ol>";
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
