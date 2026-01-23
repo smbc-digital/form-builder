@@ -110,6 +110,37 @@ namespace form_builder.TagParsers
             }
 
             return value;
-        } 
+        }
+
+        public string ParseList(string value, Regex regex, bool isNested)
+        {
+            var match = regex.Match(value);
+            if (match.Success)
+            {
+                var parser = match.Value.Split("::");
+                var parserType = parser[0];
+                var parserValue = parser[1].Split("|");
+                var replacementText = new StringBuilder(value);
+                replacementText.Remove(match.Index - 2, match.Length + 4);
+                var listHtml = new StringBuilder();
+
+                if (isNested)
+                    listHtml.Append(parserType.Equals("ULIST") ? "<ul>" : "<ol>");
+                else
+                    listHtml.Append(parserType.Equals("ULIST") ? "<ul class='govuk-list govuk-list--bullet'>" : "<ol class='govuk-list govuk-list--number'>");
+
+                foreach (var item in parserValue)
+                {
+                    listHtml.Append($"<li>{item}</li>");
+                }
+
+                listHtml.Append(parserType.Equals("ULIST") ? "</ul>" : "</ol>");
+                replacementText.Insert(match.Index - 2, listHtml);
+
+                return ParseList(replacementText.ToString(), regex, isNested);
+            }
+
+            return value;
+        }
     }
 }
