@@ -165,6 +165,7 @@ namespace form_builder.Utils.Startup
             services.AddTransient<ITagParser, ItalicTagParser>();
             services.AddTransient<ITagParser, BreakTagParser>();
             services.AddTransient<ITagParser, ImageTagParser>();
+            services.AddTransient<ITagParser, ListTagParser>();
 
             return services;
         }
@@ -416,6 +417,7 @@ namespace form_builder.Utils.Startup
             services.AddSingleton<IElementSchemaIntegrityCheck, CheckboxElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, TextboxElementCheck>();
             services.AddSingleton<IElementSchemaIntegrityCheck, TagParserCheck>();
+            services.AddSingleton<IElementSchemaIntegrityCheck, ListTagParserCheck>();
 
             services.AddSingleton<IFormSchemaIntegrityValidator, FormSchemaIntegrityValidator>();
 
