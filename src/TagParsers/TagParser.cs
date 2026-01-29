@@ -142,5 +142,47 @@ namespace form_builder.TagParsers
 
             return value;
         }
+
+        public string ParseDate(string value, Regex regex)
+        {
+            return regex.Replace(value, match =>
+            {
+                var parserValue = match.Value[8..^2];
+                var dateNow = DateTime.Now;
+
+                if (parserValue.StartsWith('+') || parserValue.StartsWith('-'))
+                {
+                    if (int.TryParse(parserValue[..^1], out var offset))
+                    {
+                        var date = parserValue[^1] switch
+                        {
+                            'y' => dateNow.AddYears(offset),
+                            'm' => dateNow.AddMonths(offset),
+                            'w' => dateNow.AddDays(offset * 7),
+                            'd' => dateNow.AddDays(offset),
+                            _ => dateNow
+                        };
+
+                        return date.ToString("dd MM yyyy");
+                    }
+                }
+
+                var parsed = parserValue.ToLower() switch
+                {
+                    "childbirthyear" => dateNow.AddYears(-15),
+                    "adultbirthyear" => dateNow.AddYears(-40),
+                    "oapbirthyear" => dateNow.AddYears(-66),
+                    "nextweek" => dateNow.AddDays(7),
+                    "nextmonth" => dateNow.AddMonths(1),
+                    "nextyear" => dateNow.AddYears(1),
+                    "lastweek" => dateNow.AddDays(-7),
+                    "lastmonth" => dateNow.AddMonths(-1),
+                    "lastyear" => dateNow.AddYears(-1),
+                    _ => dateNow
+                };
+
+                return parsed.ToString("dd MM yyyy");
+            });
+        }
     }
 }

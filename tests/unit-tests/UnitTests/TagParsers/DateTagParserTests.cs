@@ -18,21 +18,22 @@ public class DateTagParserTests
     }
 
     [Theory]
-    [InlineData("{{DATE:+5y}}")]
-    [InlineData("{{DATE:-2m}}")]
-    [InlineData("{{DATE:-4w}}")]
-    [InlineData("{{DATE:+10d}}")]
-    [InlineData("{{DATE:nextweek}}")]
-    [InlineData("{{DATE:childbirthyear}}")]
+    [InlineData("{{DATE::+5y}}")]
+    [InlineData("{{DATE::-2m}}")]
+    [InlineData("{{DATE::-4w}}")]
+    [InlineData("{{DATE::+10d}}")]
+    [InlineData("{{DATE::nextweek}}")]
+    [InlineData("{{DATE::childbirthyear}}")]
     public void Regex_ShouldReturnTrue_Result(string value)
     {
         Assert.True(_tagParser.Regex.Match(value).Success);
     }
 
     [Theory]
-    [InlineData("{{date:+5y}}")]
-    [InlineData("{{dAtE:+5y}}")]
-    [InlineData("{DATE:+5y}")]
+    [InlineData("{{date::+5y}}")]
+    [InlineData("{{dAtE::+5y}}")]
+    [InlineData("{DATE::+5y}")]
+    [InlineData("{{DATE:+5y}}")]
     [InlineData("{{DATE+5y}}")]
     [InlineData("{{TAG:+5y}}")]
     public void Regex_ShouldReturnFalse_Result(string value)
@@ -59,13 +60,13 @@ public class DateTagParserTests
     {
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithHint("this {{TAG:nextweek}} should not change")
+            .WithHint("this {{TAG::nextweek}} should not change")
             .Build();
 
         var page = new PageBuilder().WithElement(element).Build();
         var result = await _tagParser.Parse(page, new FormAnswers());
 
-        Assert.Equal("this {{TAG:nextweek}} should not change", result.Elements.First().Properties.Hint);
+        Assert.Equal("this {{TAG::nextweek}} should not change", result.Elements.First().Properties.Hint);
     }
 
     [Fact]
@@ -73,7 +74,7 @@ public class DateTagParserTests
     {
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithHint("One year from now should be {{DATE:+1y}}")
+            .WithHint("One year from now should be {{DATE::+1y}}")
             .Build();
 
         var page = new PageBuilder().WithElement(element).Build();
@@ -88,7 +89,7 @@ public class DateTagParserTests
     {
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithHint("Two months from now should be {{DATE:+2m}}")
+            .WithHint("Two months from now should be {{DATE::+2m}}")
             .Build();
 
         var page = new PageBuilder().WithElement(element).Build();
@@ -103,7 +104,7 @@ public class DateTagParserTests
     {
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithHint("Ten days from now should be {{DATE:+10d}}")
+            .WithHint("Ten days from now should be {{DATE::+10d}}")
             .Build();
 
         var page = new PageBuilder().WithElement(element).Build();
@@ -118,7 +119,7 @@ public class DateTagParserTests
     {
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithHint("Next week should be {{DATE:nextWeek}}")
+            .WithHint("Next week should be {{DATE::nextWeek}}")
             .Build();
 
         var page = new PageBuilder().WithElement(element).Build();
@@ -133,7 +134,7 @@ public class DateTagParserTests
     {
         var element = new ElementBuilder()
             .WithType(EElementType.P)
-            .WithHint("Start {{DATE:+1d}} end {{DATE:+2d}}")
+            .WithHint("Start {{DATE::+1d}} end {{DATE::+2d}}")
             .Build();
 
         var page = new PageBuilder().WithElement(element).Build();
@@ -156,7 +157,7 @@ public class DateTagParserTests
     [Fact]
     public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
     {
-        var text = "this {{TAG:nextweek}} should not change";
+        var text = "this {{TAG::nextweek}} should not change";
         var result = _tagParser.ParseString(text, new FormAnswers());
         Assert.Equal(text, result);
     }
@@ -164,7 +165,7 @@ public class DateTagParserTests
     [Fact]
     public void ParseString_ShouldReplaceMultipleValues()
     {
-        var text = "Start {{DATE:+1d}} end {{DATE:+2d}}";
+        var text = "Start {{DATE::+1d}} end {{DATE::+2d}}";
 
         var expected1 = DateTime.Now.AddDays(1).ToString("dd MM yyyy");
         var expected2 = DateTime.Now.AddDays(2).ToString("dd MM yyyy");
