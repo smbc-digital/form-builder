@@ -33,6 +33,14 @@ namespace form_builder.TagParsers
                 if (!string.IsNullOrEmpty(element.Properties?.LimitNextAvailableFromDate))
                     element.Properties.LimitNextAvailableFromDate = Parse(element.Properties.LimitNextAvailableFromDate, answersDictionary, Regex);
 
+                if (element.Properties.ListItems.Any())
+                {
+                    for (int item = 0; item < element.Properties.ListItems.Count; item++)
+                    {
+                        element.Properties.ListItems[item] = Parse(element.Properties.ListItems[item], answersDictionary, Regex);
+                    }
+                }
+
                 return element;
             }).ToList();
 

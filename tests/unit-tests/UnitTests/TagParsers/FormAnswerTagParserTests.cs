@@ -10,7 +10,6 @@ namespace form_builder_tests.UnitTests.TagParsers
 {
     public class FormAnswerTagParserTests
     {
-        private readonly IEnumerable<IFormatter> _formatters;
         private readonly Mock<IFormatter> _mockFormatter = new();
         private readonly Mock<IFormatter> _mockFormatterTwo = new();
 
@@ -18,17 +17,17 @@ namespace form_builder_tests.UnitTests.TagParsers
 
         public FormAnswerTagParserTests()
         {
-            _mockFormatter.Setup(_ => _.FormatterName).Returns("testformatter");
-            _mockFormatter.Setup(_ => _.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
-            _mockFormatterTwo.Setup(_ => _.FormatterName).Returns("anothertestformatter");
-            _mockFormatterTwo.Setup(_ => _.Parse(It.IsAny<string>())).Returns("ANOTHER-FORMATTER");
-            _formatters = new List<IFormatter>
+            _mockFormatter.Setup(mock => mock.FormatterName).Returns("testformatter");
+            _mockFormatter.Setup(mock => mock.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
+            _mockFormatterTwo.Setup(mock => mock.FormatterName).Returns("anothertestformatter");
+            _mockFormatterTwo.Setup(mock => mock.Parse(It.IsAny<string>())).Returns("ANOTHER-FORMATTER");
+            IEnumerable<IFormatter> formatters = new List<IFormatter>
             {
                 _mockFormatter.Object,
                 _mockFormatterTwo.Object
             };
 
-            _tagParser = new FormAnswerTagParser(_formatters);
+            _tagParser = new FormAnswerTagParser(formatters);
         }
 
         [Theory]
@@ -59,8 +58,14 @@ namespace form_builder_tests.UnitTests.TagParsers
                 .WithPropertyText("this has no values to be replaced")
                 .Build();
 
+            var ulElement = new ElementBuilder()
+                .WithType(EElementType.UL)
+                .WithListItems(["this item has no values to be replaced"])
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithElement(ulElement)
                 .Build();
 
             var formAnswers = new FormAnswers();
@@ -68,6 +73,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(ulElement.Properties.ListItems.First(), result.Elements.First(element => element.Type.Equals(EElementType.UL)).Properties.ListItems.First());
         }
 
         [Fact]
@@ -78,8 +84,14 @@ namespace form_builder_tests.UnitTests.TagParsers
                 .WithPropertyText("this value {{TAG:firstname}} should be replaced with name question")
                 .Build();
 
+            var ulElement = new ElementBuilder()
+                .WithType(EElementType.UL)
+                .WithListItems(["this value {{TAG:firstname}} should be replaced with name question"])
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithElement(ulElement)
                 .Build();
 
             var formAnswers = new FormAnswers();
@@ -87,6 +99,7 @@ namespace form_builder_tests.UnitTests.TagParsers
             var result = await _tagParser.Parse(page, formAnswers);
 
             Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(ulElement.Properties.ListItems.First(), result.Elements.First(element => element.Type.Equals(EElementType.UL)).Properties.ListItems.First());
         }
 
         [Fact]
@@ -99,8 +112,14 @@ namespace form_builder_tests.UnitTests.TagParsers
                .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with name question")
                .Build();
 
+            var ulElement = new ElementBuilder()
+                .WithType(EElementType.UL)
+                .WithListItems(["this value {{QUESTION:firstname}} should be replaced with name question"])
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithElement(ulElement)
                 .Build();
 
             var formAnswers = new FormAnswers
@@ -123,6 +142,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(expectedString, result.Elements.First(element => element.Type.Equals(EElementType.UL)).Properties.ListItems.First());
         }
 
         [Fact]
@@ -207,8 +227,14 @@ namespace form_builder_tests.UnitTests.TagParsers
                .WithPropertyText("this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname")
                .Build();
 
+            var ulElement = new ElementBuilder()
+                .WithType(EElementType.UL)
+                .WithListItems(["this value {{QUESTION:firstname}} should be replaced with firstname and this {{QUESTION:lastname}} with lastname"])
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithElement(ulElement)
                 .Build();
 
             var formAnswers = new FormAnswers
@@ -236,6 +262,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(expectedString, result.Elements.First(element => element.Type.Equals(EElementType.UL)).Properties.ListItems.First());
         }
 
         [Fact]
@@ -313,7 +340,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatter.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Once);
         }
 
 
@@ -351,11 +378,9 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
-            _mockFormatterTwo.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatter.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatterTwo.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Once);
         }
-
-
 
         [Fact]
         public async Task Parse_ShouldCall_Same_Formatter_MultipleTimes()
@@ -391,7 +416,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = await _tagParser.Parse(page, formAnswers);
             Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Exactly(2));
+            _mockFormatter.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -608,7 +633,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = _tagParser.ParseString(text, formAnswers);
             Assert.Equal(expectedString, result);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatter.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Once);
         }
 
 
@@ -638,11 +663,9 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = _tagParser.ParseString(text, formAnswers);
             Assert.Equal(expectedString, result);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
-            _mockFormatterTwo.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatter.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Once);
+            _mockFormatterTwo.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Once);
         }
-
-
 
         [Fact]
         public void ParseString_ShouldCall_Same_Formatter_MultipleTimes()
@@ -670,7 +693,7 @@ namespace form_builder_tests.UnitTests.TagParsers
 
             var result = _tagParser.ParseString(text, formAnswers);
             Assert.Equal(expectedString, result);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Exactly(2));
+            _mockFormatter.Verify(mock => mock.Parse(It.IsAny<string>()), Times.Exactly(2));
         }
     }
 }
