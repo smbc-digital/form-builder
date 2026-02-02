@@ -20,6 +20,9 @@ namespace form_builder.TagParsers
                 if (!string.IsNullOrEmpty(element.Properties?.Text))
                     element.Properties.Text = Parse(element.Properties.Text, Regex, _htmlContent, FormatContent);
 
+                if (!string.IsNullOrEmpty(element.Properties?.Hint))
+                    element.Properties.Hint = Parse(element.Properties.Hint, Regex, _htmlContent, FormatContent);
+
                 return element;
             }).ToList();
 

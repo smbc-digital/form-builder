@@ -54,15 +54,22 @@ namespace form_builder_tests.UnitTests.TagParsers
                 .WithPropertyText("this has no values to be replaced")
                 .Build();
 
+            var textElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithHint("this has no values to be replaced")
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithElement(textElement)
                 .Build();
 
             var formAnswers = new FormAnswers();
 
             var result = await _tagParser.Parse(page, formAnswers);
 
-            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.P)).Properties.Text);
+            Assert.Equal(textElement.Properties.Hint, result.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.Textbox)).Properties.Hint);
         }
 
         [Fact]
@@ -73,15 +80,22 @@ namespace form_builder_tests.UnitTests.TagParsers
                 .WithPropertyText("this value {{TAG:firstname}} should be replaced with name question")
                 .Build();
 
+            var textElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithHint("this value {{TAG:firstname}} should be replaced with name question")
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithElement(textElement)
                 .Build();
 
             var formAnswers = new FormAnswers();
 
             var result = await _tagParser.Parse(page, formAnswers);
 
-            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.P)).Properties.Text);
+            Assert.Equal(textElement.Properties.Hint, result.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.Textbox)).Properties.Hint);
         }
 
         [Fact]
@@ -94,12 +108,19 @@ namespace form_builder_tests.UnitTests.TagParsers
                .WithPropertyText("this link {{MAILTO:john.smith@stockport.gov.uk}} should be replaced")
                .Build();
 
+            var textElement = new ElementBuilder()
+                .WithType(EElementType.Textbox)
+                .WithHint("this link {{MAILTO:john.smith@stockport.gov.uk}} should be replaced")
+                .Build();
+
             var page = new PageBuilder()
                 .WithElement(element)
+                .WithElement(textElement)
                 .Build();
 
             var result = await _tagParser.Parse(page, new FormAnswers());
-            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.P)).Properties.Text);
+            Assert.Equal(expectedString, result.Elements.FirstOrDefault(element => element.Type.Equals(EElementType.Textbox)).Properties.Hint);
         }
 
         [Fact]
