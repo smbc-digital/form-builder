@@ -65,8 +65,17 @@ public class PaymentHelper : IPaymentHelper
             if (postUrl.URL is null || postUrl.AuthToken is null)
                 throw new Exception($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
 
-            _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-            var response = await _gateway.PostAsync(postUrl.URL, formData.Data);
+            HttpResponseMessage response;
+
+            if (postUrl.Type.Equals("flowtoken"))
+            {
+                response = await _gateway.PostAsync(postUrl.URL, formData.Data, postUrl.Type, postUrl.AuthToken);
+            }
+            else
+            {
+                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+                response = await _gateway.PostAsync(postUrl.URL, formData.Data);
+            }
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: Gateway returned unsuccessful status code {response.StatusCode}; Request: {JsonConvert.SerializeObject(formData.Data)}; Response: {JsonConvert.SerializeObject(response)}");
