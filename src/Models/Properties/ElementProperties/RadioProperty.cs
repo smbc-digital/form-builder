@@ -3,5 +3,6 @@
     public partial class BaseProperty
     {
         public bool AllowSingleOption { get; set; } = false;
+        public bool IsInline { get; set; } = false;
     }
 }
