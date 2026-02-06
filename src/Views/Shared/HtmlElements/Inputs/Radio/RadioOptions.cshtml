@@ -4,6 +4,7 @@
 	var baseCssClasses = "govuk-input";
 	var fieldsetIncrement = Model.Properties.QuestionId.Split(':').Length > 1 ? $"-{Model.Properties.QuestionId.Split(':')[1]}" : null;
 	var questionID = Model.QuestionId;
+	var radioInline = Model.Properties.IsInline ? " govuk-radios--inline" : string.Empty;
 
 	switch (Model.Properties.Width)
 	{
@@ -29,7 +30,7 @@
 		: baseCssClasses);
 }
 
-<div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? " govuk-radios--conditional" : "")" data-module="govuk-radios">
+<div class="govuk-radios@(Model.Properties.Options.Any(_ => _.HasConditionalElement) ? " govuk-radios--conditional" : "")@radioInline" data-module="govuk-radios">
 	@for (var i = 0; i < Model.Properties.Options.Count; i++)
 	{
 		@if (Model.Properties.Options[i].HasDivider)

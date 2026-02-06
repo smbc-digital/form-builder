@@ -187,6 +187,13 @@ namespace form_builder.Builders
             return this;
         }
 
+        public ElementBuilder WithIsInline(bool value)
+        {
+            _property.IsInline = value;
+
+            return this;
+        }
+
         public ElementBuilder WithDayValue(string value)
         {
             _property.Day = value;
