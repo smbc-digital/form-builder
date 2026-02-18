@@ -80,7 +80,7 @@ public class DateTagParserTests
         var page = new PageBuilder().WithElement(element).Build();
         var result = await _tagParser.Parse(page, new FormAnswers());
 
-        var expected = DateTime.Now.AddYears(1).ToString("dd MM yyyy");
+        var expected = DateTime.Now.AddYears(1).ToString("dd/MM/yyyy");
         Assert.Equal($"One year from now should be {expected}", result.Elements.First().Properties.Hint);
     }
 
@@ -95,7 +95,7 @@ public class DateTagParserTests
         var page = new PageBuilder().WithElement(element).Build();
         var result = await _tagParser.Parse(page, new FormAnswers());
 
-        var expected = DateTime.Now.AddMonths(2).ToString("dd MM yyyy");
+        var expected = DateTime.Now.AddMonths(2).ToString("dd/MM/yyyy");
         Assert.Equal($"Two months from now should be {expected}", result.Elements.First().Properties.Hint);
     }
 
@@ -110,7 +110,7 @@ public class DateTagParserTests
         var page = new PageBuilder().WithElement(element).Build();
         var result = await _tagParser.Parse(page, new FormAnswers());
 
-        var expected = DateTime.Now.AddDays(10).ToString("dd MM yyyy");
+        var expected = DateTime.Now.AddDays(10).ToString("dd/MM/yyyy");
         Assert.Equal($"Ten days from now should be {expected}", result.Elements.First().Properties.Hint);
     }
 
@@ -125,7 +125,7 @@ public class DateTagParserTests
         var page = new PageBuilder().WithElement(element).Build();
         var result = await _tagParser.Parse(page, new FormAnswers());
 
-        var expected = DateTime.Now.AddDays(7).ToString("dd MM yyyy");
+        var expected = DateTime.Now.AddDays(7).ToString("dd/MM/yyyy");
         Assert.Equal($"Next week should be {expected}", result.Elements.First().Properties.Hint);
     }
 
@@ -140,8 +140,8 @@ public class DateTagParserTests
         var page = new PageBuilder().WithElement(element).Build();
         var result = await _tagParser.Parse(page, new FormAnswers());
 
-        var expected1 = DateTime.Now.AddDays(1).ToString("dd MM yyyy");
-        var expected2 = DateTime.Now.AddDays(2).ToString("dd MM yyyy");
+        var expected1 = DateTime.Now.AddDays(1).ToString("dd/MM/yyyy");
+        var expected2 = DateTime.Now.AddDays(2).ToString("dd/MM/yyyy");
 
         Assert.Equal($"Start {expected1} end {expected2}", result.Elements.First().Properties.Hint);
     }
@@ -167,8 +167,8 @@ public class DateTagParserTests
     {
         var text = "Start {{DATE::+1d}} end {{DATE::+2d}}";
 
-        var expected1 = DateTime.Now.AddDays(1).ToString("dd MM yyyy");
-        var expected2 = DateTime.Now.AddDays(2).ToString("dd MM yyyy");
+        var expected1 = DateTime.Now.AddDays(1).ToString("dd/MM/yyyy");
+        var expected2 = DateTime.Now.AddDays(2).ToString("dd/MM/yyyy");
 
         var result = _tagParser.ParseString(text, new FormAnswers());
         Assert.Equal($"Start {expected1} end {expected2}", result);
