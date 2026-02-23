@@ -163,7 +163,7 @@ namespace form_builder.TagParsers
                             _ => dateNow
                         };
 
-                        return date.ToString("dd/MM/yyyy");
+                        return date.ToString("dd MM yyyy");
                     }
                 }
 
