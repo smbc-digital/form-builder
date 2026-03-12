@@ -62,15 +62,14 @@
         {
             <partial name="Breadcrumbs" model="@breadcrumbs" />
         }
-        
-        <partial name="ReciteMe" />
 
         @if (!Model.HideBackButton)
         {
             <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>
         }
 
-        <main class="govuk-main-wrapper " id="main-content">
+        <main class="govuk-main-wrapper" style="padding:10px;" id="main-content">
+            <partial name="ReciteMe" />
             <div class="govuk-grid-row @(Model.Embeddable ? "smbc-container-embeddable" : string.Empty)">
                 <div class="govuk-grid-column-two-thirds @embeddable">
                     @RenderBody()
