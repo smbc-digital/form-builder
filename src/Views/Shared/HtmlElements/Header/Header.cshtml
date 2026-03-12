@@ -22,11 +22,13 @@
             <div class="govuk-header__content">
                 @if (!isError)
                 {
-                    <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name">
+                    <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name govuk-grid-column-two-thirds govuk-!-padding-0">
                         @Model.FormName
                     </a>
                 }
+                <partial name="ReciteMe" />
             </div>
+            
         </div>
     </header>
 }
