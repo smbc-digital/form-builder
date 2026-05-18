@@ -276,6 +276,7 @@ namespace form_builder.Utils.Startup
         {
             services.AddSingleton<IAddressProvider, FakeAddressProvider>();
             services.AddSingleton<IAddressProvider, ServiceAddressProvider>();
+            services.AddSingleton<IAddressProvider, CRMAddressProvider>();
             services.AddSingleton<IAddressProvider, SHGAddressProvider>();
             services.AddSingleton<IAddressProvider, OSPlacesAddressProvider>();
 

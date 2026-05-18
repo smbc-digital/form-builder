@@ -5,7 +5,7 @@ namespace form_builder.Providers.Address
 {
     public class CRMAddressProvider : IAddressProvider
     {
-        public string ProviderName => "CRM";
+        public string ProviderName => "CLOUDCRM";
 
         private readonly IVerintServiceGateway _verintServiceGateway;
 
