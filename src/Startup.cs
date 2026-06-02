@@ -71,6 +71,7 @@ namespace form_builder
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
                         _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                        _.Cookie.SameSite = SameSiteMode.None;
                     })
                 .AddSession(_ =>
                 {
@@ -78,6 +79,7 @@ namespace form_builder
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
                     _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                    _.Cookie.SameSite = SameSiteMode.None;
                 });
 
             services
