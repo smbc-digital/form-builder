@@ -70,7 +70,7 @@ namespace form_builder
                 .AddAntiforgery(_ =>
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
-                        _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                        _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                         _.Cookie.SameSite = SameSiteMode.None;
                     })
                 .AddSession(_ =>
@@ -78,7 +78,7 @@ namespace form_builder
                     _.IdleTimeout = TimeSpan.FromMinutes(60);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
-                    _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                     _.Cookie.SameSite = SameSiteMode.None;
                 });
 
