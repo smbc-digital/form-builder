@@ -154,6 +154,7 @@ namespace form_builder.Utils.Startup
         public static IServiceCollection AddTagParsers(this IServiceCollection services)
         {
             services.AddTransient<ITagParser, FormAnswerTagParser>();
+            services.AddTransient<ITagParser, FormAnswerOptionalTagParser>();
             services.AddTransient<ITagParser, FormDataTagParser>();
             services.AddTransient<ITagParser, LinkTagParser>();
             services.AddTransient<ITagParser, MailToTagParser>();

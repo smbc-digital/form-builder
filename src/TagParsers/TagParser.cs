@@ -10,7 +10,7 @@ namespace form_builder.TagParsers
         private readonly IEnumerable<IFormatter> _formatters;
         public TagParser(IEnumerable<IFormatter> formatters) => _formatters = formatters;
 
-        public string Parse(string value, Dictionary<string, object> answersDictionary, Regex regex)
+        public string Parse(string value, Dictionary<string, object> answersDictionary, Regex regex, bool allowOptional = false)
         {
             var match = regex.Match(value);
             if (match.Success)
@@ -22,21 +22,31 @@ namespace form_builder.TagParsers
                 if (splitMatch.Length > 2)
                     format = splitMatch[2];
 
-                if (!answersDictionary.ContainsKey(questionId))
-                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is not stored within answers, Match value: {match.Value}");
+                if (!answersDictionary.ContainsKey(questionId) || string.IsNullOrEmpty((string)answersDictionary[questionId]))
+                {
+                    if (allowOptional)
+                    {
+                        var replacementText = new StringBuilder(value);
+                        replacementText.Remove(match.Index - 2, match.Length + 4);
+                        replacementText.Insert(match.Index - 2, string.Empty);
+                        return Parse(replacementText.ToString(), answersDictionary, regex, allowOptional);
+                    }
+
+                    if (!answersDictionary.ContainsKey(questionId))
+                        throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is not stored within answers, Match value: {match.Value}");
+
+                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is null or empty, Match value: {match.Value}");
+                }
 
                 var questionValue = (string)answersDictionary[questionId];
-
-                if (string.IsNullOrEmpty(questionValue))
-                    throw new ApplicationException($"FormAnswerTagParser::Parse, replacement value for questionId {questionId} is null or empty, Match value: {match.Value}");
 
                 if (!string.IsNullOrEmpty(format))
                     questionValue = _formatters.Get(format).Parse(questionValue);
 
-                var replacementText = new StringBuilder(value);
-                replacementText.Remove(match.Index - 2, match.Length + 4);
-                replacementText.Insert(match.Index - 2, questionValue);
-                return Parse(replacementText.ToString(), answersDictionary, regex);
+                var replacementText2 = new StringBuilder(value);
+                replacementText2.Remove(match.Index - 2, match.Length + 4);
+                replacementText2.Insert(match.Index - 2, questionValue);
+                return Parse(replacementText2.ToString(), answersDictionary, regex, allowOptional);
             }
 
             return value;
