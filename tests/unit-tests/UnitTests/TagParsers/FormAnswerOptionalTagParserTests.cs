@@ -112,7 +112,7 @@ public class FormAnswerOptionalTagParserTests
 
         var formAnswers = new FormAnswers
         {
-            Pages = new List<PageAnswers>() // ✅ prevents null
+            Pages = new List<PageAnswers>()
         };
 
         Page result = await _tagParser.Parse(page, formAnswers);

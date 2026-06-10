@@ -43,10 +43,10 @@ namespace form_builder.TagParsers
                 if (!string.IsNullOrEmpty(format))
                     questionValue = _formatters.Get(format).Parse(questionValue);
 
-                var replacementText2 = new StringBuilder(value);
-                replacementText2.Remove(match.Index - 2, match.Length + 4);
-                replacementText2.Insert(match.Index - 2, questionValue);
-                return Parse(replacementText2.ToString(), answersDictionary, regex, allowOptional);
+                var replacementText = new StringBuilder(value);
+                replacementText.Remove(match.Index - 2, match.Length + 4);
+                replacementText.Insert(match.Index - 2, questionValue);
+                return Parse(replacementText.ToString(), answersDictionary, regex, allowOptional);
             }
 
             return value;
