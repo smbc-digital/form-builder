@@ -3,6 +3,7 @@ using System.Globalization;
 using form_builder.Middleware;
 using form_builder.ModelBinders.Providers;
 using form_builder.Utils.Startup;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.FeatureManagement;
@@ -29,6 +30,12 @@ namespace form_builder
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
 
             services
                 .AddRazorViewEngineViewLocations()
@@ -70,14 +77,16 @@ namespace form_builder
                 .AddAntiforgery(_ =>
                     {
                         _.Cookie.Name = ".formbuilder.antiforgery.v2";
-                        _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                        _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                        _.Cookie.SameSite = SameSiteMode.None;
                     })
                 .AddSession(_ =>
                 {
                     _.IdleTimeout = TimeSpan.FromMinutes(60);
                     _.Cookie.Path = "/";
                     _.Cookie.Name = ".formbuilder.v2";
-                    _.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                    _.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    _.Cookie.SameSite = SameSiteMode.None;
                 });
 
             services
@@ -94,6 +103,8 @@ namespace form_builder
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders();
+
             if (env.IsEnvironment("local") || env.IsEnvironment("uitest"))
             {
                 app.UseDeveloperExceptionPage();
