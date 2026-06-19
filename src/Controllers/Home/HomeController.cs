@@ -104,7 +104,9 @@ public class HomeController : Controller
             FormName = "",
             HideBackButton = true,
             QAFormAccessToken = _qaFormAccessToken.AccessKey,
-            RequestHeaders = _httpContextAccessor.HttpContext.Request.Headers
+            RequestHeaders = _httpContextAccessor.HttpContext.Request.Headers,
+            Scheme = _httpContextAccessor.HttpContext.Request.Scheme,
+            Host = _httpContextAccessor.HttpContext.Request.Host.Value
         };
 
         return View("Home", viewModel);
