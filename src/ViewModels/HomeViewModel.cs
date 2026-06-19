@@ -14,5 +14,6 @@ namespace form_builder.ViewModels
         public bool HideBackButton { get; set; }
         public List<IncomingValue> IncomingValues { get; set; }
         public List<string> FormUrls => Forms.Select(form => form.Replace($@".\DSL\", "").Replace(".json", $"?key={QAFormAccessToken}")).ToList();
+        public IHeaderDictionary RequestHeaders { get; set; }
     }
 }

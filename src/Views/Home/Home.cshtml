@@ -24,6 +24,15 @@
 </ul>
 
 <hr style="margin: 2em 0em 2em 0em;" />
+<h2 class="govuk-heading-m">Headers</h2>
+<ul>
+    @foreach (var header in Model.RequestHeaders)
+    {
+        <li><span class="smbc-body"><strong>@header.Key:</strong> @header.Value</span></li>
+    }
+</ul>
+
+<hr style="margin: 2em 0em 2em 0em;" />
 
 <h2 class="govuk-heading-m">Forms (@Model.FormUrls.Count())</h2>
 <table style="width:100%">
@@ -38,3 +47,4 @@
         formCount++;
     }
 </table>
+
