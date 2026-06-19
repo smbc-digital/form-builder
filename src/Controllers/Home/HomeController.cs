@@ -107,6 +107,7 @@ public class HomeController : Controller
             RequestHeaders = _httpContextAccessor.HttpContext.Request.Headers,
             Scheme = _httpContextAccessor.HttpContext.Request.Scheme,
             Host = _httpContextAccessor.HttpContext.Request.Host.Value
+            RequestHeaders = _httpContextAccessor.HttpContext.Request.Headers
         };
 
         return View("Home", viewModel);
