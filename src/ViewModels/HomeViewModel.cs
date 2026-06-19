@@ -1,3 +1,4 @@
+using System.Configuration;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,5 +16,7 @@ namespace form_builder.ViewModels
         public List<IncomingValue> IncomingValues { get; set; }
         public List<string> FormUrls => Forms.Select(form => form.Replace($@".\DSL\", "").Replace(".json", $"?key={QAFormAccessToken}")).ToList();
         public IHeaderDictionary RequestHeaders { get; set; }
+        public string Scheme { get; set; }
+        public string Host  { get; set; }
     }
 }

@@ -33,8 +33,8 @@ namespace form_builder
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
-                options.ForwardedHeaders =
-                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.ForwardedHeaders = ForwardedHeaders.All;
+                options.KnownNetworks.Add(new IPNetwork(System.Net.IPAddress.Parse("10.0.0.0"), 8));
             });
 
             services
