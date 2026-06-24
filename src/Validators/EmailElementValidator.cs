@@ -20,10 +20,10 @@ namespace form_builder.Validators
 
             var value = viewModel[element.Properties.QuestionId];
             var isValid = true;
-            var regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w)+)+)$");
+            var regex = new Regex(@"^(?!.*\.\.)[A-Za-z0-9._%+-]+@([A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$");
             Match match = regex.Match(value);
 
-            if (!match.Success)
+            if (!match.Success) 
                 isValid = false;
 
             return new ValidationResult
