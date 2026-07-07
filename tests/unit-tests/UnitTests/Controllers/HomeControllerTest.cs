@@ -53,7 +53,6 @@ namespace form_builder_tests.UnitTests.Controllers
         private readonly Mock<ILogger<HomeController>> _mockLogger = new();
         private readonly Mock<IFeatureManager> _mockFeatureManager = new();
         private readonly Mock<IOptions<QAFormAccessTokenConfiguration>> _mockOptions = new();
-        private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
 
         private readonly string _qaAccessToken = Guid.NewGuid().ToString();
 
@@ -64,10 +63,6 @@ namespace form_builder_tests.UnitTests.Controllers
             _mockOptions
                 .Setup(_ => _.Value)
                 .Returns(new QAFormAccessTokenConfiguration { AccessKey = _qaAccessToken });
-
-            _mockHttpContextAccessor
-                .Setup(_ => _.HttpContext)
-                .Returns(new DefaultHttpContext());
 
             Mock<ISession> mockSession = new();
             mockSession.Setup(_ => _.IsAvailable).Returns(true);
@@ -118,8 +113,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockLogger.Object,
                 _mockSessionHelper.Object,
                 _mockFeatureManager.Object,
-                _mockOptions.Object,
-                _mockHttpContextAccessor.Object)
+                _mockOptions.Object)
 
             { TempData = tempData };
 
@@ -864,8 +858,7 @@ namespace form_builder_tests.UnitTests.Controllers
                 _mockLogger.Object,
                 _mockSessionHelper.Object,
                 _mockFeatureManager.Object,
-                _mockOptions.Object,
-                _mockHttpContextAccessor.Object);
+                _mockOptions.Object);
 
             // Act
             var result = await homeController.DataStructure("test-form");

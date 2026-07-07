@@ -14,7 +14,7 @@ namespace form_builder.Providers.Organisation
         {
             var result = await _verintServiceGateway.SearchForOrganisationByName(organisation);
 
-            return result.ResponseContent;
+            return result;
         }
     }
 }
