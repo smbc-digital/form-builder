@@ -971,7 +971,7 @@ namespace form_builder_tests.UnitTests.Services
         }
 
         [Fact]
-        public async void ProcessMonthRequest_Should_Throw_ApplicationException_When_InvalidForm()
+        public async Task ProcessMonthRequest_Should_Throw_ApplicationException_When_InvalidForm()
         {
             //
             _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
@@ -989,7 +989,7 @@ namespace form_builder_tests.UnitTests.Services
 
 
         [Fact]
-        public async void ProcessMonthRequest_Should_Should_Throw_ApplicationException_When_InvalidPath()
+        public async Task ProcessMonthRequest_Should_Should_Throw_ApplicationException_When_InvalidPath()
         {
             // Arrange
             const string form = "base-form";

@@ -15,7 +15,7 @@ namespace form_builder.Providers.Address
         {
             var response = await _verintServiceGateway.SearchForPropertyByPostcode(streetOrPostcode);
 
-            return response.ResponseContent ?? new List<AddressSearchResult>();
+            return response ?? new List<AddressSearchResult>();
         }
     }
 }

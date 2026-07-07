@@ -48,7 +48,6 @@ public class HomeController : Controller
     private readonly ISessionHelper _sessionHelper;
     private readonly IFeatureManager _featureManager;
     private readonly QAFormAccessTokenConfiguration _qaFormAccessToken;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public HomeController(IPageService pageService,
         ISchemaProvider schemaProvider,
@@ -66,8 +65,7 @@ public class HomeController : Controller
         ILogger<HomeController> logger,
         ISessionHelper sessionHelper,
         IFeatureManager featureManager,
-        IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken,
-        IHttpContextAccessor httpContextAccessor)
+        IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken)
     {
         _pageService = pageService;
         _schemaProvider = schemaProvider;
@@ -86,7 +84,6 @@ public class HomeController : Controller
         _sessionHelper = sessionHelper;
         _featureManager = featureManager;
         _qaFormAccessToken = qaFormAccessToken.Value;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     [HttpGet]
@@ -103,10 +100,7 @@ public class HomeController : Controller
             StartPageUrl = "/",
             FormName = "",
             HideBackButton = true,
-            QAFormAccessToken = _qaFormAccessToken.AccessKey,
-            RequestHeaders = _httpContextAccessor.HttpContext.Request.Headers,
-            Scheme = _httpContextAccessor.HttpContext.Request.Scheme,
-            Host = _httpContextAccessor.HttpContext.Request.Host.Value
+            QAFormAccessToken = _qaFormAccessToken.AccessKey
         };
 
         return View("Home", viewModel);

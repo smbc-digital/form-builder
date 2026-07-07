@@ -13,7 +13,7 @@ namespace form_builder.Providers.Street
         public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
         {
             var response = await _verintServiceGateway.GetStreetByReference(street);
-            return response.ResponseContent;
+            return response;
         }
     }
 }

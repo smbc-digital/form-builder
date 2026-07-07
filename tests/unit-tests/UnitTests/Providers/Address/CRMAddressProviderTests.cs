@@ -16,7 +16,10 @@ namespace form_builder_tests.UnitTests.Providers.Address
         public CRMAddressProviderTests()
         {
             _mockVerintGateway.Setup(_ => _.SearchForPropertyByPostcode(It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponse<List<AddressSearchResult>> { ResponseContent = new List<AddressSearchResult> { new AddressSearchResult { Name = "road,city,county", UniqueId = "1234567889" } } });
+                .ReturnsAsync(new List<AddressSearchResult>
+                {
+                    new AddressSearchResult { Name = "road,city,county", UniqueId = "1234567889" }
+                });
 
             _addressProvider = new CRMAddressProvider(_mockVerintGateway.Object);
         }
