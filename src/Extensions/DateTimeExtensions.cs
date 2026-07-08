@@ -1,4 +1,4 @@
-namespace form_builder.Utils.Extensions;
+namespace form_builder.Extensions;
 
 public static class DateTimeExtensions
 {

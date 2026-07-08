@@ -1,8 +1,4 @@
-﻿using form_builder.Models.Elements;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
-namespace form_builder.Helpers;
+﻿namespace form_builder.Extensions;
 
 public static class FieldsetHtmlHelperExtensions
 {

@@ -45,13 +45,10 @@ public class HomeControllerTest
     private readonly Mock<IPaymentWorkflow> _paymentWorkflow = new();
     private readonly Mock<IRedirectWorkflow> _redirectWorkflow = new();
     private readonly Mock<IFileUploadService> _mockFileUploadService = new();
-    private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
     private readonly Mock<IActionsWorkflow> _mockActionsWorkflow = new();
     private readonly Mock<ISuccessWorkflow> _mockSuccessWorkflow = new();
     private readonly Mock<IStructureMapper> _mockStructureMapper = new();
     private readonly Mock<IOptions<DataStructureConfiguration>> _mockDataStructureConfiguration = new();
-    private readonly Mock<ILogger<HomeController>> _mockLogger = new();
-    private readonly Mock<IFeatureManager> _mockFeatureManager = new();
     private readonly Mock<IOptions<QAFormAccessTokenConfiguration>> _mockOptions = new();
 
     private readonly string _qaAccessToken = Guid.NewGuid().ToString();
@@ -89,10 +86,6 @@ public class HomeControllerTest
             .Setup(_ => _.CreateBaseFormDataStructure(It.IsAny<string>()))
             .ReturnsAsync(new Dictionary<string, dynamic>());
 
-        _mockFeatureManager
-            .Setup(_ => _.IsEnabledAsync(It.IsAny<string>()))
-            .ReturnsAsync(true);
-
         _mockSchemaProvider.Setup(_ => _.IndexSchema())
             .ReturnsAsync(new List<string> { "test-form" });
 
@@ -104,15 +97,11 @@ public class HomeControllerTest
                 _paymentWorkflow.Object,
                 _redirectWorkflow.Object,
                 _mockFileUploadService.Object,
-                _mockHostingEnv.Object,
                 _mockActionsWorkflow.Object,
                 _emailWorkflow.Object,
                 _mockSuccessWorkflow.Object,
                 _mockStructureMapper.Object,
                 _mockDataStructureConfiguration.Object,
-                _mockLogger.Object,
-                _mockSessionHelper.Object,
-                _mockFeatureManager.Object,
                 _mockOptions.Object)
 
             { TempData = tempData };
@@ -132,9 +121,6 @@ public class HomeControllerTest
     [Fact]
     public async Task Home_ShouldViewResult_IFeatureToggleIsSet_ForHomeRoute()
     {
-        // Arrange
-        _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("prod");
-            
         // Act
         var result = await _homeController.Home();
 
@@ -849,15 +835,11 @@ public class HomeControllerTest
             _paymentWorkflow.Object,
             _redirectWorkflow.Object,
             _mockFileUploadService.Object,
-            _mockHostingEnv.Object,
             _mockActionsWorkflow.Object,
             _emailWorkflow.Object,
             _mockSuccessWorkflow.Object,
             _mockStructureMapper.Object,
             _mockDataStructureConfiguration.Object,
-            _mockLogger.Object,
-            _mockSessionHelper.Object,
-            _mockFeatureManager.Object,
             _mockOptions.Object);
 
         // Act

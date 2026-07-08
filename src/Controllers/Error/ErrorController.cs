@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
-
-namespace form_builder.Controllers;
+namespace form_builder.Controllers.Error;
 
 [Route("error")]
 public class ErrorController : Controller

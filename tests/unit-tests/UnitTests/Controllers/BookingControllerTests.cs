@@ -1,5 +1,5 @@
 ﻿using form_builder.Builders;
-using form_builder.Controllers;
+using form_builder.Controllers.Booking;
 using form_builder.Enum;
 using form_builder.Exceptions;
 using form_builder.Factories.Schema;

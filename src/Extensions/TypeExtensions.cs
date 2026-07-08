@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace form_builder.Extensions;
+﻿namespace form_builder.Extensions;
 
 public static class TypeExtensions
 {

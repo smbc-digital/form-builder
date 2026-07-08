@@ -1,4 +1,4 @@
-using form_builder.Utils.Extensions;
+using form_builder.Extensions;
 using Xunit;
 
 namespace form_builder_tests.UnitTests.Extensions;

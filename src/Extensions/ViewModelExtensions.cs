@@ -1,6 +1,4 @@
-﻿using form_builder.Constants;
-
-namespace form_builder.Extensions;
+﻿namespace form_builder.Extensions;
 
 public static class ViewModelExtensions
 {

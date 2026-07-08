@@ -16,7 +16,7 @@ using form_builder.Services.BookingService.Entities;
 using form_builder.Services.MappingService;
 using form_builder.Services.PageService.Entities;
 using form_builder.TagParsers;
-using form_builder.Utils.Extensions;
+using form_builder.Extensions;
 using form_builder.Utils.Hash;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;

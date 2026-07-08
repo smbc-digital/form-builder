@@ -1,4 +1,4 @@
-﻿using form_builder.Controllers;
+﻿using form_builder.Controllers.Healthcheck;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
