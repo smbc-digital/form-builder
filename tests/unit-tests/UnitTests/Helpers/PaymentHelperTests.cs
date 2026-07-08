@@ -10,6 +10,7 @@ using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
 using form_builder_tests.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
 using StockportGovUK.NetStandard.Gateways;
 using Xunit;
@@ -24,6 +25,7 @@ namespace form_builder_tests.UnitTests.Helpers
         private readonly Mock<ISessionHelper> _mockSessionHelper = new();
         private readonly Mock<IMappingService> _mockMappingService = new();
         private readonly Mock<IWebHostEnvironment> _mockHostingEnvironment = new();
+        private readonly Mock<IOptions<PaymentConfiguration>> _mockPaymentConfiguration = new();
 
         private readonly MappingEntity _mappingEntity;
 
@@ -100,11 +102,32 @@ namespace form_builder_tests.UnitTests.Helpers
                 .WithData(new object())
                 .Build();
 
-            _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
-            _mockMappingService.Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
+            _mockSessionHelper
+                .Setup(_ => _.GetBrowserSessionId())
+                .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
+
+            _mockMappingService
+                .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
                 .ReturnsAsync(_mappingEntity);
-            _mockHostingEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
-            _paymentHelper = new PaymentHelper(_mockGateway.Object, _mockSessionHelper.Object, _mockMappingService.Object, _mockHostingEnvironment.Object, _mockPaymentConfigProvider.Object);
+
+            _mockHostingEnvironment
+                .Setup(_ => _.EnvironmentName)
+                .Returns("local");
+
+            _mockPaymentConfiguration
+                .Setup(_ => _.Value)
+                .Returns(
+                    new PaymentConfiguration
+                    {
+                        FakePaymentCalculation = false
+                    });
+
+            _paymentHelper = new PaymentHelper(_mockGateway.Object,
+                _mockSessionHelper.Object,
+                _mockMappingService.Object,
+                _mockHostingEnvironment.Object,
+                _mockPaymentConfigProvider.Object,
+                _mockPaymentConfiguration.Object);
         }
 
         [Fact]

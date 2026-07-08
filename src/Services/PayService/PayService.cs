@@ -34,6 +34,7 @@ namespace form_builder.Services.PayService
         private readonly IPageHelper _pageHelper;
         private readonly IPaymentHelper _paymentHelper;
         private readonly PaymentConfiguration _paymentConfiguration;
+        private readonly SubmissionServiceConfiguration _submissionServiceConfiguration;
         private readonly IEnumerable<ITagParser> _tagParsers;
         private readonly IMailingServiceProxyGateway _mailingServiceGateway;
         private readonly ErrorEmailConfiguration _errorEmailConfiguration;
@@ -48,6 +49,7 @@ namespace form_builder.Services.PayService
             IPageHelper pageHelper,
             IPaymentHelper paymentHelper,
             IOptions<PaymentConfiguration> paymentConfiguration,
+            IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
             IEnumerable<ITagParser> tagParsers,
             IMailingServiceProxyGateway mailingServiceGateway,
             IOptions<ErrorEmailConfiguration> errorEmailConfiguration)
@@ -61,6 +63,7 @@ namespace form_builder.Services.PayService
             _pageHelper = pageHelper;
             _paymentHelper = paymentHelper;
             _paymentConfiguration = paymentConfiguration.Value;
+            _submissionServiceConfiguration = submissionServiceConfiguration.Value;
             _tagParsers = tagParsers;
             _mailingServiceGateway = mailingServiceGateway;
             _errorEmailConfiguration = errorEmailConfiguration.Value;
@@ -144,6 +147,12 @@ namespace form_builder.Services.PayService
 
         private async Task<HttpResponseMessage> HandleCallback(EPaymentStatus paymentStatus, string reference, string callbackUrl)
         {
+            if (_submissionServiceConfiguration.FakeSubmission)
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK
+                };
+
             try
             {
                 var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });

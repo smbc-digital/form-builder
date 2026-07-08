@@ -5,6 +5,7 @@ using form_builder.Models;
 using form_builder.Providers.Transforms.PaymentConfiguration;
 using form_builder.Services.MappingService;
 using form_builder.Services.MappingService.Entities;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 
@@ -17,20 +18,22 @@ public class PaymentHelper : IPaymentHelper
     private readonly ISessionHelper _sessionHelper;
     private readonly IMappingService _mappingService;
     private readonly IWebHostEnvironment _hostingEnvironment;
-
+    private readonly PaymentConfiguration _paymentConfiguration;
 
     public PaymentHelper(
         IGateway gateway,
         ISessionHelper sessionHelper,
         IMappingService mappingService,
         IWebHostEnvironment hostingEnvironment,
-        IPaymentConfigurationTransformDataProvider paymentConfigProvider)
+        IPaymentConfigurationTransformDataProvider paymentConfigProvider,
+        IOptions<PaymentConfiguration> paymentConfiguration)
     {
         _gateway = gateway;
         _sessionHelper = sessionHelper;
         _mappingService = mappingService;
         _hostingEnvironment = hostingEnvironment;
         _paymentConfigProvider = paymentConfigProvider;
+        _paymentConfiguration = paymentConfiguration.Value;
     }
 
     public async Task<PaymentInformation> GetFormPaymentInformation(string formName, FormAnswers formAnswers, FormSchema baseForm)
@@ -58,6 +61,9 @@ public class PaymentHelper : IPaymentHelper
 
     private async Task<string> GetPaymentAmountAsync(MappingEntity formData, PaymentInformation formPaymentConfig)
     {
+        if (_paymentConfiguration.FakePaymentCalculation)
+            return "0.01";
+
         try
         {
             var postUrl = formPaymentConfig.Settings.CalculationSlug;

@@ -41,6 +41,7 @@ namespace form_builder_tests.UnitTests.Services
         private readonly Mock<IEnumerable<ITagParser>> _mockTagParsers = new();
         private readonly Mock<ITagParser> _tagParser = new();
         private readonly Mock<IOptions<PaymentConfiguration>> _mockPaymentConfiguration = new();
+        private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockSubmissionServiceConfiguration = new();
         private readonly Mock<IMailingServiceProxyGateway> _mockMailingServiceGateway = new();
         private readonly Mock<IOptions<ErrorEmailConfiguration>> _mockErrorEmailConfiguration = new();
 
@@ -141,6 +142,14 @@ namespace form_builder_tests.UnitTests.Services
                         FakePayment = false
                     });
 
+            _mockSubmissionServiceConfiguration
+                .Setup(_ => _.Value)
+                .Returns(
+                    new SubmissionServiceConfiguration
+                    {
+                        FakeSubmission = false
+                    });
+
             _mockErrorEmailConfiguration
                 .Setup(configuration => configuration.Value)
                 .Returns(new ErrorEmailConfiguration
@@ -157,6 +166,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockPageHelper.Object,
                 _mockPaymentHelper.Object,
                 _mockPaymentConfiguration.Object,
+                _mockSubmissionServiceConfiguration.Object,
                 _mockTagParsers.Object,
                 _mockMailingServiceGateway.Object,
                 _mockErrorEmailConfiguration.Object);
@@ -700,6 +710,7 @@ namespace form_builder_tests.UnitTests.Services
                 _mockPageHelper.Object,
                 _mockPaymentHelper.Object,
                 _mockPaymentConfiguration.Object,
+                _mockSubmissionServiceConfiguration.Object,
                 _mockTagParsers.Object,
                 _mockMailingServiceGateway.Object,
                 _mockErrorEmailConfiguration.Object);

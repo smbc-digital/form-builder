@@ -7,5 +7,6 @@ namespace form_builder.Configuration
         public readonly string FakeProviderName = "Fake";
 
         public bool FakePayment { get; set; } = false;
+        public bool FakePaymentCalculation { get; set; } = false;
     }
 }
