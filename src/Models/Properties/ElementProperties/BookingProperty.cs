@@ -1,17 +1,16 @@
-namespace form_builder.Models.Properties.ElementProperties
+namespace form_builder.Models.Properties.ElementProperties;
+
+public partial class BaseProperty
 {
-    public partial class BaseProperty
-    {
-        public string BookingProvider { get; set; }
-        public int SearchPeriod = 12;
-        public List<AppointmentType> AppointmentTypes { get; set; } = new List<AppointmentType>();
-        public bool CheckYourBooking { get; set; }
-        public string AppointmentTime { get; set; }
-        public string NextAvailableIAG { get; set; } = "This is the next available appointment.";
-        public string NoAvailableTimeForBookingType { get; set; } = "appointments";
-        public string CustomerAddressId { get; set; }
-        public bool AutoConfirm { get; set; }
-        public int LimitNextAvailableByDays { get; set; }
-        public string LimitNextAvailableFromDate { get; set; }
-    }
+    public string BookingProvider { get; set; }
+    public int SearchPeriod = 12;
+    public List<AppointmentType> AppointmentTypes { get; set; } = new List<AppointmentType>();
+    public bool CheckYourBooking { get; set; }
+    public string AppointmentTime { get; set; }
+    public string NextAvailableIAG { get; set; } = "This is the next available appointment.";
+    public string NoAvailableTimeForBookingType { get; set; } = "appointments";
+    public string CustomerAddressId { get; set; }
+    public bool AutoConfirm { get; set; }
+    public int LimitNextAvailableByDays { get; set; }
+    public string LimitNextAvailableFromDate { get; set; }
 }

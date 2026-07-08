@@ -1,8 +1,7 @@
-namespace form_builder.Configuration
+namespace form_builder.Configuration;
+
+public class DistributedCacheConfiguration
 {
-    public class DistributedCacheConfiguration
-    {
-        public const string ConfigValue = "UseDistributedCache";
-        public bool UseDistributedCache { get; set; }
-    }
+    public const string ConfigValue = "UseDistributedCache";
+    public bool UseDistributedCache { get; set; }
 }

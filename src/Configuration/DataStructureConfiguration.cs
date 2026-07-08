@@ -1,8 +1,7 @@
-﻿namespace form_builder.Configuration
+﻿namespace form_builder.Configuration;
+
+public class DataStructureConfiguration
 {
-    public class DataStructureConfiguration
-    {
-        public const string ConfigValue = "DataStructureEnabled";
-        public bool IsEnabled { get; set; }
-    }
+    public const string ConfigValue = "DataStructureEnabled";
+    public bool IsEnabled { get; set; }
 }

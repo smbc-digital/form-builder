@@ -23,52 +23,35 @@ using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Services.EmailSubmitService;
 
-public class EmailSubmitService : IEmailSubmitService
+public class EmailSubmitService(
+    IMappingService mappingService,
+    IEmailHelper emailHelper,
+    IElementMapper elementMapper,
+    ISessionHelper sessionHelper,
+    IPageHelper pageHelper,
+    IEmailProvider emailProvider,
+    IReferenceNumberProvider referenceNumberProvider,
+    IDocumentSummaryService documentSummaryService,
+    IEnumerable<ITagParser> tagParsers,
+    ILogger<EmailSubmitService> logger,
+    IGateway gateway,
+    IWebHostEnvironment hostingEnvironment,
+    IOptions<PowerAutomateConfiguration> configuration)
+    : IEmailSubmitService
 {
-    private readonly IMappingService _mappingService;
-    private readonly IElementMapper _elementMapper;
-    private readonly IEmailHelper _emailHelper;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IEmailProvider _emailProvider;
-    private readonly IPageHelper _pageHelper;
-    private readonly IDocumentSummaryService _documentSummaryService;
-    private readonly IReferenceNumberProvider _referenceNumberProvider;
-    private readonly IEnumerable<ITagParser> _tagParsers;
-    private readonly ILogger<EmailSubmitService> _logger;
-    private readonly IGateway _gateway;
-    private readonly IWebHostEnvironment _hostingEnvironment;
-    private IOptions<PowerAutomateConfiguration> _configuration;
-
-    public EmailSubmitService(
-        IMappingService mappingService,
-        IEmailHelper emailHelper,
-        IElementMapper elementMapper,
-        ISessionHelper sessionHelper,
-        IPageHelper pageHelper,
-        IEmailProvider emailProvider,
-        IReferenceNumberProvider referenceNumberProvider,
-        IDocumentSummaryService documentSummaryService,
-        IEnumerable<ITagParser> tagParsers,
-        ILogger<EmailSubmitService> logger,
-        IGateway gateway,
-        IWebHostEnvironment hostingEnvironment,
-        IOptions<PowerAutomateConfiguration> configuration
-    )
-    {
-        _mappingService = mappingService;
-        _emailHelper = emailHelper;
-        _elementMapper = elementMapper;
-        _pageHelper = pageHelper;
-        _sessionHelper = sessionHelper;
-        _emailProvider = emailProvider;
-        _referenceNumberProvider = referenceNumberProvider;
-        _documentSummaryService = documentSummaryService;
-        _tagParsers = tagParsers;
-        _logger = logger;
-        _gateway = gateway;
-        _hostingEnvironment = hostingEnvironment;
-        _configuration = configuration;
-    }
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly IElementMapper _elementMapper = elementMapper;
+    private readonly IEmailHelper _emailHelper = emailHelper;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IEmailProvider _emailProvider = emailProvider;
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IDocumentSummaryService _documentSummaryService = documentSummaryService;
+    private readonly IReferenceNumberProvider _referenceNumberProvider = referenceNumberProvider;
+    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
+    private readonly ILogger<EmailSubmitService> _logger = logger;
+    private readonly IGateway _gateway = gateway;
+    private readonly IWebHostEnvironment _hostingEnvironment = hostingEnvironment;
+    private IOptions<PowerAutomateConfiguration> _configuration = configuration;
 
     public async Task<string> EmailSubmission(MappingEntity data, string form, string cacheKey)
     {

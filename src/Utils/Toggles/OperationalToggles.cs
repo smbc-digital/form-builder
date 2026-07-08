@@ -1,7 +1,6 @@
-namespace form_builder.Utils.Toggles
+namespace form_builder.Utils.Toggles;
+
+public static class OperationalToggles
 {
-    public static class OperationalToggles
-    {
-        public const string MyToggle = "MyToggle";
-    }
+    public const string MyToggle = "MyToggle";
 }

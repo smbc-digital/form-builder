@@ -1,9 +1,8 @@
 ﻿using form_builder.Enum;
 
-namespace form_builder.Workflows.DocumentWorkflow
+namespace form_builder.Workflows.DocumentWorkflow;
+
+public interface IDocumentWorkflow
 {
-    public interface IDocumentWorkflow
-    {
-        Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, string id);
-    }
+    Task<byte[]> GenerateSummaryDocumentAsync(EDocumentType documentType, string id);
 }

@@ -3,19 +3,17 @@ using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using StockportGovUK.NetStandard.Gateways.Models.Street;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 
-namespace form_builder.Providers.Street
+namespace form_builder.Providers.Street;
+
+public class ServiceStreetProvider(IStreetServiceGateway streetServiceGateway) : IStreetProvider
 {
-    public class ServiceStreetProvider : IStreetProvider
+    public string ProviderName => "CRM";
+
+    private readonly IStreetServiceGateway _streetServiceGateway = streetServiceGateway;
+
+    public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
     {
-        public string ProviderName => "CRM";
-
-        private readonly IStreetServiceGateway _streetServiceGateway;
-        public ServiceStreetProvider(IStreetServiceGateway streetServiceGateway) => _streetServiceGateway = streetServiceGateway;
-
-        public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
-        {
-            var response = await _streetServiceGateway.SearchAsync(new StreetSearch { StreetProvider = EStreetProvider.CRM, SearchTerm = street });
-            return response.ResponseContent;
-        }
+        var response = await _streetServiceGateway.SearchAsync(new StreetSearch { StreetProvider = EStreetProvider.CRM, SearchTerm = street });
+        return response.ResponseContent;
     }
 }

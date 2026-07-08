@@ -1,11 +1,10 @@
-﻿namespace form_builder.Models.Properties.ElementProperties
+﻿namespace form_builder.Models.Properties.ElementProperties;
+
+public partial class BaseProperty
 {
-    public partial class BaseProperty
-    {
-        public int MaxCombinedFileSize { get; set; }
+    public int MaxCombinedFileSize { get; set; }
 
-        public string PageSubmitButtonLabel { get; set; }
+    public string PageSubmitButtonLabel { get; set; }
 
-        public bool DisplayReCaptcha { get; set; } = false;
-    }
+    public bool DisplayReCaptcha { get; set; } = false;
 }

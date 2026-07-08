@@ -3,65 +3,64 @@ using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators
+namespace form_builder_tests.UnitTests.Validators;
+
+public class AutomaticAddressElementValidatorTests
 {
-    public class AutomaticAddressElementValidatorTests
+    private readonly AutomaticAddressElementValidator _automaticAddressElementValidator = new AutomaticAddressElementValidator();
+
+    [Fact]
+    public void Validate_ShouldReturnTrue_WhenDoesNotContainerAddressKey()
     {
-        private readonly AutomaticAddressElementValidator _automaticAddressElementValidator = new AutomaticAddressElementValidator();
+        // Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Address)
+            .Build();
 
-        [Fact]
-        public void Validate_ShouldReturnTrue_WhenDoesNotContainerAddressKey()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .Build();
+        var viewModel = new Dictionary<string, dynamic>();
 
-            var viewModel = new Dictionary<string, dynamic>();
+        // Act
+        var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            // Act
-            var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+        // Assert
+        Assert.True(result.IsValid);
+    }
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+    [Fact]
+    public void Validate_ShouldValidateUPRN_WhenKeySupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("testaddress")
+            .WithType(EElementType.Address)
+            .Build();
 
-        [Fact]
-        public void Validate_ShouldValidateUPRN_WhenKeySupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("testaddress")
-                .WithType(EElementType.Address)
-                .Build();
+        var viewModel = new Dictionary<string, dynamic>();
+        viewModel.Add("testaddress-address", "234567434567");
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("testaddress-address", "234567434567");
+        // Act
+        var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            // Act
-            var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+        // Assert
+        Assert.True(result.IsValid);
+    }
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+    [Fact]
+    public void Validate_ShouldReturnFalse_WhenInvalidUPRN()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("testaddress")
+            .WithType(EElementType.Address)
+            .Build();
 
-        [Fact]
-        public void Validate_ShouldReturnFalse_WhenInvalidUPRN()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("testaddress")
-                .WithType(EElementType.Address)
-                .Build();
+        var viewModel = new Dictionary<string, dynamic>();
+        viewModel.Add("testaddress-address", "566");
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("testaddress-address", "566");
+        // Act
+        var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            // Act
-            var result = _automaticAddressElementValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            // Assert
-            Assert.False(result.IsValid);
-        }
+        // Assert
+        Assert.False(result.IsValid);
     }
 }

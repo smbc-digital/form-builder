@@ -9,83 +9,82 @@ using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Models.Elements
+namespace form_builder_tests.UnitTests.Models.Elements;
+
+public class MapTests
 {
-    public class MapTests
+    private readonly Mock<IViewRender> _mockIViewRender = new();
+    private readonly Mock<IElementHelper> _mockElementHelper = new();
+    private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+
+    [Fact]
+    public async Task RenderAsync_ShouldCall_PageHelper_ToGetCurrentValue()
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new();
-        private readonly Mock<IElementHelper> _mockElementHelper = new();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        //Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Map)
+            .Build();
 
-        [Fact]
-        public async Task RenderAsync_ShouldCall_PageHelper_ToGetCurrentValue()
-        {
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Map)
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
+        var viewModel = new Dictionary<string, dynamic>();
 
-            var viewModel = new Dictionary<string, dynamic>();
+        var schema = new FormSchemaBuilder()
+            .WithName("form-name")
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
+        var formAnswers = new FormAnswers();
 
-            var formAnswers = new FormAnswers();
+        //Act
+        await element.RenderAsync(
+            _mockIViewRender.Object,
+            _mockElementHelper.Object,
+            string.Empty,
+            viewModel,
+            page,
+            schema,
+            _mockHostingEnv.Object,
+            formAnswers);
 
-            //Act
-            await element.RenderAsync(
-                _mockIViewRender.Object,
-                _mockElementHelper.Object,
-                string.Empty,
-                viewModel,
-                page,
-                schema,
-                _mockHostingEnv.Object,
-                formAnswers);
+        //Assert
+        _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Map")), It.IsAny<Map>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Once);
+    }
 
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("Map")), It.IsAny<Map>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.CurrentValue<object>(It.IsAny<string>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormAnswers>(), It.IsAny<string>()), Times.Once);
-        }
+    [Fact]
+    public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_IsDefined()
+    {
+        var label = "Custom label";
+        //Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Map)
+            .WithQuestionId("map-test")
+            .WithSummaryLabel(label)
+            .Build();
 
-        [Fact]
-        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_IsDefined()
-        {
-            var label = "Custom label";
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Map)
-                .WithQuestionId("map-test")
-                .WithSummaryLabel(label)
-                .Build();
+        //Act
+        var result = element.GetLabelText(string.Empty);
 
-            //Act
-            var result = element.GetLabelText(string.Empty);
+        //Assert
+        Assert.Equal(label, result);
+    }
 
-            //Assert
-            Assert.Equal(label, result);
-        }
+    [Fact]
+    public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_Is_Not_Defined()
+    {
+        var elementTitle = "Map";
+        //Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Map)
+            .WithQuestionId("map-test")
+            .Build();
 
-        [Fact]
-        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_Is_Not_Defined()
-        {
-            var elementTitle = "Map";
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Map)
-                .WithQuestionId("map-test")
-                .Build();
+        //Act
+        var result = element.GetLabelText(string.Empty);
 
-            //Act
-            var result = element.GetLabelText(string.Empty);
-
-            //Assert
-            Assert.Equal(elementTitle, result);
-        }
+        //Assert
+        Assert.Equal(elementTitle, result);
     }
 }

@@ -2,136 +2,135 @@ using form_builder.Models;
 using form_builder.Models.Elements;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Models.Elements
+namespace form_builder_tests.UnitTests.Models.Elements;
+
+public class DatePickerTests
 {
-    public class DatePickerTests
+    [Fact]
+    public void GetDate_ShouldThrowException_IfDateIsIncorrectlyFormatted()
     {
-        [Fact]
-        public void GetDate_ShouldThrowException_IfDateIsIncorrectlyFormatted()
+        var viewModel = new Dictionary<string, dynamic>()
         {
-            var viewModel = new Dictionary<string, dynamic>()
+            { "test-date", "ABC123" }
+        };
+
+        Assert.Throws<FormatException>(() => DatePicker.GetDate(viewModel, "test-date"));
+    }
+
+    [Fact]
+    public void GetDate_ReturnCorrectDate()
+    {
+        var viewModel = new Dictionary<string, dynamic>()
+        {
+            { "test-date", "01/01/2020" }
+        };
+
+        var result = DatePicker.GetDate(viewModel, "test-date");
+        Assert.True(result.HasValue);
+        Assert.True(result.Value == new DateTime(2020, 1, 1));
+    }
+
+    [Fact]
+    public void GetDate_ReturnNull_IfKeyNotPresent()
+    {
+        var viewModel = new Dictionary<string, dynamic>();
+        DateTime? result = DatePicker.GetDate(viewModel, "test-date");
+        Assert.False(result.HasValue);
+    }
+
+    [Fact]
+    public void GetDate_ReturnNull_IfKeyPresentButValueIsEmpty()
+    {
+        var viewModel = new Dictionary<string, dynamic>
+        {
+            { "test-date", "" }
+        };
+
+        DateTime? result = DatePicker.GetDate(viewModel, "test-date");
+        Assert.False(result.HasValue);
+    }
+
+    [Fact]
+    public void GetDate_WithFormAnswers_ReturnCorrectDate()
+    {
+        var formAnswers = new FormAnswers
+        {
+            Pages = new List<PageAnswers>
             {
-                { "test-date", "ABC123" }
-            };
-
-            Assert.Throws<FormatException>(() => DatePicker.GetDate(viewModel, "test-date"));
-        }
-
-        [Fact]
-        public void GetDate_ReturnCorrectDate()
-        {
-            var viewModel = new Dictionary<string, dynamic>()
-            {
-                { "test-date", "01/01/2020" }
-            };
-
-            var result = DatePicker.GetDate(viewModel, "test-date");
-            Assert.True(result.HasValue);
-            Assert.True(result.Value == new DateTime(2020, 1, 1));
-        }
-
-        [Fact]
-        public void GetDate_ReturnNull_IfKeyNotPresent()
-        {
-            var viewModel = new Dictionary<string, dynamic>();
-            DateTime? result = DatePicker.GetDate(viewModel, "test-date");
-            Assert.False(result.HasValue);
-        }
-
-        [Fact]
-        public void GetDate_ReturnNull_IfKeyPresentButValueIsEmpty()
-        {
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "test-date", "" }
-            };
-
-            DateTime? result = DatePicker.GetDate(viewModel, "test-date");
-            Assert.False(result.HasValue);
-        }
-
-        [Fact]
-        public void GetDate_WithFormAnswers_ReturnCorrectDate()
-        {
-            var formAnswers = new FormAnswers
-            {
-                Pages = new List<PageAnswers>
+                new PageAnswers
                 {
-                    new PageAnswers
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new Answers
                         {
-                            new Answers
-                            {
-                                QuestionId = "test-date",
-                                Response = "01/01/2020"
-                            }
-
+                            QuestionId = "test-date",
+                            Response = "01/01/2020"
                         }
+
                     }
                 }
-            };
+            }
+        };
 
-            var result = DatePicker.GetDate(formAnswers, "test-date");
-            Assert.True(result.HasValue);
-            Assert.True(result.Value == new DateTime(2020, 1, 1));
-        }
+        var result = DatePicker.GetDate(formAnswers, "test-date");
+        Assert.True(result.HasValue);
+        Assert.True(result.Value == new DateTime(2020, 1, 1));
+    }
 
-        [Fact]
-        public void GetDate_WithFormAnswers_ShouldThrowException_IfDateIsIncorrectlyFormatted()
+    [Fact]
+    public void GetDate_WithFormAnswers_ShouldThrowException_IfDateIsIncorrectlyFormatted()
+    {
+        var formAnswers = new FormAnswers
         {
-            var formAnswers = new FormAnswers
+            Pages = new List<PageAnswers>
             {
-                Pages = new List<PageAnswers>
-                {
-                    new PageAnswers{
-                        Answers = new List<Answers>
-                        {
-                            new Answers
-                            {
-                                QuestionId = "test-date",
-                                Response = "ABC123"
-                            }
-                        }
-                    }
-                }
-            };
-
-            Assert.Throws<FormatException>(() => DatePicker.GetDate(formAnswers, "test-date"));
-        }
-
-        [Fact]
-        public void GetDate_WithFormAnswers_ShouldReturnNull_IfAnswersIsNotPresent()
-        {
-            var formAnswers = new FormAnswers
-            {
-                Pages = new List<PageAnswers>
-                {
-                    new PageAnswers{ Answers = new List<Answers>() }
-                }
-            };
-
-            Assert.False(DatePicker.GetDate(formAnswers, "test-date").HasValue);
-        }
-
-        [Fact]
-        public void GetDate_WithFormAnswers_ShouldReturnNull_IfAnswersPresent_AndEmpty()
-        {
-            var formAnswers = new FormAnswers
-            {
-                Pages = new List<PageAnswers>
-                {
-                    new PageAnswers
+                new PageAnswers{
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new Answers
                         {
-                            new Answers{ QuestionId = "test-date" }
+                            QuestionId = "test-date",
+                            Response = "ABC123"
                         }
                     }
                 }
-            };
+            }
+        };
 
-            Assert.False(DatePicker.GetDate(formAnswers, "test-date").HasValue);
-        }
+        Assert.Throws<FormatException>(() => DatePicker.GetDate(formAnswers, "test-date"));
+    }
+
+    [Fact]
+    public void GetDate_WithFormAnswers_ShouldReturnNull_IfAnswersIsNotPresent()
+    {
+        var formAnswers = new FormAnswers
+        {
+            Pages = new List<PageAnswers>
+            {
+                new PageAnswers{ Answers = new List<Answers>() }
+            }
+        };
+
+        Assert.False(DatePicker.GetDate(formAnswers, "test-date").HasValue);
+    }
+
+    [Fact]
+    public void GetDate_WithFormAnswers_ShouldReturnNull_IfAnswersPresent_AndEmpty()
+    {
+        var formAnswers = new FormAnswers
+        {
+            Pages = new List<PageAnswers>
+            {
+                new PageAnswers
+                {
+                    Answers = new List<Answers>
+                    {
+                        new Answers{ QuestionId = "test-date" }
+                    }
+                }
+            }
+        };
+
+        Assert.False(DatePicker.GetDate(formAnswers, "test-date").HasValue);
     }
 }

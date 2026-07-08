@@ -1,10 +1,9 @@
 ﻿using form_builder.Models;
 using form_builder.Models.Actions;
 
-namespace form_builder.Services.ValidateService
+namespace form_builder.Services.ValidateService;
+
+public interface IValidateService
 {
-    public interface IValidateService
-    {
-        Task Process(List<IAction> actions, FormSchema formSchema, string formName);
-    }
+    Task Process(List<IAction> actions, FormSchema formSchema, string formName);
 }

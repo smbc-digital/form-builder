@@ -4,32 +4,31 @@ using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 
-namespace form_builder.Validators
+namespace form_builder.Validators;
+
+public class StockportAddressPostcodeElementValidator : IElementValidator
 {
-    public class StockportAddressPostcodeElementValidator : IElementValidator
+    public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
     {
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
+        if (!element.Type.Equals(EElementType.Address) || (element.Type.Equals(EElementType.Address) && !viewModel.IsInitial()))
+            return new ValidationResult { IsValid = true };
+
+        if (!element.Properties.StockportPostcode || !viewModel.ContainsKey($"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
+            return new ValidationResult { IsValid = true };
+
+        if (string.IsNullOrEmpty(viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"]) && element.Properties.Optional)
+            return new ValidationResult { IsValid = true };
+
+        var value = viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
+        var isValid = true;
+
+        if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.Match(value).Success)
+            isValid = false;
+
+        return new ValidationResult
         {
-            if (!element.Type.Equals(EElementType.Address) || (element.Type.Equals(EElementType.Address) && !viewModel.IsInitial()))
-                return new ValidationResult { IsValid = true };
-
-            if (!element.Properties.StockportPostcode || !viewModel.ContainsKey($"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"))
-                return new ValidationResult { IsValid = true };
-
-            if (string.IsNullOrEmpty(viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"]) && element.Properties.Optional)
-                return new ValidationResult { IsValid = true };
-
-            var value = viewModel[$"{element.Properties.QuestionId}{AddressConstants.SEARCH_SUFFIX}"];
-            var isValid = true;
-
-            if (!AddressConstants.STOCKPORT_POSTCODE_REGEX.Match(value).Success)
-                isValid = false;
-
-            return new ValidationResult
-            {
-                IsValid = isValid,
-                Message = isValid ? string.Empty : ValidationConstants.POSTCODE_INCORRECT_FORMAT
-            };
-        }
+            IsValid = isValid,
+            Message = isValid ? string.Empty : ValidationConstants.POSTCODE_INCORRECT_FORMAT
+        };
     }
 }

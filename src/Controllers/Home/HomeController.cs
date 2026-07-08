@@ -29,62 +29,43 @@ using NJsonSchema;
 
 namespace form_builder.Controllers.Home;
 
-public class HomeController : Controller
+public class HomeController(
+    IPageService pageService,
+    ISchemaProvider schemaProvider,
+    ISchemaFactory schemaFactory,
+    ISubmitWorkflow submitWorkflow,
+    IPaymentWorkflow paymentWorkflow,
+    IRedirectWorkflow redirectWorkflow,
+    IFileUploadService fileUploadService,
+    IWebHostEnvironment hostingEnvironment,
+    IActionsWorkflow actionsWorkflow,
+    IEmailWorkflow emailWorkFlow,
+    ISuccessWorkflow successWorkflow,
+    IStructureMapper structureMapper,
+    IOptions<DataStructureConfiguration> dataStructureConfiguration,
+    ILogger<HomeController> logger,
+    ISessionHelper sessionHelper,
+    IFeatureManager featureManager,
+    IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken)
+    : Controller
 {
-    private readonly IPageService _pageService;
-    private readonly ISchemaProvider _schemaProvider;
-    private readonly ISchemaFactory _schemaFactory;
-    private readonly ISubmitWorkflow _submitWorkflow;
-    private readonly IEmailWorkflow _emailWorkFlow;
-    private readonly IRedirectWorkflow _redirectWorkflow;
-    private readonly IPaymentWorkflow _paymentWorkflow;
-    private readonly IActionsWorkflow _actionsWorkflow;
-    private readonly ISuccessWorkflow _successWorkflow;
-    private readonly IFileUploadService _fileUploadService;
-    private readonly IWebHostEnvironment _hostingEnvironment;
-    private readonly IStructureMapper _structureMapper;
-    private readonly DataStructureConfiguration _dataStructureConfiguration;
-    private readonly ILogger<HomeController> _logger;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IFeatureManager _featureManager;
-    private readonly QAFormAccessTokenConfiguration _qaFormAccessToken;
-
-    public HomeController(IPageService pageService,
-        ISchemaProvider schemaProvider,
-        ISchemaFactory schemaFactory,
-        ISubmitWorkflow submitWorkflow,
-        IPaymentWorkflow paymentWorkflow,
-        IRedirectWorkflow redirectWorkflow,
-        IFileUploadService fileUploadService,
-        IWebHostEnvironment hostingEnvironment,
-        IActionsWorkflow actionsWorkflow,
-        IEmailWorkflow emailWorkFlow,
-        ISuccessWorkflow successWorkflow,
-        IStructureMapper structureMapper,
-        IOptions<DataStructureConfiguration> dataStructureConfiguration,
-        ILogger<HomeController> logger,
-        ISessionHelper sessionHelper,
-        IFeatureManager featureManager,
-        IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken)
-    {
-        _pageService = pageService;
-        _schemaProvider = schemaProvider;
-        _schemaFactory = schemaFactory;
-        _submitWorkflow = submitWorkflow;
-        _redirectWorkflow = redirectWorkflow;
-        _paymentWorkflow = paymentWorkflow;
-        _fileUploadService = fileUploadService;
-        _hostingEnvironment = hostingEnvironment;
-        _actionsWorkflow = actionsWorkflow;
-        _successWorkflow = successWorkflow;
-        _structureMapper = structureMapper;
-        _logger = logger;
-        _dataStructureConfiguration = dataStructureConfiguration.Value;
-        _emailWorkFlow = emailWorkFlow;
-        _sessionHelper = sessionHelper;
-        _featureManager = featureManager;
-        _qaFormAccessToken = qaFormAccessToken.Value;
-    }
+    private readonly IPageService _pageService = pageService;
+    private readonly ISchemaProvider _schemaProvider = schemaProvider;
+    private readonly ISchemaFactory _schemaFactory = schemaFactory;
+    private readonly ISubmitWorkflow _submitWorkflow = submitWorkflow;
+    private readonly IEmailWorkflow _emailWorkFlow = emailWorkFlow;
+    private readonly IRedirectWorkflow _redirectWorkflow = redirectWorkflow;
+    private readonly IPaymentWorkflow _paymentWorkflow = paymentWorkflow;
+    private readonly IActionsWorkflow _actionsWorkflow = actionsWorkflow;
+    private readonly ISuccessWorkflow _successWorkflow = successWorkflow;
+    private readonly IFileUploadService _fileUploadService = fileUploadService;
+    private readonly IWebHostEnvironment _hostingEnvironment = hostingEnvironment;
+    private readonly IStructureMapper _structureMapper = structureMapper;
+    private readonly DataStructureConfiguration _dataStructureConfiguration = dataStructureConfiguration.Value;
+    private readonly ILogger<HomeController> _logger = logger;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IFeatureManager _featureManager = featureManager;
+    private readonly QAFormAccessTokenConfiguration _qaFormAccessToken = qaFormAccessToken.Value;
 
     [HttpGet]
     [Route("/")]

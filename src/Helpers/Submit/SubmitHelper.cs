@@ -9,12 +9,9 @@ using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
 
 namespace form_builder.Helpers.Submit;
 
-public class SubmitHelper : ISubmitHelper
+public class SubmitHelper(IEnumerable<IBookingProvider> bookingProviders) : ISubmitHelper
 {
-    private readonly IEnumerable<IBookingProvider> _bookingProviders;
-
-    public SubmitHelper(IEnumerable<IBookingProvider> bookingProviders) =>
-        _bookingProviders = bookingProviders;
+    private readonly IEnumerable<IBookingProvider> _bookingProviders = bookingProviders;
 
     public async Task ConfirmBookings(MappingEntity mappingEntity, string environmentName, string caseReference)
     {

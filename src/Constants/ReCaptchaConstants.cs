@@ -1,9 +1,8 @@
-﻿namespace form_builder.Constants
-{
-    public class ReCaptchaConstants
-    {
-        public static readonly string ReCaptchaModelErrorKey = "ReCaptcha";
+﻿namespace form_builder.Constants;
 
-        public static readonly string RecaptchaResponseTokenKey = "g-recaptcha-response";
-    }
+public class ReCaptchaConstants
+{
+    public static readonly string ReCaptchaModelErrorKey = "ReCaptcha";
+
+    public static readonly string RecaptchaResponseTokenKey = "g-recaptcha-response";
 }

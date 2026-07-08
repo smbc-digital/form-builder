@@ -17,49 +17,33 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.SubmitService;
 
-public class SubmitService : ISubmitService
+public class SubmitService(
+    IGateway gateway,
+    IPageHelper pageHelper,
+    IWebHostEnvironment environment,
+    IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
+    IDistributedCacheWrapper distributedCache,
+    ISchemaFactory schemaFactory,
+    IReferenceNumberProvider referenceNumberProvider,
+    IEnumerable<ISubmitProvider> submitProviders,
+    IPaymentHelper paymentHelper,
+    ISubmitHelper submitHelper,
+    IEnumerable<ITagParser> tagParsers,
+    ILogger<SubmitService> logger)
+    : ISubmitService
 {
-    private readonly IGateway _gateway;
-    private readonly IPageHelper _pageHelper;
-    private readonly IWebHostEnvironment _environment;
-    private readonly SubmissionServiceConfiguration _submissionServiceConfiguration;
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly ISchemaFactory _schemaFactory;
-    private readonly IReferenceNumberProvider _referenceNumberProvider;
-    private readonly IEnumerable<ISubmitProvider> _submitProviders;
-    private readonly IPaymentHelper _paymentHelper;
-    private readonly ISubmitHelper _submitHelper;
-    private readonly IEnumerable<ITagParser> _tagParsers;
-    private readonly ILogger<SubmitService> _logger;
-
-    public SubmitService(
-        IGateway gateway,
-        IPageHelper pageHelper,
-        IWebHostEnvironment environment,
-        IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
-        IDistributedCacheWrapper distributedCache,
-        ISchemaFactory schemaFactory,
-        IReferenceNumberProvider referenceNumberProvider,
-        IEnumerable<ISubmitProvider> submitProviders,
-        IPaymentHelper paymentHelper,
-        ISubmitHelper submitHelper,
-        IEnumerable<ITagParser> tagParsers,
-        ILogger<SubmitService> logger
-    )
-    {
-        _gateway = gateway;
-        _pageHelper = pageHelper;
-        _environment = environment;
-        _submissionServiceConfiguration = submissionServiceConfiguration.Value;
-        _distributedCache = distributedCache;
-        _schemaFactory = schemaFactory;
-        _referenceNumberProvider = referenceNumberProvider;
-        _submitProviders = submitProviders;
-        _paymentHelper = paymentHelper;
-        _submitHelper = submitHelper;
-        _tagParsers = tagParsers;
-        _logger = logger;
-    }
+    private readonly IGateway _gateway = gateway;
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IWebHostEnvironment _environment = environment;
+    private readonly SubmissionServiceConfiguration _submissionServiceConfiguration = submissionServiceConfiguration.Value;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly ISchemaFactory _schemaFactory = schemaFactory;
+    private readonly IReferenceNumberProvider _referenceNumberProvider = referenceNumberProvider;
+    private readonly IEnumerable<ISubmitProvider> _submitProviders = submitProviders;
+    private readonly IPaymentHelper _paymentHelper = paymentHelper;
+    private readonly ISubmitHelper _submitHelper = submitHelper;
+    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
+    private readonly ILogger<SubmitService> _logger = logger;
 
     public async Task PreProcessSubmission(string form, string cacheKey)
     {

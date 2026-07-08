@@ -1,7 +1,6 @@
-namespace form_builder.Providers.ReferenceNumbers
+namespace form_builder.Providers.ReferenceNumbers;
+
+public interface IReferenceNumberProvider
 {
-    public interface IReferenceNumberProvider
-    {
-        string GetReference(string prefix, int length = 8);
-    }
+    string GetReference(string prefix, int length = 8);
 }

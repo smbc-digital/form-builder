@@ -12,158 +12,157 @@ using Moq;
 using Xunit;
 using Microsoft.Extensions.Logging;
 
-namespace form_builder_tests.UnitTests.Helpers
+namespace form_builder_tests.UnitTests.Helpers;
+
+public class ActionHelperTests
 {
-    public class ActionHelperTests
-    {
-        private const string validResponse = "ValidResponse";
-        private const string validVariableQuestionId = "validVariableQuestionId";
-        private const string validVariableQuestionIdInBraces = "{{validVariableQuestionId}}";
-        private const string invalidVariableQuestionIdInBraces = "{{invalidVariableQuestionId}}";
-        private const string contentWithValidVariableQuestionIdInBraces = "Some text with a {{validVariableQuestionId}}.";
-        private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
+    private const string validResponse = "ValidResponse";
+    private const string validVariableQuestionId = "validVariableQuestionId";
+    private const string validVariableQuestionIdInBraces = "{{validVariableQuestionId}}";
+    private const string invalidVariableQuestionIdInBraces = "{{invalidVariableQuestionId}}";
+    private const string contentWithValidVariableQuestionIdInBraces = "Some text with a {{validVariableQuestionId}}.";
+    private const string contentWithInvalidVariableQuestionIdInBraces = "Some text with a {{invalidVariableQuestionId}}";
 
-        private readonly IActionHelper _actionHelper;
-        private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
-        private readonly Mock<ILogger<ActionHelper>> _mockLogger = new();
+    private readonly IActionHelper _actionHelper;
+    private readonly Mock<IEnumerable<IFormatter>> _mockFormatters = new();
+    private readonly Mock<ILogger<ActionHelper>> _mockLogger = new();
 
-        private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
-            .WithFormAnswers(new FormAnswers
+    private readonly MappingEntity _mappingEntity = new MappingEntityBuilder()
+        .WithFormAnswers(new FormAnswers
+        {
+            Path = "page-one",
+            Pages = new List<PageAnswers>
             {
-                Path = "page-one",
-                Pages = new List<PageAnswers>
+                new PageAnswers
+                {
+                    Answers = new List<Answers>
                     {
-                        new PageAnswers
+                        new Answers
                         {
-                            Answers = new List<Answers>
-                            {
-                                new Answers
-                                {
-                                    Response = "testResponse",
-                                    QuestionId = "testQuestionId"
-                                }
-                            },
-                            PageSlug = "page-one"
-                        },
-                        new PageAnswers
-                        {
-                            Answers = new List<Answers>
-                            {
-                                new Answers
-                                {
-                                    Response = "testResponse.email@test.com",
-                                    QuestionId = "emailQuestion"
-                                },
-                                new Answers
-                                {
-                                    Response = validResponse,
-                                    QuestionId = validVariableQuestionId
-                                }
-                            },
-                            PageSlug = "page-one"
+                            Response = "testResponse",
+                            QuestionId = "testQuestionId"
                         }
-                    }
-            })
-            .Build();
+                    },
+                    PageSlug = "page-one"
+                },
+                new PageAnswers
+                {
+                    Answers = new List<Answers>
+                    {
+                        new Answers
+                        {
+                            Response = "testResponse.email@test.com",
+                            QuestionId = "emailQuestion"
+                        },
+                        new Answers
+                        {
+                            Response = validResponse,
+                            QuestionId = validVariableQuestionId
+                        }
+                    },
+                    PageSlug = "page-one"
+                }
+            }
+        })
+        .Build();
 
-        private readonly FormSchema _formSchema = new FormSchemaBuilder()
-            .WithStartPageUrl("page-one")
-            .WithBaseUrl("base-test")
-            .WithPage(new PageBuilder()
+    private readonly FormSchema _formSchema = new FormSchemaBuilder()
+        .WithStartPageUrl("page-one")
+        .WithBaseUrl("base-test")
+        .WithPage(new PageBuilder()
             .WithElement(new ElementBuilder()
-            .WithType(EElementType.H2)
-            .Build())
+                .WithType(EElementType.H2)
+                .Build())
             .WithPageSlug("success")
             .Build())
-            .WithFormActions(new UserEmail
+        .WithFormActions(new UserEmail
+        {
+            Properties = new BaseActionProperty
             {
-                Properties = new BaseActionProperty
-                {
-                    To = "email.test@test.com, {{emailQuestion}}"
-                },
-                Type = EActionType.UserEmail
-            })
-            .Build();
+                To = "email.test@test.com, {{emailQuestion}}"
+            },
+            Type = EActionType.UserEmail
+        })
+        .Build();
 
-        public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object, _mockLogger.Object);
+    public ActionHelperTests() => _actionHelper = new ActionHelper(_mockFormatters.Object, _mockLogger.Object);
 
-        [Fact]
-        public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()
-        {
-            // Act
-            var result = _actionHelper.GenerateUrl("www.testurl.com/{{testQuestionId}}", _mappingEntity.FormAnswers);
+    [Fact]
+    public void GenerateUrl_ShouldGenerateCorrectGetUrl_PathParameters()
+    {
+        // Act
+        var result = _actionHelper.GenerateUrl("www.testurl.com/{{testQuestionId}}", _mappingEntity.FormAnswers);
 
-            // Assert
-            Assert.Equal("www.testurl.com/testResponse", result.Url);
-            Assert.False(result.IsPost);
-        }
+        // Assert
+        Assert.Equal("www.testurl.com/testResponse", result.Url);
+        Assert.False(result.IsPost);
+    }
 
-        [Fact]
-        public void GenerateUrl_ShouldGenerateCorrectGetUrl_QueryStringParameters()
-        {
-            // Act
-            var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}", _mappingEntity.FormAnswers);
+    [Fact]
+    public void GenerateUrl_ShouldGenerateCorrectGetUrl_QueryStringParameters()
+    {
+        // Act
+        var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}", _mappingEntity.FormAnswers);
 
-            // Assert
-            Assert.Equal("www.testurl.com?id=testResponse", result.Url);
-            Assert.False(result.IsPost);
-        }
+        // Assert
+        Assert.Equal("www.testurl.com?id=testResponse", result.Url);
+        Assert.False(result.IsPost);
+    }
 
-        [Fact]
-        public void GenerateUrl_ShouldGenerateCorrectPostUrl()
-        {
-            // Act
-            var result = _actionHelper.GenerateUrl("www.testurl.com", _mappingEntity.FormAnswers);
+    [Fact]
+    public void GenerateUrl_ShouldGenerateCorrectPostUrl()
+    {
+        // Act
+        var result = _actionHelper.GenerateUrl("www.testurl.com", _mappingEntity.FormAnswers);
 
-            // Assert
-            Assert.Equal("www.testurl.com", result.Url);
-            Assert.True(result.IsPost);
-        }
+        // Assert
+        Assert.Equal("www.testurl.com", result.Url);
+        Assert.True(result.IsPost);
+    }
 
-        [Fact]
-        public void GenerateUrl_ShouldGenerateCorrectUrl_WhichContains_Empty_OptionalQuery_Values()
-        {
-            // Act
-            var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}&extra={{doesnotexists}}", _mappingEntity.FormAnswers);
+    [Fact]
+    public void GenerateUrl_ShouldGenerateCorrectUrl_WhichContains_Empty_OptionalQuery_Values()
+    {
+        // Act
+        var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}&extra={{doesnotexists}}", _mappingEntity.FormAnswers);
 
-            // Assert
-            Assert.Equal("www.testurl.com?id=testResponse&extra=", result.Url);
-        }
+        // Assert
+        Assert.Equal("www.testurl.com?id=testResponse&extra=", result.Url);
+    }
 
-        [Fact]
-        public void GenerateUrl_ShouldGenerateCorrectUrl_WhichContains_Multiple_Empty_OptionalQuery_Values()
-        {
-            // Act
-            var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}&extra={{doesnotexists}}&more={{testQuestionId}}&empty={{doesnotexists}}", _mappingEntity.FormAnswers);
+    [Fact]
+    public void GenerateUrl_ShouldGenerateCorrectUrl_WhichContains_Multiple_Empty_OptionalQuery_Values()
+    {
+        // Act
+        var result = _actionHelper.GenerateUrl("www.testurl.com?id={{testQuestionId}}&extra={{doesnotexists}}&more={{testQuestionId}}&empty={{doesnotexists}}", _mappingEntity.FormAnswers);
 
-            // Assert
-            Assert.Equal("www.testurl.com?id=testResponse&extra=&more=testResponse&empty=", result.Url);
-        }
+        // Assert
+        Assert.Equal("www.testurl.com?id=testResponse&extra=&more=testResponse&empty=", result.Url);
+    }
 
-        [Fact]
-        public void GetEmailToAddresses_ShouldReturnListOfToEmailAddress()
-        {
-            // Act
-            var result = _actionHelper.GetEmailToAddresses(_formSchema.FormActions.FirstOrDefault(), _mappingEntity.FormAnswers);
+    [Fact]
+    public void GetEmailToAddresses_ShouldReturnListOfToEmailAddress()
+    {
+        // Act
+        var result = _actionHelper.GetEmailToAddresses(_formSchema.FormActions.FirstOrDefault(), _mappingEntity.FormAnswers);
 
-            // Assert
-            Assert.Equal("testResponse.email@test.com,email.test@test.com", result);
-        }
+        // Assert
+        Assert.Equal("testResponse.email@test.com,email.test@test.com", result);
+    }
 
-        [Theory]
-        [InlineData(contentWithValidVariableQuestionIdInBraces)]
-        [InlineData(contentWithInvalidVariableQuestionIdInBraces)]
-        public void GetEmailContent_ShouldReturnContent_WithQuestionResponse_Or_EmptyString(string content)
-        {
-            // Arrange
-            var action = _formSchema.FormActions.FirstOrDefault();
-            action.Properties.Content = content;
+    [Theory]
+    [InlineData(contentWithValidVariableQuestionIdInBraces)]
+    [InlineData(contentWithInvalidVariableQuestionIdInBraces)]
+    public void GetEmailContent_ShouldReturnContent_WithQuestionResponse_Or_EmptyString(string content)
+    {
+        // Arrange
+        var action = _formSchema.FormActions.FirstOrDefault();
+        action.Properties.Content = content;
 
-            // Act
-            var result = _actionHelper.GetEmailContent(action, _mappingEntity.FormAnswers);
+        // Act
+        var result = _actionHelper.GetEmailContent(action, _mappingEntity.FormAnswers);
 
-            // Assert
-            Assert.True(result.Contains(validResponse) && !result.Contains(validVariableQuestionIdInBraces) || !result.Contains(invalidVariableQuestionIdInBraces));
-        }
+        // Assert
+        Assert.True(result.Contains(validResponse) && !result.Contains(validVariableQuestionIdInBraces) || !result.Contains(invalidVariableQuestionIdInBraces));
     }
 }

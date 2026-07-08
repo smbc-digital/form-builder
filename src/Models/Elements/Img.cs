@@ -1,9 +1,8 @@
 ﻿using form_builder.Enum;
 
-namespace form_builder.Models.Elements
+namespace form_builder.Models.Elements;
+
+public class Img : Element
 {
-    public class Img : Element
-    {
-        public Img() => Type = EElementType.Img;
-    }
+    public Img() => Type = EElementType.Img;
 }

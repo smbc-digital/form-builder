@@ -1,7 +1,6 @@
-﻿namespace form_builder.Constants
+﻿namespace form_builder.Constants;
+
+public class ValidateConstants
 {
-    public class ValidateConstants
-    {
-        public const string ValidateId = "isValidated";
-    }
+    public const string ValidateId = "isValidated";
 }

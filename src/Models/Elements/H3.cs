@@ -1,9 +1,8 @@
 ﻿using form_builder.Enum;
 
-namespace form_builder.Models.Elements
+namespace form_builder.Models.Elements;
+
+public class H3 : Element
 {
-    public class H3 : Element
-    {
-        public H3() => Type = EElementType.H3;
-    }
+    public H3() => Type = EElementType.H3;
 }

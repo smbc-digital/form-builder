@@ -4,10 +4,8 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers;
 
-public class EmphasisTagParser : TagParser, ITagParser
+public class EmphasisTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public EmphasisTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
-
     public Regex Regex => new Regex("(?<={{)EMPHASIS::.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

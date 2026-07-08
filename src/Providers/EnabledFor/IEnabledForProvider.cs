@@ -1,11 +1,10 @@
 using form_builder.Enum;
 using form_builder.Models;
 
-namespace form_builder.Providers.EnabledFor
+namespace form_builder.Providers.EnabledFor;
+
+public interface IEnabledForProvider
 {
-    public interface IEnabledForProvider
-    {
-        EEnabledFor Type { get; }
-        bool IsAvailable(EnabledForBase enabledFor);
-    }
+    EEnabledFor Type { get; }
+    bool IsAvailable(EnabledForBase enabledFor);
 }

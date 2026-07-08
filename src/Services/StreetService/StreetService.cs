@@ -11,25 +11,18 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.StreetService;
 
-public class StreetService : IStreetService
+public class StreetService(
+    IDistributedCacheWrapper distributedCache,
+    IEnumerable<IStreetProvider> streetProviders,
+    IPageHelper pageHelper,
+    IPageFactory pageFactory)
+    : IStreetService
 {
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IPageHelper _pageHelper;
-    private readonly IEnumerable<IStreetProvider> _streetProviders;
-    private readonly IPageFactory _pageFactory;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IEnumerable<IStreetProvider> _streetProviders = streetProviders;
+    private readonly IPageFactory _pageFactory = pageFactory;
 
-
-    public StreetService(
-        IDistributedCacheWrapper distributedCache,
-        IEnumerable<IStreetProvider> streetProviders,
-        IPageHelper pageHelper,
-        IPageFactory pageFactory)
-    {
-        _distributedCache = distributedCache;
-        _pageHelper = pageHelper;
-        _streetProviders = streetProviders;
-        _pageFactory = pageFactory;
-    }
 
     public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string cacheKey, string path)
     {

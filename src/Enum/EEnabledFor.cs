@@ -1,8 +1,7 @@
-namespace form_builder.Enum
+namespace form_builder.Enum;
+
+public enum EEnabledFor
 {
-    public enum EEnabledFor
-    {
-        Unknown,
-        TimeWindow
-    }
+    Unknown,
+    TimeWindow
 }

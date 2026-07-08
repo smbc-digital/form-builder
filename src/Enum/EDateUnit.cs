@@ -1,9 +1,8 @@
-﻿namespace form_builder.Enum
+﻿namespace form_builder.Enum;
+
+public enum EDateUnit
 {
-    public enum EDateUnit
-    {
-        Day,
-        Month,
-        Year
-    }
+    Day,
+    Month,
+    Year
 }

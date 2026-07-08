@@ -1,9 +1,8 @@
 ﻿using form_builder.Models.Actions;
 
-namespace form_builder.Services.TemplatedEmailService
+namespace form_builder.Services.TemplatedEmailService;
+
+public interface ITemplatedEmailService
 {
-    public interface ITemplatedEmailService
-    {
-        Task ProcessTemplatedEmail(List<IAction> actions, string form);
-    }
+    Task ProcessTemplatedEmail(List<IAction> actions, string form);
 }

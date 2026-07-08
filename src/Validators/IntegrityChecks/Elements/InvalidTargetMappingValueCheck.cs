@@ -1,31 +1,30 @@
 using System.Text.RegularExpressions;
 using form_builder.Models.Elements;
 
-namespace form_builder.Validators.IntegrityChecks.Elements
+namespace form_builder.Validators.IntegrityChecks.Elements;
+
+public class InvalidTargetMappingValueCheck : IElementSchemaIntegrityCheck
 {
-    public class InvalidTargetMappingValueCheck : IElementSchemaIntegrityCheck
+    public IntegrityCheckResult Validate(IElement element)
     {
-        public IntegrityCheckResult Validate(IElement element)
-        {
-            IntegrityCheckResult result = new();
+        IntegrityCheckResult result = new();
 
-            if (element.Properties is null || string.IsNullOrEmpty(element.Properties.TargetMapping))
-                return result;
-
-            Regex regex = new(@"^[a-zA-Z.]+$", RegexOptions.IgnoreCase);
-
-            if (!regex.IsMatch(element.Properties.TargetMapping) ||
-                element.Properties.TargetMapping.EndsWith(".") ||
-                element.Properties.TargetMapping.StartsWith("."))
-            {
-                result.AddFailureMessage(
-                    "The provided json contains invalid TargetMapping, " +
-                    $"'{element.Properties.QuestionId}' contains invalid characters");
-            }
-
+        if (element.Properties is null || string.IsNullOrEmpty(element.Properties.TargetMapping))
             return result;
+
+        Regex regex = new(@"^[a-zA-Z.]+$", RegexOptions.IgnoreCase);
+
+        if (!regex.IsMatch(element.Properties.TargetMapping) ||
+            element.Properties.TargetMapping.EndsWith(".") ||
+            element.Properties.TargetMapping.StartsWith("."))
+        {
+            result.AddFailureMessage(
+                "The provided json contains invalid TargetMapping, " +
+                $"'{element.Properties.QuestionId}' contains invalid characters");
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
+        return result;
     }
+
+    public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
 }

@@ -4,74 +4,67 @@ using form_builder.Validators.IntegrityChecks.Behaviours;
 using form_builder.Validators.IntegrityChecks.Elements;
 using form_builder.Validators.IntegrityChecks.Form;
 
-namespace form_builder.Validators.IntegrityChecks
-{
-    public class FormSchemaIntegrityValidator : IFormSchemaIntegrityValidator
-    {
-        IEnumerable<IFormSchemaIntegrityCheck> _formSchemaIntegrityChecks;
-        IEnumerable<IBehaviourSchemaIntegrityCheck> _behaviorSchemaIntegrityChecks;
-        IEnumerable<IElementSchemaIntegrityCheck> _elementSchemaIntegrityChecks;
+namespace form_builder.Validators.IntegrityChecks;
 
-        public FormSchemaIntegrityValidator(
-            IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks,
-            IEnumerable<IBehaviourSchemaIntegrityCheck> behaviorSchemaIntegrityChecks,
-            IEnumerable<IElementSchemaIntegrityCheck> elementSchemaIntegrityChecks)
+public class FormSchemaIntegrityValidator(
+    IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks,
+    IEnumerable<IBehaviourSchemaIntegrityCheck> behaviorSchemaIntegrityChecks,
+    IEnumerable<IElementSchemaIntegrityCheck> elementSchemaIntegrityChecks)
+    : IFormSchemaIntegrityValidator
+{
+    IEnumerable<IFormSchemaIntegrityCheck> _formSchemaIntegrityChecks = formSchemaIntegrityChecks;
+    IEnumerable<IBehaviourSchemaIntegrityCheck> _behaviorSchemaIntegrityChecks = behaviorSchemaIntegrityChecks;
+    IEnumerable<IElementSchemaIntegrityCheck> _elementSchemaIntegrityChecks = elementSchemaIntegrityChecks;
+
+    public async Task Validate(FormSchema schema)
+    {
+        List<IntegrityCheckResult> integrityCheckResults = new();
+
+        foreach (var integrityCheck in _formSchemaIntegrityChecks)
         {
-            _formSchemaIntegrityChecks = formSchemaIntegrityChecks;
-            _behaviorSchemaIntegrityChecks = behaviorSchemaIntegrityChecks;
-            _elementSchemaIntegrityChecks = elementSchemaIntegrityChecks;
+            integrityCheckResults.Add(await integrityCheck.ValidateAsync(schema));
         }
 
-        public async Task Validate(FormSchema schema)
+        foreach (var page in schema.Pages)
         {
-            List<IntegrityCheckResult> integrityCheckResults = new();
-
-            foreach (var integrityCheck in _formSchemaIntegrityChecks)
+            if (page.Behaviours is not null)
             {
-                integrityCheckResults.Add(await integrityCheck.ValidateAsync(schema));
-            }
-
-            foreach (var page in schema.Pages)
-            {
-                if (page.Behaviours is not null)
+                foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
                 {
-                    foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
-                    {
-                        integrityCheckResults.Add(await integrityCheck.ValidateAsync(page.Behaviours));
-                    }
+                    integrityCheckResults.Add(await integrityCheck.ValidateAsync(page.Behaviours));
+                }
 
-                    if (!page.Elements.Any())
-                        continue;
+                if (!page.Elements.Any())
+                    continue;
 
-                    foreach (var element in page.Elements)
+                foreach (var element in page.Elements)
+                {
+                    if (element.Properties is not null &&
+                        element.Properties.Elements is not null &&
+                        element.Properties.Elements.Any())
                     {
-                        if (element.Properties is not null &&
-                            element.Properties.Elements is not null &&
-                            element.Properties.Elements.Any())
+                        foreach (var nestedElement in element.Properties.Elements)
                         {
-                            foreach (var nestedElement in element.Properties.Elements)
+                            foreach (var integrityCheck in _elementSchemaIntegrityChecks)
                             {
-                                foreach (var integrityCheck in _elementSchemaIntegrityChecks)
-                                {
-                                    integrityCheckResults.Add(await integrityCheck.ValidateAsync(nestedElement));
-                                }
+                                integrityCheckResults.Add(await integrityCheck.ValidateAsync(nestedElement));
                             }
                         }
+                    }
 
-                        foreach (var integrityCheck in _elementSchemaIntegrityChecks)
-                        {
-                            integrityCheckResults.Add(await integrityCheck.ValidateAsync(element));
-                        }
+                    foreach (var integrityCheck in _elementSchemaIntegrityChecks)
+                    {
+                        integrityCheckResults.Add(await integrityCheck.ValidateAsync(element));
                     }
                 }
             }
+        }
 
-            var invalidCheckResults = integrityCheckResults.Where(result => !result.IsValid);
-            if (invalidCheckResults.Any())
-            {
-                var failingCheckResultMessages = invalidCheckResults.SelectMany(result => result.Messages);
-                throw new ApplicationException($"The requested for schema '{schema.FormName}' was invalid, The following integrity check results are failing: {SystemConstants.NEW_LINE_CHARACTER} {String.Join(SystemConstants.NEW_LINE_CHARACTER, failingCheckResultMessages)}");
-            }
+        var invalidCheckResults = integrityCheckResults.Where(result => !result.IsValid);
+        if (invalidCheckResults.Any())
+        {
+            var failingCheckResultMessages = invalidCheckResults.SelectMany(result => result.Messages);
+            throw new ApplicationException($"The requested for schema '{schema.FormName}' was invalid, The following integrity check results are failing: {SystemConstants.NEW_LINE_CHARACTER} {String.Join(SystemConstants.NEW_LINE_CHARACTER, failingCheckResultMessages)}");
         }
     }
 }

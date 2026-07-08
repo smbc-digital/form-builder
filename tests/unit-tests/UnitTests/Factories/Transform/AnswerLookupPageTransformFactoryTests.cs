@@ -6,93 +6,92 @@ using form_builder.Models;
 using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Factories.Transform
+namespace form_builder_tests.UnitTests.Factories.Transform;
+
+public class AnswerLookupPageTransformFactoryTests
 {
-    public class AnswerLookupPageTransformFactoryTests
+    private AnswerLookupPageTransformFactory _answerLookupPageTransformFactory = new();
+
+    [Theory]
+    [InlineData("#dynamic")]
+    [InlineData("#local")]
+    [InlineData("#S3")]
+    public async Task Transform_Should_Transform(string lookUp)
     {
-        private AnswerLookupPageTransformFactory _answerLookupPageTransformFactory = new();
-
-        [Theory]
-        [InlineData("#dynamic")]
-        [InlineData("#local")]
-        [InlineData("#S3")]
-        public async Task Transform_Should_Transform(string lookUp)
+        // Arrange
+        string questionId = "testQuestionId";
+        List<Option> options = new() { new() { Text = "This", Value = "This" }, new() { Text = "That", Value = "That" } };
+        FormAnswers convertedAnswers = new()
         {
-            // Arrange
-            string questionId = "testQuestionId";
-            List<Option> options = new() { new() { Text = "This", Value = "This" }, new() { Text = "That", Value = "That" } };
-            FormAnswers convertedAnswers = new()
+            Pages = new()
             {
-                Pages = new()
+                new()
                 {
-                    new()
+                    Answers = new()
                     {
-                        Answers = new()
-                        {
-                            new(lookUp.TrimStart('#'), JsonSerializer.Serialize(options))
-                        }
+                        new(lookUp.TrimStart('#'), JsonSerializer.Serialize(options))
                     }
                 }
-            };
+            }
+        };
 
-            var element = new ElementBuilder()
-                .WithQuestionId(questionId)
-                .WithLookup(lookUp)
-                .WithType(EElementType.Checkbox)
-                .Build();
+        var element = new ElementBuilder()
+            .WithQuestionId(questionId)
+            .WithLookup(lookUp)
+            .WithType(EElementType.Checkbox)
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
 
-            // Act
-            await _answerLookupPageTransformFactory.Transform(page, convertedAnswers);
+        // Act
+        await _answerLookupPageTransformFactory.Transform(page, convertedAnswers);
 
-            // Assert
-            var elementToTest = page.Elements.Single(element => element.Properties.QuestionId.Equals(questionId));
-            Assert.True(elementToTest.Properties.Options.Count.Equals(options.Count));
-        }
+        // Assert
+        var elementToTest = page.Elements.Single(element => element.Properties.QuestionId.Equals(questionId));
+        Assert.True(elementToTest.Properties.Options.Count.Equals(options.Count));
+    }
 
-        [Theory]
-        [InlineData("dynamic")]
-        [InlineData("local")]
-        [InlineData("S3")]
-        public async Task Transform_Should_Not_Transform(string lookUp)
+    [Theory]
+    [InlineData("dynamic")]
+    [InlineData("local")]
+    [InlineData("S3")]
+    public async Task Transform_Should_Not_Transform(string lookUp)
+    {
+        // Arrange
+        string questionId = "testQuestionId";
+        List<Option> options = new() { new() { Text = "This", Value = "This" }, new() { Text = "That", Value = "That" } };
+        FormAnswers convertedAnswers = new()
         {
-            // Arrange
-            string questionId = "testQuestionId";
-            List<Option> options = new() { new() { Text = "This", Value = "This" }, new() { Text = "That", Value = "That" } };
-            FormAnswers convertedAnswers = new()
+            Pages = new()
             {
-                Pages = new()
+                new()
                 {
-                    new()
+                    Answers = new()
                     {
-                        Answers = new()
-                        {
-                            new(lookUp.TrimStart('#'), JsonSerializer.Serialize(options))
-                        }
+                        new(lookUp.TrimStart('#'), JsonSerializer.Serialize(options))
                     }
                 }
-            };
+            }
+        };
 
-            var element = new ElementBuilder()
-                .WithQuestionId(questionId)
-                .WithLookup(lookUp)
-                .WithType(EElementType.Checkbox)
-                .Build();
+        var element = new ElementBuilder()
+            .WithQuestionId(questionId)
+            .WithLookup(lookUp)
+            .WithType(EElementType.Checkbox)
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
 
-            // Act
-            await _answerLookupPageTransformFactory.Transform(page, convertedAnswers);
+        // Act
+        await _answerLookupPageTransformFactory.Transform(page, convertedAnswers);
 
-            // Assert
-            // page element has no options
-            var elementToTest = page.Elements.Single(element => element.Properties.QuestionId.Equals(questionId));
-            Assert.True(elementToTest.Properties.Options.Count.Equals(0));
-        }
+        // Assert
+        // page element has no options
+        var elementToTest = page.Elements.Single(element => element.Properties.QuestionId.Equals(questionId));
+        Assert.True(elementToTest.Properties.Options.Count.Equals(0));
     }
 }

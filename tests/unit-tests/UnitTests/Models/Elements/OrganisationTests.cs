@@ -10,133 +10,132 @@ using Moq;
 using StockportGovUK.NetStandard.Gateways.Models.Verint.Lookup;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Models.Elements
+namespace form_builder_tests.UnitTests.Models.Elements;
+
+public class OrganisationTests
 {
-    public class OrganisationTests
+    private readonly Mock<IViewRender> _mockIViewRender = new();
+    private readonly Mock<IElementHelper> _mockElementHelper = new();
+    private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+
+    public OrganisationTests()
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new();
-        private readonly Mock<IElementHelper> _mockElementHelper = new();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+    }
 
-        public OrganisationTests()
+    [Fact]
+    public async Task RenderAsync_ShouldCall_ViewRender_WithListOf_SelectListItem_FromOrgSearchResults()
+    {
+        //Arrange
+        var callback = new form_builder.Models.Elements.Organisation();
+
+        _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()))
+            .Callback<string, form_builder.Models.Elements.Organisation, Dictionary<string, object>>((x, y, z) => callback = y);
+
+        var organisationElement = (form_builder.Models.Elements.Organisation)new ElementBuilder()
+            .WithType(EElementType.Organisation)
+            .WithStreetProvider("Fake")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(organisationElement)
+            .Build();
+
+        var schema = new FormSchemaBuilder()
+            .WithName("form-name")
+            .Build();
+
+        var formAnswers = new FormAnswers();
+
+        var viewModel = new Dictionary<string, dynamic>
         {
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
-        }
+            { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
+            { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
+        };
 
-        [Fact]
-        public async Task RenderAsync_ShouldCall_ViewRender_WithListOf_SelectListItem_FromOrgSearchResults()
+        //Act
+        await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object, formAnswers);
+
+        //Assert
+        _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        Assert.Single(callback.Items);
+    }
+
+    [Fact]
+    public async Task RenderAsync_ShouldCall_ViewRender_WithListOf_SelectListItem_GeneratedFromOrgSearchResults()
+    {
+        //Arrange
+        var callback = new form_builder.Models.Elements.Organisation();
+
+        _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()))
+            .Callback<string, form_builder.Models.Elements.Organisation, Dictionary<string, object>>((x, y, z) => callback = y);
+
+        var organisationElement = (form_builder.Models.Elements.Organisation)new ElementBuilder()
+            .WithType(EElementType.Organisation)
+            .WithStreetProvider("Fake")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(organisationElement)
+            .Build();
+
+        var schema = new FormSchemaBuilder()
+            .WithName("form-name")
+            .Build();
+
+        var formAnswers = new FormAnswers();
+
+        var viewModel = new Dictionary<string, dynamic>
         {
-            //Arrange
-            var callback = new form_builder.Models.Elements.Organisation();
+            { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
+            { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
+        };
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()))
-                .Callback<string, form_builder.Models.Elements.Organisation, Dictionary<string, object>>((x, y, z) => callback = y);
-
-            var organisationElement = (form_builder.Models.Elements.Organisation)new ElementBuilder()
-                .WithType(EElementType.Organisation)
-                .WithStreetProvider("Fake")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(organisationElement)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
-
-            var formAnswers = new FormAnswers();
-
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
-                { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
-            };
-
-            //Act
-            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, "", viewModel, page, schema, _mockHostingEnv.Object, formAnswers);
-
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            Assert.Single(callback.Items);
-        }
-
-        [Fact]
-        public async Task RenderAsync_ShouldCall_ViewRender_WithListOf_SelectListItem_GeneratedFromOrgSearchResults()
+        var searchResults = new List<object>
         {
-            //Arrange
-            var callback = new form_builder.Models.Elements.Organisation();
+            new OrganisationSearchResult{ Reference = "123455", Name = "name123" }
+        };
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()))
-                .Callback<string, form_builder.Models.Elements.Organisation, Dictionary<string, object>>((x, y, z) => callback = y);
+        //Act
+        await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, formAnswers, searchResults);
 
-            var organisationElement = (form_builder.Models.Elements.Organisation)new ElementBuilder()
-                .WithType(EElementType.Organisation)
-                .WithStreetProvider("Fake")
-                .Build();
+        //Assert
+        _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        Assert.Equal(2, callback.Items.Count);
+    }
 
-            var page = new PageBuilder()
-                .WithElement(organisationElement)
-                .Build();
+    [Fact]
+    public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_IsDefined()
+    {
+        var label = "Custom label";
+        //Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .WithQuestionId("org-test")
+            .WithSummaryLabel(label)
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
+        //Act
+        var result = element.GetLabelText(string.Empty);
 
-            var formAnswers = new FormAnswers();
+        //Assert
+        Assert.Equal(label, result);
+    }
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { LookUpConstants.SubPathViewModelKey, LookUpConstants.Automatic },
-                { $"{organisationElement.Properties.QuestionId}-organisation", "test org" }
-            };
+    [Fact]
+    public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_Is_Not_Defined()
+    {
+        var pageTitle = "Page Title";
+        //Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .WithQuestionId("org-test")
+            .Build();
 
-            var searchResults = new List<object>
-            {
-                new OrganisationSearchResult{ Reference = "123455", Name = "name123" }
-            };
+        //Act
+        var result = element.GetLabelText(pageTitle);
 
-            //Act
-            await organisationElement.RenderAsync(_mockIViewRender.Object, _mockElementHelper.Object, string.Empty, viewModel, page, schema, _mockHostingEnv.Object, formAnswers, searchResults);
-
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x == "OrganisationSelect"), It.IsAny<form_builder.Models.Elements.Organisation>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            Assert.Equal(2, callback.Items.Count);
-        }
-
-        [Fact]
-        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_IsDefined()
-        {
-            var label = "Custom label";
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Street)
-                .WithQuestionId("org-test")
-                .WithSummaryLabel(label)
-                .Build();
-
-            //Act
-            var result = element.GetLabelText(string.Empty);
-
-            //Assert
-            Assert.Equal(label, result);
-        }
-
-        [Fact]
-        public void GetLabelText_ShouldGenerate_CorrectLabel_WhenSummaryLabel_Is_Not_Defined()
-        {
-            var pageTitle = "Page Title";
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Street)
-                .WithQuestionId("org-test")
-                .Build();
-
-            //Act
-            var result = element.GetLabelText(pageTitle);
-
-            //Assert
-            Assert.Equal(pageTitle, result);
-        }
+        //Assert
+        Assert.Equal(pageTitle, result);
     }
 }

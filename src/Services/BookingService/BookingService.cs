@@ -25,48 +25,33 @@ using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
 
 namespace form_builder.Services.BookingService;
 
-public class BookingService : IBookingService
+public class BookingService(
+    IDistributedCacheWrapper distributedCache,
+    IPageHelper pageHelper,
+    IEnumerable<IBookingProvider> bookingProviders,
+    IPageFactory pageFactory,
+    IMappingService mappingService,
+    IWebHostEnvironment environment,
+    ISchemaFactory schemaFactory,
+    ISessionHelper sessionHelper,
+    IHashUtil hashUtil,
+    IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+    IHttpContextAccessor httpContextAccessor,
+    IEnumerable<ITagParser> tagParsers)
+    : IBookingService
 {
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IPageHelper _pageHelper;
-    private readonly IEnumerable<IBookingProvider> _bookingProviders;
-    private readonly IPageFactory _pageFactory;
-    private readonly IMappingService _mappingService;
-    private readonly IWebHostEnvironment _environment;
-    private readonly ISchemaFactory _schemaFactory;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IHashUtil _hashUtil;
-    private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IEnumerable<ITagParser> _tagParsers;
-
-    public BookingService(
-        IDistributedCacheWrapper distributedCache,
-        IPageHelper pageHelper,
-        IEnumerable<IBookingProvider> bookingProviders,
-        IPageFactory pageFactory,
-        IMappingService mappingService,
-        IWebHostEnvironment environment,
-        ISchemaFactory schemaFactory,
-        ISessionHelper sessionHelper,
-        IHashUtil hashUtil,
-        IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-        IHttpContextAccessor httpContextAccessor,
-        IEnumerable<ITagParser> tagParsers)
-    {
-        _distributedCache = distributedCache;
-        _pageHelper = pageHelper;
-        _bookingProviders = bookingProviders;
-        _pageFactory = pageFactory;
-        _mappingService = mappingService;
-        _environment = environment;
-        _schemaFactory = schemaFactory;
-        _sessionHelper = sessionHelper;
-        _hashUtil = hashUtil;
-        _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-        _httpContextAccessor = httpContextAccessor;
-        _tagParsers = tagParsers;
-    }
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IEnumerable<IBookingProvider> _bookingProviders = bookingProviders;
+    private readonly IPageFactory _pageFactory = pageFactory;
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly IWebHostEnvironment _environment = environment;
+    private readonly ISchemaFactory _schemaFactory = schemaFactory;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IHashUtil _hashUtil = hashUtil;
+    private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
 
     public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string cacheKey)
     {

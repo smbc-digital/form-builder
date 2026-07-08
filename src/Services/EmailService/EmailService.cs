@@ -8,20 +8,17 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.EmailService;
 
-public class EmailService : IEmailService
+public class EmailService(
+    ISessionHelper sessionHelper,
+    IDistributedCacheWrapper distributedCache,
+    IEnumerable<IEmailProvider> emailProviders,
+    IActionHelper actionHelper)
+    : IEmailService
 {
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IEmailProvider _emailProvider;
-    private readonly IActionHelper _actionHelper;
-
-    public EmailService(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, IEnumerable<IEmailProvider> emailProviders, IActionHelper actionHelper)
-    {
-        _sessionHelper = sessionHelper;
-        _distributedCache = distributedCache;
-        _emailProvider = emailProviders.First();
-        _actionHelper = actionHelper;
-    }
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IEmailProvider _emailProvider = emailProviders.First();
+    private readonly IActionHelper _actionHelper = actionHelper;
 
     public async Task Process(List<IAction> actions, string form)
     {

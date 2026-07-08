@@ -1,12 +1,11 @@
-﻿namespace form_builder.Enum
+﻿namespace form_builder.Enum;
+
+public enum EActionType
 {
-    public enum EActionType
-    {
-        Unknown,
-        RetrieveExternalData,
-        UserEmail,
-        BackOfficeEmail,
-        Validate,
-        TemplatedEmail
-    }
+    Unknown,
+    RetrieveExternalData,
+    UserEmail,
+    BackOfficeEmail,
+    Validate,
+    TemplatedEmail
 }

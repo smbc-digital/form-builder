@@ -2,45 +2,42 @@
 using form_builder.Models;
 using form_builder.TagParsers.Formatters;
 
-namespace form_builder.TagParsers
+namespace form_builder.TagParsers;
+
+public class CaseReferenceTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public class CaseReferenceTagParser : TagParser, ITagParser
+    public Regex Regex => new Regex("(?<={{)CASEREFERENCE.*?(?=}})", RegexOptions.Compiled);
+
+    public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
     {
-        public CaseReferenceTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
+        var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
+        var pageHasElementsMatchingRegex = page.Elements.Any(_ => (_.Properties.Text is not null && Regex.IsMatch(_.Properties.Text))
+                                                                  || (_.Properties.Url is not null && Regex.IsMatch(_.Properties.Url)));
 
-        public Regex Regex => new Regex("(?<={{)CASEREFERENCE.*?(?=}})", RegexOptions.Compiled);
-
-        public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
+        if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex)
         {
-            var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
-            var pageHasElementsMatchingRegex = page.Elements.Any(_ => (_.Properties.Text is not null && Regex.IsMatch(_.Properties.Text))
-            || (_.Properties.Url is not null && Regex.IsMatch(_.Properties.Url)));
-
-            if (leadingParagraphRegexIsMatch || pageHasElementsMatchingRegex)
+            if (leadingParagraphRegexIsMatch)
             {
-                if (leadingParagraphRegexIsMatch)
-                {
-                    page.LeadingParagraph = Parse(page.LeadingParagraph, formAnswers.CaseReference, Regex);
-                }
-
-                if (pageHasElementsMatchingRegex)
-                {
-                    page.Elements.Select((element) =>
-                    {
-                        if (!string.IsNullOrEmpty(element.Properties?.Text))
-                            element.Properties.Text = Parse(element.Properties.Text, formAnswers.CaseReference, Regex);
-
-                        if (!string.IsNullOrEmpty(element.Properties?.Url))
-                            element.Properties.Url = Parse(element.Properties.Url, formAnswers.CaseReference, Regex);
-
-                        return element;
-                    }).ToList();
-                }
+                page.LeadingParagraph = Parse(page.LeadingParagraph, formAnswers.CaseReference, Regex);
             }
 
-            return await Task.FromResult(page);
+            if (pageHasElementsMatchingRegex)
+            {
+                page.Elements.Select((element) =>
+                {
+                    if (!string.IsNullOrEmpty(element.Properties?.Text))
+                        element.Properties.Text = Parse(element.Properties.Text, formAnswers.CaseReference, Regex);
+
+                    if (!string.IsNullOrEmpty(element.Properties?.Url))
+                        element.Properties.Url = Parse(element.Properties.Url, formAnswers.CaseReference, Regex);
+
+                    return element;
+                }).ToList();
+            }
         }
 
-        public string ParseString(string content, FormAnswers formAnswers) => Regex.IsMatch(content) ? Parse(content, formAnswers.CaseReference, Regex) : content;
+        return await Task.FromResult(page);
     }
+
+    public string ParseString(string content, FormAnswers formAnswers) => Regex.IsMatch(content) ? Parse(content, formAnswers.CaseReference, Regex) : content;
 }

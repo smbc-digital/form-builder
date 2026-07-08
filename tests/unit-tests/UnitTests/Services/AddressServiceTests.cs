@@ -14,238 +14,237 @@ using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.Services;
+
+public class AddressServiceTests
 {
-    public class AddressServiceTests
+    private readonly AddressService _service;
+    private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
+    private readonly Mock<IPageHelper> _pageHelper = new();
+    private readonly Mock<IAddressProvider> _addressProvider = new();
+    private readonly Mock<IPageFactory> _mockPageContentFactory = new();
+    private readonly IEnumerable<IAddressProvider> _addressProviders;
+    private readonly Mock<ILogger<AddressService>> _mockLogger = new();
+
+    public AddressServiceTests()
     {
-        private readonly AddressService _service;
-        private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
-        private readonly Mock<IPageHelper> _pageHelper = new();
-        private readonly Mock<IAddressProvider> _addressProvider = new();
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new();
-        private readonly IEnumerable<IAddressProvider> _addressProviders;
-        private readonly Mock<ILogger<AddressService>> _mockLogger = new();
-
-        public AddressServiceTests()
+        _addressProvider.Setup(_ => _.ProviderName).Returns("testAddressProvider");
+        _addressProviders = new List<IAddressProvider>
         {
-            _addressProvider.Setup(_ => _.ProviderName).Returns("testAddressProvider");
-            _addressProviders = new List<IAddressProvider>
-            {
-                _addressProvider.Object
-            };
+            _addressProvider.Object
+        };
 
-            _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object, _mockLogger.Object);
-        }
+        _service = new AddressService(_mockDistributedCache.Object, _pageHelper.Object, _addressProviders, _mockPageContentFactory.Object, _mockLogger.Object);
+    }
 
-        [Fact]
-        public async Task ProcessAddress_ShouldCallAddressProvider_WhenCorrectJourney()
+    [Fact]
+    public async Task ProcessAddress_ShouldCallAddressProvider_WhenCorrectJourney()
+    {
+        var questionId = "test-address";
+
+        var cacheData = new FormAnswers
         {
-            var questionId = "test-address";
-
-            var cacheData = new FormAnswers
+            Path = "page-one",
+            Pages = new List<PageAnswers>()
             {
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
+                new()
                 {
-                    new()
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new()
                         {
-                            new()
-                            {
-                                QuestionId = $"{questionId}-postcode",
-                                Response = "sk11aa"
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
+                            QuestionId = $"{questionId}-postcode",
+                            Response = "sk11aa"
+                        }
+                    },
+                    PageSlug = "page-one"
                 }
-            };
+            }
+        };
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithQuestionId(questionId)
-                .WithAddressProvider("testAddressProvider")
-                .Build();
+        var element = new ElementBuilder()
+            .WithType(EElementType.Address)
+            .WithQuestionId(questionId)
+            .WithAddressProvider("testAddressProvider")
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithValidatedModel(true)
-                .WithPageSlug("page-one")
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithValidatedModel(true)
+            .WithPageSlug("page-one")
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
-            };
-
-            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
-
-            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-        }
-
-
-        [Fact]
-        public async Task ProcessAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional()
+        var viewModel = new Dictionary<string, dynamic>
         {
-            var questionId = "test-address";
+            { "Guid", Guid.NewGuid().ToString() },
+            { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+        };
 
-            var cacheData = new FormAnswers
+        await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
+
+        _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+    }
+
+
+    [Fact]
+    public async Task ProcessAddress_ShouldNotCallAddressProvider_WhenAddressIsOptional()
+    {
+        var questionId = "test-address";
+
+        var cacheData = new FormAnswers
+        {
+            Path = "page-one",
+            Pages = new List<PageAnswers>()
             {
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
+                new()
                 {
-                    new()
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new()
                         {
-                            new()
-                            {
-                                QuestionId = $"{questionId}-postcode",
-                                Response = ""
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
+                            QuestionId = $"{questionId}-postcode",
+                            Response = ""
+                        }
+                    },
+                    PageSlug = "page-one"
                 }
-            };
+            }
+        };
 
-            _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithQuestionId(questionId)
-                .WithAddressProvider("testAddressProvider")
-                .WithOptional(true)
-                .Build();
+        var element = new ElementBuilder()
+            .WithType(EElementType.Address)
+            .WithQuestionId(questionId)
+            .WithAddressProvider("testAddressProvider")
+            .WithOptional(true)
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithValidatedModel(true)
-                .WithPageSlug("page-one")
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithValidatedModel(true)
+            .WithPageSlug("page-one")
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { $"{element.Properties.QuestionId}-postcode", "" },
-            };
-
-            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
-
-            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task ProcessAddress_ShouldCall_PageHelper_ToProcessSearchResults()
+        var viewModel = new Dictionary<string, dynamic>
         {
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithQuestionId("test-address")
-                .WithAddressProvider("testAddressProvider")
-                .Build();
+            { "Guid", Guid.NewGuid().ToString() },
+            { $"{element.Properties.QuestionId}-postcode", "" },
+        };
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
+        await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+        _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+    }
 
-            _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
-                .ReturnsAsync(new FormBuilderViewModel());
+    [Fact]
+    public async Task ProcessAddress_ShouldCall_PageHelper_ToProcessSearchResults()
+    {
+        var element = new ElementBuilder()
+            .WithType(EElementType.Address)
+            .WithQuestionId("test-address")
+            .WithAddressProvider("testAddressProvider")
+            .Build();
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
-            };
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithPageSlug("page-one")
+            .WithValidatedModel(true)
+            .Build();
 
-            await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
 
-            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-        }
+        _pageHelper.Setup(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()))
+            .ReturnsAsync(new FormBuilderViewModel());
 
-        [Fact]
-        public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
+        var viewModel = new Dictionary<string, dynamic>
         {
-            var addressProvider = "NON-EXIST-PROVIDER";
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithAddressProvider(addressProvider)
-                .WithQuestionId("test-address")
-                .Build();
+            { "Guid", Guid.NewGuid().ToString() },
+            { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+        };
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
+        await _service.ProcessAddress(viewModel, page, schema, "", "page-one");
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+        _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+    }
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
-            };
+    [Fact]
+    public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenNoMatchingAddressProvider()
+    {
+        var addressProvider = "NON-EXIST-PROVIDER";
+        var element = new ElementBuilder()
+            .WithType(EElementType.Address)
+            .WithAddressProvider(addressProvider)
+            .WithQuestionId("test-address")
+            .Build();
 
-            var result = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
-            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            Assert.Equal($"Sequence contains no matching element", result.Message);            
-        }
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithPageSlug("page-one")
+            .WithValidatedModel(true)
+            .Build();
 
-        [Fact]
-        public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
+
+        var viewModel = new Dictionary<string, dynamic>
         {
-            _addressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
-                .Throws<Exception>();
+            { "Guid", Guid.NewGuid().ToString() },
+            { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+        };
 
-            var testAddressProvider = "testAddressProvider";
+        var result = await Assert.ThrowsAsync<InvalidOperationException>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
+        _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+        Assert.Equal($"Sequence contains no matching element", result.Message);            
+    }
 
-            var element = new ElementBuilder()
-                .WithType(EElementType.Address)
-                .WithAddressProvider(testAddressProvider)
-                .WithQuestionId("test-address")
-                .Build();
+    [Fact]
+    public async Task ProcessAddress_Application_ShouldThrowApplicationException_WhenAddressProvider_ThrowsException()
+    {
+        _addressProvider.Setup(_ => _.SearchAsync(It.IsAny<string>()))
+            .Throws<Exception>();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
+        var testAddressProvider = "testAddressProvider";
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+        var element = new ElementBuilder()
+            .WithType(EElementType.Address)
+            .WithAddressProvider(testAddressProvider)
+            .WithQuestionId("test-address")
+            .Build();
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
-            };
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithPageSlug("page-one")
+            .WithValidatedModel(true)
+            .Build();
 
-            var result = await Assert.ThrowsAsync<Exception>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
 
-            _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.Equal($"Exception of type 'System.Exception' was thrown.", result.Message);                
-        }
+        var viewModel = new Dictionary<string, dynamic>
+        {
+            { "Guid", Guid.NewGuid().ToString() },
+            { $"{element.Properties.QuestionId}-postcode", "SK11aa" },
+        };
+
+        var result = await Assert.ThrowsAsync<Exception>(() => _service.ProcessAddress(viewModel, page, schema, "", "page-one"));
+
+        _addressProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+        _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
+        Assert.Equal($"Exception of type 'System.Exception' was thrown.", result.Message);                
     }
 }

@@ -14,155 +14,154 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Controllers
+namespace form_builder_tests.UnitTests.Controllers;
+
+public class BookingControllerTests
 {
-    public class BookingControllerTests
+    private readonly BookingController _bookingController;
+
+    private readonly Mock<IBookingService> _bookingService = new();
+    private readonly Mock<IPageService> _pageService = new();
+    private readonly Mock<ISchemaFactory> _schemaFactory = new();
+
+    public BookingControllerTests()
     {
-        private readonly BookingController _bookingController;
+        var element = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithQuestionId("valid")
+            .Build();
 
-        private readonly Mock<IBookingService> _bookingService = new();
-        private readonly Mock<IPageService> _pageService = new();
-        private readonly Mock<ISchemaFactory> _schemaFactory = new();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithValidatedModel(true)
+            .WithPageSlug("valid")
+            .Build();
 
-        public BookingControllerTests()
-        {
-            var element = new ElementBuilder()
-               .WithType(EElementType.Booking)
-               .WithQuestionId("valid")
-               .Build();
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithValidatedModel(true)
-                .WithPageSlug("valid")
-                .Build();
+        _schemaFactory.Setup(_ => _.Build("valid"))
+            .ReturnsAsync(schema);
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            _schemaFactory.Setup(_ => _.Build("valid"))
-                .ReturnsAsync(schema);
-
-            _bookingController = new BookingController(_bookingService.Object, _schemaFactory.Object, _pageService.Object);
-            _bookingController.ControllerContext = new ControllerContext();
-            _bookingController.ControllerContext.HttpContext = new DefaultHttpContext();
-            _bookingController.ControllerContext.HttpContext.Request.Query = new QueryCollection();
-        }
+        _bookingController = new BookingController(_bookingService.Object, _schemaFactory.Object, _pageService.Object);
+        _bookingController.ControllerContext = new ControllerContext();
+        _bookingController.ControllerContext.HttpContext = new DefaultHttpContext();
+        _bookingController.ControllerContext.HttpContext.Request.Query = new QueryCollection();
+    }
 
 
-        [Fact]
-        public async Task Index_Should_RedirectTo_HomeController_Index_WithRouteValues()
-        {
-            // Arrange
-            const string form = "valid";
-            const string path = "valid";
-            var viewModel = new Dictionary<string, string[]>();
+    [Fact]
+    public async Task Index_Should_RedirectTo_HomeController_Index_WithRouteValues()
+    {
+        // Arrange
+        const string form = "valid";
+        const string path = "valid";
+        var viewModel = new Dictionary<string, string[]>();
 
-            // Act
-            var result = await _bookingController.Index(form, path, viewModel);
+        // Act
+        var result = await _bookingController.Index(form, path, viewModel);
 
-            // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            redirectResult.RouteValues.TryGetValue(nameof(form), out var formName);
-            redirectResult.RouteValues.TryGetValue(nameof(path), out var pathName);
+        // Assert
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        redirectResult.RouteValues.TryGetValue(nameof(form), out var formName);
+        redirectResult.RouteValues.TryGetValue(nameof(path), out var pathName);
 
-            Assert.Equal("Home", redirectResult.ControllerName);
-            Assert.Equal("Index", redirectResult.ActionName);
+        Assert.Equal("Home", redirectResult.ControllerName);
+        Assert.Equal("Index", redirectResult.ActionName);
 
-            Assert.Equal(form, formName);
-            Assert.Equal(path, pathName);
-            _bookingService.Verify(_ => _.ProcessMonthRequest(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-        }
+        Assert.Equal(form, formName);
+        Assert.Equal(path, pathName);
+        _bookingService.Verify(_ => _.ProcessMonthRequest(It.IsAny<Dictionary<string, object>>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
 
-        [Fact]
-        public async Task CancelBooking_Should_Throw_ApplicationException_When_Id_IsEmpty()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBooking("hash", Guid.Empty, "path"));
-            Assert.StartsWith("BookingController::CancelBooking, Invalid parameters received. Id:", result.Message);
-        }
+    [Fact]
+    public async Task CancelBooking_Should_Throw_ApplicationException_When_Id_IsEmpty()
+    {
+        var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBooking("hash", Guid.Empty, "path"));
+        Assert.StartsWith("BookingController::CancelBooking, Invalid parameters received. Id:", result.Message);
+    }
 
-        [Fact]
-        public async Task CancelBooking_Should_Throw_ApplicationException_When_Hash_IsEmpty()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBooking(string.Empty, Guid.NewGuid(), "path"));
-            Assert.StartsWith("BookingController::CancelBooking, Invalid parameters received. Id:", result.Message);
-        }
+    [Fact]
+    public async Task CancelBooking_Should_Throw_ApplicationException_When_Hash_IsEmpty()
+    {
+        var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBooking(string.Empty, Guid.NewGuid(), "path"));
+        Assert.StartsWith("BookingController::CancelBooking, Invalid parameters received. Id:", result.Message);
+    }
 
 
-        [Fact]
-        public async Task CancelBooking_Should_RedirectToAction_When_Booking_Cannot_Be_Cancelled()
-        {
-            _bookingService.Setup(_ => _.ValidateCancellationRequest(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()))
-                .ThrowsAsync(new BookingCannotBeCancelledException(("cancellation not available")));
+    [Fact]
+    public async Task CancelBooking_Should_RedirectToAction_When_Booking_Cannot_Be_Cancelled()
+    {
+        _bookingService.Setup(_ => _.ValidateCancellationRequest(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()))
+            .ThrowsAsync(new BookingCannotBeCancelledException(("cancellation not available")));
 
-            var result = await _bookingController.CancelBooking("hash", Guid.NewGuid(), "path");
+        var result = await _bookingController.CancelBooking("hash", Guid.NewGuid(), "path");
 
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("CannotCancel", redirectResult.ActionName);
-        }
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("CannotCancel", redirectResult.ActionName);
+    }
 
-        [Fact]
-        public async Task CancelBooking_Should_Return_View_WhenAble_To_Cancel_Booking()
-        {
-            _bookingService.Setup(_ => _.ValidateCancellationRequest(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()))
-                .ReturnsAsync(new CancelledAppointmentInformation());
+    [Fact]
+    public async Task CancelBooking_Should_Return_View_WhenAble_To_Cancel_Booking()
+    {
+        _bookingService.Setup(_ => _.ValidateCancellationRequest(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()))
+            .ReturnsAsync(new CancelledAppointmentInformation());
 
-            var result = await _bookingController.CancelBooking("hash", Guid.NewGuid(), "path");
+        var result = await _bookingController.CancelBooking("hash", Guid.NewGuid(), "path");
 
-            var redirectResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("AppointmentDetails", redirectResult.ViewName);
-            _bookingService.Verify(_ => _.ValidateCancellationRequest(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
-        }
+        var redirectResult = Assert.IsType<ViewResult>(result);
+        Assert.Equal("AppointmentDetails", redirectResult.ViewName);
+        _bookingService.Verify(_ => _.ValidateCancellationRequest(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+    }
 
-        [Fact]
-        public async Task CancelBookingPost_Should_Throw_ApplicationException_When_Id_IsEmpty()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBookingPost("hash", Guid.Empty, "path"));
-            Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters received. Id:", result.Message);
-        }
+    [Fact]
+    public async Task CancelBookingPost_Should_Throw_ApplicationException_When_Id_IsEmpty()
+    {
+        var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBookingPost("hash", Guid.Empty, "path"));
+        Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters received. Id:", result.Message);
+    }
 
-        [Fact]
-        public async Task CancelBookingPost_Should_Throw_ApplicationException_When_Hash_IsEmpty()
-        {
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBookingPost(string.Empty, Guid.NewGuid(), "path"));
-            Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters received. Id:", result.Message);
-        }
+    [Fact]
+    public async Task CancelBookingPost_Should_Throw_ApplicationException_When_Hash_IsEmpty()
+    {
+        var result = await Assert.ThrowsAsync<ApplicationException>(() => _bookingController.CancelBookingPost(string.Empty, Guid.NewGuid(), "path"));
+        Assert.StartsWith("BookingController::CancelBookingPost, Invalid parameters received. Id:", result.Message);
+    }
 
-        [Fact]
-        public async Task CancelBookingPost_Should_Return_Success_View_WhenBooking_Cancelled_Successfully()
-        {
-            var result = await _bookingController.CancelBookingPost("hash", Guid.NewGuid(), "path");
+    [Fact]
+    public async Task CancelBookingPost_Should_Return_Success_View_WhenBooking_Cancelled_Successfully()
+    {
+        var result = await _bookingController.CancelBookingPost("hash", Guid.NewGuid(), "path");
 
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("CancelSuccess", redirectResult.ActionName);
-            _bookingService.Verify(_ => _.Cancel(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
-        }
+        var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+        Assert.Equal("CancelSuccess", redirectResult.ActionName);
+        _bookingService.Verify(_ => _.Cancel(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+    }
 
-        [Fact]
-        public async Task CannotCancel_ShouldReturn_Cannot_Cancel_View()
-        {
-            _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
-                .ReturnsAsync(new FormSchema());
+    [Fact]
+    public async Task CannotCancel_ShouldReturn_Cannot_Cancel_View()
+    {
+        _schemaFactory.Setup(_ => _.Build(It.IsAny<string>()))
+            .ReturnsAsync(new FormSchema());
 
-            var result = await _bookingController.CannotCancel("form");
+        var result = await _bookingController.CannotCancel("form");
 
-            var redirectResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("CannotCancel", redirectResult.ViewName);
-            _schemaFactory.Verify(_ => _.Build(It.Is<string>(_ => _.Equals("form"))), Times.Once);
-        }
+        var redirectResult = Assert.IsType<ViewResult>(result);
+        Assert.Equal("CannotCancel", redirectResult.ViewName);
+        _schemaFactory.Verify(_ => _.Build(It.Is<string>(_ => _.Equals("form"))), Times.Once);
+    }
 
-        [Fact]
-        public async Task CancelSuccess_ShouldReturn_Cannot_Cancel_View()
-        {
-            _pageService.Setup(_ => _.GetCancelBookingSuccessPage(It.IsAny<string>()))
-                .ReturnsAsync(new SuccessPageEntity());
+    [Fact]
+    public async Task CancelSuccess_ShouldReturn_Cannot_Cancel_View()
+    {
+        _pageService.Setup(_ => _.GetCancelBookingSuccessPage(It.IsAny<string>()))
+            .ReturnsAsync(new SuccessPageEntity());
 
-            var result = await _bookingController.CancelSuccess("form");
+        var result = await _bookingController.CancelSuccess("form");
 
-            var redirectResult = Assert.IsType<ViewResult>(result);
-            Assert.Equal("../Home/Success", redirectResult.ViewName);
-            _pageService.Verify(_ => _.GetCancelBookingSuccessPage(It.Is<string>(_ => _.Equals("form"))), Times.Once);
-        }
+        var redirectResult = Assert.IsType<ViewResult>(result);
+        Assert.Equal("../Home/Success", redirectResult.ViewName);
+        _pageService.Verify(_ => _.GetCancelBookingSuccessPage(It.Is<string>(_ => _.Equals("form"))), Times.Once);
     }
 }

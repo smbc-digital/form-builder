@@ -1,17 +1,16 @@
 using form_builder.Enum;
 
-namespace form_builder.Providers.DocumentCreation
+namespace form_builder.Providers.DocumentCreation;
+
+public interface IDocumentCreation
 {
-    public interface IDocumentCreation
-    {
-        EProviderPriority Priority { get; }
+    EProviderPriority Priority { get; }
 
-        EDocumentType DocumentType { get; }
+    EDocumentType DocumentType { get; }
 
-        byte[] CreateDocument(List<string> fileContent);
+    byte[] CreateDocument(List<string> fileContent);
 
-        byte[] CreateHtmlDocument(List<string> fileContent, string formName);
+    byte[] CreateHtmlDocument(List<string> fileContent, string formName);
 
-        byte[] CreatePdfDocument(List<string> fileContent, string formName);
-    }
+    byte[] CreatePdfDocument(List<string> fileContent, string formName);
 }

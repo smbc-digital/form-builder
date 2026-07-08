@@ -1,8 +1,7 @@
-namespace form_builder.Configuration
+namespace form_builder.Configuration;
+
+public class JavascriptConfiguration
 {
-    public class JavascriptConfiguration
-    {
-        public const string ConfigValue = "JavascriptUrl";
-        public string Javascript { get; set; }
-    }
+    public const string ConfigValue = "JavascriptUrl";
+    public string Javascript { get; set; }
 }

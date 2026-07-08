@@ -3,55 +3,54 @@ using form_builder.Models.Properties.EnabledForProperties;
 using form_builder.Providers.EnabledFor;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Providers.EnabledFor
+namespace form_builder_tests.UnitTests.Providers.EnabledFor;
+
+public class TimeWindowTests
 {
-    public class TimeWindowTests
+    private readonly TimeWindow _timeWindow = new TimeWindow();
+
+    [Fact]
+    public void IsAvailable_ShouldReturnTrue_WhenDate_IsBetween_Start_And_End_Date()
     {
-        private readonly TimeWindow _timeWindow = new TimeWindow();
-
-        [Fact]
-        public void IsAvailable_ShouldReturnTrue_WhenDate_IsBetween_Start_And_End_Date()
+        var model = new EnabledForBase
         {
-            var model = new EnabledForBase
+            Properties = new EnabledForProperties
             {
-                Properties = new EnabledForProperties
-                {
-                    Start = DateTime.Now.AddDays(-1),
-                    End = DateTime.Now.AddDays(+1)
-                }
-            };
+                Start = DateTime.Now.AddDays(-1),
+                End = DateTime.Now.AddDays(+1)
+            }
+        };
 
-            Assert.True(_timeWindow.IsAvailable(model));
-        }
+        Assert.True(_timeWindow.IsAvailable(model));
+    }
 
-        [Fact]
-        public void IsAvailable_ShouldReturnFalse_WhenDate_IsAfter_EndDate()
+    [Fact]
+    public void IsAvailable_ShouldReturnFalse_WhenDate_IsAfter_EndDate()
+    {
+        var model = new EnabledForBase
         {
-            var model = new EnabledForBase
+            Properties = new EnabledForProperties
             {
-                Properties = new EnabledForProperties
-                {
-                    Start = DateTime.Now.AddDays(-2),
-                    End = DateTime.Now.AddDays(-1)
-                }
-            };
+                Start = DateTime.Now.AddDays(-2),
+                End = DateTime.Now.AddDays(-1)
+            }
+        };
 
-            Assert.False(_timeWindow.IsAvailable(model));
-        }
+        Assert.False(_timeWindow.IsAvailable(model));
+    }
 
-        [Fact]
-        public void IsAvailable_ShouldReturnFalse_WhenDate_IsBefore_StartDate()
+    [Fact]
+    public void IsAvailable_ShouldReturnFalse_WhenDate_IsBefore_StartDate()
+    {
+        var model = new EnabledForBase
         {
-            var model = new EnabledForBase
+            Properties = new EnabledForProperties
             {
-                Properties = new EnabledForProperties
-                {
-                    Start = DateTime.Now.AddDays(+1),
-                    End = DateTime.Now.AddDays(+2)
-                }
-            };
+                Start = DateTime.Now.AddDays(+1),
+                End = DateTime.Now.AddDays(+2)
+            }
+        };
 
-            Assert.False(_timeWindow.IsAvailable(model));
-        }
+        Assert.False(_timeWindow.IsAvailable(model));
     }
 }

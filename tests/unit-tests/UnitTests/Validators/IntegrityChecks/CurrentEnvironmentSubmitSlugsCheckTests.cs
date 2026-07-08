@@ -7,44 +7,43 @@ using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators.IntegrityChecks
+namespace form_builder_tests.UnitTests.Validators.IntegrityChecks;
+
+public class CurrentEnvironmentSubmitSlugsCheckTests
 {
-    public class CurrentEnvironmentSubmitSlugsCheckTests
+    private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+
+    public CurrentEnvironmentSubmitSlugsCheckTests()
     {
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new Mock<IWebHostEnvironment>();
+        _mockHostingEnv.Setup(_ => _.EnvironmentName)
+            .Returns("local");
+    }
 
-        public CurrentEnvironmentSubmitSlugsCheckTests()
+    [Fact]
+    public void CurrentEnvironmentSubmitSlugsCheck_IsNotValid_WhenPageSlugIsNotPresentFor()
+    {
+        // Arrange
+        var submitSlug = new SubmitSlug
         {
-            _mockHostingEnv.Setup(_ => _.EnvironmentName)
-                    .Returns("local");
-        }
+            Environment = "mysteryEnvironment",
+            URL = "test-url"
+        };
 
-        [Fact]
-        public void CurrentEnvironmentSubmitSlugsCheck_IsNotValid_WhenPageSlugIsNotPresentFor()
+        var behaviours = new List<Behaviour>
         {
-            // Arrange
-            var submitSlug = new SubmitSlug
-            {
-                Environment = "mysteryEnvironment",
-                URL = "test-url"
-            };
-
-            var behaviours = new List<Behaviour>
-            {
-                new BehaviourBuilder()
+            new BehaviourBuilder()
                 .WithBehaviourType(EBehaviourType.SubmitForm)
                 .WithSubmitSlug(submitSlug)
                 .Build()
-            };
+        };
 
-            var check = new CurrentEnvironmentSubmitSlugsCheck(_mockHostingEnv.Object);
+        var check = new CurrentEnvironmentSubmitSlugsCheck(_mockHostingEnv.Object);
 
-            // Act & Assert
-            var result = check.Validate(behaviours);
+        // Act & Assert
+        var result = check.Validate(behaviours);
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Collection<string>(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
     }
 }

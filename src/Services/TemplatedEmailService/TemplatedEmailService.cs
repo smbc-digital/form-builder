@@ -7,58 +7,50 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Providers.TemplatedEmailProvider;
 using Newtonsoft.Json;
 
-namespace form_builder.Services.TemplatedEmailService
+namespace form_builder.Services.TemplatedEmailService;
+
+public class TemplatedEmailService(
+    IEnumerable<ITemplatedEmailProvider> templatedEmailProviders,
+    IActionHelper actionHelper,
+    ISessionHelper sessionHelper,
+    IDistributedCacheWrapper distributedCache)
+    : ITemplatedEmailService
 {
-    public class TemplatedEmailService : ITemplatedEmailService
+    private readonly IEnumerable<ITemplatedEmailProvider> _templatedEmailProviders = templatedEmailProviders;
+    private readonly IActionHelper _actionHelper = actionHelper;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+
+    public Task ProcessTemplatedEmail(List<IAction> actions, string form)
     {
-        private readonly IEnumerable<ITemplatedEmailProvider> _templatedEmailProviders;
-        private readonly IActionHelper _actionHelper;
-        private readonly ISessionHelper _sessionHelper;
-        private readonly IDistributedCacheWrapper _distributedCache;
+        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string formSessionId = $"{form}::{browserSessionId}";
 
-        public TemplatedEmailService(
-            IEnumerable<ITemplatedEmailProvider> templatedEmailProviders,
-            IActionHelper actionHelper,
-            ISessionHelper sessionHelper,
-            IDistributedCacheWrapper distributedCache)
+        var formData = _distributedCache.GetString(formSessionId);
+
+        if (string.IsNullOrEmpty(formData))
+            throw new Exception("TemplatedEmailService::Process: Session has expired");
+
+        var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
+
+        foreach (var action in actions)
         {
-            _templatedEmailProviders = templatedEmailProviders;
-            _actionHelper = actionHelper;
-            _sessionHelper = sessionHelper;
-            _distributedCache = distributedCache;
+            var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
+            var convertedAnswers = formAnswers.AllAnswers.ToDictionary(x => x.QuestionId, x => x.Response);
+            var personalisation = new Dictionary<string, dynamic>();
+
+            if (action.Properties.IncludeCaseReference)
+                personalisation.Add("reference", formAnswers.CaseReference);
+
+            if (action.Properties.Personalisation is not null && !convertedAnswers.Count.Equals(0))
+                action.Properties.Personalisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
+
+            action.ProcessTemplatedEmail(
+                _actionHelper,
+                templatedEmailProvider,
+                personalisation,
+                formAnswers);
         }
-
-        public Task ProcessTemplatedEmail(List<IAction> actions, string form)
-        {
-            string browserSessionId = _sessionHelper.GetBrowserSessionId();
-            string formSessionId = $"{form}::{browserSessionId}";
-
-            var formData = _distributedCache.GetString(formSessionId);
-
-            if (string.IsNullOrEmpty(formData))
-                throw new Exception("TemplatedEmailService::Process: Session has expired");
-
-            var formAnswers = JsonConvert.DeserializeObject<FormAnswers>(formData);
-
-            foreach (var action in actions)
-            {
-                var templatedEmailProvider = _templatedEmailProviders.Get(action.Properties.EmailTemplateProvider);
-                var convertedAnswers = formAnswers.AllAnswers.ToDictionary(x => x.QuestionId, x => x.Response);
-                var personalisation = new Dictionary<string, dynamic>();
-
-                if (action.Properties.IncludeCaseReference)
-                    personalisation.Add("reference", formAnswers.CaseReference);
-
-                if (action.Properties.Personalisation is not null && !convertedAnswers.Count.Equals(0))
-                    action.Properties.Personalisation.ForEach(field => { personalisation.Add(field, convertedAnswers[field]); });
-
-                action.ProcessTemplatedEmail(
-                    _actionHelper,
-                    templatedEmailProvider,
-                    personalisation,
-                    formAnswers);
-            }
-            return null;
-        }
+        return null;
     }
 }

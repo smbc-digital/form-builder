@@ -3,43 +3,38 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.MappingService;
 using form_builder.Services.SubmitService;
 
-namespace form_builder.Workflows.RedirectWorkflow
+namespace form_builder.Workflows.RedirectWorkflow;
+
+public class RedirectWorkflow(
+    ISubmitService submitService,
+    IMappingService mappingService,
+    ISessionHelper sessionHelper,
+    IDistributedCacheWrapper distributedCache,
+    ILogger<RedirectWorkflow> logger)
+    : IRedirectWorkflow
 {
-    public class RedirectWorkflow : IRedirectWorkflow
+
+    private readonly ISubmitService _submitService = submitService;
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+
+    private readonly ILogger<RedirectWorkflow> _logger = logger;
+
+    public async Task<string> Submit(string form, string path)
     {
+        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        if (string.IsNullOrEmpty(browserSessionId))
+            throw new ApplicationException("RedirectWorkflow:Submit: Session GUID is null");
 
-        private readonly ISubmitService _submitService;
-        private readonly IMappingService _mappingService;
-        private readonly ISessionHelper _sessionHelper;
-        private readonly IDistributedCacheWrapper _distributedCache;
+        string formSessionId = $"{form}::{browserSessionId}";
 
-        private readonly ILogger<RedirectWorkflow> _logger;
+        var data = await _mappingService.Map(formSessionId, form, null, null);
+        var redirectUrl = await _submitService.RedirectSubmission(data, form, formSessionId);
 
-        public RedirectWorkflow(ISubmitService submitService, IMappingService mappingService, ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache, ILogger<RedirectWorkflow> logger)
-        {
-            _submitService = submitService;
-            _mappingService = mappingService;
-            _sessionHelper = sessionHelper;
-            _distributedCache = distributedCache;
-            _logger = logger;
-            
-        }
+        _logger.LogInformation($"RedirectWorkflow:Submit:{formSessionId}: Disposing session");
+        _distributedCache.Remove(formSessionId);
 
-        public async Task<string> Submit(string form, string path)
-        {
-            string browserSessionId = _sessionHelper.GetBrowserSessionId();
-            if (string.IsNullOrEmpty(browserSessionId))
-                throw new ApplicationException("RedirectWorkflow:Submit: Session GUID is null");
-
-            string formSessionId = $"{form}::{browserSessionId}";
-
-            var data = await _mappingService.Map(formSessionId, form, null, null);
-            var redirectUrl = await _submitService.RedirectSubmission(data, form, formSessionId);
-
-            _logger.LogInformation($"RedirectWorkflow:Submit:{formSessionId}: Disposing session");
-            _distributedCache.Remove(formSessionId);
-
-            return redirectUrl;
-        }
+        return redirectUrl;
     }
 }

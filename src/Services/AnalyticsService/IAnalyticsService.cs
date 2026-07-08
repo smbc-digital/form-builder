@@ -1,10 +1,9 @@
 
 using form_builder.Enum;
 
-namespace form_builder.Services.AnalyticsService
+namespace form_builder.Services.AnalyticsService;
+
+public interface IAnalyticsService
 {
-    public interface IAnalyticsService
-    {
-        void RaiseEvent(string form, EAnalyticsEventType eventType);
-    }
+    void RaiseEvent(string form, EAnalyticsEventType eventType);
 }

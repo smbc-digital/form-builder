@@ -8,73 +8,72 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Workflows
+namespace form_builder_tests.UnitTests.Workflows;
+
+public class RedirectWorkflowTests
 {
-    public class RedirectWorkflowTests
+    private readonly RedirectWorkflow _workflow;
+    private readonly Mock<ISessionHelper> _sessionHelper = new();
+    private readonly Mock<ISubmitService> _submitService = new();
+    private readonly Mock<IMappingService> _mappingService = new();
+    private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
+
+    private readonly Mock<ILogger<RedirectWorkflow>> _logger = new();
+
+    public RedirectWorkflowTests()
     {
-        private readonly RedirectWorkflow _workflow;
-        private readonly Mock<ISessionHelper> _sessionHelper = new();
-        private readonly Mock<ISubmitService> _submitService = new();
-        private readonly Mock<IMappingService> _mappingService = new();
-        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
+        _workflow = new RedirectWorkflow(_submitService.Object, _mappingService.Object, _sessionHelper.Object, _distributedCache.Object, _logger.Object);
+    }
 
-        private readonly Mock<ILogger<RedirectWorkflow>> _logger = new();
+    [Fact]
+    public async Task Submit_ShouldThrowApplicationException_WhenNoSessionGuid()
+    {
+        // Act
+        var result = await Assert.ThrowsAsync<ApplicationException>(() => _workflow.Submit("form", "page"));
 
-        public RedirectWorkflowTests()
-        {
-            _workflow = new RedirectWorkflow(_submitService.Object, _mappingService.Object, _sessionHelper.Object, _distributedCache.Object, _logger.Object);
-        }
+        // Assert
+        _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Never);
+        _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
 
-        [Fact]
-        public async Task Submit_ShouldThrowApplicationException_WhenNoSessionGuid()
-        {
-            // Act
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _workflow.Submit("form", "page"));
+    [Fact]
+    public async Task Submit_ShouldCallMappingService_WhenSessionGuidIsSupplied()
+    {
+        // Arrange
+        _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123454");
 
-            // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Never);
-            _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        }
+        // Act
+        await _workflow.Submit("form", "page");
 
-        [Fact]
-        public async Task Submit_ShouldCallMappingService_WhenSessionGuidIsSupplied()
-        {
-            // Arrange
-            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123454");
+        // Assert
+        _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Once);
+    }
 
-            // Act
-            await _workflow.Submit("form", "page");
+    [Fact]
+    public async Task Submit_ShouldCallSubmitService_WhenSessionGuidIsSupplied()
+    {
+        // Arrange
+        _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123454");
 
-            // Assert
-            _mappingService.Verify(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null), Times.Once);
-        }
+        // Act
+        await _workflow.Submit("form", "page");
 
-        [Fact]
-        public async Task Submit_ShouldCallSubmitService_WhenSessionGuidIsSupplied()
-        {
-            // Arrange
-            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("123454");
+        // Assert
+        _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
 
-            // Act
-            await _workflow.Submit("form", "page");
+    [Fact]
+    public async Task Submit_ShouldDeleteCacheEntry()
+    {
+        // Arrange
+        var guid = "1234";
+        _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid);
 
-            // Assert
-            _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-        }
+        // Act
+        await _workflow.Submit("form", "page");
 
-        [Fact]
-        public async Task Submit_ShouldDeleteCacheEntry()
-        {
-            // Arrange
-            var guid = "1234";
-            _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns(guid);
-
-            // Act
-            await _workflow.Submit("form", "page");
-
-            // Assert
-            _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
-        }
+        // Assert
+        _submitService.Verify(_ => _.RedirectSubmission(It.IsAny<MappingEntity>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        _distributedCache.Verify(_ => _.Remove(It.IsAny<string>()), Times.Once);
     }
 }

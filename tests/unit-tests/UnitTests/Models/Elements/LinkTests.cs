@@ -9,56 +9,55 @@ using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Models.Elements
+namespace form_builder_tests.UnitTests.Models.Elements;
+
+public class LinkTests
 {
-    public class LinkTests
+    private readonly Mock<IViewRender> _mockIViewRender = new();
+    private readonly Mock<IElementHelper> _mockElementHelper = new();
+    private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+
+    public LinkTests()
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new();
-        private readonly Mock<IElementHelper> _mockElementHelper = new();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
+    }
 
-        public LinkTests()
-        {
-            _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("local");
-        }
+    [Fact]
+    public async Task GenerateHtml_ShouldCallViewRenderForLinkElement()
+    {
+        //Arrange
+        Element element = new ElementBuilder()
+            .WithType(EElementType.Link)
+            .WithPropertyText("test")
+            .WithUrl("test")
+            .WithClassName("govuk-button")
+            .WithOpenInTab(true)
+            .Build();
 
-        [Fact]
-        public async Task GenerateHtml_ShouldCallViewRenderForLinkElement()
-        {
-            //Arrange
-            Element element = new ElementBuilder()
-                .WithType(EElementType.Link)
-                .WithPropertyText("test")
-                .WithUrl("test")
-                .WithClassName("govuk-button")
-                .WithOpenInTab(true)
-                .Build();
+        Page page = new PageBuilder()
+            .WithElement(element)
+            .Build();
 
-            Page page = new PageBuilder()
-                .WithElement(element)
-                .Build();
+        Dictionary<string, dynamic> viewModel = new Dictionary<string, dynamic>();
 
-            Dictionary<string, dynamic> viewModel = new Dictionary<string, dynamic>();
+        FormSchema schema = new FormSchemaBuilder()
+            .WithName("form-name")
+            .Build();
 
-            FormSchema schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
+        FormAnswers formAnswers = new FormAnswers();
 
-            FormAnswers formAnswers = new FormAnswers();
+        //Act
+        await element.RenderAsync(
+            _mockIViewRender.Object,
+            _mockElementHelper.Object,
+            string.Empty,
+            viewModel,
+            page,
+            schema,
+            _mockHostingEnv.Object,
+            formAnswers);
 
-            //Act
-            await element.RenderAsync(
-                _mockIViewRender.Object,
-                _mockElementHelper.Object,
-                string.Empty,
-                viewModel,
-                page,
-                schema,
-                _mockHostingEnv.Object,
-                formAnswers);
-
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync<Element>(It.Is<string>(x => x.Equals("Link")), It.IsAny<Link>(), It.IsAny<Dictionary<string, object>?>()), Times.Once);
-        }
+        //Assert
+        _mockIViewRender.Verify(_ => _.RenderAsync<Element>(It.Is<string>(x => x.Equals("Link")), It.IsAny<Link>(), It.IsAny<Dictionary<string, object>?>()), Times.Once);
     }
 }

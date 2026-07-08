@@ -1,9 +1,8 @@
 ﻿using form_builder.Enum;
 
-namespace form_builder.Models.Properties.ElementProperties
+namespace form_builder.Models.Properties.ElementProperties;
+
+public partial class BaseProperty
 {
-    public partial class BaseProperty
-    {
-        public EDocumentType DocumentType { get; set; }
-    }
+    public EDocumentType DocumentType { get; set; }
 }

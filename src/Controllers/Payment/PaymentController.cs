@@ -10,22 +10,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace form_builder.Controllers.Payment;
 
-public class PaymentController : Controller
+public class PaymentController(
+    IPayService payService,
+    ISessionHelper sessionHelper,
+    IMappingService mappingService,
+    ISuccessWorkflow successWorkflow,
+    ILogger<PaymentController> logger)
+    : Controller
 {
-    private readonly IPayService _payService;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IMappingService _mappingService;
-    private readonly ISuccessWorkflow _successWorkflow;
-    private readonly ILogger<PaymentController> _logger;
-
-    public PaymentController(IPayService payService, ISessionHelper sessionHelper, IMappingService mappingService, ISuccessWorkflow successWorkflow, ILogger<PaymentController> logger)
-    {
-        _payService = payService;
-        _sessionHelper = sessionHelper;
-        _mappingService = mappingService;
-        _successWorkflow = successWorkflow;
-        _logger = logger;
-    }
+    private readonly IPayService _payService = payService;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly ISuccessWorkflow _successWorkflow = successWorkflow;
+    private readonly ILogger<PaymentController> _logger = logger;
 
     [HttpGet]
     [Route("{form}/{path}/payment-response")]

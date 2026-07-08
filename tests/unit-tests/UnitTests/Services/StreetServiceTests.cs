@@ -12,291 +12,290 @@ using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways.Enums;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Services
+namespace form_builder_tests.UnitTests.Services;
+
+public class StreetServiceTests
 {
-    public class StreetServiceTests
+    private readonly StreetService _service;
+    private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
+    private readonly Mock<IPageHelper> _pageHelper = new();
+    private readonly Mock<IStreetProvider> _streetProvider = new();
+    private readonly Mock<IPageFactory> _mockPageContentFactory = new();
+
+    public StreetServiceTests()
     {
-        private readonly StreetService _service;
-        private readonly Mock<IDistributedCacheWrapper> _distributedCache = new();
-        private readonly Mock<IPageHelper> _pageHelper = new();
-        private readonly Mock<IStreetProvider> _streetProvider = new();
-        private readonly Mock<IPageFactory> _mockPageContentFactory = new();
-
-        public StreetServiceTests()
+        _streetProvider.Setup(_ => _.ProviderName).Returns("Fake");
+        var _streetProviders = new List<IStreetProvider>
         {
-            _streetProvider.Setup(_ => _.ProviderName).Returns("Fake");
-            var _streetProviders = new List<IStreetProvider>
-            {
-                _streetProvider.Object
-            };
+            _streetProvider.Object
+        };
 
-            _service = new StreetService(_distributedCache.Object, _streetProviders, _pageHelper.Object, _mockPageContentFactory.Object);
-        }
+        _service = new StreetService(_distributedCache.Object, _streetProviders, _pageHelper.Object, _mockPageContentFactory.Object);
+    }
 
-        [Fact]
-        public async Task ProcessStreet_ShouldCallStreetProvider_WhenCorrectJourney()
+    [Fact]
+    public async Task ProcessStreet_ShouldCallStreetProvider_WhenCorrectJourney()
+    {
+        var questionId = "test-street";
+
+        var cacheData = new FormAnswers
         {
-            var questionId = "test-street";
-
-            var cacheData = new FormAnswers
+            Path = "page-one",
+            Pages = new List<PageAnswers>()
             {
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
+                new()
                 {
-                    new()
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new()
                         {
-                            new()
-                            {
-                                QuestionId = questionId,
-                                Response = "searchTerm"
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
-                },
-                FormData = new Dictionary<string, object>
-                {
-                    { "page-one-search-results" , new List<object>() }
+                            QuestionId = questionId,
+                            Response = "searchTerm"
+                        }
+                    },
+                    PageSlug = "page-one"
                 }
-            };
-
-            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId(questionId)
-               .WithStreetProvider(EStreetProvider.Fake.ToString())
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithValidatedModel(true)
-                .WithPageSlug("page-one")
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>
+            },
+            FormData = new Dictionary<string, object>
             {
-                { "Guid", Guid.NewGuid().ToString() },
-                { "subPath", "automatic" },
-                { element.Properties.QuestionId, "searchTerm" },
-            };
+                { "page-one-search-results" , new List<object>() }
+            }
+        };
 
-            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-        }
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .WithQuestionId(questionId)
+            .WithStreetProvider(EStreetProvider.Fake.ToString())
+            .Build();
 
-        [Fact]
-        public async Task ProcessStreet_ShouldNotCallStreetProvider_WhenStreetIsOptional()
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithValidatedModel(true)
+            .WithPageSlug("page-one")
+            .Build();
+
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
+
+        var viewModel = new Dictionary<string, dynamic>
         {
-            var questionId = "test-street";
+            { "Guid", Guid.NewGuid().ToString() },
+            { "subPath", "automatic" },
+            { element.Properties.QuestionId, "searchTerm" },
+        };
 
-            var cacheData = new FormAnswers
+        await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+
+        _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+        _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ProcessStreet_ShouldNotCallStreetProvider_WhenStreetIsOptional()
+    {
+        var questionId = "test-street";
+
+        var cacheData = new FormAnswers
+        {
+            Path = "page-one",
+            Pages = new List<PageAnswers>()
             {
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
+                new()
                 {
-                    new()
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new()
                         {
-                            new()
-                            {
-                                QuestionId = questionId,
-                                Response = ""
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
+                            QuestionId = questionId,
+                            Response = ""
+                        }
+                    },
+                    PageSlug = "page-one"
                 }
-            };
+            }
+        };
 
-            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId(questionId)
-               .WithStreetProvider(EStreetProvider.Fake.ToString())
-               .Build();
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .WithQuestionId(questionId)
+            .WithStreetProvider(EStreetProvider.Fake.ToString())
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithValidatedModel(true)
-                .WithPageSlug("page-one")
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithValidatedModel(true)
+            .WithPageSlug("page-one")
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-               { "Guid", Guid.NewGuid().ToString() },
-                { "subPath", "automatic" },
-                { element.Properties.QuestionId, "" },
-            };
-
-            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
-
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task ProcessStreet_Should_NotCall_StreetProvider_When_SearchTerm_IsTheSame()
+        var viewModel = new Dictionary<string, dynamic>
         {
-            var cacheData = new FormAnswers
+            { "Guid", Guid.NewGuid().ToString() },
+            { "subPath", "automatic" },
+            { element.Properties.QuestionId, "" },
+        };
+
+        await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+
+        _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+        _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ProcessStreet_Should_NotCall_StreetProvider_When_SearchTerm_IsTheSame()
+    {
+        var cacheData = new FormAnswers
+        {
+            Path = "page-one",
+            Pages = new List<PageAnswers>()
             {
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
+                new()
                 {
-                    new()
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new()
                         {
-                            new()
-                            {
-                                QuestionId = "test-street",
-                                Response = "streetname"
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
-                },
-                FormData = new Dictionary<string, object>
-                {
-                    { "page-one-search-results", new List<object>() }
+                            QuestionId = "test-street",
+                            Response = "streetname"
+                        }
+                    },
+                    PageSlug = "page-one"
                 }
-            };
-
-            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("test-street")
-               .WithStreetProvider(EStreetProvider.Fake.ToString())
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
-
-            var viewModel = new Dictionary<string, dynamic>
+            },
+            FormData = new Dictionary<string, object>
             {
-                { "Guid", Guid.NewGuid().ToString() },
-                { "subPath", "" },
-                { element.Properties.QuestionId, "streetname" },
-            };
+                { "page-one-search-results", new List<object>() }
+            }
+        };
 
-            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
-            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
-            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        }
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .WithQuestionId("test-street")
+            .WithStreetProvider(EStreetProvider.Fake.ToString())
+            .Build();
 
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithPageSlug("page-one")
+            .WithValidatedModel(true)
+            .Build();
 
-        [Fact]
-        public async Task ProcessStreet_Should_Call_StreetProvider_When_SearchTerm_IsDifferent()
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
+
+        var viewModel = new Dictionary<string, dynamic>
         {
-            var cacheData = new FormAnswers
+            { "Guid", Guid.NewGuid().ToString() },
+            { "subPath", "" },
+            { element.Properties.QuestionId, "streetname" },
+        };
+
+        await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
+
+        _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Never);
+        _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
+        _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+
+    [Fact]
+    public async Task ProcessStreet_Should_Call_StreetProvider_When_SearchTerm_IsDifferent()
+    {
+        var cacheData = new FormAnswers
+        {
+            Path = "page-one",
+            Pages = new List<PageAnswers>()
             {
-                Path = "page-one",
-                Pages = new List<PageAnswers>()
+                new()
                 {
-                    new()
+                    Answers = new List<Answers>
                     {
-                        Answers = new List<Answers>
+                        new()
                         {
-                            new()
-                            {
-                                QuestionId = "test-street",
-                                Response = "old search term"
-                            }
-                        },
-                        PageSlug = "page-one"
-                    }
+                            QuestionId = "test-street",
+                            Response = "old search term"
+                        }
+                    },
+                    PageSlug = "page-one"
                 }
-            };
+            }
+        };
 
-            _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
 
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("test-street")
-               .WithStreetProvider(EStreetProvider.Fake.ToString())
-               .Build();
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .WithQuestionId("test-street")
+            .WithStreetProvider(EStreetProvider.Fake.ToString())
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithPageSlug("page-one")
+            .WithValidatedModel(true)
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { "subPath", "" },
-                { element.Properties.QuestionId, "new street search" },
-            };
-
-            await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
-
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
-            _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task ProcessStreet_Application_ShouldThrowApplicationException_WhenStreetProvider_ThrowsException()
+        var viewModel = new Dictionary<string, dynamic>
         {
-            _streetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>())).Throws<Exception>();
-            var fakeStreetProvider = EStreetProvider.Fake.ToString();
+            { "Guid", Guid.NewGuid().ToString() },
+            { "subPath", "" },
+            { element.Properties.QuestionId, "new street search" },
+        };
 
-            var element = new ElementBuilder()
-               .WithType(EElementType.Street)
-               .WithQuestionId("street")
-               .WithStreetProvider(fakeStreetProvider)
-               .Build();
+        await _service.ProcessStreet(viewModel, page, schema, "", "page-one");
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .WithPageSlug("page-one")
-                .WithValidatedModel(true)
-                .Build();
+        _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+        _pageHelper.Verify(_ => _.SaveAnswers(It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<CustomFormFile>>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
+        _pageHelper.Verify(_ => _.SaveFormData(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
 
-            var schema = new FormSchemaBuilder()
-                .WithPage(page)
-                .Build();
+    [Fact]
+    public async Task ProcessStreet_Application_ShouldThrowApplicationException_WhenStreetProvider_ThrowsException()
+    {
+        _streetProvider.Setup(_ => _.SearchAsync(It.IsAny<string>())).Throws<Exception>();
+        var fakeStreetProvider = EStreetProvider.Fake.ToString();
 
-            var viewModel = new Dictionary<string, dynamic>
-            {
-                { "Guid", Guid.NewGuid().ToString() },
-                { "subPath", "" },
-                { element.Properties.QuestionId, "streetname" },
-            };
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .WithQuestionId("street")
+            .WithStreetProvider(fakeStreetProvider)
+            .Build();
 
-            var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessStreet(viewModel, page, schema, "", "page-one"));
-            _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
-            _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
-            Assert.StartsWith($"StreetService::ProcessInitialStreet: An exception has occurred while attempting to perform street lookup on Provider '{fakeStreetProvider}' with searchterm 'streetname' Exception:", result.Message);
-        }
+        var page = new PageBuilder()
+            .WithElement(element)
+            .WithPageSlug("page-one")
+            .WithValidatedModel(true)
+            .Build();
+
+        var schema = new FormSchemaBuilder()
+            .WithPage(page)
+            .Build();
+
+        var viewModel = new Dictionary<string, dynamic>
+        {
+            { "Guid", Guid.NewGuid().ToString() },
+            { "subPath", "" },
+            { element.Properties.QuestionId, "streetname" },
+        };
+
+        var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.ProcessStreet(viewModel, page, schema, "", "page-one"));
+        _streetProvider.Verify(_ => _.SearchAsync(It.IsAny<string>()), Times.Once);
+        _pageHelper.Verify(_ => _.GenerateHtml(It.IsAny<Page>(), It.IsAny<Dictionary<string, dynamic>>(), It.IsAny<FormSchema>(), It.IsAny<string>(), It.IsAny<FormAnswers>(), It.IsAny<List<object>>()), Times.Never);
+        Assert.StartsWith($"StreetService::ProcessInitialStreet: An exception has occurred while attempting to perform street lookup on Provider '{fakeStreetProvider}' with searchterm 'streetname' Exception:", result.Message);
     }
 }

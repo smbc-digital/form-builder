@@ -1,9 +1,8 @@
-﻿namespace form_builder.Providers.TemplatedEmailProvider
-{
-    public interface ITemplatedEmailProvider
-    {
-        public string ProviderName { get; }
+﻿namespace form_builder.Providers.TemplatedEmailProvider;
 
-        Task SendEmailAsync(string emailAddress, string templateId, Dictionary<string, dynamic> personalisation);
-    }
+public interface ITemplatedEmailProvider
+{
+    public string ProviderName { get; }
+
+    Task SendEmailAsync(string emailAddress, string templateId, Dictionary<string, dynamic> personalisation);
 }

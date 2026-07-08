@@ -1,29 +1,28 @@
 ﻿using form_builder.Enum;
 using form_builder.Models;
 
-namespace form_builder.Factories.Transform.UserSchema
+namespace form_builder.Factories.Transform.UserSchema;
+
+public class BehaviourConditionsPageTransformFactory : IUserPageTransformFactory
 {
-    public class BehaviourConditionsPageTransformFactory : IUserPageTransformFactory
+    public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
     {
-        public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
+        if (page.Behaviours is not null && page.Behaviours.Any() && page.Behaviours.Where(_ => _.Conditions is not null).Any(_ => _.Conditions.Any()))
         {
-            if (page.Behaviours is not null && page.Behaviours.Any() && page.Behaviours.Where(_ => _.Conditions is not null).Any(_ => _.Conditions.Any()))
+            foreach (var behaviour in page.Behaviours.Where(_ => _.Conditions.Any()))
             {
-                foreach (var behaviour in page.Behaviours.Where(_ => _.Conditions.Any()))
+                foreach (var condition in behaviour.Conditions)
                 {
-                    foreach (var condition in behaviour.Conditions)
+                    switch (condition.ConditionType)
                     {
-                        switch (condition.ConditionType)
-                        {
-                            case ECondition.PaymentAmountEqualTo:
-                                condition.QuestionId = "{{PAYMENTAMOUNT}}";
-                                break;
-                        }
+                        case ECondition.PaymentAmountEqualTo:
+                            condition.QuestionId = "{{PAYMENTAMOUNT}}";
+                            break;
                     }
                 }
             }
-
-            return await Task.FromResult(page);
         }
+
+        return await Task.FromResult(page);
     }
 }

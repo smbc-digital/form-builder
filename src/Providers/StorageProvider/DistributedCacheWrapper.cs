@@ -9,16 +9,13 @@ namespace form_builder.Providers.StorageProvider;
  * Due to IDistributedCache using static methods and the inability to moq static methods.
  * This is a wrapper around IDistributedCache to allow testing of static methods
  **/
-public class DistributedCacheWrapper : IDistributedCacheWrapper
+public class DistributedCacheWrapper(
+    IDistributedCache distributedCache,
+    IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
+    : IDistributedCacheWrapper
 {
-    private readonly IDistributedCache _distributedCache;
-    private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-
-    public DistributedCacheWrapper(IDistributedCache distributedCache, IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration)
-    {
-        _distributedCache = distributedCache;
-        _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-    }
+    private readonly IDistributedCache _distributedCache = distributedCache;
+    private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
 
     public string GetString(string key) => _distributedCache.GetString(key);
 

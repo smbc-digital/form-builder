@@ -3,86 +3,85 @@ using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators
+namespace form_builder_tests.UnitTests.Validators;
+
+public class StockportPostCodeValidatorTests
 {
-    public class StockportPostCodeValidatorTests
+
+    private readonly StockportPostcodeElementValidator _stockportPostcodeValidator = new StockportPostcodeElementValidator();
+
+    [Fact]
+    public void Validate_ShouldReturnTrue_WhenDoesNotPostcode()
     {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("postcode")
+            .WithType(EElementType.Textbox)
+            .Build();
 
-        private readonly StockportPostcodeElementValidator _stockportPostcodeValidator = new StockportPostcodeElementValidator();
+        var viewModel = new Dictionary<string, dynamic> { { "postcode", "OL16 0AE" } };
 
-        [Fact]
-        public void Validate_ShouldReturnTrue_WhenDoesNotPostcode()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("postcode")
-                .WithType(EElementType.Textbox)
-                .Build();
+        // Act
+        var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic> { { "postcode", "OL16 0AE" } };
+        // Assert
+        Assert.True(result.IsValid);
+    }
 
-            // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+    [Fact]
+    public void Validate_ShouldValidatePostcode_WhenPostcodeSupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("postcode")
+            .WithType(EElementType.Textbox)
+            .WithStockportPostcode(true)
+            .Build();
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+        var viewModel = new Dictionary<string, dynamic> { { "postcode", "SK4 1AA" } };
 
-        [Fact]
-        public void Validate_ShouldValidatePostcode_WhenPostcodeSupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("postcode")
-                .WithType(EElementType.Textbox)
-                .WithStockportPostcode(true)
-                .Build();
+        // Act
+        var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic> { { "postcode", "SK4 1AA" } };
+        // Assert
+        Assert.True(result.IsValid);
+    }
 
-            // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+    [Fact]
+    public void Validate_ShouldNotValidatePostcode_WhenInvalidPostcodeSupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("postcode")
+            .WithType(EElementType.Textbox)
+            .WithStockportPostcode(true)
+            .Build();
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+        var viewModel = new Dictionary<string, dynamic> { { "postcode", "Elephant" } };
 
-        [Fact]
-        public void Validate_ShouldNotValidatePostcode_WhenInvalidPostcodeSupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("postcode")
-                .WithType(EElementType.Textbox)
-                .WithStockportPostcode(true)
-                .Build();
+        // Act
+        var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic> { { "postcode", "Elephant" } };
+        // Assert
+        Assert.False(result.IsValid);
+    }
 
-            // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+    [Fact]
+    public void Validate_ShouldNotValidatePostcode_WhenNonStockportPostcodeSupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("postcode")
+            .WithType(EElementType.Textbox)
+            .WithStockportPostcode(true)
+            .Build();
 
-            // Assert
-            Assert.False(result.IsValid);
-        }
+        var viewModel = new Dictionary<string, dynamic> { { "postcode", "OL16 0AE" } };
 
-        [Fact]
-        public void Validate_ShouldNotValidatePostcode_WhenNonStockportPostcodeSupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("postcode")
-                .WithType(EElementType.Textbox)
-                .WithStockportPostcode(true)
-                .Build();
+        // Act
+        var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic> { { "postcode", "OL16 0AE" } };
-
-            // Act
-            var result = _stockportPostcodeValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            // Assert
-            Assert.False(result.IsValid);
-        }
+        // Assert
+        Assert.False(result.IsValid);
     }
 }

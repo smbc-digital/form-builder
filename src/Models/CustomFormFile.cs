@@ -1,21 +1,12 @@
-namespace form_builder.Models
+namespace form_builder.Models;
+
+public class CustomFormFile(string content, string questionId, long fileSize, string fileName)
 {
-    public class CustomFormFile
-    {
-        public CustomFormFile(string content, string questionId, long fileSize, string fileName)
-        {
-            Base64EncodedContent = content;
-            UntrustedOriginalFileName = fileName;
-            QuestionId = questionId;
-            Length = fileSize;
-        }
+    public string Base64EncodedContent { get; } = content;
 
-        public string Base64EncodedContent { get; }
+    public string UntrustedOriginalFileName { get; } = fileName;
 
-        public string UntrustedOriginalFileName { get; }
+    public string QuestionId { get; } = questionId;
 
-        public string QuestionId { get; }
-
-        public long Length { get; }
-    }
+    public long Length { get; } = fileSize;
 }

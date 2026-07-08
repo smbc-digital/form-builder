@@ -5,13 +5,9 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers;
 
-public class TagParser
+public class TagParser(IEnumerable<IFormatter> formatters)
 {
-    private readonly IEnumerable<IFormatter> _formatters;
-    public TagParser(IEnumerable<IFormatter> formatters)
-    {
-        _formatters = formatters;
-    }
+    private readonly IEnumerable<IFormatter> _formatters = formatters;
 
     public string Parse(string value, Dictionary<string, object> answersDictionary, Regex regex, bool allowOptional = false)
     {

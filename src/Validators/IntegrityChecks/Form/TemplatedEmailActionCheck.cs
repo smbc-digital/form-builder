@@ -2,37 +2,36 @@
 using form_builder.Models;
 using form_builder.Models.Actions;
 
-namespace form_builder.Validators.IntegrityChecks.Form
+namespace form_builder.Validators.IntegrityChecks.Form;
+
+public class TemplatedEmailActionCheck : IFormSchemaIntegrityCheck
 {
-    public class TemplatedEmailActionCheck : IFormSchemaIntegrityCheck
+    public IntegrityCheckResult Validate(FormSchema schema)
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
-        {
-            IntegrityCheckResult result = new();
+        IntegrityCheckResult result = new();
 
-            List<IAction> actions = schema.FormActions
-                .Where(formAction => formAction.Type.Equals(EActionType.TemplatedEmail))
-                .Concat(schema.Pages.SelectMany(page => page.PageActions)
-                    .Where(pageAction => pageAction.Type.Equals(EActionType.TemplatedEmail))).ToList();
+        List<IAction> actions = schema.FormActions
+            .Where(formAction => formAction.Type.Equals(EActionType.TemplatedEmail))
+            .Concat(schema.Pages.SelectMany(page => page.PageActions)
+                .Where(pageAction => pageAction.Type.Equals(EActionType.TemplatedEmail))).ToList();
 
-            if (actions.Count.Equals(0))
-                return result;
-
-            actions.ForEach(action =>
-            {
-                if (string.IsNullOrEmpty(action.Properties.EmailTemplateProvider))
-                    result.AddFailureMessage("Templated Email Action, there is no 'EmailTemplateProvider'");
-
-                if (string.IsNullOrEmpty(action.Properties.TemplateId))
-                    result.AddFailureMessage("Templated Email Action, there is no 'TemplateId' provided");
-
-                if (string.IsNullOrEmpty(action.Properties.To))
-                    result.AddFailureMessage("Templated Email Action, there is no 'To' provided");
-            });
-
+        if (actions.Count.Equals(0))
             return result;
-        }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        actions.ForEach(action =>
+        {
+            if (string.IsNullOrEmpty(action.Properties.EmailTemplateProvider))
+                result.AddFailureMessage("Templated Email Action, there is no 'EmailTemplateProvider'");
+
+            if (string.IsNullOrEmpty(action.Properties.TemplateId))
+                result.AddFailureMessage("Templated Email Action, there is no 'TemplateId' provided");
+
+            if (string.IsNullOrEmpty(action.Properties.To))
+                result.AddFailureMessage("Templated Email Action, there is no 'To' provided");
+        });
+
+        return result;
     }
+
+    public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
 }

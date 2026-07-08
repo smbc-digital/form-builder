@@ -1,40 +1,37 @@
 using form_builder.Models;
 
-namespace form_builder.Validators.IntegrityChecks.Behaviours
+namespace form_builder.Validators.IntegrityChecks.Behaviours;
+
+public class SubmitSlugsHaveAllPropertiesCheck(IWebHostEnvironment environment) : IBehaviourSchemaIntegrityCheck
 {
-    public class SubmitSlugsHaveAllPropertiesCheck : IBehaviourSchemaIntegrityCheck
+    readonly IWebHostEnvironment _environment = environment;
+
+    public IntegrityCheckResult Validate(List<Behaviour> behaviours)
     {
-        readonly IWebHostEnvironment _environment;
-        public SubmitSlugsHaveAllPropertiesCheck(IWebHostEnvironment environment) =>
-            _environment = environment;
+        IntegrityCheckResult result = new();
 
-        public IntegrityCheckResult Validate(List<Behaviour> behaviours)
+        foreach (var behaviour in behaviours.Where(behaviour => behaviour.SubmitSlugs is not null && behaviour.SubmitSlugs.Count > 0))
         {
-            IntegrityCheckResult result = new();
-
-            foreach (var behaviour in behaviours.Where(behaviour => behaviour.SubmitSlugs is not null && behaviour.SubmitSlugs.Count > 0))
+            foreach (var submitSlug in behaviour.SubmitSlugs)
             {
-                foreach (var submitSlug in behaviour.SubmitSlugs)
+                if (string.IsNullOrEmpty(submitSlug.URL))
+                    result.AddFailureMessage($"No URL found for SubmitSlug in environmment '{submitSlug.Environment}'");
+
+                if (string.IsNullOrEmpty(submitSlug.AuthToken))
+                    result.AddFailureMessage($"No auth token found for SubmitSlug in environmment '{submitSlug.Environment}'");
+
+                if (!_environment.IsEnvironment("local") &&
+                    !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase) &&
+                    !submitSlug.URL.StartsWith("https://"))
                 {
-                    if (string.IsNullOrEmpty(submitSlug.URL))
-                        result.AddFailureMessage($"No URL found for SubmitSlug in environmment '{submitSlug.Environment}'");
-
-                    if (string.IsNullOrEmpty(submitSlug.AuthToken))
-                        result.AddFailureMessage($"No auth token found for SubmitSlug in environmment '{submitSlug.Environment}'");
-
-                    if (!_environment.IsEnvironment("local") &&
-                        !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase) &&
-                        !submitSlug.URL.StartsWith("https://"))
-                    {
-                        result.AddFailureMessage(
-                            $"SubmitUrl '{submitSlug.URL}' must start with https for environmment '{submitSlug.Environment}'");
-                    }
+                    result.AddFailureMessage(
+                        $"SubmitUrl '{submitSlug.URL}' must start with https for environmment '{submitSlug.Environment}'");
                 }
             }
-
-            return result;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours) => await Task.Run(() => Validate(behaviours));
+        return result;
     }
+
+    public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours) => await Task.Run(() => Validate(behaviours));
 }

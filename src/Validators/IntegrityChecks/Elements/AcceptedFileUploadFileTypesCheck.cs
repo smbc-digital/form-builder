@@ -1,31 +1,30 @@
 using form_builder.Enum;
 using form_builder.Models.Elements;
 
-namespace form_builder.Validators.IntegrityChecks.Elements
+namespace form_builder.Validators.IntegrityChecks.Elements;
+
+public class AcceptedFileUploadFileTypesCheck : IElementSchemaIntegrityCheck
 {
-    public class AcceptedFileUploadFileTypesCheck : IElementSchemaIntegrityCheck
+    public IntegrityCheckResult Validate(IElement element)
     {
-        public IntegrityCheckResult Validate(IElement element)
+        IntegrityCheckResult result = new();
+
+        if (element.Type.Equals(EElementType.FileUpload) && element.Properties.AllowedFileTypes is not null)
         {
-            IntegrityCheckResult result = new();
-
-            if (element.Type.Equals(EElementType.FileUpload) && element.Properties.AllowedFileTypes is not null)
+            element.Properties.AllowedFileTypes.ForEach(fileType =>
             {
-                element.Properties.AllowedFileTypes.ForEach(fileType =>
+                if (!fileType.StartsWith("."))
                 {
-                    if (!fileType.StartsWith("."))
-                    {
-                        result.AddFailureMessage(
-                            $"Accepted FileUpload File Types Check, " +
-                            $"Allowed file type in FileUpload element, " +
-                            $"'{element.Properties.QuestionId}' must have a valid extension which begins with a '.', e.g. .png");
-                    }
-                });
-            }
-
-            return result;
+                    result.AddFailureMessage(
+                        $"Accepted FileUpload File Types Check, " +
+                        $"Allowed file type in FileUpload element, " +
+                        $"'{element.Properties.QuestionId}' must have a valid extension which begins with a '.', e.g. .png");
+                }
+            });
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
+        return result;
     }
+
+    public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
 }

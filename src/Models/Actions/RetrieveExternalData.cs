@@ -1,12 +1,11 @@
 using form_builder.Enum;
 
-namespace form_builder.Models.Actions
+namespace form_builder.Models.Actions;
+
+public class RetrieveExternalData : Action
 {
-    public class RetrieveExternalData : Action
+    public RetrieveExternalData()
     {
-        public RetrieveExternalData()
-        {
-            Type = EActionType.RetrieveExternalData;
-        }
+        Type = EActionType.RetrieveExternalData;
     }
 }

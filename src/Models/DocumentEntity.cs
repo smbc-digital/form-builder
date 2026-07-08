@@ -1,11 +1,10 @@
-﻿namespace form_builder.Models
+﻿namespace form_builder.Models;
+
+public class DocumentEntity
 {
-    public class DocumentEntity
-    {
-        public string Extension { get; set; }
+    public string Extension { get; set; }
 
-        public byte[] Contents { get; set; }
+    public byte[] Contents { get; set; }
 
-        public string FileName { get; set; }
-    }
+    public string FileName { get; set; }
 }

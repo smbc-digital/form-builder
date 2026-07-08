@@ -3,37 +3,33 @@ using form_builder.Services.MappingService;
 using form_builder.Services.PayService;
 using form_builder.Services.SubmitService;
 
-namespace form_builder.Workflows.PaymentWorkflow
+namespace form_builder.Workflows.PaymentWorkflow;
+
+public class PaymentWorkflow(
+    IPayService payService,
+    ISubmitService submitService,
+    IMappingService mappingService,
+    ISessionHelper sessionHelper)
+    : IPaymentWorkflow
 {
-    public class PaymentWorkflow : IPaymentWorkflow
+    private readonly ISubmitService _submitService = submitService;
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly IPayService _payService = payService;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+
+    public async Task<string> Submit(string form, string path)
     {
-        private readonly ISubmitService _submitService;
-        private readonly IMappingService _mappingService;
-        private readonly IPayService _payService;
-        private readonly ISessionHelper _sessionHelper;
+        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        if (string.IsNullOrEmpty(browserSessionId))
+            throw new ApplicationException("A Session GUID was not provided.");
 
-        public PaymentWorkflow(IPayService payService, ISubmitService submitService, IMappingService mappingService, ISessionHelper sessionHelper)
-        {
-            _submitService = submitService;
-            _mappingService = mappingService;
-            _sessionHelper = sessionHelper;
-            _payService = payService;
-        }
+        string formSessionId = $"{form}::{browserSessionId}";
 
-        public async Task<string> Submit(string form, string path)
-        {
-            string browserSessionId = _sessionHelper.GetBrowserSessionId();
-            if (string.IsNullOrEmpty(browserSessionId))
-                throw new ApplicationException("A Session GUID was not provided.");
+        await _submitService.PreProcessSubmission(form, formSessionId);
 
-            string formSessionId = $"{form}::{browserSessionId}";
+        var data = await _mappingService.Map(formSessionId, form, null, null);
+        var paymentReference = await _submitService.PaymentSubmission(data, form, formSessionId);
 
-            await _submitService.PreProcessSubmission(form, formSessionId);
-
-            var data = await _mappingService.Map(formSessionId, form, null, null);
-            var paymentReference = await _submitService.PaymentSubmission(data, form, formSessionId);
-
-            return await _payService.ProcessPayment(data, form, path, paymentReference, formSessionId);
-        }
+        return await _payService.ProcessPayment(data, form, path, paymentReference, formSessionId);
     }
 }

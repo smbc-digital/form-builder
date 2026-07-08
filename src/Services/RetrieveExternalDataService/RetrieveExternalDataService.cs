@@ -11,30 +11,21 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Services.RetrieveExternalDataService;
 
-public class RetrieveExternalDataService : IRetrieveExternalDataService
+public class RetrieveExternalDataService(
+    IGateway gateway,
+    ISessionHelper sessionHelper,
+    IDistributedCacheWrapper distributedCache,
+    IMappingService mappingService,
+    IActionHelper actionHelper,
+    IWebHostEnvironment environment)
+    : IRetrieveExternalDataService
 {
-    private readonly IGateway _gateway;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IMappingService _mappingService;
-    private readonly IActionHelper _actionHelper;
-    private readonly IWebHostEnvironment _environment;
-
-    public RetrieveExternalDataService(
-        IGateway gateway,
-        ISessionHelper sessionHelper,
-        IDistributedCacheWrapper distributedCache,
-        IMappingService mappingService,
-        IActionHelper actionHelper,
-        IWebHostEnvironment environment)
-    {
-        _gateway = gateway;
-        _sessionHelper = sessionHelper;
-        _distributedCache = distributedCache;
-        _mappingService = mappingService;
-        _actionHelper = actionHelper;
-        _environment = environment;
-    }
+    private readonly IGateway _gateway = gateway;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly IActionHelper _actionHelper = actionHelper;
+    private readonly IWebHostEnvironment _environment = environment;
 
     public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
     {
