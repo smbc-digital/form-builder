@@ -1,40 +1,17 @@
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
-using Microsoft.Extensions.Options;
-
 namespace form_builder.ContentFactory.SuccessPageFactory;
 
-public class SuccessPageFactory(
-    IPageHelper pageHelper,
+public class SuccessPageFactory(IPageHelper pageHelper,
     IPageFactory pageFactory,
-    ISessionHelper sessionHelper,
     IDistributedCacheWrapper distributedCache,
     IOptions<PreviewModeConfiguration> previewModeConfiguration,
-    IWebHostEnvironment environment,
     ILogger<SuccessPageFactory> logger)
     : ISuccessPageFactory
 {
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IPageFactory _pageFactory = pageFactory;
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-    private readonly IWebHostEnvironment _environment = environment;
     private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration = previewModeConfiguration;
-
-    private readonly ILogger<SuccessPageFactory> _logger = logger;
 
     public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string cacheKey, FormAnswers formAnswers, EBehaviourType behaviourType)
     {
-        var page = baseForm.GetPage(_pageHelper, "success", form);
+        var page = baseForm.GetPage(pageHelper, "success", form);
             
         if (page is null && behaviourType.Equals(EBehaviourType.SubmitAndPay))
         {
@@ -44,8 +21,8 @@ public class SuccessPageFactory(
 
         if (page is null)
         {
-            _logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
-            _distributedCache.Remove(cacheKey);
+            logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
+            distributedCache.Remove(cacheKey);
 
             return new SuccessPageEntity
             {
@@ -61,10 +38,10 @@ public class SuccessPageFactory(
             };
         }
 
-        var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
+        var result = await pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
 
-        _logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
-        _distributedCache.Remove(cacheKey);
+        logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
+        distributedCache.Remove(cacheKey);
 
         return new SuccessPageEntity
         {
@@ -88,7 +65,7 @@ public class SuccessPageFactory(
     {
         var page = GenerateGenericBookingPage(baseForm);
 
-        var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
+        var result = await pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
 
         return new SuccessPageEntity
         {

@@ -1,8 +1,7 @@
 ﻿using System.Net;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
-using form_builder.Builders.Email;
-using form_builder.Models;
+using form_builder.Builders;
 
 namespace form_builder.Providers.EmailProvider;
 

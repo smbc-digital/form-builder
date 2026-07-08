@@ -25,9 +25,7 @@ public class SuccessPageContentFactoryTests
     private readonly SuccessPageFactory _factory;
     private readonly Mock<IPageHelper> _mockPageHelper = new();
     private readonly Mock<IPageFactory> _mockPageContentFactory = new();
-    private readonly Mock<ISessionHelper> _mockSessionHelper = new();
     private readonly Mock<IDistributedCacheWrapper> _mockDistributedCache = new();
-    private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
     private readonly Mock<IOptions<PreviewModeConfiguration>> _mockPreviewModeConfiguration = new();
 
     private readonly Mock<ILogger<SuccessPageFactory>> _logger = new();
@@ -41,13 +39,9 @@ public class SuccessPageContentFactoryTests
         _factory = new SuccessPageFactory(
             _mockPageHelper.Object,
             _mockPageContentFactory.Object,
-            _mockSessionHelper.Object,
             _mockDistributedCache.Object,
             _mockPreviewModeConfiguration.Object,
-            _mockWebHostEnvironment.Object,
             _logger.Object);
-
-        _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
     }
 
     private static readonly Page Page = new PageBuilder()

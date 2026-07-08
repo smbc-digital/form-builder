@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.ViewModels;
-
-namespace form_builder.ContentFactory.PageFactory;
+﻿namespace form_builder.ContentFactory.PageFactory;
 
 public interface IPageFactory
 {

@@ -8,23 +8,21 @@ using StockportGovUK.NetStandard.Gateways.Models.Civica.Pay.Request;
 
 namespace form_builder.Providers.PaymentProvider;
 
-public class CivicaPayProvider : IPaymentProvider
+public class CivicaPayProvider(
+    ICivicaPayGateway civicaPayGateway,
+    IOptions<CivicaPaymentConfiguration> paymentConfiguration,
+    IHttpContextAccessor httpContextAccessor,
+    IWebHostEnvironment environment,
+    ILogger<CivicaPayProvider> logger)
+    : IPaymentProvider
 {
     public string ProviderName => "CivicaPay";
-    private readonly ICivicaPayGateway _civicaPayGateway;
-    private readonly CivicaPaymentConfiguration _paymentConfig;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IWebHostEnvironment _environment;
-    private readonly ILogger<CivicaPayProvider> _logger;
+    private readonly ICivicaPayGateway _civicaPayGateway = civicaPayGateway;
+    private readonly CivicaPaymentConfiguration _paymentConfig = paymentConfiguration.Value;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly IWebHostEnvironment _environment = environment;
+    private readonly ILogger<CivicaPayProvider> _logger = logger;
 
-    public CivicaPayProvider(ICivicaPayGateway civicaPayGateway, IOptions<CivicaPaymentConfiguration> paymentConfiguration, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment environment, ILogger<CivicaPayProvider> logger)
-    {
-        _civicaPayGateway = civicaPayGateway;
-        _httpContextAccessor = httpContextAccessor;
-        _paymentConfig = paymentConfiguration.Value;
-        _environment = environment;
-        _logger = logger;
-    }
     public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string cacheKey, PaymentInformation paymentInformation)
     {
         if (string.IsNullOrEmpty(reference))
