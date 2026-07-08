@@ -1,7 +1,6 @@
-﻿namespace form_builder.Constants
+﻿namespace form_builder.Constants;
+
+public class StructureConstants
 {
-    public class StructureConstants
-    {
-        public const string SMBC_MODELS_PREFIX = "StockportGovUK.NetStandard";
-    }
+    public const string SMBC_MODELS_PREFIX = "StockportGovUK.NetStandard";
 }

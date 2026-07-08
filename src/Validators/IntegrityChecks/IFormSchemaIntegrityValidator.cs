@@ -1,9 +1,8 @@
 using form_builder.Models;
 
-namespace form_builder.Validators.IntegrityChecks
+namespace form_builder.Validators.IntegrityChecks;
+
+public interface IFormSchemaIntegrityValidator
 {
-    public interface IFormSchemaIntegrityValidator
-    {
-        Task Validate(FormSchema schema);
-    }
+    Task Validate(FormSchema schema);
 }

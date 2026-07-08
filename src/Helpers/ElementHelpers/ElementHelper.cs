@@ -11,23 +11,17 @@ using Newtonsoft.Json;
 
 namespace form_builder.Helpers.ElementHelpers;
 
-public class ElementHelper : IElementHelper
+public class ElementHelper(
+    IDistributedCacheWrapper distributedCacheWrapper,
+    IElementMapper elementMapper,
+    IWebHostEnvironment environment,
+    IHttpContextAccessor httpContextAccessor)
+    : IElementHelper
 {
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IElementMapper _elementMapper;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public ElementHelper(IDistributedCacheWrapper distributedCacheWrapper,
-        IElementMapper elementMapper,
-        IWebHostEnvironment environment,
-        IHttpContextAccessor httpContextAccessor)
-    {
-        _distributedCache = distributedCacheWrapper;
-        _elementMapper = elementMapper;
-        _environment = environment;
-        _httpContextAccessor = httpContextAccessor;
-    }
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCacheWrapper;
+    private readonly IElementMapper _elementMapper = elementMapper;
+    private readonly IWebHostEnvironment _environment = environment;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public string CurrentValue(string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix = "")
     {

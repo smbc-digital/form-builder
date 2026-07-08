@@ -1,9 +1,8 @@
-namespace form_builder.Enum
+namespace form_builder.Enum;
+
+public enum ETimePeriod
 {
-    public enum ETimePeriod
-    {
-        Unknown,
-        Morning,
-        Afternoon
-    }
+    Unknown,
+    Morning,
+    Afternoon
 }

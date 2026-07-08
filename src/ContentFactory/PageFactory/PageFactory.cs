@@ -11,24 +11,17 @@ using Newtonsoft.Json;
 
 namespace form_builder.ContentFactory.PageFactory;
 
-public class PageFactory : IPageFactory
+public class PageFactory(
+    IPageHelper pageHelper,
+    IEnumerable<ITagParser> tagParsers,
+    IOptions<PreviewModeConfiguration> previewModeConfiguration,
+    IDistributedCacheWrapper distributedCache)
+    : IPageFactory
 {
-    private readonly IPageHelper _pageHelper;
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IEnumerable<ITagParser> _tagParsers;
-    private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
-
-    public PageFactory(
-        IPageHelper pageHelper,
-        IEnumerable<ITagParser> tagParsers,
-        IOptions<PreviewModeConfiguration> previewModeConfiguration,
-        IDistributedCacheWrapper distributedCache)
-    {
-        _pageHelper = pageHelper;
-        _tagParsers = tagParsers;
-        _distributedCache = distributedCache;
-        _previewModeConfiguration = previewModeConfiguration;
-    }
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
+    private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration = previewModeConfiguration;
 
     public async Task<FormBuilderViewModel> Build(Page page, Dictionary<string, dynamic> viewModel, FormSchema baseForm, string cacheKey, FormAnswers formAnswers = null, List<object> results = null)
     {

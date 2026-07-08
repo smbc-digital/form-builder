@@ -8,9 +8,7 @@ namespace form_builder.Models.Elements;
 
 public class Element : IElement
 {
-    protected ValidationResult validationResult;
-
-    public Element() => validationResult = new ValidationResult();
+    protected ValidationResult validationResult = new();
 
     public EElementType Type { get; set; }
 

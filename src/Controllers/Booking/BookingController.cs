@@ -7,134 +7,128 @@ using form_builder.Services.PageService;
 using form_builder.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace form_builder.Controllers
+namespace form_builder.Controllers;
+
+public class BookingController(
+    IBookingService bookingService,
+    ISchemaFactory schemaFactory,
+    IPageService pageService)
+    : Controller
 {
-    public class BookingController : Controller
+    private readonly IBookingService _bookingService = bookingService;
+    private readonly ISchemaFactory _schemaFactory = schemaFactory;
+    private readonly IPageService _pageService = pageService;
+
+    [HttpPost]
+    [Route("booking/{form}/{path}/month")]
+    public async Task<IActionResult> Index(
+        string form,
+        string path,
+        Dictionary<string, string[]> formData)
     {
-        private readonly IBookingService _bookingService;
-        private readonly ISchemaFactory _schemaFactory;
-        private readonly IPageService _pageService;
+        var viewModel = formData.ToNormaliseDictionary(string.Empty);
+        var queryParamters = Request.Query;
 
-        public BookingController(IBookingService bookingService,
-            ISchemaFactory schemaFactory,
-            IPageService pageService)
+        await _bookingService.ProcessMonthRequest(viewModel, form, path);
+
+        var routeValuesDictionary = new RouteValueDictionaryBuilder()
+            .WithValue("path", path)
+            .WithValue("form", form)
+            .WithQueryValues(queryParamters)
+            .Build();
+
+        return RedirectToAction("Index", "Home", routeValuesDictionary);
+    }
+
+    [HttpGet]
+    [Route("booking/{formName}/cancel/{bookingGuid}")]
+    public async Task<IActionResult> CancelBooking([FromQuery] string hash, Guid bookingGuid, string formName)
+    {
+        if (string.IsNullOrEmpty(hash) || bookingGuid.Equals(Guid.Empty))
+            throw new ApplicationException($"BookingController::CancelBooking, Invalid parameters received. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
+
+        try
         {
-            _bookingService = bookingService;
-            _schemaFactory = schemaFactory;
-            _pageService = pageService;
-        }
+            var appointment = await _bookingService.ValidateCancellationRequest(formName, bookingGuid, hash);
 
-        [HttpPost]
-        [Route("booking/{form}/{path}/month")]
-        public async Task<IActionResult> Index(
-            string form,
-            string path,
-            Dictionary<string, string[]> formData)
-        {
-            var viewModel = formData.ToNormaliseDictionary(string.Empty);
-            var queryParamters = Request.Query;
-
-            await _bookingService.ProcessMonthRequest(viewModel, form, path);
-
-            var routeValuesDictionary = new RouteValueDictionaryBuilder()
-                .WithValue("path", path)
-                .WithValue("form", form)
-                .WithQueryValues(queryParamters)
-                .Build();
-
-            return RedirectToAction("Index", "Home", routeValuesDictionary);
-        }
-
-        [HttpGet]
-        [Route("booking/{formName}/cancel/{bookingGuid}")]
-        public async Task<IActionResult> CancelBooking([FromQuery] string hash, Guid bookingGuid, string formName)
-        {
-            if (string.IsNullOrEmpty(hash) || bookingGuid.Equals(Guid.Empty))
-                throw new ApplicationException($"BookingController::CancelBooking, Invalid parameters received. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
-
-            try
+            return View("AppointmentDetails", new CancelBookingViewModel
             {
-                var appointment = await _bookingService.ValidateCancellationRequest(formName, bookingGuid, hash);
-
-                return View("AppointmentDetails", new CancelBookingViewModel
-                {
-                    FormName = appointment.FormName,
-                    BaseURL = appointment.BaseURL,
-                    StartPageUrl = appointment.StartPageUrl,
-                    Id = bookingGuid,
-                    BookingDate = appointment.BookingDate,
-                    StartTime = appointment.StartTime,
-                    EndTime = appointment.EndTime,
-                    Hash = hash,
-                    IsFullday = appointment.IsFullday,
-                    DisplayBreadCrumbs = false,
-                    HideBackButton = true,
-                    PageTitle = "Cancel Appointment"
-                });
-            }
-            catch (BookingCannotBeCancelledException)
-            {
-                return RedirectToAction("CannotCancel", new
-                {
-                    formName
-                });
-            }
+                FormName = appointment.FormName,
+                BaseURL = appointment.BaseURL,
+                StartPageUrl = appointment.StartPageUrl,
+                Id = bookingGuid,
+                BookingDate = appointment.BookingDate,
+                StartTime = appointment.StartTime,
+                EndTime = appointment.EndTime,
+                Hash = hash,
+                IsFullday = appointment.IsFullday,
+                DisplayBreadCrumbs = false,
+                HideBackButton = true,
+                PageTitle = "Cancel Appointment"
+            });
         }
-
-        [HttpPost]
-        [Route("booking/{formName}/cancel/{bookingGuid}")]
-        public async Task<IActionResult> CancelBookingPost([FromQuery] string hash, Guid bookingGuid, string formName)
+        catch (BookingCannotBeCancelledException)
         {
-            if (string.IsNullOrEmpty(hash) || Guid.Empty.Equals(bookingGuid))
-                throw new ApplicationException($"BookingController::CancelBookingPost, Invalid parameters received. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
-
-            await _bookingService.Cancel(formName, bookingGuid, hash);
-
-            return RedirectToAction("CancelSuccess", new
+            return RedirectToAction("CannotCancel", new
             {
                 formName
             });
         }
+    }
 
-        [HttpGet]
-        [Route("{formName}/cannot-cancel-booking")]
-        public async Task<IActionResult> CannotCancel(string formName)
+    [HttpPost]
+    [Route("booking/{formName}/cancel/{bookingGuid}")]
+    public async Task<IActionResult> CancelBookingPost([FromQuery] string hash, Guid bookingGuid, string formName)
+    {
+        if (string.IsNullOrEmpty(hash) || Guid.Empty.Equals(bookingGuid))
+            throw new ApplicationException($"BookingController::CancelBookingPost, Invalid parameters received. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
+
+        await _bookingService.Cancel(formName, bookingGuid, hash);
+
+        return RedirectToAction("CancelSuccess", new
         {
-            var formSchema = await _schemaFactory.Build(formName);
+            formName
+        });
+    }
 
-            return View("CannotCancel", new FormBuilderViewModel
-            {
-                FormName = formSchema.FormName,
-                StartPageUrl = formSchema.StartPageUrl,
-                PageTitle = "Appointment cannot be cancelled",
-                DisplayBreadCrumbs = false,
-                HideBackButton = true
-            });
-        }
+    [HttpGet]
+    [Route("{formName}/cannot-cancel-booking")]
+    public async Task<IActionResult> CannotCancel(string formName)
+    {
+        var formSchema = await _schemaFactory.Build(formName);
 
-        [HttpGet]
-        [Route("{formName}/booking-cancel-success")]
-        public async Task<IActionResult> CancelSuccess(string formName)
+        return View("CannotCancel", new FormBuilderViewModel
         {
-            var result = await _pageService.GetCancelBookingSuccessPage(formName);
-            var success = new SuccessViewModel
-            {
-                Reference = result.CaseReference,
-                PageContent = result.HtmlContent,
-                FormAnswers = result.FormAnswers,
-                FormName = result.FormName,
-                StartPageUrl = result.StartPageUrl,
-                Embeddable = result.Embeddable,
-                FeedbackPhase = result.FeedbackPhase,
-                FeedbackForm = result.FeedbackFormUrl,
-                PageTitle = result.PageTitle,
-                BannerTitle = result.BannerTitle,
-                LeadingParagraph = result.LeadingParagraph,
-                DisplayBreadcrumbs = result.DisplayBreadcrumbs,
-                Breadcrumbs = result.Breadcrumbs
-            };
+            FormName = formSchema.FormName,
+            StartPageUrl = formSchema.StartPageUrl,
+            PageTitle = "Appointment cannot be cancelled",
+            DisplayBreadCrumbs = false,
+            HideBackButton = true
+        });
+    }
 
-            return View("../Home/Success", success);
-        }
+    [HttpGet]
+    [Route("{formName}/booking-cancel-success")]
+    public async Task<IActionResult> CancelSuccess(string formName)
+    {
+        var result = await _pageService.GetCancelBookingSuccessPage(formName);
+        var success = new SuccessViewModel
+        {
+            Reference = result.CaseReference,
+            PageContent = result.HtmlContent,
+            FormAnswers = result.FormAnswers,
+            FormName = result.FormName,
+            StartPageUrl = result.StartPageUrl,
+            Embeddable = result.Embeddable,
+            FeedbackPhase = result.FeedbackPhase,
+            FeedbackForm = result.FeedbackFormUrl,
+            PageTitle = result.PageTitle,
+            BannerTitle = result.BannerTitle,
+            LeadingParagraph = result.LeadingParagraph,
+            DisplayBreadcrumbs = result.DisplayBreadcrumbs,
+            Breadcrumbs = result.Breadcrumbs
+        };
+
+        return View("../Home/Success", success);
     }
 }

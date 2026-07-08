@@ -7,187 +7,184 @@ using form_builder.Factories.Schema;
 using form_builder.Models.Elements;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
-namespace form_builder.Mappers.Structure
+namespace form_builder.Mappers.Structure;
+
+public class StructureMapper(ISchemaFactory schemaFactory) : IStructureMapper
 {
-    public class StructureMapper : IStructureMapper
+    private readonly ISchemaFactory _schemaFactory = schemaFactory;
+
+    public async Task<object> CreateBaseFormDataStructure(string form)
     {
-        private readonly ISchemaFactory _schemaFactory;
+        var formSchema = await _schemaFactory.Build(form);
+        var dataStructure = new ExpandoObject() as IDictionary<string, dynamic>;
+        var elements = formSchema.Pages.SelectMany(_ => _.ValidatableElements).ToList();
 
-        public StructureMapper(ISchemaFactory schemaFactory) => _schemaFactory = schemaFactory;
+        dataStructure = elements
+            .Aggregate(dataStructure, (current, element) =>
+                RecursiveObjectCreate(string.IsNullOrEmpty(element.Properties.TargetMapping) ? element.Properties.QuestionId : element.Properties.TargetMapping, element, current));
 
-        public async Task<object> CreateBaseFormDataStructure(string form)
+        foreach (var page in formSchema.Pages)
         {
-            var formSchema = await _schemaFactory.Build(form);
-            var dataStructure = new ExpandoObject() as IDictionary<string, dynamic>;
-            var elements = formSchema.Pages.SelectMany(_ => _.ValidatableElements).ToList();
-
-            dataStructure = elements
-                .Aggregate(dataStructure, (current, element) =>
-                    RecursiveObjectCreate(string.IsNullOrEmpty(element.Properties.TargetMapping) ? element.Properties.QuestionId : element.Properties.TargetMapping, element, current));
-
-            foreach (var page in formSchema.Pages)
+            if (page.HasIncomingValues)
             {
-                if (page.HasIncomingValues)
-                {
-                    dataStructure = page.IncomingValues
-                        .Aggregate(dataStructure, (current, incomingValue) =>
-                            RecursiveObjectCreate(incomingValue.QuestionId, null, current));
-                }
-
-                if (page.HasPageActions)
-                {
-                    dataStructure = page.PageActions
-                        .Where(_ => _.Type.Equals(EActionType.RetrieveExternalData))
-                        .Aggregate(dataStructure, (current, action) =>
-                            RecursiveObjectCreate(action.Properties.TargetQuestionId, null, current));
-                }
+                dataStructure = page.IncomingValues
+                    .Aggregate(dataStructure, (current, incomingValue) =>
+                        RecursiveObjectCreate(incomingValue.QuestionId, null, current));
             }
 
-            dataStructure.Add(formSchema.GenerateReferenceNumber ? formSchema.GeneratedReferenceNumberMapping : "CaseReference", string.Empty.GetType().ConvertTypeToFormattedString());
-
-            if (formSchema.Pages.Any(_ => _.Behaviours is not null && _.Behaviours.Any(_ => _.BehaviourType.Equals(EBehaviourType.SubmitAndPay))) || formSchema.SavePaymentAmount)
-                dataStructure.Add("PaymentAmount", string.Empty.GetType().ConvertTypeToFormattedString());
-
-            return dataStructure;
+            if (page.HasPageActions)
+            {
+                dataStructure = page.PageActions
+                    .Where(_ => _.Type.Equals(EActionType.RetrieveExternalData))
+                    .Aggregate(dataStructure, (current, action) =>
+                        RecursiveObjectCreate(action.Properties.TargetQuestionId, null, current));
+            }
         }
 
-        private IDictionary<string, dynamic> RecursiveObjectCreate(string targetMapping, IElement element, IDictionary<string, dynamic> dataStructure)
+        dataStructure.Add(formSchema.GenerateReferenceNumber ? formSchema.GeneratedReferenceNumberMapping : "CaseReference", string.Empty.GetType().ConvertTypeToFormattedString());
+
+        if (formSchema.Pages.Any(_ => _.Behaviours is not null && _.Behaviours.Any(_ => _.BehaviourType.Equals(EBehaviourType.SubmitAndPay))) || formSchema.SavePaymentAmount)
+            dataStructure.Add("PaymentAmount", string.Empty.GetType().ConvertTypeToFormattedString());
+
+        return dataStructure;
+    }
+
+    private IDictionary<string, dynamic> RecursiveObjectCreate(string targetMapping, IElement element, IDictionary<string, dynamic> dataStructure)
+    {
+        var splitTargets = targetMapping.Split(".");
+
+        if (splitTargets.Length.Equals(1))
         {
-            var splitTargets = targetMapping.Split(".");
+            if (element is { Type: EElementType.AddAnother })
+                return CreateStructureForAddAnother(splitTargets[0], element, dataStructure);
 
-            if (splitTargets.Length.Equals(1))
-            {
-                if (element is { Type: EElementType.AddAnother })
-                    return CreateStructureForAddAnother(splitTargets[0], element, dataStructure);
-
-                if (dataStructure.ContainsKey($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}"))
-                    return dataStructure;
-
-                dataStructure.Add($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", GetDataType(element));
+            if (dataStructure.ContainsKey($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}"))
                 return dataStructure;
-            }
 
-            object subObject;
-            if (!dataStructure.TryGetValue($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", out subObject))
-                subObject = new ExpandoObject();
-
-            subObject = RecursiveObjectCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, subObject as IDictionary<string, dynamic>);
-
-            dataStructure.Remove($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}");
-            dataStructure.Add($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", subObject);
-
+            dataStructure.Add($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", GetDataType(element));
             return dataStructure;
         }
 
-        private IDictionary<string, dynamic> CreateStructureForAddAnother(string target, IElement element, IDictionary<string, dynamic> dataStructure)
+        object subObject;
+        if (!dataStructure.TryGetValue($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", out subObject))
+            subObject = new ExpandoObject();
+
+        subObject = RecursiveObjectCreate(targetMapping.Replace($"{splitTargets[0]}.", ""), element, subObject as IDictionary<string, dynamic>);
+
+        dataStructure.Remove($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}");
+        dataStructure.Add($"{splitTargets[0].First().ToString().ToUpper()}{splitTargets[0][1..]}", subObject);
+
+        return dataStructure;
+    }
+
+    private IDictionary<string, dynamic> CreateStructureForAddAnother(string target, IElement element, IDictionary<string, dynamic> dataStructure)
+    {
+        var addAnotherStructure = new List<IDictionary<string, dynamic>>();
+        var fieldsetStructure = new Dictionary<string, dynamic>();
+
+        fieldsetStructure = element.Properties.Elements
+            .Aggregate(fieldsetStructure, (current, nestedElement) =>
+                (Dictionary<string, dynamic>)RecursiveObjectCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping)
+                    ? nestedElement.Properties.QuestionId
+                    : nestedElement.Properties.TargetMapping, nestedElement, current));
+
+        addAnotherStructure.Add(fieldsetStructure);
+        dataStructure.Add($"{target.First().ToString().ToUpper()}{target[1..]}", addAnotherStructure);
+
+        return dataStructure;
+    }
+
+    private dynamic GetDataType(IElement element)
+    {
+        if (element is null)
+            return "Dynamic";
+
+        PropertyInfo[] properties;
+
+        switch (element.Type)
         {
-            var addAnotherStructure = new List<IDictionary<string, dynamic>>();
-            var fieldsetStructure = new Dictionary<string, dynamic>();
+            case EElementType.Checkbox:
+                return new List<string> { string.Empty.GetType().ConvertTypeToFormattedString() };
 
-            fieldsetStructure = element.Properties.Elements
-                .Aggregate(fieldsetStructure, (current, nestedElement) =>
-                    (Dictionary<string, dynamic>)RecursiveObjectCreate(string.IsNullOrEmpty(nestedElement.Properties.TargetMapping)
-                        ? nestedElement.Properties.QuestionId
-                        : nestedElement.Properties.TargetMapping, nestedElement, current));
+            case EElementType.DateInput:
+            case EElementType.DatePicker:
+            case EElementType.TimeInput:
+                return new DateTime().GetType().ConvertTypeToFormattedString();
 
-            addAnotherStructure.Add(fieldsetStructure);
-            dataStructure.Add($"{target.First().ToString().ToUpper()}{target[1..]}", addAnotherStructure);
+            case EElementType.Street:
+            case EElementType.Address:
+                var address = new StockportGovUK.NetStandard.Gateways.Models.Addresses.Address();
+                properties = address.GetType().GetProperties();
+                return GeneratePropertyDictionary(properties);
 
-            return dataStructure;
+            case EElementType.Organisation:
+                var organisation = new StockportGovUK.NetStandard.Gateways.Models.Verint.Organisation();
+                properties = organisation.GetType().GetProperties();
+                return GeneratePropertyDictionary(properties);
+
+            case EElementType.Booking:
+                var booking = new StockportGovUK.NetStandard.Gateways.Models.Booking.Booking();
+                properties = booking.GetType().GetProperties();
+                return GeneratePropertyDictionary(properties);
+
+            case EElementType.Map:
+                return new ExpandoObject();
+
+            case EElementType.MultipleFileUpload:
+            case EElementType.FileUpload:
+                var file = new File();
+                var fileArray = new List<Dictionary<string, dynamic>>();
+                fileArray.Add(GeneratePropertyDictionary(file.GetType().GetProperties()));
+                return fileArray;
+
+            default:
+                return string.Empty.GetType().ConvertTypeToFormattedString();
         }
+    }
 
-        private dynamic GetDataType(IElement element)
+    private Dictionary<string, dynamic> GeneratePropertyDictionary(PropertyInfo[] props)
+    {
+        var propertyDictionary = new Dictionary<string, dynamic>();
+
+        foreach (var prop in props)
         {
-            if (element is null)
-                return "Dynamic";
-
-            PropertyInfo[] properties;
-
-            switch (element.Type)
+            if (prop.PropertyType.ToString().StartsWith(StructureConstants.SMBC_MODELS_PREFIX) && !prop.PropertyType.ToString().EndsWith("[]"))
             {
-                case EElementType.Checkbox:
-                    return new List<string> { string.Empty.GetType().ConvertTypeToFormattedString() };
-
-                case EElementType.DateInput:
-                case EElementType.DatePicker:
-                case EElementType.TimeInput:
-                    return new DateTime().GetType().ConvertTypeToFormattedString();
-
-                case EElementType.Street:
-                case EElementType.Address:
-                    var address = new StockportGovUK.NetStandard.Gateways.Models.Addresses.Address();
-                    properties = address.GetType().GetProperties();
-                    return GeneratePropertyDictionary(properties);
-
-                case EElementType.Organisation:
-                    var organisation = new StockportGovUK.NetStandard.Gateways.Models.Verint.Organisation();
-                    properties = organisation.GetType().GetProperties();
-                    return GeneratePropertyDictionary(properties);
-
-                case EElementType.Booking:
-                    var booking = new StockportGovUK.NetStandard.Gateways.Models.Booking.Booking();
-                    properties = booking.GetType().GetProperties();
-                    return GeneratePropertyDictionary(properties);
-
-                case EElementType.Map:
-                    return new ExpandoObject();
-
-                case EElementType.MultipleFileUpload:
-                case EElementType.FileUpload:
-                    var file = new File();
-                    var fileArray = new List<Dictionary<string, dynamic>>();
-                    fileArray.Add(GeneratePropertyDictionary(file.GetType().GetProperties()));
-                    return fileArray;
-
-                default:
-                    return string.Empty.GetType().ConvertTypeToFormattedString();
-            }
-        }
-
-        private Dictionary<string, dynamic> GeneratePropertyDictionary(PropertyInfo[] props)
-        {
-            var propertyDictionary = new Dictionary<string, dynamic>();
-
-            foreach (var prop in props)
-            {
-                if (prop.PropertyType.ToString().StartsWith(StructureConstants.SMBC_MODELS_PREFIX) && !prop.PropertyType.ToString().EndsWith("[]"))
+                var typeInstance = Activator.CreateInstance(prop.PropertyType);
+                var nestedProperties = typeInstance.GetType().GetProperties();
+                var nestedPropertyDictionary = new Dictionary<string, dynamic>();
+                foreach (var nestedProp in nestedProperties)
                 {
-                    var typeInstance = Activator.CreateInstance(prop.PropertyType);
-                    var nestedProperties = typeInstance.GetType().GetProperties();
+                    nestedPropertyDictionary.Add(nestedProp.Name, nestedProp.PropertyType.ConvertTypeToFormattedString());
+                }
+
+                propertyDictionary.Add(prop.Name, nestedPropertyDictionary);
+            }
+            else if (prop.PropertyType.ToString().StartsWith(StructureConstants.SMBC_MODELS_PREFIX) && prop.PropertyType.ToString().EndsWith("[]"))
+            {
+                var typeArray = new object[1];
+                typeArray[0] = Activator.CreateInstance(prop.PropertyType.GetElementType());
+                var arrayDictionary = new List<Dictionary<string, dynamic>>();
+                foreach (var type in typeArray)
+                {
+                    var nestedProperties = type.GetType().GetProperties();
                     var nestedPropertyDictionary = new Dictionary<string, dynamic>();
                     foreach (var nestedProp in nestedProperties)
                     {
                         nestedPropertyDictionary.Add(nestedProp.Name, nestedProp.PropertyType.ConvertTypeToFormattedString());
                     }
 
-                    propertyDictionary.Add(prop.Name, nestedPropertyDictionary);
+                    arrayDictionary.Add(nestedPropertyDictionary);
                 }
-                else if (prop.PropertyType.ToString().StartsWith(StructureConstants.SMBC_MODELS_PREFIX) && prop.PropertyType.ToString().EndsWith("[]"))
-                {
-                    var typeArray = new object[1];
-                    typeArray[0] = Activator.CreateInstance(prop.PropertyType.GetElementType());
-                    var arrayDictionary = new List<Dictionary<string, dynamic>>();
-                    foreach (var type in typeArray)
-                    {
-                        var nestedProperties = type.GetType().GetProperties();
-                        var nestedPropertyDictionary = new Dictionary<string, dynamic>();
-                        foreach (var nestedProp in nestedProperties)
-                        {
-                            nestedPropertyDictionary.Add(nestedProp.Name, nestedProp.PropertyType.ConvertTypeToFormattedString());
-                        }
 
-                        arrayDictionary.Add(nestedPropertyDictionary);
-                    }
-
-                    propertyDictionary.Add(prop.Name, arrayDictionary);
-                }
-                else
-                {
-                    propertyDictionary.Add(prop.Name, prop.PropertyType.ConvertTypeToFormattedString());
-                }
+                propertyDictionary.Add(prop.Name, arrayDictionary);
             }
-
-            return propertyDictionary;
+            else
+            {
+                propertyDictionary.Add(prop.Name, prop.PropertyType.ConvertTypeToFormattedString());
+            }
         }
+
+        return propertyDictionary;
     }
 }

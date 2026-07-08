@@ -1,7 +1,6 @@
-namespace form_builder.Services.PageService.Entities
+namespace form_builder.Services.PageService.Entities;
+
+public class ProcessPreviewRequestEntity : ProcessRequestEntity
 {
-    public class ProcessPreviewRequestEntity : ProcessRequestEntity
-    {
-        public string PreviewFormKey { get; set; }
-    }
+    public string PreviewFormKey { get; set; }
 }

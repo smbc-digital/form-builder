@@ -13,33 +13,24 @@ using Microsoft.Extensions.Options;
 
 namespace form_builder.ContentFactory.SuccessPageFactory;
 
-public class SuccessPageFactory : ISuccessPageFactory
+public class SuccessPageFactory(
+    IPageHelper pageHelper,
+    IPageFactory pageFactory,
+    ISessionHelper sessionHelper,
+    IDistributedCacheWrapper distributedCache,
+    IOptions<PreviewModeConfiguration> previewModeConfiguration,
+    IWebHostEnvironment environment,
+    ILogger<SuccessPageFactory> logger)
+    : ISuccessPageFactory
 {
-    private readonly IPageHelper _pageHelper;
-    private readonly IPageFactory _pageFactory;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IPageFactory _pageFactory = pageFactory;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IWebHostEnvironment _environment = environment;
+    private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration = previewModeConfiguration;
 
-    private readonly ILogger<SuccessPageFactory> _logger;
-
-    public SuccessPageFactory(IPageHelper pageHelper, 
-        IPageFactory pageFactory,
-        ISessionHelper sessionHelper, 
-        IDistributedCacheWrapper distributedCache,
-        IOptions<PreviewModeConfiguration> previewModeConfiguration,
-        IWebHostEnvironment environment,
-        ILogger<SuccessPageFactory> logger)
-    {
-        _pageHelper = pageHelper;
-        _pageFactory = pageFactory;
-        _sessionHelper = sessionHelper;
-        _distributedCache = distributedCache;
-        _environment = environment;
-        _previewModeConfiguration = previewModeConfiguration;
-        _logger = logger;
-    }
+    private readonly ILogger<SuccessPageFactory> _logger = logger;
 
     public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string cacheKey, FormAnswers formAnswers, EBehaviourType behaviourType)
     {

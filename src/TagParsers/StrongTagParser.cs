@@ -4,10 +4,8 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers;
 
-public class StrongTagParser : TagParser, ITagParser
+public class StrongTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public StrongTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
-
     public Regex Regex => new Regex("(?<={{)STRONG::.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

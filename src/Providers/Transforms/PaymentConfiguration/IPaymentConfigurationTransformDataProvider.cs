@@ -1,7 +1,6 @@
-﻿namespace form_builder.Providers.Transforms.PaymentConfiguration
+﻿namespace form_builder.Providers.Transforms.PaymentConfiguration;
+
+public interface IPaymentConfigurationTransformDataProvider
 {
-    public interface IPaymentConfigurationTransformDataProvider
-    {
-        Task<T> Get<T>();
-    }
+    Task<T> Get<T>();
 }

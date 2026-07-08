@@ -1,24 +1,23 @@
 using form_builder.Models;
 
-namespace form_builder.Validators.IntegrityChecks.Behaviours
+namespace form_builder.Validators.IntegrityChecks.Behaviours;
+
+public class EmptyBehaviourSlugsCheck : IBehaviourSchemaIntegrityCheck
 {
-    public class EmptyBehaviourSlugsCheck : IBehaviourSchemaIntegrityCheck
+    public IntegrityCheckResult Validate(List<Behaviour> behaviours)
     {
-        public IntegrityCheckResult Validate(List<Behaviour> behaviours)
+        IntegrityCheckResult result = new();
+
+        foreach (var behaviour in behaviours)
         {
-            IntegrityCheckResult result = new();
-
-            foreach (var behaviour in behaviours)
+            if (string.IsNullOrEmpty(behaviour.PageSlug) &&
+                (behaviour.SubmitSlugs is null || behaviour.SubmitSlugs.Count.Equals(0)))
             {
-                if (string.IsNullOrEmpty(behaviour.PageSlug) &&
-                    (behaviour.SubmitSlugs is null || behaviour.SubmitSlugs.Count.Equals(0)))
-                {
-                    result.AddFailureMessage("Empty Behaviour Slug, Incorrectly configured behaviour slug was discovered");
-                }
+                result.AddFailureMessage("Empty Behaviour Slug, Incorrectly configured behaviour slug was discovered");
             }
-            return result;
         }
-
-        public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours) => await Task.Run(() => Validate(behaviours));
+        return result;
     }
+
+    public async Task<IntegrityCheckResult> ValidateAsync(List<Behaviour> behaviours) => await Task.Run(() => Validate(behaviours));
 }

@@ -1,43 +1,42 @@
 using form_builder.Models;
 
-namespace form_builder.Validators.IntegrityChecks.Form
+namespace form_builder.Validators.IntegrityChecks.Form;
+
+public class HasDuplicateQuestionIdsCheck : IFormSchemaIntegrityCheck
 {
-    public class HasDuplicateQuestionIdsCheck : IFormSchemaIntegrityCheck
+    public IntegrityCheckResult Validate(FormSchema schema)
     {
-        public IntegrityCheckResult Validate(FormSchema schema)
+        IntegrityCheckResult result = new();
+        List<string> questionIds = new();
+
+        foreach (var page in schema.Pages)
         {
-            IntegrityCheckResult result = new();
-            List<string> questionIds = new();
-
-            foreach (var page in schema.Pages)
+            foreach (var element in page.ValidatableElements)
             {
-                foreach (var element in page.ValidatableElements)
-                {
-                    questionIds.Add(element.Properties.QuestionId);
+                questionIds.Add(element.Properties.QuestionId);
 
-                    if (element.Properties.Elements is not null && element.Properties.Elements.Count > 0)
+                if (element.Properties.Elements is not null && element.Properties.Elements.Count > 0)
+                {
+                    foreach (var nestedElement in element.Properties.Elements)
                     {
-                        foreach (var nestedElement in element.Properties.Elements)
-                        {
-                            questionIds.Add(nestedElement.Properties.QuestionId);
-                        }
+                        questionIds.Add(nestedElement.Properties.QuestionId);
                     }
                 }
             }
-
-            // TODO: this seems to always report the first id on the hash set not the erroring one?
-            HashSet<string> hashSet = new();
-            if (questionIds.Any(id => !hashSet.Add(id)))
-            {
-                result.AddFailureMessage(
-                    "The provided json contains questions with the same QuestionID, " +
-                    "All Questions must have unique QuestionIds, " +
-                    $"QuestionId: {hashSet.First()}");
-            }
-
-            return result;
         }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
+        // TODO: this seems to always report the first id on the hash set not the erroring one?
+        HashSet<string> hashSet = new();
+        if (questionIds.Any(id => !hashSet.Add(id)))
+        {
+            result.AddFailureMessage(
+                "The provided json contains questions with the same QuestionID, " +
+                "All Questions must have unique QuestionIds, " +
+                $"QuestionId: {hashSet.First()}");
+        }
+
+        return result;
     }
+
+    public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema) => await Task.Run(() => Validate(schema));
 }

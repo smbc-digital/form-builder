@@ -30,77 +30,53 @@ using NuGet.Packaging;
 
 namespace form_builder.Services.PageService;
 
-public class PageService : IPageService
+public class PageService(
+    IEnumerable<IElementValidator> validators,
+    IPageHelper pageHelper,
+    ISessionHelper sessionHelper,
+    IAddressService addressService,
+    IFileUploadService fileUploadService,
+    IStreetService streetService,
+    IOrganisationService organisationService,
+    IDistributedCacheWrapper distributedCache,
+    IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
+    IWebHostEnvironment environment,
+    ISuccessPageFactory successPageFactory,
+    IPageFactory pageFactory,
+    IBookingService bookingService,
+    ISchemaFactory schemaFactory,
+    IIncomingDataHelper incomingDataHelper,
+    IActionsWorkflow actionsWorkflow,
+    IAddAnotherService addAnotherService,
+    IFormAvailabilityService formAvailabilityService,
+    ILogger<IPageService> logger,
+    IEnumerable<IFileStorageProvider> fileStorageProviders,
+    IEnumerable<ITagParser> tagParsers,
+    IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
+    : IPageService
 {
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IFileStorageProvider _fileStorageProvider;
-    private readonly IEnumerable<IElementValidator> _validators;
-    private readonly IPageHelper _pageHelper;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IStreetService _streetService;
-    private readonly IAddressService _addressService;
-    private readonly IOrganisationService _organisationService;
-    private readonly IFileUploadService _fileUploadService;
-    private readonly ISchemaFactory _schemaFactory;
-    private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IBookingService _bookingService;
-    private readonly IAddAnotherService _addAnotherService;
-    private readonly ISuccessPageFactory _successPageContentFactory;
-    private readonly IPageFactory _pageContentFactory;
-    private readonly IIncomingDataHelper _incomingDataHelper;
-    private readonly IActionsWorkflow _actionsWorkflow;
-    private readonly IFormAvailabilityService _formAvailabilityService;
-    private readonly ILogger<IPageService> _logger;
-    private readonly IEnumerable<ITagParser> _tagParsers;
-    
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IFileStorageProvider _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
+    private readonly IEnumerable<IElementValidator> _validators = validators;
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IStreetService _streetService = streetService;
+    private readonly IAddressService _addressService = addressService;
+    private readonly IOrganisationService _organisationService = organisationService;
+    private readonly IFileUploadService _fileUploadService = fileUploadService;
+    private readonly ISchemaFactory _schemaFactory = schemaFactory;
+    private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
+    private readonly IWebHostEnvironment _environment = environment;
+    private readonly IBookingService _bookingService = bookingService;
+    private readonly IAddAnotherService _addAnotherService = addAnotherService;
+    private readonly ISuccessPageFactory _successPageContentFactory = successPageFactory;
+    private readonly IPageFactory _pageContentFactory = pageFactory;
+    private readonly IIncomingDataHelper _incomingDataHelper = incomingDataHelper;
+    private readonly IActionsWorkflow _actionsWorkflow = actionsWorkflow;
+    private readonly IFormAvailabilityService _formAvailabilityService = formAvailabilityService;
+    private readonly ILogger<IPageService> _logger = logger;
+    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
 
-    public PageService(
-        IEnumerable<IElementValidator> validators,
-        IPageHelper pageHelper,
-        ISessionHelper sessionHelper,
-        IAddressService addressService,
-        IFileUploadService fileUploadService,
-        IStreetService streetService,
-        IOrganisationService organisationService,
-        IDistributedCacheWrapper distributedCache,
-        IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
-        IWebHostEnvironment environment,
-        ISuccessPageFactory successPageFactory,
-        IPageFactory pageFactory,
-        IBookingService bookingService,
-        ISchemaFactory schemaFactory,
-        IIncomingDataHelper incomingDataHelper,
-        IActionsWorkflow actionsWorkflow,
-        IAddAnotherService addAnotherService,
-        IFormAvailabilityService formAvailabilityService,
-        ILogger<IPageService> logger,
-        IEnumerable<IFileStorageProvider> fileStorageProviders,
-        IEnumerable<ITagParser> tagParsers,
-        IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
-    {
-        _validators = validators;
-        _pageHelper = pageHelper;
-        _sessionHelper = sessionHelper;
-        _streetService = streetService;
-        _addressService = addressService;
-        _bookingService = bookingService;
-        _organisationService = organisationService;
-        _fileUploadService = fileUploadService;
-        _distributedCache = distributedCache;
-        _schemaFactory = schemaFactory;
-        _successPageContentFactory = successPageFactory;
-        _pageContentFactory = pageFactory;
-        _environment = environment;
-        _formAvailabilityService = formAvailabilityService;
-        _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-        _incomingDataHelper = incomingDataHelper;
-        _actionsWorkflow = actionsWorkflow;
-        _logger = logger;
-        _addAnotherService = addAnotherService;
-        _tagParsers = tagParsers;
-        _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
-    }
 
     public async Task<ProcessPageEntity> ProcessPage(string form, string path, string subPath, IQueryCollection queryParameters)
     {

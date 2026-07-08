@@ -2,26 +2,25 @@
 using form_builder.Helpers.ActionsHelpers;
 using form_builder.Providers.TemplatedEmailProvider;
 
-namespace form_builder.Models.Actions
+namespace form_builder.Models.Actions;
+
+public class TemplatedEmail : Action
 {
-    public class TemplatedEmail : Action
+    public TemplatedEmail()
     {
-        public TemplatedEmail()
+        Type = EActionType.TemplatedEmail;
+    }
+
+    public override Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers)
+    {
+        var emailAddressList = actionHelper.GetEmailToAddresses(this, formAnswers).Split(',').ToList();
+
+        foreach (var emailAddress in emailAddressList)
         {
-            Type = EActionType.TemplatedEmail;
+            templatedEmailProvider
+                .SendEmailAsync(emailAddress, Properties.TemplateId, personalisation);
         }
 
-        public override Task ProcessTemplatedEmail(IActionHelper actionHelper, ITemplatedEmailProvider templatedEmailProvider, Dictionary<string, dynamic> personalisation, FormAnswers formAnswers)
-        {
-            var emailAddressList = actionHelper.GetEmailToAddresses(this, formAnswers).Split(',').ToList();
-
-            foreach (var emailAddress in emailAddressList)
-            {
-                templatedEmailProvider
-                    .SendEmailAsync(emailAddress, Properties.TemplateId, personalisation);
-            }
-
-            return null;
-        }
+        return null;
     }
 }

@@ -6,295 +6,294 @@ using form_builder.TagParsers.Formatters;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.TagParsers
+namespace form_builder_tests.UnitTests.TagParsers;
+
+public class FormDataTagParserTests
 {
-    public class FormDataTagParserTests
+    private readonly IEnumerable<IFormatter> _formatters;
+    private readonly Mock<IFormatter> _mockFormatter = new();
+    private readonly FormDataTagParser _tagParser;
+
+    public FormDataTagParserTests()
     {
-        private readonly IEnumerable<IFormatter> _formatters;
-        private readonly Mock<IFormatter> _mockFormatter = new();
-        private readonly FormDataTagParser _tagParser;
-
-        public FormDataTagParserTests()
+        _mockFormatter.Setup(_ => _.FormatterName).Returns("testformatter");
+        _mockFormatter.Setup(_ => _.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
+        _formatters = new List<IFormatter>
         {
-            _mockFormatter.Setup(_ => _.FormatterName).Returns("testformatter");
-            _mockFormatter.Setup(_ => _.Parse(It.IsAny<string>())).Returns("FAKE-FORMATTED-VALUE");
-            _formatters = new List<IFormatter>
+            _mockFormatter.Object
+        };
+
+        _tagParser = new FormDataTagParser(_formatters);
+    }
+
+    [Theory]
+    [InlineData("{{FORMDATA:firstname}}")]
+    [InlineData("{{FORMDATA:ref}}")]
+    public void Regex_ShouldReturnTrue_Result(string value)
+    {
+        Assert.True(_tagParser.Regex.Match(value).Success);
+    }
+
+    [Theory]
+    [InlineData("{{FORMDATAA:firstname}}")]
+    [InlineData("{{ORMDATA:ref}}")]
+    [InlineData("{FORMDATA:firstname}")]
+    [InlineData("{{FORMDATA:firstname}")]
+    [InlineData("{{TAG:firstname}")]
+    [InlineData("{{DIFFERENTTAG:firstname}}")]
+    public void Regex_ShouldReturnFalse_Result(string value)
+    {
+        Assert.False(_tagParser.Regex.Match(value).Success);
+    }
+
+    [Fact]
+    public async Task Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+    {
+        var element = new ElementBuilder()
+            .WithType(EElementType.P)
+            .WithPropertyText("this has no values to be replaced")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+        var formAnswers = new FormAnswers();
+
+        var result = await _tagParser.Parse(page, formAnswers);
+
+        Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+    }
+
+    [Fact]
+    public async Task Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+    {
+        var element = new ElementBuilder()
+            .WithType(EElementType.P)
+            .WithPropertyText("this value {{TAG:firstname}} should be replaced with name question")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+        var formAnswers = new FormAnswers();
+
+        var result = await _tagParser.Parse(page, formAnswers);
+
+        Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
+    }
+
+    [Fact]
+    public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+    {
+        var expectedString = "this value testfirstname should be replaced with name question";
+
+        var element = new ElementBuilder()
+            .WithType(EElementType.P)
+            .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with name question")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+        var formAnswers = new FormAnswers
+        {
+            AdditionalFormData = new Dictionary<string, object>
             {
-                _mockFormatter.Object
-            };
+                { "firstname", "testfirstname"}
+            }
+        };
 
-            _tagParser = new FormDataTagParser(_formatters);
-        }
+        var result = await _tagParser.Parse(page, formAnswers);
+        Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+    }
 
-        [Theory]
-        [InlineData("{{FORMDATA:firstname}}")]
-        [InlineData("{{FORMDATA:ref}}")]
-        public void Regex_ShouldReturnTrue_Result(string value)
+    [Fact]
+    public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
+    {
+        var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
+
+        var element = new ElementBuilder()
+            .WithType(EElementType.P)
+            .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+        var formAnswers = new FormAnswers
         {
-            Assert.True(_tagParser.Regex.Match(value).Success);
-        }
-
-        [Theory]
-        [InlineData("{{FORMDATAA:firstname}}")]
-        [InlineData("{{ORMDATA:ref}}")]
-        [InlineData("{FORMDATA:firstname}")]
-        [InlineData("{{FORMDATA:firstname}")]
-        [InlineData("{{TAG:firstname}")]
-        [InlineData("{{DIFFERENTTAG:firstname}}")]
-        public void Regex_ShouldReturnFalse_Result(string value)
-        {
-            Assert.False(_tagParser.Regex.Match(value).Success);
-        }
-
-        [Fact]
-        public async Task Parse_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
-        {
-            var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this has no values to be replaced")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formAnswers = new FormAnswers();
-
-            var result = await _tagParser.Parse(page, formAnswers);
-
-            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
-        }
-
-        [Fact]
-        public async Task Parse_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
-        {
-            var element = new ElementBuilder()
-                .WithType(EElementType.P)
-                .WithPropertyText("this value {{TAG:firstname}} should be replaced with name question")
-                .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formAnswers = new FormAnswers();
-
-            var result = await _tagParser.Parse(page, formAnswers);
-
-            Assert.Equal(element.Properties.Text, result.Elements.FirstOrDefault().Properties.Text);
-        }
-
-        [Fact]
-        public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
-        {
-            var expectedString = "this value testfirstname should be replaced with name question";
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.P)
-               .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with name question")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formAnswers = new FormAnswers
+            AdditionalFormData = new Dictionary<string, object>
             {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"}
-                }
-            };
+                { "firstname", "testfirstname"},
+                { "lastname", "testlastname"}
+            }
+        };
 
-            var result = await _tagParser.Parse(page, formAnswers);
-            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
-        }
+        var result = await _tagParser.Parse(page, formAnswers);
+        Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+    }
 
-        [Fact]
-        public async Task Parse_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
+    [Fact]
+    public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
+    {
+        var expectedString = "this value testfirstname should be replaced with name question";
+
+        var element = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithHint("this value {{FORMDATA:firstname}} should be replaced with name question")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+        var formAnswers = new FormAnswers
         {
-            var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.P)
-               .WithPropertyText("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formAnswers = new FormAnswers
+            AdditionalFormData = new Dictionary<string, object>
             {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"},
-                    { "lastname", "testlastname"}
-                }
-            };
+                { "firstname", "testfirstname"}
+            }
+        };
 
-            var result = await _tagParser.Parse(page, formAnswers);
-            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
-        }
+        var result = await _tagParser.Parse(page, formAnswers);
+        Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
+    }
 
-        [Fact]
-        public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingSingleValue()
+    [Fact]
+    public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingMultipleValues()
+    {
+        var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
+
+        var element = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithHint("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+        var formAnswers = new FormAnswers
         {
-            var expectedString = "this value testfirstname should be replaced with name question";
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.Textbox)
-               .WithHint("this value {{FORMDATA:firstname}} should be replaced with name question")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formAnswers = new FormAnswers
+            AdditionalFormData = new Dictionary<string, object>
             {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"}
-                }
-            };
+                { "firstname", "testfirstname"},
+                { "lastname", "testlastname"}
+            }
+        };
 
-            var result = await _tagParser.Parse(page, formAnswers);
-            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
-        }
+        var result = await _tagParser.Parse(page, formAnswers);
+        Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
+    }
 
-        [Fact]
-        public async Task Parse_ShouldReturnUpdatedValueForHint_WhenReplacingMultipleValues()
+    [Fact]
+    public async Task Parse_ShouldCallFormatter_WhenProvided()
+    {
+        var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
+
+        var element = new ElementBuilder()
+            .WithType(EElementType.P)
+            .WithPropertyText("this value should be formatted: {{FORMDATA:firstname:testformatter}}")
+            .Build();
+
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
+
+        var formAnswers = new FormAnswers
         {
-            var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.Textbox)
-               .WithHint("this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formAnswers = new FormAnswers
+            AdditionalFormData = new Dictionary<string, object>
             {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"},
-                    { "lastname", "testlastname"}
-                }
-            };
+                { "firstname", "testfirstname"}
+            }
+        };
 
-            var result = await _tagParser.Parse(page, formAnswers);
-            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Hint);
-        }
+        var result = await _tagParser.Parse(page, formAnswers);
+        Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
+        _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
+    }
 
-        [Fact]
-        public async Task Parse_ShouldCallFormatter_WhenProvided()
+    [Fact]
+    public void ParseString_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+    {
+        var text = "this has no values to be replaced";
+        var formAnswers = new FormAnswers();
+
+        var result = _tagParser.ParseString(text, formAnswers);
+
+        Assert.Equal(text, result);
+    }
+
+    [Fact]
+    public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
+    {
+        var text = "this value {{TAG:firstname}} should be replaced with name question";
+        var formAnswers = new FormAnswers();
+
+        var result = _tagParser.ParseString(text, formAnswers);
+
+        Assert.Equal(text, result);
+    }
+
+    [Fact]
+    public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
+    {
+        var expectedString = "this value testfirstname should be replaced with name question";
+        var text = "this value {{FORMDATA:firstname}} should be replaced with name question";
+
+        var formAnswers = new FormAnswers
         {
-            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
-
-            var element = new ElementBuilder()
-               .WithType(EElementType.P)
-               .WithPropertyText("this value should be formatted: {{FORMDATA:firstname:testformatter}}")
-               .Build();
-
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
-
-            var formAnswers = new FormAnswers
+            AdditionalFormData = new Dictionary<string, object>
             {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"}
-                }
-            };
+                { "firstname", "testfirstname"}
+            }
+        };
 
-            var result = await _tagParser.Parse(page, formAnswers);
-            Assert.Equal(expectedString, result.Elements.FirstOrDefault().Properties.Text);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
-        }
+        var result = _tagParser.ParseString(text, formAnswers);
+        Assert.Equal(expectedString, result);
+    }
 
-        [Fact]
-        public void ParseString_ShouldReturnInitialValue_WhenNoValuesAre_To_BeReplaced()
+    [Fact]
+    public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
+    {
+        var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
+        var text = "this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname";
+
+        var formAnswers = new FormAnswers
         {
-            var text = "this has no values to be replaced";
-            var formAnswers = new FormAnswers();
-
-            var result = _tagParser.ParseString(text, formAnswers);
-
-            Assert.Equal(text, result);
-        }
-
-        [Fact]
-        public void ParseString_ShouldReturnInitialValue_When_NoTag_MatchesRegex()
-        {
-            var text = "this value {{TAG:firstname}} should be replaced with name question";
-            var formAnswers = new FormAnswers();
-
-            var result = _tagParser.ParseString(text, formAnswers);
-
-            Assert.Equal(text, result);
-        }
-
-        [Fact]
-        public void ParseString_ShouldReturnUpdatedValue_WhenReplacingSingleValue()
-        {
-            var expectedString = "this value testfirstname should be replaced with name question";
-            var text = "this value {{FORMDATA:firstname}} should be replaced with name question";
-
-            var formAnswers = new FormAnswers
+            AdditionalFormData = new Dictionary<string, object>
             {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"}
-                }
-            };
+                { "firstname", "testfirstname"},
+                { "lastname", "testlastname"}
+            }
+        };
 
-            var result = _tagParser.ParseString(text, formAnswers);
-            Assert.Equal(expectedString, result);
-        }
+        var result = _tagParser.ParseString(text, formAnswers);
+        Assert.Equal(expectedString, result);
+    }
 
-        [Fact]
-        public void ParseString_ShouldReturnUpdatedValue_WhenReplacingMultipleValues()
+
+    [Fact]
+    public void ParseString_ShouldCallFormatter_WhenProvided()
+    {
+        var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
+
+        var text = "this value should be formatted: {{FORMDATA:firstname:testformatter}}";
+
+        var formAnswers = new FormAnswers
         {
-            var expectedString = "this value testfirstname should be replaced with firstname and this testlastname with lastname";
-            var text = "this value {{FORMDATA:firstname}} should be replaced with firstname and this {{FORMDATA:lastname}} with lastname";
-
-            var formAnswers = new FormAnswers
+            AdditionalFormData = new Dictionary<string, object>
             {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"},
-                    { "lastname", "testlastname"}
-                }
-            };
+                { "firstname", "testfirstname"}
+            }
+        };
 
-            var result = _tagParser.ParseString(text, formAnswers);
-            Assert.Equal(expectedString, result);
-        }
-
-
-        [Fact]
-        public void ParseString_ShouldCallFormatter_WhenProvided()
-        {
-            var expectedString = "this value should be formatted: FAKE-FORMATTED-VALUE";
-
-            var text = "this value should be formatted: {{FORMDATA:firstname:testformatter}}";
-
-            var formAnswers = new FormAnswers
-            {
-                AdditionalFormData = new Dictionary<string, object>
-                {
-                    { "firstname", "testfirstname"}
-                }
-            };
-
-            var result = _tagParser.ParseString(text, formAnswers);
-            Assert.Equal(expectedString, result);
-            _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
-        }
+        var result = _tagParser.ParseString(text, formAnswers);
+        Assert.Equal(expectedString, result);
+        _mockFormatter.Verify(_ => _.Parse(It.IsAny<string>()), Times.Once);
     }
 }

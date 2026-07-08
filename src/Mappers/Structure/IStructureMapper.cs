@@ -1,7 +1,6 @@
-﻿namespace form_builder.Mappers.Structure
+﻿namespace form_builder.Mappers.Structure;
+
+public interface IStructureMapper
 {
-    public interface IStructureMapper
-    {
-        Task<object> CreateBaseFormDataStructure(string form);
-    }
+    Task<object> CreateBaseFormDataStructure(string form);
 }

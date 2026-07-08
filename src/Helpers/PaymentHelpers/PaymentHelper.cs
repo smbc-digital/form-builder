@@ -11,30 +11,21 @@ using StockportGovUK.NetStandard.Gateways;
 
 namespace form_builder.Helpers.PaymentHelpers;
 
-public class PaymentHelper : IPaymentHelper
+public class PaymentHelper(
+    IGateway gateway,
+    ISessionHelper sessionHelper,
+    IMappingService mappingService,
+    IWebHostEnvironment hostingEnvironment,
+    IPaymentConfigurationTransformDataProvider paymentConfigProvider,
+    IOptions<PaymentConfiguration> paymentConfiguration)
+    : IPaymentHelper
 {
-    private readonly IGateway _gateway;
-    private readonly IPaymentConfigurationTransformDataProvider _paymentConfigProvider;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IMappingService _mappingService;
-    private readonly IWebHostEnvironment _hostingEnvironment;
-    private readonly PaymentConfiguration _paymentConfiguration;
-
-    public PaymentHelper(
-        IGateway gateway,
-        ISessionHelper sessionHelper,
-        IMappingService mappingService,
-        IWebHostEnvironment hostingEnvironment,
-        IPaymentConfigurationTransformDataProvider paymentConfigProvider,
-        IOptions<PaymentConfiguration> paymentConfiguration)
-    {
-        _gateway = gateway;
-        _sessionHelper = sessionHelper;
-        _mappingService = mappingService;
-        _hostingEnvironment = hostingEnvironment;
-        _paymentConfigProvider = paymentConfigProvider;
-        _paymentConfiguration = paymentConfiguration.Value;
-    }
+    private readonly IGateway _gateway = gateway;
+    private readonly IPaymentConfigurationTransformDataProvider _paymentConfigProvider = paymentConfigProvider;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly IWebHostEnvironment _hostingEnvironment = hostingEnvironment;
+    private readonly PaymentConfiguration _paymentConfiguration = paymentConfiguration.Value;
 
     public async Task<PaymentInformation> GetFormPaymentInformation(string formName, FormAnswers formAnswers, FormSchema baseForm)
     {

@@ -4,10 +4,8 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers;
 
-public class ItalicTagParser : TagParser, ITagParser
+public class ItalicTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public ItalicTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
-
     public Regex Regex => new Regex("(?<={{)ITALIC::.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

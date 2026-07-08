@@ -1,82 +1,81 @@
 ﻿using form_builder.Models;
 using MimeKit;
 
-namespace form_builder.Builders.Email
-{
-    public class EmailBuilder
-    {
-        public MemoryStream BuildMessageToStream(EmailMessage emailMessage)
-        {
-            var stream = new MemoryStream();
-            BuildMessage(emailMessage).WriteTo(stream);
+namespace form_builder.Builders.Email;
 
-            return stream;
+public class EmailBuilder
+{
+    public MemoryStream BuildMessageToStream(EmailMessage emailMessage)
+    {
+        var stream = new MemoryStream();
+        BuildMessage(emailMessage).WriteTo(stream);
+
+        return stream;
+    }
+
+    private static MimeMessage BuildMessage(EmailMessage emailMessage)
+    {
+        var message = new MimeMessage();
+        var toEmails = emailMessage.ToEmail.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var email in toEmails)
+        {
+            message.To.Add(new MailboxAddress(string.Empty, email.Trim()));
         }
 
-        private static MimeMessage BuildMessage(EmailMessage emailMessage)
+        message.From.Add(new MailboxAddress(string.Empty, emailMessage.FromEmail));
+
+        if (!string.IsNullOrEmpty(emailMessage.CcEmail))
+            message.Cc.Add(new MailboxAddress(string.Empty, emailMessage.CcEmail));
+
+        var multipart = new Multipart("mixed")
         {
-            var message = new MimeMessage();
-            var toEmails = emailMessage.ToEmail.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var email in toEmails)
+            new TextPart("html")
             {
-                message.To.Add(new MailboxAddress(string.Empty, email.Trim()));
+                Text = emailMessage.Body
             }
+        };
 
-            message.From.Add(new MailboxAddress(string.Empty, emailMessage.FromEmail));
-
-            if (!string.IsNullOrEmpty(emailMessage.CcEmail))
-                message.Cc.Add(new MailboxAddress(string.Empty, emailMessage.CcEmail));
-
-            var multipart = new Multipart("mixed")
+        if(emailMessage.FileUploads is not null)
+        {
+            foreach(var file in emailMessage.FileUploads)
             {
-                new TextPart("html")
+                var attachment = new MimePart("application", file.TrustedOriginalFileName.Split('.').Last().ToLower())
                 {
-                    Text = emailMessage.Body
-                }
-            };
-
-            if(emailMessage.FileUploads is not null)
-            {
-                foreach(var file in emailMessage.FileUploads)
-                {
-                    var attachment = new MimePart("application", file.TrustedOriginalFileName.Split('.').Last().ToLower())
-                    {
-                        Content = new MimeContent(new MemoryStream(Convert.FromBase64String(file.Content.Replace("\"", "")))),
-                        ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
-                        ContentTransferEncoding = ContentEncoding.Base64,
-                        FileName = file.TrustedOriginalFileName,
-                        IsAttachment = true
-                    };
-
-                    multipart.Add(attachment);
-                }
-            }
-
-            if (emailMessage.Attachment is not null)
-            {
-                var attachment = new MimePart("application", "pdf")
-                {
-                    Content = new MimeContent(new MemoryStream(emailMessage.Attachment)),
+                    Content = new MimeContent(new MemoryStream(Convert.FromBase64String(file.Content.Replace("\"", "")))),
                     ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
                     ContentTransferEncoding = ContentEncoding.Base64,
-                    FileName = emailMessage.AttachmentName,
+                    FileName = file.TrustedOriginalFileName,
                     IsAttachment = true
                 };
 
                 multipart.Add(attachment);
             }
-
-            message.Subject = emailMessage.Subject;
-            message.Body = multipart;
-
-            return message;
         }
 
-        private static BodyBuilder BuildMessageBody(string bodyContent) => new BodyBuilder
+        if (emailMessage.Attachment is not null)
         {
-            HtmlBody = bodyContent,
-            TextBody = bodyContent
-        };
+            var attachment = new MimePart("application", "pdf")
+            {
+                Content = new MimeContent(new MemoryStream(emailMessage.Attachment)),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = emailMessage.AttachmentName,
+                IsAttachment = true
+            };
+
+            multipart.Add(attachment);
+        }
+
+        message.Subject = emailMessage.Subject;
+        message.Body = multipart;
+
+        return message;
     }
+
+    private static BodyBuilder BuildMessageBody(string bodyContent) => new BodyBuilder
+    {
+        HtmlBody = bodyContent,
+        TextBody = bodyContent
+    };
 }

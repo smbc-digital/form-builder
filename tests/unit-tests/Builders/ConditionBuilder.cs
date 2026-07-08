@@ -1,50 +1,49 @@
 using form_builder.Enum;
 using form_builder.Models;
 
-namespace form_builder_tests.Builders
+namespace form_builder_tests.Builders;
+
+public class ConditionBuilder
 {
-    public class ConditionBuilder
+    private List<Condition> _conditions = new List<Condition>();
+    private ECondition _conditionType;
+    private string _comparisonValue;
+    private string _questionId;
+
+
+    public Condition Build() => new Condition
     {
-        private List<Condition> _conditions = new List<Condition>();
-        private ECondition _conditionType;
-        private string _comparisonValue;
-        private string _questionId;
+        Conditions = _conditions,
+        ConditionType = _conditionType,
+        ComparisonValue = _comparisonValue,
+        QuestionId = _questionId
+    };
 
+    public ConditionBuilder WithConditionType(ECondition type)
+    {
+        _conditionType = type;
 
-        public Condition Build() => new Condition
-        {
-            Conditions = _conditions,
-            ConditionType = _conditionType,
-            ComparisonValue = _comparisonValue,
-            QuestionId = _questionId
-        };
+        return this;
+    }
 
-        public ConditionBuilder WithConditionType(ECondition type)
-        {
-            _conditionType = type;
+    public ConditionBuilder WithComparisonValue(string value)
+    {
+        _comparisonValue = value;
 
-            return this;
-        }
+        return this;
+    }
 
-        public ConditionBuilder WithComparisonValue(string value)
-        {
-            _comparisonValue = value;
+    public ConditionBuilder WithQuestionId(string value)
+    {
+        _questionId = value;
 
-            return this;
-        }
+        return this;
+    }
 
-        public ConditionBuilder WithQuestionId(string value)
-        {
-            _questionId = value;
+    public ConditionBuilder WithCondition(Condition condition)
+    {
+        _conditions.Add(condition);
 
-            return this;
-        }
-
-        public ConditionBuilder WithCondition(Condition condition)
-        {
-            _conditions.Add(condition);
-
-            return this;
-        }
+        return this;
     }
 }

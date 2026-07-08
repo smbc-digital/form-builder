@@ -1,12 +1,11 @@
-namespace form_builder.Configuration
+namespace form_builder.Configuration;
+
+public class PaymentConfiguration
 {
-    public class PaymentConfiguration
-    {
-        public const string ConfigValue = "PaymentConfiguration";
+    public const string ConfigValue = "PaymentConfiguration";
 
-        public readonly string FakeProviderName = "Fake";
+    public readonly string FakeProviderName = "Fake";
 
-        public bool FakePayment { get; set; } = false;
-        public bool FakePaymentCalculation { get; set; } = false;
-    }
+    public bool FakePayment { get; set; } = false;
+    public bool FakePaymentCalculation { get; set; } = false;
 }

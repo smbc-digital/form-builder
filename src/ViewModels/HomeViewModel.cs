@@ -1,16 +1,15 @@
 using form_builder.Models;
 
-namespace form_builder.ViewModels
+namespace form_builder.ViewModels;
+
+public class HomeViewModel
 {
-    public class HomeViewModel
-    {
-        public bool Embeddable { get; set; }
-        public List<string> Forms { get; set; } = new();
-        public string QAFormAccessToken { get; set; }
-        public string StartPageUrl { get; set; }
-        public string FormName { get; set; }
-        public bool HideBackButton { get; set; }
-        public List<IncomingValue> IncomingValues { get; set; }
-        public List<string> FormUrls => Forms.Select(form => form.Replace($@".\DSL\", "").Replace(".json", $"?key={QAFormAccessToken}")).ToList();
-    }
+    public bool Embeddable { get; set; }
+    public List<string> Forms { get; set; } = new();
+    public string QAFormAccessToken { get; set; }
+    public string StartPageUrl { get; set; }
+    public string FormName { get; set; }
+    public bool HideBackButton { get; set; }
+    public List<IncomingValue> IncomingValues { get; set; }
+    public List<string> FormUrls => Forms.Select(form => form.Replace($@".\DSL\", "").Replace(".json", $"?key={QAFormAccessToken}")).ToList();
 }

@@ -1,10 +1,9 @@
 using form_builder.Models.Elements;
 
-namespace form_builder.Validators.IntegrityChecks.Elements
+namespace form_builder.Validators.IntegrityChecks.Elements;
+
+public interface IElementSchemaIntegrityCheck
 {
-    public interface IElementSchemaIntegrityCheck
-    {
-        IntegrityCheckResult Validate(IElement element);
-        Task<IntegrityCheckResult> ValidateAsync(IElement element);
-    }
+    IntegrityCheckResult Validate(IElement element);
+    Task<IntegrityCheckResult> ValidateAsync(IElement element);
 }

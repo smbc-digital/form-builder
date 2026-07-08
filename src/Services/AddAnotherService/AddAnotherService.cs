@@ -7,17 +7,13 @@ using form_builder.Services.PageService.Entities;
 
 namespace form_builder.Services.AddAnotherService;
 
-public class AddAnotherService : IAddAnotherService
+public class AddAnotherService(
+    IPageHelper pageHelper,
+    IPageFactory pageContentFactory)
+    : IAddAnotherService
 {
-    private readonly IPageHelper _pageHelper;
-    private readonly IPageFactory _pageContentFactory;
-
-    public AddAnotherService(IPageHelper pageHelper,
-        IPageFactory pageContentFactory)
-    {
-        _pageHelper = pageHelper;
-        _pageContentFactory = pageContentFactory;
-    }
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IPageFactory _pageContentFactory = pageContentFactory;
 
     public async Task<ProcessRequestEntity> ProcessAddAnother(
         Dictionary<string, dynamic> viewModel,

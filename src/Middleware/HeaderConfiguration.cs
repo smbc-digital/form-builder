@@ -1,42 +1,35 @@
-﻿namespace form_builder.Middleware
+﻿namespace form_builder.Middleware;
+
+public class HeaderConfiguration(RequestDelegate next, IWebHostEnvironment env)
 {
-    public class HeaderConfiguration
+    private readonly RequestDelegate _next = next;
+    private IWebHostEnvironment _env { get; } = env;
+
+    // TODO: Move these header values to config!
+    public async Task Invoke(HttpContext context)
     {
-        private readonly RequestDelegate _next;
-        private IWebHostEnvironment _env { get; }
+        var headers = context.Response.Headers;
 
-        public HeaderConfiguration(RequestDelegate next, IWebHostEnvironment env)
+        var testUrls = !_env.IsEnvironment("stage") || !_env.IsEnvironment("prod") ? "http://localhost:5006/ https://localhost:5006/" : "";
+
+        var queryString = context.Request.QueryString.ToString();
+
+        if (queryString.Contains("utm_source=lagan") || context.Request.Cookies.ContainsKey("is_verint"))
         {
-            _next = next;
-            _env = env;
+            headers["Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080 https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com";
+            headers["X-Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080 https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com";
+            context.Response.Cookies.Append("is_verint", "yes");
+        }
+        else
+        {
+            headers["Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://www.stockrm.org https://int-webplatform-stockportgov.smbcdigital.net/ https://int-webplatform-stockroom.smbcdigital.net/ https://qa-webplatform-stockportgov.smbcdigital.net/ https://qa-webplatform-stockroom.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockroom.smbcdigital.net/ https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com {testUrls}";
+            headers["X-Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://www.stockrm.org https://int-webplatform-stockportgov.smbcdigital.net https://int-webplatform-stockroom.smbcdigital.net/ https://qa-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com {testUrls}";
         }
 
-        // TODO: Move these header values to config!
-        public async Task Invoke(HttpContext context)
-        {
-            var headers = context.Response.Headers;
+        headers["Access-Control-Allow-Origin"] = $"http://www.stockport.gov.uk https://www.stockport.gov.uk https://www.stockrm.org https://int-webplatform-stockportgov.smbcdigital.net https://int-webplatform-stockroom.smbcdigital.net/ https://qa-webplatform-stockportgov.smbcdigital.net/ https://qa-webplatform-stockroom.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockroom.smbcdigital.net/ {testUrls}";
+        headers["X-Content-Type-Options"] = "nosniff";
+        headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
 
-            var testUrls = !_env.IsEnvironment("stage") || !_env.IsEnvironment("prod") ? "http://localhost:5006/ https://localhost:5006/" : "";
-
-            var queryString = context.Request.QueryString.ToString();
-
-            if (queryString.Contains("utm_source=lagan") || context.Request.Cookies.ContainsKey("is_verint"))
-            {
-                headers["Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080 https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com";
-                headers["X-Content-Security-Policy"] = "frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk http://scnverintlive.stockport.gov.uk:8080 http://scnverinttest.stockport.gov.uk:8080 https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com";
-                context.Response.Cookies.Append("is_verint", "yes");
-            }
-            else
-            {
-                headers["Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://www.stockrm.org https://int-webplatform-stockportgov.smbcdigital.net/ https://int-webplatform-stockroom.smbcdigital.net/ https://qa-webplatform-stockportgov.smbcdigital.net/ https://qa-webplatform-stockroom.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockroom.smbcdigital.net/ https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com {testUrls}";
-                headers["X-Content-Security-Policy"] = $"frame-ancestors 'self' http://www.stockport.gov.uk https://www.stockport.gov.uk https://www.stockrm.org https://int-webplatform-stockportgov.smbcdigital.net https://int-webplatform-stockroom.smbcdigital.net/ https://qa-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ https://stockportqa.desktop.ukpreview.empro.verintcloudservices.com https://stockport.desktop.ukpreview.empro.verintcloudservices.com {testUrls}";
-            }
-
-            headers["Access-Control-Allow-Origin"] = $"http://www.stockport.gov.uk https://www.stockport.gov.uk https://www.stockrm.org https://int-webplatform-stockportgov.smbcdigital.net https://int-webplatform-stockroom.smbcdigital.net/ https://qa-webplatform-stockportgov.smbcdigital.net/ https://qa-webplatform-stockroom.smbcdigital.net/ https://stage-webplatform-stockportgov.smbcdigital.net/ https://stage-webplatform-stockroom.smbcdigital.net/ {testUrls}";
-            headers["X-Content-Type-Options"] = "nosniff";
-            headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
-
-            await _next(context);
-        }
+        await _next(context);
     }
 }

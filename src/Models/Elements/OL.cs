@@ -1,9 +1,8 @@
 ﻿using form_builder.Enum;
 
-namespace form_builder.Models.Elements
+namespace form_builder.Models.Elements;
+
+public class OL : Element
 {
-    public class OL : Element
-    {
-        public OL() => Type = EElementType.OL;
-    }
+    public OL() => Type = EElementType.OL;
 }

@@ -1,25 +1,22 @@
-namespace form_builder.Helpers.Cookie
+namespace form_builder.Helpers.Cookie;
+
+public class CookieHelper(IHttpContextAccessor httpContextAccessor) : ICookieHelper
 {
-    public class CookieHelper : ICookieHelper
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+
+    public void AddCookie(string key, string value)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public CookieHelper(IHttpContextAccessor httpContextAccessor)
-            => _httpContextAccessor = httpContextAccessor;
-
-        public void AddCookie(string key, string value)
+        var cookieOptions = new CookieOptions
         {
-            var cookieOptions = new CookieOptions
-            {
-                Secure = true
-            };
+            Secure = true
+        };
 
-            _httpContextAccessor.HttpContext.Response.Cookies.Append(key, value, cookieOptions);
-        }
-
-        public void DeleteCookie(string key)
-            => _httpContextAccessor.HttpContext.Response.Cookies.Delete(key);
-
-        public string GetCookie(string key)
-            => _httpContextAccessor.HttpContext.Request.Cookies[key];
+        _httpContextAccessor.HttpContext.Response.Cookies.Append(key, value, cookieOptions);
     }
+
+    public void DeleteCookie(string key)
+        => _httpContextAccessor.HttpContext.Response.Cookies.Delete(key);
+
+    public string GetCookie(string key)
+        => _httpContextAccessor.HttpContext.Request.Cookies[key];
 }

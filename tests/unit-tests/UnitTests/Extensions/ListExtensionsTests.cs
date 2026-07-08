@@ -3,39 +3,38 @@ using form_builder.Models;
 using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Extensions
+namespace form_builder_tests.UnitTests.Extensions;
+
+public class ListExtensionsTests
 {
-    public class ListExtensionsTests
+    [Fact]
+    public void GetAppointmentTypeForEnvironment_ShouldReturnAppointmenType_Object()
     {
-        [Fact]
-        public void GetAppointmentTypeForEnvironment_ShouldReturnAppointmenType_Object()
+        var id = Guid.NewGuid();
+        var testList = new List<AppointmentType>
         {
-            var id = Guid.NewGuid();
-            var testList = new List<AppointmentType>
+            new AppointmentType
             {
-                new AppointmentType
-                {
-                    Environment = "local",
-                    AppointmentId = id,
-                    OptionalResources = new List<BookingResource>{
-                        new BookingResource()
-                    }
+                Environment = "local",
+                AppointmentId = id,
+                OptionalResources = new List<BookingResource>{
+                    new BookingResource()
                 }
-            };
-            var result = testList.GetAppointmentTypeForEnvironment("uitest");
+            }
+        };
+        var result = testList.GetAppointmentTypeForEnvironment("uitest");
 
 
-            Assert.NotNull(result);
-            Assert.Equal(id, result.AppointmentId);
-            Assert.Single(result.OptionalResources);
-        }
+        Assert.NotNull(result);
+        Assert.Equal(id, result.AppointmentId);
+        Assert.Single(result.OptionalResources);
+    }
 
-        [Fact]
-        public void GetAppointmentTypeForEnvironment_Should_Throw_Exception_When_ListDoesNotContain_Environemnt()
-        {
-            var testList = new List<AppointmentType>();
+    [Fact]
+    public void GetAppointmentTypeForEnvironment_Should_Throw_Exception_When_ListDoesNotContain_Environemnt()
+    {
+        var testList = new List<AppointmentType>();
 
-            Assert.Throws<InvalidOperationException>(() => testList.GetAppointmentTypeForEnvironment("unknown-env"));
-        }
+        Assert.Throws<InvalidOperationException>(() => testList.GetAppointmentTypeForEnvironment("unknown-env"));
     }
 }

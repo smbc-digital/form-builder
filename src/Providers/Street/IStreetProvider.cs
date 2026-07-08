@@ -1,11 +1,10 @@
 using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 
-namespace form_builder.Providers.Street
-{
-    public interface IStreetProvider
-    {
-        string ProviderName { get; }
+namespace form_builder.Providers.Street;
 
-        Task<IEnumerable<AddressSearchResult>> SearchAsync(string street);
-    }
+public interface IStreetProvider
+{
+    string ProviderName { get; }
+
+    Task<IEnumerable<AddressSearchResult>> SearchAsync(string street);
 }

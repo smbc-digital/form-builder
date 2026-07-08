@@ -1,13 +1,12 @@
-﻿namespace form_builder.Providers.FileStorage
+﻿namespace form_builder.Providers.FileStorage;
+
+public interface IFileStorageProvider
 {
-    public interface IFileStorageProvider
-    {
-        string ProviderName { get; }
+    string ProviderName { get; }
 
-        Task<string> GetString(string key);
+    Task<string> GetString(string key);
 
-        Task Remove(string key);
+    Task Remove(string key);
 
-        Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default);
-    }
+    Task SetStringAsync(string key, string value, int expiration, CancellationToken token = default);
 }

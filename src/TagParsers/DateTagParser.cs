@@ -3,10 +3,8 @@ using form_builder.TagParsers;
 using form_builder.TagParsers.Formatters;
 using System.Text.RegularExpressions;
 
-public class DateTagParser : TagParser, ITagParser
+public class DateTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public DateTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
-
     public Regex Regex => new Regex(@"\{\{DATE::[^}]+\}\}", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

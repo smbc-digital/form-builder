@@ -1,10 +1,3 @@
-namespace form_builder.Exceptions
-{
-    public class PaymentDeclinedException : Exception
-    {
-        public PaymentDeclinedException(string message)
-            : base(message)
-        {
-        }
-    }
-}
+namespace form_builder.Exceptions;
+
+public class PaymentDeclinedException(string message) : Exception(message);

@@ -1,9 +1,8 @@
 ﻿using form_builder.Services.DocumentService.Entities;
 
-namespace form_builder.Services.DocumentService
+namespace form_builder.Services.DocumentService;
+
+public interface IDocumentSummaryService
 {
-    public interface IDocumentSummaryService
-    {
-        Task<byte[]> GenerateDocument(DocumentSummaryEntity entity);
-    }
+    Task<byte[]> GenerateDocument(DocumentSummaryEntity entity);
 }

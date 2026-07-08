@@ -1,8 +1,7 @@
-namespace form_builder.Configuration
+namespace form_builder.Configuration;
+
+public class SubmissionServiceConfiguration
 {
-    public class SubmissionServiceConfiguration
-    {
-        public const string ConfigValue = "SubmissionServiceConfiguration";
-        public bool FakeSubmission { get; set; } = false;
-    }
+    public const string ConfigValue = "SubmissionServiceConfiguration";
+    public bool FakeSubmission { get; set; } = false;
 }

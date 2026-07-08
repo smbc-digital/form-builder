@@ -1,10 +1,8 @@
 ﻿namespace form_builder.Helpers.Session;
 
-public class SessionHelper : ISessionHelper
+public class SessionHelper(IHttpContextAccessor httpContextAccessor) : ISessionHelper
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public SessionHelper(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     // Remove
     public ISession GetSession() => _httpContextAccessor.HttpContext.Session;

@@ -4,10 +4,8 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers;
 
-public class BreakTagParser : TagParser, ITagParser
+public class BreakTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public BreakTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
-
     public Regex Regex => new Regex("(?<={{)BREAK(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

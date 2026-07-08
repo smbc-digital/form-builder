@@ -9,69 +9,59 @@ using form_builder.Services.MappingService;
 using Newtonsoft.Json;
 using StockportGovUK.NetStandard.Gateways;
 
-namespace form_builder.Services.ValidateService
+namespace form_builder.Services.ValidateService;
+
+public class ValidateService(
+    IGateway gateway,
+    ISessionHelper sessionHelper,
+    IDistributedCacheWrapper distributedCache,
+    IMappingService mappingService,
+    IActionHelper actionHelper,
+    IWebHostEnvironment environment)
+    : IValidateService
 {
-    public class ValidateService : IValidateService
+    private readonly IGateway _gateway = gateway;
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IMappingService _mappingService = mappingService;
+    private readonly IActionHelper _actionHelper = actionHelper;
+    private readonly IWebHostEnvironment _environment = environment;
+
+    public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
     {
-        private readonly IGateway _gateway;
-        private readonly ISessionHelper _sessionHelper;
-        private readonly IDistributedCacheWrapper _distributedCache;
-        private readonly IMappingService _mappingService;
-        private readonly IActionHelper _actionHelper;
-        private readonly IWebHostEnvironment _environment;
+        List<Answers> answers = new();
+        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string formSessionId = $"{formName}::{browserSessionId}";
+        var mappingData = await _mappingService.Map(formSessionId, formName, null, formSchema);
 
-        public ValidateService(
-            IGateway gateway,
-            ISessionHelper sessionHelper,
-            IDistributedCacheWrapper distributedCache,
-            IMappingService mappingService,
-            IActionHelper actionHelper,
-            IWebHostEnvironment environment)
+        foreach (var action in actions)
         {
-            _gateway = gateway;
-            _sessionHelper = sessionHelper;
-            _distributedCache = distributedCache;
-            _mappingService = mappingService;
-            _actionHelper = actionHelper;
-            _environment = environment;
-        }
+            var response = new HttpResponseMessage();
+            var submitSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ =>
+                _.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
-        public async Task Process(List<IAction> actions, FormSchema formSchema, string formName)
-        {
-            List<Answers> answers = new();
-            string browserSessionId = _sessionHelper.GetBrowserSessionId();
-            string formSessionId = $"{formName}::{browserSessionId}";
-            var mappingData = await _mappingService.Map(formSessionId, formName, null, formSchema);
+            if (submitSlug is null)
+                throw new ApplicationException("ValidateService::Process, there is no PageActionSlug defined for this environment");
 
-            foreach (var action in actions)
-            {
-                var response = new HttpResponseMessage();
-                var submitSlug = action.Properties.PageActionSlugs.FirstOrDefault(_ =>
-                    _.Environment.Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
+            var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);
 
-                if (submitSlug is null)
-                    throw new ApplicationException("ValidateService::Process, there is no PageActionSlug defined for this environment");
+            if (!string.IsNullOrEmpty(submitSlug.AuthToken))
+                _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
 
-                var entity = _actionHelper.GenerateUrl(submitSlug.URL, mappingData.FormAnswers);
+            response = await _gateway.GetAsync(entity.Url);
 
-                if (!string.IsNullOrEmpty(submitSlug.AuthToken))
-                    _gateway.ChangeAuthenticationHeader(submitSlug.AuthToken);
+            var responseAnswer = await response.Content.ReadAsStringAsync();
+            answers.Add(new(ValidateConstants.ValidateId, responseAnswer));
 
-                response = await _gateway.GetAsync(entity.Url);
+            if (mappingData.FormAnswers.AdditionalFormData.TryGetValue(ValidateConstants.ValidateId, out object _))
+                mappingData.FormAnswers.AdditionalFormData.Remove(ValidateConstants.ValidateId);
 
-                var responseAnswer = await response.Content.ReadAsStringAsync();
-                answers.Add(new(ValidateConstants.ValidateId, responseAnswer));
+            mappingData.FormAnswers.AdditionalFormData.Add(ValidateConstants.ValidateId, responseAnswer);
 
-                if (mappingData.FormAnswers.AdditionalFormData.TryGetValue(ValidateConstants.ValidateId, out object _))
-                    mappingData.FormAnswers.AdditionalFormData.Remove(ValidateConstants.ValidateId);
+            await _distributedCache.SetStringAsync(formSessionId, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
 
-                mappingData.FormAnswers.AdditionalFormData.Add(ValidateConstants.ValidateId, responseAnswer);
-
-                await _distributedCache.SetStringAsync(formSessionId, JsonConvert.SerializeObject(mappingData.FormAnswers), CancellationToken.None);
-
-                if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
-            }
+            if (!response.IsSuccessStatusCode)
+                throw new ApplicationException($"ValidateService::Process, http request to {entity.Url} returned an unsuccessful status code, Response: {JsonConvert.SerializeObject(response)}");
         }
     }
 }

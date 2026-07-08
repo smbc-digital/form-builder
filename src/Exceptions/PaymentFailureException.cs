@@ -1,10 +1,3 @@
-namespace form_builder.Exceptions
-{
-    public class PaymentFailureException : Exception
-    {
-        public PaymentFailureException(string message)
-            : base(message)
-        {
-        }
-    }
-}
+namespace form_builder.Exceptions;
+
+public class PaymentFailureException(string message) : Exception(message);

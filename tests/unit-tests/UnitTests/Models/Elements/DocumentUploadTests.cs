@@ -9,95 +9,94 @@ using Microsoft.AspNetCore.Hosting;
 using Moq;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Models.Elements
+namespace form_builder_tests.UnitTests.Models.Elements;
+
+public class DocuemntUploadTest
 {
-    public class DocuemntUploadTest
+    private readonly Mock<IViewRender> _mockIViewRender = new();
+    private readonly Mock<IElementHelper> _mockElementHelper = new();
+    private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+
+    [Fact]
+    public async Task RenderAsync_ShouldCallGenerateDocumentUploadUrl_Base64StringCaseRef()
     {
-        private readonly Mock<IViewRender> _mockIViewRender = new();
-        private readonly Mock<IElementHelper> _mockElementHelper = new();
-        private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
+        //Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.DocumentUpload)
+            .Build();
 
-        [Fact]
-        public async Task RenderAsync_ShouldCallGenerateDocumentUploadUrl_Base64StringCaseRef()
-        {
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DocumentUpload)
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
+        var viewModel = new Dictionary<string, dynamic>();
 
-            var viewModel = new Dictionary<string, dynamic>();
+        var schema = new FormSchemaBuilder()
+            .WithName("form-name")
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
+        var formAnswers = new FormAnswers();
 
-            var formAnswers = new FormAnswers();
+        //Act
+        await element.RenderAsync(
+            _mockIViewRender.Object,
+            _mockElementHelper.Object,
+            string.Empty,
+            viewModel,
+            page,
+            schema,
+            _mockHostingEnv.Object,
+            formAnswers);
 
-            //Act
-            await element.RenderAsync(
-                _mockIViewRender.Object,
-                _mockElementHelper.Object,
-                string.Empty,
-                viewModel,
-                page,
-                schema,
-                _mockHostingEnv.Object,
-                formAnswers);
+        //Assert
+        _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("DocumentUpload")), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        _mockElementHelper.Verify(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()), Times.Once);
+    }
 
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("DocumentUpload")), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()), Times.Once);
-        }
+    [Fact]
+    public async Task RenderAsync_ShouldSet_DocumentUploadUrl()
+    {
+        var url = "test";
 
-        [Fact]
-        public async Task RenderAsync_ShouldSet_DocumentUploadUrl()
-        {
-            var url = "test";
+        var callBackValue = new DocumentUpload();
+        _mockElementHelper.Setup(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()))
+            .Returns(url);
 
-            var callBackValue = new DocumentUpload();
-            _mockElementHelper.Setup(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()))
-                .Returns(url);
+        _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, dynamic>>()))
+            .Callback<string, DocumentUpload, Dictionary<string, object>>((x, y, z) => callBackValue = y);
 
-            _mockIViewRender.Setup(_ => _.RenderAsync(It.IsAny<string>(), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, dynamic>>()))
-                .Callback<string, DocumentUpload, Dictionary<string, object>>((x, y, z) => callBackValue = y);
+        //Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.DocumentUpload)
+            .Build();
 
-            //Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.DocumentUpload)
-                .Build();
+        var page = new PageBuilder()
+            .WithElement(element)
+            .Build();
 
-            var page = new PageBuilder()
-                .WithElement(element)
-                .Build();
+        var viewModel = new Dictionary<string, dynamic>();
 
-            var viewModel = new Dictionary<string, dynamic>();
+        var schema = new FormSchemaBuilder()
+            .WithName("form-name")
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("form-name")
-                .Build();
+        var formAnswers = new FormAnswers();
 
-            var formAnswers = new FormAnswers();
+        //Act
+        await element.RenderAsync(
+            _mockIViewRender.Object,
+            _mockElementHelper.Object,
+            string.Empty,
+            viewModel,
+            page,
+            schema,
+            _mockHostingEnv.Object,
+            formAnswers);
 
-            //Act
-            await element.RenderAsync(
-                _mockIViewRender.Object,
-                _mockElementHelper.Object,
-                string.Empty,
-                viewModel,
-                page,
-                schema,
-                _mockHostingEnv.Object,
-                formAnswers);
-
-            //Assert
-            _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("DocumentUpload")), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
-            _mockElementHelper.Verify(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()), Times.Once);
-            Assert.NotEmpty(callBackValue.Properties.DocumentUploadUrl);
-            Assert.Equal(url, callBackValue.Properties.DocumentUploadUrl);
-        }
+        //Assert
+        _mockIViewRender.Verify(_ => _.RenderAsync(It.Is<string>(x => x.Equals("DocumentUpload")), It.IsAny<DocumentUpload>(), It.IsAny<Dictionary<string, object>>()), Times.Once);
+        _mockElementHelper.Verify(_ => _.GenerateDocumentUploadUrl(It.IsAny<Element>(), It.IsAny<FormSchema>(), It.IsAny<FormAnswers>()), Times.Once);
+        Assert.NotEmpty(callBackValue.Properties.DocumentUploadUrl);
+        Assert.Equal(url, callBackValue.Properties.DocumentUploadUrl);
     }
 }

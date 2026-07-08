@@ -4,108 +4,107 @@ using form_builder.Models.Actions;
 using form_builder.Models.Properties.ActionProperties;
 using Action = form_builder.Models.Actions.Action;
 
-namespace form_builder_tests.Builders
+namespace form_builder_tests.Builders;
+
+public class ActionBuilder
 {
-    public class ActionBuilder
+    private EActionType _type = EActionType.RetrieveExternalData;
+    private BaseActionProperty _actionProperties = new BaseActionProperty();
+
+    public IAction Build()
     {
-        private EActionType _type = EActionType.RetrieveExternalData;
-        private BaseActionProperty _actionProperties = new BaseActionProperty();
+        var elementType = typeof(IAction).GetTypeInfo().Assembly
+            .GetTypes()
+            .FirstOrDefault(type => type.Name.Equals(_type.ToString()));
 
-        public IAction Build()
-        {
-            var elementType = typeof(IAction).GetTypeInfo().Assembly
-                .GetTypes()
-                .FirstOrDefault(type => type.Name.Equals(_type.ToString()));
+        var element = (Action)Activator.CreateInstance(elementType);
+        element.Properties = _actionProperties;
 
-            var element = (Action)Activator.CreateInstance(elementType);
-            element.Properties = _actionProperties;
+        return element;
+    }
 
-            return element;
-        }
+    public ActionBuilder WithActionType(EActionType type)
+    {
+        _type = type;
 
-        public ActionBuilder WithActionType(EActionType type)
-        {
-            _type = type;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithCaseReference(bool includeCaseReference)
+    {
+        _actionProperties.IncludeCaseReference = includeCaseReference;
 
-        public ActionBuilder WithCaseReference(bool includeCaseReference)
-        {
-            _actionProperties.IncludeCaseReference = includeCaseReference;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithPersonalisation(List<string> personalisation)
+    {
+        _actionProperties.Personalisation = personalisation;
 
-        public ActionBuilder WithPersonalisation(List<string> personalisation)
-        {
-            _actionProperties.Personalisation = personalisation;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithTo(string to)
+    {
+        _actionProperties.To = to;
 
-        public ActionBuilder WithTo(string to)
-        {
-            _actionProperties.To = to;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithFrom(string from)
+    {
+        _actionProperties.From = from;
 
-        public ActionBuilder WithFrom(string from)
-        {
-            _actionProperties.From = from;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithTemplateId(string templateId)
+    {
+        _actionProperties.TemplateId = templateId;
 
-        public ActionBuilder WithTemplateId(string templateId)
-        {
-            _actionProperties.TemplateId = templateId;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithProvider(string provider)
+    {
+        _actionProperties.EmailTemplateProvider = provider;
 
-        public ActionBuilder WithProvider(string provider)
-        {
-            _actionProperties.EmailTemplateProvider = provider;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithContent(string content)
+    {
+        _actionProperties.Content = content;
 
-        public ActionBuilder WithContent(string content)
-        {
-            _actionProperties.Content = content;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithSubject(string subject)
+    {
+        _actionProperties.Subject = subject;
 
-        public ActionBuilder WithSubject(string subject)
-        {
-            _actionProperties.Subject = subject;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithTargetQuestionId(string targetQuestionId)
+    {
+        _actionProperties.TargetQuestionId = targetQuestionId;
 
-        public ActionBuilder WithTargetQuestionId(string targetQuestionId)
-        {
-            _actionProperties.TargetQuestionId = targetQuestionId;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithHttpActionType(EHttpActionType httpActionType)
+    {
+        _actionProperties.HttpActionType = httpActionType;
 
-        public ActionBuilder WithHttpActionType(EHttpActionType httpActionType)
-        {
-            _actionProperties.HttpActionType = httpActionType;
+        return this;
+    }
 
-            return this;
-        }
+    public ActionBuilder WithPageActionSlug(PageActionSlug pageActionSlug)
+    {
+        if (_actionProperties.PageActionSlugs is null) _actionProperties.PageActionSlugs = new List<PageActionSlug>();
+        _actionProperties.PageActionSlugs.Add(pageActionSlug);
 
-        public ActionBuilder WithPageActionSlug(PageActionSlug pageActionSlug)
-        {
-            if (_actionProperties.PageActionSlugs is null) _actionProperties.PageActionSlugs = new List<PageActionSlug>();
-            _actionProperties.PageActionSlugs.Add(pageActionSlug);
-
-            return this;
-        }
+        return this;
     }
 }

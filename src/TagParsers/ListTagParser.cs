@@ -4,10 +4,8 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers;
 
-public class ListTagParser : TagParser, ITagParser
+public class ListTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public ListTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
-
     public Regex Regex => new Regex("(?<={{)([UO]LIST)::.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

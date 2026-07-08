@@ -1,26 +1,25 @@
 using form_builder.Enum;
 using form_builder.Models.Elements;
 
-namespace form_builder.Validators.IntegrityChecks.Elements
+namespace form_builder.Validators.IntegrityChecks.Elements;
+
+public class DocumentDownloadCheck : IElementSchemaIntegrityCheck
 {
-    public class DocumentDownloadCheck : IElementSchemaIntegrityCheck
+    public IntegrityCheckResult Validate(IElement element)
     {
-        public IntegrityCheckResult Validate(IElement element)
-        {
-            IntegrityCheckResult result = new();
+        IntegrityCheckResult result = new();
 
-            if (!element.Type.Equals(EElementType.DocumentDownload))
-                return result;
-
-            if (element.Properties is null)
-                return result;
-
-            if (element.Properties.DocumentType.Equals(EDocumentType.Unknown))
-                result.AddFailureMessage($"Document Download Check, '{element.Properties.QuestionId}' requires valid DocumentType");
-
+        if (!element.Type.Equals(EElementType.DocumentDownload))
             return result;
-        }
 
-        public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
+        if (element.Properties is null)
+            return result;
+
+        if (element.Properties.DocumentType.Equals(EDocumentType.Unknown))
+            result.AddFailureMessage($"Document Download Check, '{element.Properties.QuestionId}' requires valid DocumentType");
+
+        return result;
     }
+
+    public async Task<IntegrityCheckResult> ValidateAsync(IElement element) => await Task.Run(() => Validate(element));
 }

@@ -4,40 +4,38 @@ using Amazon.SimpleEmail.Model;
 using form_builder.Builders.Email;
 using form_builder.Models;
 
-namespace form_builder.Providers.EmailProvider
+namespace form_builder.Providers.EmailProvider;
+
+public class AwsSesProvider(IAmazonSimpleEmailService emailService) : IEmailProvider
 {
-    public class AwsSesProvider : IEmailProvider
+    private readonly IAmazonSimpleEmailService _emailService = emailService;
+
+    public async Task<HttpStatusCode> SendEmail(EmailMessage emailMessage)
     {
-        private readonly IAmazonSimpleEmailService _emailService;
-        public AwsSesProvider(IAmazonSimpleEmailService emailService) => _emailService = emailService;
+        if (string.IsNullOrEmpty(emailMessage.ToEmail))
+            throw new ApplicationException("AwsSesProvider:: SendEmail, ToEmail cannot be null or empty. No email has been sent.");
 
-        public async Task<HttpStatusCode> SendEmail(EmailMessage emailMessage)
+        var result = await SendAwsSesEmail(emailMessage);
+
+        return result.HttpStatusCode;
+    }
+
+    private async Task<SendRawEmailResponse> SendAwsSesEmail(EmailMessage emailMessage)
+    {
+        var emailBuilder = new EmailBuilder();
+
+        var sendRequest = new SendRawEmailRequest
         {
-            if (string.IsNullOrEmpty(emailMessage.ToEmail))
-                throw new ApplicationException("AwsSesProvider:: SendEmail, ToEmail cannot be null or empty. No email has been sent.");
+            RawMessage = new RawMessage(emailBuilder.BuildMessageToStream(emailMessage))
+        };
 
-            var result = await SendAwsSesEmail(emailMessage);
-
-            return result.HttpStatusCode;
+        try
+        {
+            return await _emailService.SendRawEmailAsync(sendRequest);
         }
-
-        private async Task<SendRawEmailResponse> SendAwsSesEmail(EmailMessage emailMessage)
+        catch (Exception ex)
         {
-            var emailBuilder = new EmailBuilder();
-
-            var sendRequest = new SendRawEmailRequest
-            {
-                RawMessage = new RawMessage(emailBuilder.BuildMessageToStream(emailMessage))
-            };
-
-            try
-            {
-                return await _emailService.SendRawEmailAsync(sendRequest);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"AwsSesProvider:: SendEmail, An error has occured while attempting to send an email to Amazon Ses. \n{ex.Message}");
-            }
+            throw new Exception($"AwsSesProvider:: SendEmail, An error has occured while attempting to send an email to Amazon Ses. \n{ex.Message}");
         }
     }
 }

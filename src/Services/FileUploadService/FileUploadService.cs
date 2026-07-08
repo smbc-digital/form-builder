@@ -14,24 +14,18 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.FileUploadService;
 
-public class FileUploadService : IFileUploadService
+public class FileUploadService(
+    IDistributedCacheWrapper distributedCache,
+    IEnumerable<IFileStorageProvider> fileStorageProviders,
+    IPageFactory pageFactory,
+    IPageHelper pageHelper,
+    IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
+    : IFileUploadService
 {
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IFileStorageProvider _fileStorageProvider;
-    private readonly IPageFactory _pageFactory;
-    private readonly IPageHelper _pageHelper;
-
-    public FileUploadService(IDistributedCacheWrapper distributedCache,
-        IEnumerable<IFileStorageProvider> fileStorageProviders,
-        IPageFactory pageFactory,
-        IPageHelper pageHelper,
-        IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
-    {
-        _distributedCache = distributedCache;
-        _pageFactory = pageFactory;
-        _pageHelper = pageHelper;
-        _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
-    }
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IFileStorageProvider _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
+    private readonly IPageFactory _pageFactory = pageFactory;
+    private readonly IPageHelper _pageHelper = pageHelper;
 
     public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
     {

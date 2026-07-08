@@ -3,16 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-public class SessionLoggingMiddleware
+public class SessionLoggingMiddleware(RequestDelegate next, ILogger<SessionLoggingMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<SessionLoggingMiddleware> _logger;
-
-    public SessionLoggingMiddleware(RequestDelegate next, ILogger<SessionLoggingMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<SessionLoggingMiddleware> _logger = logger;
 
     public async Task InvokeAsync(HttpContext context)
     {

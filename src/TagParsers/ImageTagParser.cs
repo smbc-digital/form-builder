@@ -4,10 +4,8 @@ using form_builder.TagParsers.Formatters;
 
 namespace form_builder.TagParsers;
 
-public class ImageTagParser : TagParser, ITagParser, ISimpleTagParser
+public class ImageTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser, ISimpleTagParser
 {
-    public ImageTagParser(IEnumerable<IFormatter> formatters) : base(formatters) { }
-
     public Regex Regex => new Regex("(?<={{)IMAGE::.*?(?=}})", RegexOptions.Compiled);
     public string _htmlContent => "<img class='form-builder-img' src='{0}' alt='{1}'>";
 

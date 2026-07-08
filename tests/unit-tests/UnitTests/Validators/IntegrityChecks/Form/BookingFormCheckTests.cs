@@ -5,336 +5,335 @@ using form_builder.Validators.IntegrityChecks.Form;
 using form_builder_tests.Builders;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form
+namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form;
+
+public class BookingFormCheckTests
 {
-    public class BookingFormCheckTests
+    [Theory]
+    [InlineData("AppointmentI", "AppointmentId", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+    [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", "test-page")]
+    [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customerlastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+    [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customerfirstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+    public void BookingFormCheck_IsNotValid_WillFailOnOneAspect(
+        string questionId,
+        string appointmentIdKey,
+        string appointmentIdGuid,
+        string bookingProvider,
+        string firstName,
+        string lastName,
+        string pageSlug)
     {
-        [Theory]
-        [InlineData("AppointmentI", "AppointmentId", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", "test-page")]
-        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customerlastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customerfirstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        public void BookingFormCheck_IsNotValid_WillFailOnOneAspect(
-            string questionId,
-            string appointmentIdKey,
-            string appointmentIdGuid,
-            string bookingProvider,
-            string firstName,
-            string lastName,
-            string pageSlug)
-        {
-            // Arrange
-            var realAppointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
-            var selectAppointmentType = new ElementBuilder()
-                .WithType(EElementType.Select)
-                .WithQuestionId(questionId)
-                .WithOptions(new()
+        // Arrange
+        var realAppointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
+        var selectAppointmentType = new ElementBuilder()
+            .WithType(EElementType.Select)
+            .WithQuestionId(questionId)
+            .WithOptions(new()
+            {
+                new()
                 {
-                    new()
-                    {
-                        Text = "Appointment Type",
-                        Value = realAppointmentId
-                    }
-                })
-                .Build();
+                    Text = "Appointment Type",
+                    Value = realAppointmentId
+                }
+            })
+            .Build();
 
-            var customerFirstName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping(firstName)
-                .Build();
+        var customerFirstName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping(firstName)
+            .Build();
 
-            var customerLastName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping(lastName)
-                .Build();
+        var customerLastName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping(lastName)
+            .Build();
 
-            var page1 = new PageBuilder()
-                .WithElement(selectAppointmentType)
-                .WithElement(customerFirstName)
-                .WithElement(customerLastName)
-                .Build();
+        var page1 = new PageBuilder()
+            .WithElement(selectAppointmentType)
+            .WithElement(customerFirstName)
+            .WithElement(customerLastName)
+            .Build();
 
-            var bookingElement = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider(bookingProvider)
-                .WithAppointmentType(new()
+        var bookingElement = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider(bookingProvider)
+            .WithAppointmentType(new()
+            {
+                Environment = "any",
+                AppointmentId = string.IsNullOrEmpty(appointmentIdGuid) ? new Guid() : new Guid(appointmentIdGuid),
+                AppointmentIdKey = appointmentIdKey
+            })
+            .Build();
+
+        var page2 = new PageBuilder()
+            .WithElement(bookingElement)
+            .Build();
+
+        var page3 = new PageBuilder()
+            .WithPageSlug(pageSlug)
+            .Build();
+
+        var schema = new FormSchemaBuilder()
+            .WithName("test-name")
+            .WithPage(page1)
+            .WithPage(page2)
+            .WithPage(page3)
+            .Build();
+
+        // Act
+        BookingFormCheck check = new();
+        var result = check.Validate(schema);
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Single(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
+    }
+
+    [Theory]
+    [InlineData("", "", "", BookingConstants.FAKE_PROVIDER, "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+    [InlineData("AppointmentId", "AppointmentId", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+    [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
+    public void BookingFormCheck_IsValid(
+        string questionId,
+        string appointmentIdKey,
+        string appointmentIdGuid,
+        string bookingProvider,
+        string firstName,
+        string lastName,
+        string pageSlug)
+    {
+        // Arrange
+        var realAppointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
+        var selectAppointmentType = new ElementBuilder()
+            .WithType(EElementType.Select)
+            .WithQuestionId(questionId)
+            .WithOptions(new()
+            {
+                new()
                 {
-                    Environment = "any",
-                    AppointmentId = string.IsNullOrEmpty(appointmentIdGuid) ? new Guid() : new Guid(appointmentIdGuid),
-                    AppointmentIdKey = appointmentIdKey
-                })
-                .Build();
+                    Text = "Appointment Type",
+                    Value = realAppointmentId
+                }
+            })
+            .Build();
 
-            var page2 = new PageBuilder()
-                .WithElement(bookingElement)
-                .Build();
+        var customerFirstName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping(firstName)
+            .Build();
 
-            var page3 = new PageBuilder()
-                .WithPageSlug(pageSlug)
-                .Build();
+        var customerLastName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping(lastName)
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("test-name")
-                .WithPage(page1)
-                .WithPage(page2)
-                .WithPage(page3)
-                .Build();
+        var page1 = new PageBuilder()
+            .WithElement(selectAppointmentType)
+            .WithElement(customerFirstName)
+            .WithElement(customerLastName)
+            .Build();
 
-            // Act
-            BookingFormCheck check = new();
-            var result = check.Validate(schema);
+        var bookingElement = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider(bookingProvider)
+            .WithAppointmentType(new()
+            {
+                Environment = "any",
+                AppointmentId = string.IsNullOrEmpty(appointmentIdGuid) ? new Guid() : new Guid(appointmentIdGuid),
+                AppointmentIdKey = appointmentIdKey
+            })
+            .Build();
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Single(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
-        }
+        var page2 = new PageBuilder()
+            .WithElement(bookingElement)
+            .Build();
 
-        [Theory]
-        [InlineData("", "", "", BookingConstants.FAKE_PROVIDER, "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        [InlineData("AppointmentId", "AppointmentId", "", "Real_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        [InlineData("", "", "022ebc92-1c51-4a68-a079-f6edefc63a07", "Any_Provider", "customer.firstname", "customer.lastname", BookingConstants.NO_APPOINTMENT_AVAILABLE)]
-        public void BookingFormCheck_IsValid(
-            string questionId,
-            string appointmentIdKey,
-            string appointmentIdGuid,
-            string bookingProvider,
-            string firstName,
-            string lastName,
-            string pageSlug)
-        {
-            // Arrange
-            var realAppointmentId = "022ebc92-1c51-4a68-a079-f6edefc63a07";
-            var selectAppointmentType = new ElementBuilder()
-                .WithType(EElementType.Select)
-                .WithQuestionId(questionId)
-                .WithOptions(new()
-                {
-                    new()
-                    {
-                        Text = "Appointment Type",
-                        Value = realAppointmentId
-                    }
-                })
-                .Build();
+        var page3 = new PageBuilder()
+            .WithPageSlug(pageSlug)
+            .Build();
 
-            var customerFirstName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping(firstName)
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithName("test-name")
+            .WithPage(page1)
+            .WithPage(page2)
+            .WithPage(page3)
+            .Build();
 
-            var customerLastName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping(lastName)
-                .Build();
+        // Act
+        BookingFormCheck check = new();
+        var result = check.Validate(schema);
 
-            var page1 = new PageBuilder()
-                .WithElement(selectAppointmentType)
-                .WithElement(customerFirstName)
-                .WithElement(customerLastName)
-                .Build();
+        // Assert
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
+    }
 
-            var bookingElement = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider(bookingProvider)
-                .WithAppointmentType(new()
-                {
-                    Environment = "any",
-                    AppointmentId = string.IsNullOrEmpty(appointmentIdGuid) ? new Guid() : new Guid(appointmentIdGuid),
-                    AppointmentIdKey = appointmentIdKey
-                })
-                .Build();
+    [Fact]
+    public void BookingFormCheck_IsValid_If_FormSchema_Contains_Multiple_BookingElements_But_Same_Provider()
+    {
+        // Arrange
+        var customerFirstName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping("customer.firstname")
+            .Build();
 
-            var page2 = new PageBuilder()
-                .WithElement(bookingElement)
-                .Build();
+        var customerLastName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping("customer.lastname")
+            .Build();
 
-            var page3 = new PageBuilder()
-                .WithPageSlug(pageSlug)
-                .Build();
+        var page1 = new PageBuilder()
+            .WithElement(customerFirstName)
+            .WithElement(customerLastName)
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("test-name")
-                .WithPage(page1)
-                .WithPage(page2)
-                .WithPage(page3)
-                .Build();
+        var bookingElement = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider("testprovider")
+            .Build();
 
-            // Act
-            BookingFormCheck check = new();
-            var result = check.Validate(schema);
+        // Arrange
+        var bookingElement2 = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider("testprovider")
+            .Build();
 
-            // Assert
-            Assert.True(result.IsValid);
-            Assert.Empty(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
-        }
+        var page2 = new PageBuilder()
+            .WithElement(bookingElement)
+            .Build();
 
-        [Fact]
-        public void BookingFormCheck_IsValid_If_FormSchema_Contains_Multiple_BookingElements_But_Same_Provider()
-        {
-            // Arrange
-            var customerFirstName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.firstname")
-                .Build();
+        var page3 = new PageBuilder()
+            .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+            .WithElement(bookingElement2)
+            .Build();
 
-            var customerLastName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.lastname")
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithName("test-name")
+            .WithPage(page1)
+            .WithPage(page2)
+            .WithPage(page3)
+            .Build();
 
-            var page1 = new PageBuilder()
-                .WithElement(customerFirstName)
-                .WithElement(customerLastName)
-                .Build();
+        // Act
+        BookingFormCheck check = new();
+        var result = check.Validate(schema);
 
-            var bookingElement = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("testprovider")
-                .Build();
+        // Assert
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
+    }
 
-            // Arrange
-            var bookingElement2 = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("testprovider")
-                .Build();
+    [Fact]
+    public void BookingFormCheck_Should_Return_Failure_Message_If_FormSchema_Contains_Multiple_BookingProviders()
+    {
+        // Arrange
+        var customerFirstName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping("customer.firstname")
+            .Build();
 
-            var page2 = new PageBuilder()
-                .WithElement(bookingElement)
-                .Build();
+        var customerLastName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping("customer.lastname")
+            .Build();
 
-            var page3 = new PageBuilder()
-                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
-                .WithElement(bookingElement2)
-                .Build();
+        var page1 = new PageBuilder()
+            .WithElement(customerFirstName)
+            .WithElement(customerLastName)
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("test-name")
-                .WithPage(page1)
-                .WithPage(page2)
-                .WithPage(page3)
-                .Build();
+        var bookingElement = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider("testprovider")
+            .Build();
 
-            // Act
-            BookingFormCheck check = new();
-            var result = check.Validate(schema);
+        // Arrange
+        var bookingElement2 = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider("differentProvider")
+            .Build();
 
-            // Assert
-            Assert.True(result.IsValid);
-            Assert.Empty(result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE)));
-        }
+        var page2 = new PageBuilder()
+            .WithElement(bookingElement)
+            .WithElement(bookingElement2)
+            .Build();
 
-        [Fact]
-        public void BookingFormCheck_Should_Return_Failure_Message_If_FormSchema_Contains_Multiple_BookingProviders()
-        {
-            // Arrange
-            var customerFirstName = new ElementBuilder()
-               .WithType(EElementType.Textbox)
-               .WithTargetMapping("customer.firstname")
-               .Build();
+        var page3 = new PageBuilder()
+            .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+            .Build();
 
-            var customerLastName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.lastname")
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithName("test-name")
+            .WithPage(page1)
+            .WithPage(page2)
+            .WithPage(page3)
+            .Build();
 
-            var page1 = new PageBuilder()
-                .WithElement(customerFirstName)
-                .WithElement(customerLastName)
-                .Build();
+        // Act
+        BookingFormCheck check = new();
+        var result = check.Validate(schema);
+        var failureMessages = result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE));
 
-            var bookingElement = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("testprovider")
-                .Build();
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Single(failureMessages);
+        Assert.Contains(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER, failureMessages.First());
+    }
 
-            // Arrange
-            var bookingElement2 = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("differentProvider")
-                .Build();
+    [Fact]
+    public void BookingFormCheck_Should_Return_Failure_Message_If_FormSchema_Contains_Multiple_BookingProviders_OnDifferentPages()
+    {
+        // Arrange
+        var customerFirstName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping("customer.firstname")
+            .Build();
 
-            var page2 = new PageBuilder()
-                .WithElement(bookingElement)
-                .WithElement(bookingElement2)
-                .Build();
+        var customerLastName = new ElementBuilder()
+            .WithType(EElementType.Textbox)
+            .WithTargetMapping("customer.lastname")
+            .Build();
 
-            var page3 = new PageBuilder()
-                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
-                .Build();
+        var page1 = new PageBuilder()
+            .WithElement(customerFirstName)
+            .WithElement(customerLastName)
+            .Build();
 
-            var schema = new FormSchemaBuilder()
-                .WithName("test-name")
-                .WithPage(page1)
-                .WithPage(page2)
-                .WithPage(page3)
-                .Build();
+        var bookingElement = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider("testprovider")
+            .Build();
 
-            // Act
-            BookingFormCheck check = new();
-            var result = check.Validate(schema);
-            var failureMessages = result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE));
+        // Arrange
+        var bookingElement2 = new ElementBuilder()
+            .WithType(EElementType.Booking)
+            .WithBookingProvider("differentProvider")
+            .Build();
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Single(failureMessages);
-            Assert.Contains(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER, failureMessages.First());
-        }
+        var page2 = new PageBuilder()
+            .WithElement(bookingElement)
+            .Build();
 
-        [Fact]
-        public void BookingFormCheck_Should_Return_Failure_Message_If_FormSchema_Contains_Multiple_BookingProviders_OnDifferentPages()
-        {
-            // Arrange
-            var customerFirstName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.firstname")
-                .Build();
+        var page3 = new PageBuilder()
+            .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
+            .WithElement(bookingElement2)
+            .Build();
 
-            var customerLastName = new ElementBuilder()
-                .WithType(EElementType.Textbox)
-                .WithTargetMapping("customer.lastname")
-                .Build();
+        var schema = new FormSchemaBuilder()
+            .WithName("test-name")
+            .WithPage(page1)
+            .WithPage(page2)
+            .WithPage(page3)
+            .Build();
 
-            var page1 = new PageBuilder()
-                .WithElement(customerFirstName)
-                .WithElement(customerLastName)
-                .Build();
+        // Act
+        BookingFormCheck check = new();
+        var result = check.Validate(schema);
+        var failureMessages = result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE));
 
-            var bookingElement = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("testprovider")
-                .Build();
-
-            // Arrange
-            var bookingElement2 = new ElementBuilder()
-                .WithType(EElementType.Booking)
-                .WithBookingProvider("differentProvider")
-                .Build();
-
-            var page2 = new PageBuilder()
-                .WithElement(bookingElement)
-                .Build();
-
-            var page3 = new PageBuilder()
-                .WithPageSlug(BookingConstants.NO_APPOINTMENT_AVAILABLE)
-                .WithElement(bookingElement2)
-                .Build();
-
-            var schema = new FormSchemaBuilder()
-                .WithName("test-name")
-                .WithPage(page1)
-                .WithPage(page2)
-                .WithPage(page3)
-                .Build();
-
-            // Act
-            BookingFormCheck check = new();
-            var result = check.Validate(schema);
-            var failureMessages = result.Messages.Where(message => message.StartsWith(IntegrityChecksConstants.FAILURE));
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Single(failureMessages);
-            Assert.Contains(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER, failureMessages.First());
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Single(failureMessages);
+        Assert.Contains(BookingConstants.INTEGRITY_FAILURE_MESSAGE_DUPLICATEPROVIDER, failureMessages.First());
     }
 }

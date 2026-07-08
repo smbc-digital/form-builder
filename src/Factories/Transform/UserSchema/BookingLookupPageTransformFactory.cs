@@ -10,20 +10,15 @@ using form_builder.Services.RetrieveExternalDataService.Entities;
 
 namespace form_builder.Factories.Transform.UserSchema;
 
-public class BookingLookupPageTransformFactory : IUserPageTransformFactory
+public class BookingLookupPageTransformFactory(
+    IActionHelper actionHelper,
+    IEnumerable<ILookupProvider> lookupProviders,
+    IWebHostEnvironment environment)
+    : IUserPageTransformFactory
 {
-    private readonly IActionHelper _actionHelper;
-    private readonly IEnumerable<ILookupProvider> _lookupProviders;
-    private readonly IWebHostEnvironment _environment;
-
-    public BookingLookupPageTransformFactory(IActionHelper actionHelper,
-        IEnumerable<ILookupProvider> lookupProviders,
-        IWebHostEnvironment environment)
-    {
-        _actionHelper = actionHelper;
-        _lookupProviders = lookupProviders;
-        _environment = environment;
-    }
+    private readonly IActionHelper _actionHelper = actionHelper;
+    private readonly IEnumerable<ILookupProvider> _lookupProviders = lookupProviders;
+    private readonly IWebHostEnvironment _environment = environment;
 
     public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
     {

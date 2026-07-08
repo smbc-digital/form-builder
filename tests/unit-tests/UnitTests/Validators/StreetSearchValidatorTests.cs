@@ -4,107 +4,106 @@ using form_builder.Enum;
 using form_builder.Validators;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Validators
+namespace form_builder_tests.UnitTests.Validators;
+
+public class StreetSearchValidatorTests
 {
-    public class StreetSearchValidatorTests
+
+    private readonly StreetSearchValidator _streetSearchValidator = new StreetSearchValidator();
+
+    [Fact]
+    public void Validate_ShouldReturnTrue_WhenDoesNotStreetSearch()
     {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithType(EElementType.Street)
+            .Build();
 
-        private readonly StreetSearchValidator _streetSearchValidator = new StreetSearchValidator();
+        var viewModel = new Dictionary<string, dynamic>();
 
-        [Fact]
-        public void Validate_ShouldReturnTrue_WhenDoesNotStreetSearch()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithType(EElementType.Street)
-                .Build();
+        // Act
+        var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic>();
+        // Assert
+        Assert.True(result.IsValid);
+    }
 
-            // Act
-            var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+    [Fact]
+    public void Validate_ShouldValidateStreet_WhenStreetSupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("teststreet")
+            .WithType(EElementType.Street)
+            .Build();
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+        var viewModel = new Dictionary<string, dynamic>();
+        viewModel.Add("teststreet", "Some Street");
 
-        [Fact]
-        public void Validate_ShouldValidateStreet_WhenStreetSupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("teststreet")
-                .WithType(EElementType.Street)
-                .Build();
+        // Act
+        var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("teststreet", "Some Street");
+        // Assert
+        Assert.True(result.IsValid);
+    }
 
-            // Act
-            var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+    [Fact]
+    public void Validate_ShouldNotValidateStreet_WhenInvalidStreetSupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("teststreet")
+            .WithType(EElementType.Street)
+            .Build();
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+        var viewModel = new Dictionary<string, dynamic>();
+        viewModel.Add("teststreet", "Some_Street");
 
-        [Fact]
-        public void Validate_ShouldNotValidateStreet_WhenInvalidStreetSupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("teststreet")
-                .WithType(EElementType.Street)
-                .Build();
+        // Act
+        var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("teststreet", "Some_Street");
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal(ValidationConstants.STREET_INCORRECT_FORMAT, result.Message);
+    }
 
-            // Act
-            var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+    [Fact]
+    public void Validate_ShouldNotValidateStreet_WhenIncorrectLengthStreetSupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("teststreet")
+            .WithType(EElementType.Street)
+            .Build();
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal(ValidationConstants.STREET_INCORRECT_FORMAT, result.Message);
-        }
+        var viewModel = new Dictionary<string, dynamic>();
+        viewModel.Add("teststreet", "So");
 
-        [Fact]
-        public void Validate_ShouldNotValidateStreet_WhenIncorrectLengthStreetSupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("teststreet")
-                .WithType(EElementType.Street)
-                .Build();
+        // Act
+        var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("teststreet", "So");
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal(ValidationConstants.STREET_INCORRECT_LENGTH, result.Message);
+    }
 
-            // Act
-            var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
+    [Fact]
+    public void Validate_ShouldNotValidateStreet_WhenIncorrectLengtStreetSupplied()
+    {
+        // Arrange
+        var element = new ElementBuilder()
+            .WithQuestionId("teststreet")
+            .WithType(EElementType.Street)
+            .Build();
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal(ValidationConstants.STREET_INCORRECT_LENGTH, result.Message);
-        }
+        var viewModel = new Dictionary<string, dynamic>();
+        viewModel.Add("teststreet", "So");
 
-        [Fact]
-        public void Validate_ShouldNotValidateStreet_WhenIncorrectLengtStreetSupplied()
-        {
-            // Arrange
-            var element = new ElementBuilder()
-                .WithQuestionId("teststreet")
-                .WithType(EElementType.Street)
-                .Build();
+        // Act
+        var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
 
-            var viewModel = new Dictionary<string, dynamic>();
-            viewModel.Add("teststreet", "So");
-
-            // Act
-            var result = _streetSearchValidator.Validate(element, viewModel, new form_builder.Models.FormSchema());
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Equal("Street name must be 3 characters or more", result.Message);
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.Equal("Street name must be 3 characters or more", result.Message);
     }
 }

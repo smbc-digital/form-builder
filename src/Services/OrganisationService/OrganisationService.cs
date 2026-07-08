@@ -11,20 +11,17 @@ using Newtonsoft.Json;
 
 namespace form_builder.Services.OrganisationService;
 
-public class OrganisationService : IOrganisationService
+public class OrganisationService(
+    IDistributedCacheWrapper distributedCache,
+    IEnumerable<IOrganisationProvider> organisationProviders,
+    IPageHelper pageHelper,
+    IPageFactory pageFactory)
+    : IOrganisationService
 {
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IPageHelper _pageHelper;
-    private readonly IEnumerable<IOrganisationProvider> _organisationProviders;
-    private readonly IPageFactory _pageFactory;
-
-    public OrganisationService(IDistributedCacheWrapper distributedCache, IEnumerable<IOrganisationProvider> organisationProviders, IPageHelper pageHelper, IPageFactory pageFactory)
-    {
-        _distributedCache = distributedCache;
-        _pageHelper = pageHelper;
-        _organisationProviders = organisationProviders;
-        _pageFactory = pageFactory;
-    }
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
+    private readonly IPageHelper _pageHelper = pageHelper;
+    private readonly IEnumerable<IOrganisationProvider> _organisationProviders = organisationProviders;
+    private readonly IPageFactory _pageFactory = pageFactory;
 
     public async Task<ProcessRequestEntity> ProcessOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string cacheKey, string path)
     {

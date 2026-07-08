@@ -5,47 +5,46 @@ using form_builder.Validators.IntegrityChecks.Elements;
 using Xunit;
 using Elements = form_builder.Models.Elements;
 
-namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element
+namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element;
+
+public class AddAnotherElementCheckTests
 {
-    public class AddAnotherElementCheckTests
+    private readonly AddAnotherElementCheck _integrityCheck = new();
+
+    [Fact]
+    public void ValidateAddAnotherElement_NullProperties_ShouldAddError()
     {
-        private readonly AddAnotherElementCheck _integrityCheck = new();
+        // Arrange
+        var element = new Elements.Element() { Type = EElementType.AddAnother };
 
-        [Fact]
-        public void ValidateAddAnotherElement_NullProperties_ShouldAddError()
+        // Act
+        var result = _integrityCheck.Validate(element);
+
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.True(result.Messages.Count.Equals(1));
+        Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
+    }
+
+    [Fact]
+    public void ValidateAddAnotherElement_NullElements_ShouldAddError()
+    {
+        // Arrange
+        var element = new Elements.Element()
         {
-            // Arrange
-            var element = new Elements.Element() { Type = EElementType.AddAnother };
-
-            // Act
-            var result = _integrityCheck.Validate(element);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.True(result.Messages.Count.Equals(1));
-            Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
-        }
-
-        [Fact]
-        public void ValidateAddAnotherElement_NullElements_ShouldAddError()
-        {
-            // Arrange
-            var element = new Elements.Element()
+            Type = EElementType.AddAnother,
+            Properties = new BaseProperty()
             {
-                Type = EElementType.AddAnother,
-                Properties = new BaseProperty()
-                {
-                    Elements = null
-                }
-            };
+                Elements = null
+            }
+        };
 
-            // Act
-            var result = _integrityCheck.Validate(element);
+        // Act
+        var result = _integrityCheck.Validate(element);
 
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.True(result.Messages.Count.Equals(1));
-            Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
-        }
+        // Assert
+        Assert.False(result.IsValid);
+        Assert.True(result.Messages.Count.Equals(1));
+        Assert.Collection(result.Messages, message => Assert.StartsWith(IntegrityChecksConstants.FAILURE, message));
     }
 }

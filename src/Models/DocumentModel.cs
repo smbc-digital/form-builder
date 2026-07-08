@@ -1,11 +1,10 @@
-﻿namespace form_builder.Models
+﻿namespace form_builder.Models;
+
+public class DocumentModel
 {
-    public class DocumentModel
-    {
-        public string Content { get; set; }
+    public string Content { get; set; }
 
-        public long FileSize { get; set; }
+    public long FileSize { get; set; }
 
-        public string FileName { get; set; }
-    }
+    public string FileName { get; set; }
 }

@@ -1,21 +1,12 @@
-namespace form_builder.Validators
+namespace form_builder.Validators;
+
+public class ValidationResult(bool isValid, string message = "")
 {
-    public class ValidationResult
+    public ValidationResult() : this(true, string.Empty)
     {
-        public ValidationResult()
-        {
-            IsValid = true;
-            Message = string.Empty;
-        }
-
-        public ValidationResult(bool isValid, string message = "")
-        {
-            IsValid = isValid;
-            Message = message;
-        }
-
-        public bool IsValid { get; set; }
-
-        public string Message { get; set; }
     }
+
+    public bool IsValid { get; set; } = isValid;
+
+    public string Message { get; set; } = message;
 }

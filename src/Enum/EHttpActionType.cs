@@ -1,9 +1,8 @@
-namespace form_builder.Enum
+namespace form_builder.Enum;
+
+public enum EHttpActionType
 {
-    public enum EHttpActionType
-    {
-        Unknown,
-        Get,
-        Post
-    }
+    Unknown,
+    Get,
+    Post
 }

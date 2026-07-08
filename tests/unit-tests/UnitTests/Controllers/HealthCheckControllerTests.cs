@@ -2,27 +2,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
-namespace form_builder_tests.UnitTests.Controllers
+namespace form_builder_tests.UnitTests.Controllers;
+
+public class HealthCheckControllerTests
 {
-    public class HealthCheckControllerTests
+    private readonly HealthCheckController _healthCheckController = new();
+
+    [Fact]
+    public void HealthCheckShouldReturnHealthCheck()
     {
-        private readonly HealthCheckController _healthCheckController;
+        // Act
+        var response = _healthCheckController.Get() as OkObjectResult;
 
-        public HealthCheckControllerTests()
-        {
-            _healthCheckController = new HealthCheckController();
-        }
-
-        [Fact]
-        public void HealthCheckShouldReturnHealthCheck()
-        {
-            // Act
-            var response = _healthCheckController.Get() as OkObjectResult;
-
-            // Assert
-            Assert.Equal(200, response.StatusCode);
-            Assert.NotNull(response);
-            Assert.NotNull(response.Value);
-        }
+        // Assert
+        Assert.Equal(200, response.StatusCode);
+        Assert.NotNull(response);
+        Assert.NotNull(response.Value);
     }
 }

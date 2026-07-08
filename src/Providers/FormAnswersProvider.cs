@@ -5,16 +5,11 @@ using Newtonsoft.Json;
 
 namespace form_builder.Providers;
 
-public class FormAnswersProvider : IFormAnswersProvider
+public class FormAnswersProvider(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
+    : IFormAnswersProvider
 {
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IDistributedCacheWrapper _distributedCache;
-
-    public FormAnswersProvider(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
-    {
-        _sessionHelper = sessionHelper;
-        _distributedCache = distributedCache;
-    }
+    private readonly ISessionHelper _sessionHelper = sessionHelper;
+    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
 
     public FormAnswers GetFormAnswers(string form)
     {
