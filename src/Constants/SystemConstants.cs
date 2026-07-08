@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace form_builder.Constants;
+﻿namespace form_builder.Constants;
 
 public class SystemConstants
 {

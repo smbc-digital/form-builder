@@ -1,4 +1,4 @@
-using form_builder.Providers.Address;
+namespace form_builder.Configuration;
 
 public class SHGAddressProviderConfiguration
 {

@@ -1,12 +1,10 @@
-﻿using form_builder.Enum;
-
-namespace form_builder.Builders;
+﻿namespace form_builder.Builders;
 
 public class SummaryDictionaryBuilder
 {
 
-    private Dictionary<string, string> _data = new Dictionary<string, string>();
-    private List<string> _filesData = new List<string>();
+    private Dictionary<string, string> _data = new();
+    private List<string> _filesData = new();
 
     public void Add(string question, string answer, EElementType type)
     {

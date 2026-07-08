@@ -2,7 +2,7 @@ namespace form_builder.Builders;
 
 public class RouteValueDictionaryBuilder
 {
-    private RouteValueDictionary _routeValueDictionary = new RouteValueDictionary();
+    private RouteValueDictionary _routeValueDictionary = new();
 
     public RouteValueDictionaryBuilder WithValue(string key, string value)
     {

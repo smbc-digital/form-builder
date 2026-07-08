@@ -1,13 +1,9 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-
-namespace form_builder.Conditions;
+﻿namespace form_builder.Conditions;
 
 public class ConditionValidator
 {
-    private readonly Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> ConditionList =
-
-        new Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>>
+    private readonly Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> _conditionList =
+        new()
         {
             { ECondition.IsBefore, DateComparator.DateIsBefore },
             { ECondition.IsAfter, DateComparator.DateIsAfter },
@@ -28,7 +24,7 @@ public class ConditionValidator
         if (condition.ConditionType.Equals(ECondition.Any))
             return AnyNumberOfConditionsIsValid(condition, viewModel);
 
-        return ConditionList[condition.ConditionType](condition, viewModel);
+        return _conditionList[condition.ConditionType](condition, viewModel);
     }
 
     public bool AnyNumberOfConditionsIsValid(Condition condition, Dictionary<string, dynamic> viewModel)
@@ -38,7 +34,7 @@ public class ConditionValidator
 
         foreach (var con in condition.Conditions)
         {
-            if (ConditionList[con.ConditionType](con, viewModel))
+            if (_conditionList[con.ConditionType](con, viewModel))
                 isValidCount++;
 
             if (isValidCount >= targetConditionCount)

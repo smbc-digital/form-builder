@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using MimeKit;
-
-namespace form_builder.Builders.Email;
+﻿namespace form_builder.Builders;
 
 public class EmailBuilder
 {

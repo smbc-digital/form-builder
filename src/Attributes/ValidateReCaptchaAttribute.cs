@@ -1,21 +1,11 @@
-﻿using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Controllers.Document;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
-using StockportGovUK.NetStandard.Gateways;
+﻿namespace form_builder.Attributes;
 
-namespace form_builder.Attributes;
-
-public class ValidateReCaptchaAttribute(
-    IGateway gateway,
+public class ValidateReCaptchaAttribute(IGateway gateway,
     IOptions<ReCaptchaConfiguration> configuration,
-    ILogger<DocumentController> logger)
+    ILogger<ValidateReCaptchaAttribute> logger)
     : ActionFilterAttribute
 {
-    private readonly IGateway _gateway = gateway;
     private readonly ReCaptchaConfiguration _configuration = configuration.Value;
-    private readonly ILogger<DocumentController> _logger = logger;
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -38,7 +28,7 @@ public class ValidateReCaptchaAttribute(
         if (!context.HttpContext.Request.HasFormContentType)
         {
             AddModelError(context, "No reCaptcha Token Found");
-            _logger.LogWarning("ValidateReCaptchaAttribute:: DoReCaptchaValidation:: No reCaptcha Token Found");
+            logger.LogWarning("ValidateReCaptchaAttribute:: DoReCaptchaValidation:: No reCaptcha Token Found");
             return;
         }
 
@@ -62,17 +52,17 @@ public class ValidateReCaptchaAttribute(
             new KeyValuePair<string, string>("response", token)
         });
 
-        var response = await _gateway.PostAsync(_configuration.ApiVerificationEndpoint, request, false);
+        var response = await gateway.PostAsync(_configuration.ApiVerificationEndpoint, request, false);
 
         if (response.Content is null)
         {
             AddModelError(context, "Unable To Read Response From Server");
-            _logger.LogWarning("ValidateReCaptchaAttribute:: ValidateReCaptcha:: Unable To Read Response From Server");
+            logger.LogWarning("ValidateReCaptchaAttribute:: ValidateReCaptcha:: Unable To Read Response From Server");
         }
         else if (!response.IsSuccessStatusCode)
         {
             AddModelError(context, "Invalid reCaptcha");
-            _logger.LogWarning("ValidateReCaptchaAttribute:: ValidateReCaptcha:: Invalid reCaptcha");
+            logger.LogWarning("ValidateReCaptchaAttribute:: ValidateReCaptcha:: Invalid reCaptcha");
         }
     }
 }
