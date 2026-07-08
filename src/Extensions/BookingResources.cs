@@ -1,5 +1,3 @@
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-
 namespace form_builder.Extensions;
 
 public static class BookingResourceExtensions

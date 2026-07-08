@@ -1,24 +1,16 @@
-﻿using form_builder.Constants;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Services.PreviewService;
-using Microsoft.AspNetCore.Mvc;
-
-namespace form_builder.Controllers;
+﻿namespace form_builder.Controllers.Preview;
 
 [Route("[Controller]")]
 public class PreviewController(IPreviewService previewService) : Controller
 {
-    private readonly IPreviewService _previewService = previewService;
-
     [HttpGet]
     public async Task<IActionResult> Index()
-        => View(await _previewService.GetPreviewPage());
+        => View(await previewService.GetPreviewPage());
 
     [HttpPost]
     public async Task<IActionResult> IndexPost(IEnumerable<CustomFormFile> fileUpload)
     {
-        var currentPageResult = await _previewService.VerifyPreviewRequest(fileUpload);
+        var currentPageResult = await previewService.VerifyPreviewRequest(fileUpload);
 
         if (!currentPageResult.Page.IsValid || currentPageResult.UseGeneratedViewModel)
         {
@@ -35,7 +27,7 @@ public class PreviewController(IPreviewService previewService) : Controller
     [HttpGet]
     public IActionResult Exit()
     {
-        _previewService.ExitPreviewMode();
+        previewService.ExitPreviewMode();
         return View();
     }
 }

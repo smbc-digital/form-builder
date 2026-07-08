@@ -1,6 +1,4 @@
-﻿using form_builder.Enum;
-
-namespace form_builder.Extensions;
+﻿namespace form_builder.Extensions;
 
 public static class EnumExtensions
 {
@@ -9,7 +7,7 @@ public static class EnumExtensions
         switch (value)
         {
             case ESchemaType.FormJson:
-                return $"form-json-";
+                return "form-json-";
             case ESchemaType.PaymentConfiguration:
                 return "paymentconfig-";
             default:

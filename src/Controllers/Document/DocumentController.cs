@@ -1,18 +1,9 @@
-using form_builder.Enum;
-using form_builder.Exceptions;
-using form_builder.Extensions;
-using form_builder.Workflows.DocumentWorkflow;
-using Microsoft.AspNetCore.Mvc;
-
 namespace form_builder.Controllers.Document;
 
 [Route("document")]
 public class DocumentController(IDocumentWorkflow documentWorkflow, ILogger<DocumentController> logger)
     : Controller
 {
-    private IDocumentWorkflow _documentWorkflow = documentWorkflow;
-    private ILogger<DocumentController> _logger = logger;
-
     [HttpGet]
     [Route("Summary/{documentType}/{id}")]
     public async Task<IActionResult> Summary(EDocumentType documentType, string id)
@@ -21,13 +12,13 @@ public class DocumentController(IDocumentWorkflow documentWorkflow, ILogger<Docu
 
         try
         {
-            var result = await _documentWorkflow.GenerateSummaryDocumentAsync(documentType, id);
+            var result = await documentWorkflow.GenerateSummaryDocumentAsync(documentType, id);
 
             return File(result, documentType.ToContentType(), $"summary.{documentType.ToString().ToLower()}");
         }
         catch (DocumentExpiredException ex)
         {
-            _logger.LogWarning(ex, ex.Message);
+            logger.LogWarning(ex, ex.Message);
 
             return RedirectToAction("Expired");
         }

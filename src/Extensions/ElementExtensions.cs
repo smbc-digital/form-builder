@@ -1,8 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models.Elements;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
-
-namespace form_builder.Extensions;
+﻿namespace form_builder.Extensions;
 
 public static class ElementExtensions
 {

@@ -1,5 +1,5 @@
 using form_builder.Enum;
-using form_builder.Utils.Extensions;
+using form_builder.Extensions;
 
 namespace form_builder.ViewModels;
 

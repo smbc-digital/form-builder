@@ -5,7 +5,7 @@ using form_builder.Extensions;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.FileStorage;
-using form_builder.Utils.Extensions;
+using form_builder.Extensions;
 using form_builder.Utils.Hash;
 using Newtonsoft.Json;
 using Address = StockportGovUK.NetStandard.Gateways.Models.Addresses.Address;

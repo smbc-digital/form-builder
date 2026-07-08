@@ -1,4 +1,4 @@
-using form_builder.Utils.Extensions;
+using form_builder.Extensions;
 
 namespace form_builder.TagParsers.Formatters;
 

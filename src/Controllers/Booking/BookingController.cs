@@ -1,23 +1,10 @@
-using form_builder.Builders;
-using form_builder.Exceptions;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Services.BookingService;
-using form_builder.Services.PageService;
-using form_builder.ViewModels;
-using Microsoft.AspNetCore.Mvc;
+namespace form_builder.Controllers.Booking;
 
-namespace form_builder.Controllers;
-
-public class BookingController(
-    IBookingService bookingService,
+public class BookingController(IBookingService bookingService,
     ISchemaFactory schemaFactory,
     IPageService pageService)
     : Controller
 {
-    private readonly IBookingService _bookingService = bookingService;
-    private readonly ISchemaFactory _schemaFactory = schemaFactory;
-    private readonly IPageService _pageService = pageService;
 
     [HttpPost]
     [Route("booking/{form}/{path}/month")]
@@ -29,7 +16,7 @@ public class BookingController(
         var viewModel = formData.ToNormaliseDictionary(string.Empty);
         var queryParamters = Request.Query;
 
-        await _bookingService.ProcessMonthRequest(viewModel, form, path);
+        await bookingService.ProcessMonthRequest(viewModel, form, path);
 
         var routeValuesDictionary = new RouteValueDictionaryBuilder()
             .WithValue("path", path)
@@ -49,7 +36,7 @@ public class BookingController(
 
         try
         {
-            var appointment = await _bookingService.ValidateCancellationRequest(formName, bookingGuid, hash);
+            var appointment = await bookingService.ValidateCancellationRequest(formName, bookingGuid, hash);
 
             return View("AppointmentDetails", new CancelBookingViewModel
             {
@@ -83,7 +70,7 @@ public class BookingController(
         if (string.IsNullOrEmpty(hash) || Guid.Empty.Equals(bookingGuid))
             throw new ApplicationException($"BookingController::CancelBookingPost, Invalid parameters received. Id: '{bookingGuid}', hash '{hash}' for form '{formName}'");
 
-        await _bookingService.Cancel(formName, bookingGuid, hash);
+        await bookingService.Cancel(formName, bookingGuid, hash);
 
         return RedirectToAction("CancelSuccess", new
         {
@@ -95,7 +82,7 @@ public class BookingController(
     [Route("{formName}/cannot-cancel-booking")]
     public async Task<IActionResult> CannotCancel(string formName)
     {
-        var formSchema = await _schemaFactory.Build(formName);
+        var formSchema = await schemaFactory.Build(formName);
 
         return View("CannotCancel", new FormBuilderViewModel
         {
@@ -111,7 +98,7 @@ public class BookingController(
     [Route("{formName}/booking-cancel-success")]
     public async Task<IActionResult> CancelSuccess(string formName)
     {
-        var result = await _pageService.GetCancelBookingSuccessPage(formName);
+        var result = await pageService.GetCancelBookingSuccessPage(formName);
         var success = new SuccessViewModel
         {
             Reference = result.CaseReference,
