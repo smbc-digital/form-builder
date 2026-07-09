@@ -22,7 +22,6 @@ public class CivicaPayProviderTests
     private readonly Mock<IOptions<CivicaPaymentConfiguration>> _civicaPayConfig = new();
     private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
     private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
-    private readonly Mock<ILogger<CivicaPayProvider>> _logger = new();
 
     public CivicaPayProviderTests()
     {
@@ -38,7 +37,7 @@ public class CivicaPayProviderTests
 
         _civicaPayConfig.Setup(_ => _.Value).Returns(new CivicaPaymentConfiguration { CustomerId = "testId", ApiPassword = "test" });
 
-        _civicaPayProvider = new CivicaPayProvider(_mockCivicaPayGateway.Object, _civicaPayConfig.Object, _mockHttpContextAccessor.Object, _mockHostingEnv.Object, _logger.Object);
+        _civicaPayProvider = new CivicaPayProvider(_mockCivicaPayGateway.Object, _civicaPayConfig.Object, _mockHttpContextAccessor.Object, _mockHostingEnv.Object);
     }
 
     [Fact]

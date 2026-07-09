@@ -1,14 +1,7 @@
-﻿using System.Net;
-using Amazon.SimpleEmail;
-using Amazon.SimpleEmail.Model;
-using form_builder.Builders;
-
-namespace form_builder.Providers.EmailProvider;
+﻿namespace form_builder.Providers.EmailProvider;
 
 public class AwsSesProvider(IAmazonSimpleEmailService emailService) : IEmailProvider
 {
-    private readonly IAmazonSimpleEmailService _emailService = emailService;
-
     public async Task<HttpStatusCode> SendEmail(EmailMessage emailMessage)
     {
         if (string.IsNullOrEmpty(emailMessage.ToEmail))
@@ -30,7 +23,7 @@ public class AwsSesProvider(IAmazonSimpleEmailService emailService) : IEmailProv
 
         try
         {
-            return await _emailService.SendRawEmailAsync(sendRequest);
+            return await emailService.SendRawEmailAsync(sendRequest);
         }
         catch (Exception ex)
         {

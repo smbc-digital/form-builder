@@ -1,30 +1,15 @@
-﻿using System.Dynamic;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.FileStorage;
-using form_builder.Extensions;
-using form_builder.Utils.Hash;
-using Newtonsoft.Json;
-using Address = StockportGovUK.NetStandard.Gateways.Models.Addresses.Address;
+﻿using Address = StockportGovUK.NetStandard.Gateways.Models.Addresses.Address;
 using Booking = StockportGovUK.NetStandard.Gateways.Models.Booking.Booking;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 using Organisation = StockportGovUK.NetStandard.Gateways.Models.Verint.Organisation;
 
-namespace form_builder.Mappers;
+namespace form_builder.Mappers.Element;
 
-public class ElementMapper(
-    IEnumerable<IFileStorageProvider> fileStorageProviders,
+public class ElementMapper(IEnumerable<IFileStorageProvider> fileStorageProviders,
     IHashUtil hashUtil,
     IConfiguration configuration)
     : IElementMapper
 {
-    private readonly IEnumerable<IFileStorageProvider> _fileStorageProviders = fileStorageProviders;
-    private readonly IHashUtil _hashUtil = hashUtil;
-    private readonly IConfiguration _configuration = configuration;
-
     public async Task<T> GetAnswerValue<T>(IElement element, FormAnswers formAnswers)
     {
         var value = await GetAnswerValue(element, formAnswers);
@@ -178,7 +163,7 @@ public class ElementMapper(
 
         List<FileUploadModel> uploadedFiles = JsonConvert.DeserializeObject<List<FileUploadModel>>(value.Response.ToString());
 
-        var fileStorageProvider = _fileStorageProviders.Get(_configuration["FileStorageProvider:Type"]);
+        var fileStorageProvider = fileStorageProviders.Get(configuration["FileStorageProvider:Type"]);
 
         foreach (var file in uploadedFiles)
         {
@@ -197,7 +182,6 @@ public class ElementMapper(
         }
 
         return listOfFiles;
-
     }
 
 
@@ -226,7 +210,7 @@ public class ElementMapper(
         var bookingEndTime = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentEndTime))?.Response;
         var bookingLocation = value.FirstOrDefault(_ => _.QuestionId.Equals(appointmentLocation))?.Response;
         bookingObject.Id = bookingId is not null ? Guid.Parse(bookingId) : Guid.Empty;
-        bookingObject.HashedId = bookingId is not null ? _hashUtil.Hash(bookingObject.Id.ToString()) : string.Empty;
+        bookingObject.HashedId = bookingId is not null ? hashUtil.Hash(bookingObject.Id.ToString()) : string.Empty;
         bookingObject.Date = bookingDate is not null ? DateTime.Parse(bookingDate) : DateTime.MinValue;
         bookingObject.StartTime = bookingStartTime is not null ? DateTime.Parse(bookingStartTime) : DateTime.MinValue;
         bookingObject.EndTime = bookingEndTime is not null ? DateTime.Parse(bookingEndTime) : DateTime.MinValue;

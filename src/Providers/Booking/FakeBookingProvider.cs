@@ -1,13 +1,8 @@
-﻿using form_builder.Builders;
-using form_builder.Exceptions;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
-
-namespace form_builder.Providers.Booking;
+﻿namespace form_builder.Providers.Booking;
 
 public class FakeBookingProvider : IBookingProvider
 {
-    public string ProviderName { get => "Fake"; }
+    public string ProviderName => "Fake";
     private static string BOOKING_UI_TEST => "00000000-0000-0000-0000-000000000002";
     private static string BOOKING_WITH_NO_AVAILABILITY => "00000000-0000-0000-0000-000000000001";
     private static string BOOKING_NON_FULL_DAY_APPOINTMENT => "00000000-0000-0000-0000-000000000003";

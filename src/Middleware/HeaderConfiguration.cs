@@ -2,15 +2,12 @@
 
 public class HeaderConfiguration(RequestDelegate next, IWebHostEnvironment env)
 {
-    private readonly RequestDelegate _next = next;
-    private IWebHostEnvironment _env { get; } = env;
-
     // TODO: Move these header values to config!
     public async Task Invoke(HttpContext context)
     {
         var headers = context.Response.Headers;
 
-        var testUrls = !_env.IsEnvironment("stage") || !_env.IsEnvironment("prod") ? "http://localhost:5006/ https://localhost:5006/" : "";
+        var testUrls = !env.IsEnvironment("stage") || !env.IsEnvironment("prod") ? "http://localhost:5006/ https://localhost:5006/" : "";
 
         var queryString = context.Request.QueryString.ToString();
 
@@ -30,6 +27,6 @@ public class HeaderConfiguration(RequestDelegate next, IWebHostEnvironment env)
         headers["X-Content-Type-Options"] = "nosniff";
         headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
 
-        await _next(context);
+        await next(context);
     }
 }

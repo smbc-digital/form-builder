@@ -1,27 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿namespace form_builder.Helpers.ViewRender;
 
-namespace form_builder.Helpers.ViewRender;
-
-public class ViewRender(
-    IRazorViewEngine viewEngine,
+public class ViewRender(IRazorViewEngine viewEngine,
     ITempDataProvider tempDataProvider,
     IServiceProvider serviceProvider)
     : IViewRender
 {
-    private readonly IRazorViewEngine _viewEngine = viewEngine;
-    private readonly ITempDataProvider _tempDataProvider = tempDataProvider;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
     public async Task<string> RenderAsync<TModel>(string viewName, TModel model, Dictionary<string, dynamic> viewData = null)
     {
-        var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
+        var httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
         var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-        var viewEngineResult = _viewEngine.FindView(actionContext, viewName, false);
+        var viewEngineResult = viewEngine.FindView(actionContext, viewName, false);
 
         if (!viewEngineResult.Success)
             throw new InvalidOperationException($"Couldn't find view {viewName}");
@@ -41,7 +29,7 @@ public class ViewRender(
                 },
                 new TempDataDictionary(
                     actionContext.HttpContext,
-                    _tempDataProvider),
+                    tempDataProvider),
                 output,
                 new HtmlHelperOptions());
 

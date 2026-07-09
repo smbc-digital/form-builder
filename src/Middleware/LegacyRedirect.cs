@@ -2,14 +2,12 @@
 
 public class LegacyRedirect(RequestDelegate next)
 {
-    private readonly RequestDelegate _next = next;
-
     public async Task Invoke(HttpContext context)
     {
         var url = context.Request.Path.ToString().ToLower();
         if (url.StartsWith("/v2/"))
             context.Response.Redirect($"{url.Substring(3)}{(context.Request.QueryString.HasValue ? context.Request.QueryString.Value : string.Empty)}");
         else
-            await _next(context);
+            await next(context);
     }
 }

@@ -1,9 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Helpers.ElementHelpers;
-using form_builder.Helpers.ViewRender;
-using Newtonsoft.Json;
-
-namespace form_builder.Models.Elements;
+﻿namespace form_builder.Models.Elements;
 
 public class Map : Element
 {

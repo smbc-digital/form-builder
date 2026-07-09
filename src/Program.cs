@@ -12,6 +12,7 @@ using StockportGovUK.AspNetCore.Middleware.App;
 using Serilog;
 using Serilog.Events;
 using StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws;
+using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 var builder = WebApplication.CreateBuilder(args);
 

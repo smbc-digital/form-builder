@@ -1,9 +1,5 @@
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Providers.Analytics;
 using form_builder.Providers.Analytics.Request;
-using Microsoft.Extensions.Options;
+using AnalyticsConfiguration = form_builder.Configuration.AnalyticsConfiguration;
 
 namespace form_builder.Services.AnalyticsService;
 

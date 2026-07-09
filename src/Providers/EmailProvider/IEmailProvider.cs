@@ -1,7 +1,4 @@
-﻿using System.Net;
-using form_builder.Models;
-
-namespace form_builder.Providers.EmailProvider;
+﻿namespace form_builder.Providers.EmailProvider;
 
 public interface IEmailProvider
 {

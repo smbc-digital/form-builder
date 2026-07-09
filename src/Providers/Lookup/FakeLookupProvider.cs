@@ -1,12 +1,9 @@
-﻿using form_builder.Models;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
-
-namespace form_builder.Providers.Lookup;
+﻿namespace form_builder.Providers.Lookup;
 
 public class FakeLookupProvider : ILookupProvider
 {
-    public string ProviderName { get => "Fake"; }
+    public string ProviderName => "Fake";
+
     public async Task<OptionsResponse> GetAsync(string url, string authToken)
     {
         if (url.Contains("waste", StringComparison.OrdinalIgnoreCase))

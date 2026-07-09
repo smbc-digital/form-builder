@@ -1,28 +1,10 @@
-using System.Net;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Extensions;
-using form_builder.Helpers.ElementHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Helpers.ViewRender;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
-using form_builder.Providers.FileStorage;
-using form_builder.Providers.StorageProvider;
-using form_builder.ViewModels;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using NuGet.Packaging;
-
 namespace form_builder.Helpers.PageHelpers;
 
-public class PageHelper(
-    IViewRender viewRender,
+public class PageHelper(IViewRender viewRender,
     IElementHelper elementHelper,
     IDistributedCacheWrapper distributedCache,
     IOptions<FormConfiguration> disallowedKeys,
-    IWebHostEnvironment enviroment,
+    IWebHostEnvironment environment,
     IOptions<DistributedCacheExpirationConfiguration> distributedCacheExpirationConfiguration,
     ISessionHelper sessionHelper,
     IEnumerable<IFileStorageProvider> fileStorageProviders,
@@ -30,15 +12,9 @@ public class PageHelper(
     ILogger<PageHelper> logger)
     : IPageHelper
 {
-    private readonly IViewRender _viewRender = viewRender;
-    private readonly IElementHelper _elementHelper = elementHelper;
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-    private readonly IWebHostEnvironment _environment = enviroment;
     private readonly FormConfiguration _disallowedKeys = disallowedKeys.Value;
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
     private readonly IFileStorageProvider _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
     private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-    private readonly ILogger<PageHelper> _logger = logger;
 
     public async Task<FormBuilderViewModel> GenerateHtml(
         Page page,
@@ -52,13 +28,13 @@ public class PageHelper(
 
         if (!page.PageSlug.Equals("success", StringComparison.OrdinalIgnoreCase) && !page.HideTitle)
         {
-            formModel.RawHTML += await _viewRender
+            formModel.RawHTML += await viewRender
                 .RenderAsync("H1", new Element { Properties = new BaseProperty { Text = page.GetPageTitle(), Optional = page.DisplayOptionalInTitle } });
         }
 
         foreach (var element in page.Elements)
         {
-            string html = await element.RenderAsync(_viewRender, _elementHelper, cacheKey, viewModel, page, baseForm, _environment, formAnswers, results);
+            string html = await element.RenderAsync(viewRender, elementHelper, cacheKey, viewModel, page, baseForm, environment, formAnswers, results);
 
             if (element.Properties is not null && element.Properties.isConditionalElement)
                 formModel.RawHTML = formModel.RawHTML.Replace($"{SystemConstants.CONDITIONAL_ELEMENT_REPLACEMENT}{element.Properties.QuestionId}", html);
@@ -115,7 +91,7 @@ public class PageHelper(
 
     public FormAnswers GetSavedAnswers(string cacheKey)
     {
-        string rawFormData = _distributedCache.GetString(cacheKey);
+        string rawFormData = distributedCache.GetString(cacheKey);
         FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
         if (!string.IsNullOrEmpty(rawFormData))
@@ -148,12 +124,12 @@ public class PageHelper(
 
     public void SaveAnswers(Dictionary<string, dynamic> viewModel, string cacheKey, string form, IEnumerable<CustomFormFile> files, bool isPageValid, bool appendMultipleFileUploadParts = false)
     {
-        var rawFormData = _distributedCache.GetString(cacheKey);
+        var rawFormData = distributedCache.GetString(cacheKey);
 
         if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection") || form.Equals("garden-waste-permit"))
-            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache - {rawFormData}");
+            logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache - {rawFormData}");
         else
-            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache");
+            logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - raw data retrieved from cache");
 
         FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
         var currentPageAnswers = new PageAnswers();
@@ -193,17 +169,17 @@ public class PageHelper(
         formAnswers.Path = viewModel["Path"];
         formAnswers.FormName = form;
 
-        _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
+        distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
 
         if (form.Equals("missed-bin-collection") || form.Equals("bulky-waste-collection"))
-            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - answers saved - {JsonConvert.SerializeObject(formAnswers.Pages)}");
+            logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - answers saved - {JsonConvert.SerializeObject(formAnswers.Pages)}");
         else
-            _logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - answers saved");
+            logger.LogInformation($"{nameof(PageHelper)}::{nameof(SaveAnswers)}:{cacheKey} - answers saved");
     }
 
     public void SaveCaseReference(string cacheId, string caseReference, bool isGenerated = false, string generatedReferenceMappingId = "GeneratedReference")
     {
-        string rawFormData = _distributedCache.GetString(cacheId);
+        string rawFormData = distributedCache.GetString(cacheId);
         FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
         if (!string.IsNullOrEmpty(rawFormData))
@@ -218,12 +194,12 @@ public class PageHelper(
         }
             
         formAnswers.CaseReference = caseReference;
-        _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(formAnswers));
+        distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(formAnswers));
     }
 
     public void SavePaymentAmount(string cacheId, string paymentAmount, string targetMapping)
     {
-        string rawFormData = _distributedCache.GetString(cacheId);
+        string rawFormData = distributedCache.GetString(cacheId);
         FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
         if (!string.IsNullOrEmpty(rawFormData))
@@ -231,12 +207,12 @@ public class PageHelper(
 
         formAnswers.PaymentAmount = paymentAmount;
 
-        _distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(formAnswers));
+        distributedCache.SetStringAsync(cacheId, JsonConvert.SerializeObject(formAnswers));
     }
 
     public void SaveFormData(string key, object value, string cacheKey, string form)
     {
-        string rawFormData = _distributedCache.GetString(cacheKey);
+        string rawFormData = distributedCache.GetString(cacheKey);
         FormAnswers formAnswers = new() { Pages = new List<PageAnswers>() };
 
         if (!string.IsNullOrEmpty(rawFormData))
@@ -248,7 +224,7 @@ public class PageHelper(
         formAnswers.FormData.Add(key, value);
         formAnswers.FormName = form;
 
-        _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
+        distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
     }
 
     public void RemoveFormData(string key, string cacheKey, string form)
@@ -259,7 +235,7 @@ public class PageHelper(
             formAnswers.FormData.Remove(key);
 
         formAnswers.FormName = form;
-        _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
+        distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
     }
 
     public void SaveNonQuestionAnswers(Dictionary<string, object> values, string form, string path, string cacheKey)
@@ -267,7 +243,7 @@ public class PageHelper(
         if (!values.Any())
             return;
 
-        string rawFormData = _distributedCache.GetString(cacheKey);
+        string rawFormData = distributedCache.GetString(cacheKey);
         FormAnswers formAnswers = new()
         {
             Pages = new List<PageAnswers>(),
@@ -286,7 +262,7 @@ public class PageHelper(
             formAnswers.AdditionalFormData.Add(_.Key, _.Value);
         });
 
-        _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
+        distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(formAnswers));
     }
 
     public List<Answers> SaveFormFileAnswers(List<Answers> answers, IEnumerable<CustomFormFile> files, bool isMultipleFileUploadElementType, PageAnswers currentAnswersForFileUpload)
@@ -338,9 +314,9 @@ public class PageHelper(
 
     public Page GetPageWithMatchingRenderConditions(List<Page> pages, string form)
     {
-        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string browserSessionId = sessionHelper.GetBrowserSessionId();
         string cacheKey = $"{form}::{browserSessionId}";
-        string rawFormData = _distributedCache.GetString(cacheKey);
+        string rawFormData = distributedCache.GetString(cacheKey);
         var convertedAnswers = !string.IsNullOrEmpty(rawFormData)
             ? JsonConvert.DeserializeObject<FormAnswers>(rawFormData)
             : new FormAnswers { Pages = new List<PageAnswers>() };

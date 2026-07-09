@@ -1,5 +1,3 @@
-using form_builder.Enum;
-
 namespace form_builder.Models.Time;
 
 public class TimeAvailability

@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace form_builder.Providers.Transforms.EmailConfiguration;
+﻿namespace form_builder.Providers.Transforms.EmailConfiguration;
 
 public class LocalEmailConfigurationTransformDataProvider : IEmailConfigurationTransformDataProvider
 {

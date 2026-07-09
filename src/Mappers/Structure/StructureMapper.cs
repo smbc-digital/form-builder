@@ -1,21 +1,12 @@
-﻿using System.Dynamic;
-using System.Reflection;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Models.Elements;
-using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
+﻿using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Mappers.Structure;
 
 public class StructureMapper(ISchemaFactory schemaFactory) : IStructureMapper
 {
-    private readonly ISchemaFactory _schemaFactory = schemaFactory;
-
     public async Task<object> CreateBaseFormDataStructure(string form)
     {
-        var formSchema = await _schemaFactory.Build(form);
+        var formSchema = await schemaFactory.Build(form);
         var dataStructure = new ExpandoObject() as IDictionary<string, dynamic>;
         var elements = formSchema.Pages.SelectMany(_ => _.ValidatableElements).ToList();
 

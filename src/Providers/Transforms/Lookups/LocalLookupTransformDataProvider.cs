@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-
 namespace form_builder.Providers.Transforms.Lookups;
 
 public class LocalLookupTransformDataProvider : ILookupTransformDataProvider

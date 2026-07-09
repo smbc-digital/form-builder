@@ -1,6 +1,3 @@
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
-using StockportGovUK.NetStandard.Gateways.VerintService;
-
 namespace form_builder.Providers.Street;
 
 public class CRMStreetProvider(IVerintServiceGateway verintServiceGateway) : IStreetProvider

@@ -1,27 +1,13 @@
-using form_builder.Configuration;
-using form_builder.Exceptions;
-using form_builder.Extensions;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.CivicaPay;
-using StockportGovUK.NetStandard.Gateways.Models.Civica.Pay.Request;
-
 namespace form_builder.Providers.PaymentProvider;
 
-public class CivicaPayProvider(
-    ICivicaPayGateway civicaPayGateway,
+public class CivicaPayProvider(ICivicaPayGateway civicaPayGateway,
     IOptions<CivicaPaymentConfiguration> paymentConfiguration,
     IHttpContextAccessor httpContextAccessor,
-    IWebHostEnvironment environment,
-    ILogger<CivicaPayProvider> logger)
+    IWebHostEnvironment environment)
     : IPaymentProvider
 {
     public string ProviderName => "CivicaPay";
-    private readonly ICivicaPayGateway _civicaPayGateway = civicaPayGateway;
     private readonly CivicaPaymentConfiguration _paymentConfig = paymentConfiguration.Value;
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-    private readonly IWebHostEnvironment _environment = environment;
-    private readonly ILogger<CivicaPayProvider> _logger = logger;
 
     public async Task<string> GeneratePaymentUrl(string form, string path, string reference, string cacheKey, PaymentInformation paymentInformation)
     {
@@ -35,7 +21,7 @@ public class CivicaPayProvider(
             CallingAppIdentifier = "Basket",
             CustomerID = _paymentConfig.CustomerId,
             ApiPassword = _paymentConfig.ApiPassword,
-            ReturnURL = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
+            ReturnURL = $"https://{httpContextAccessor.HttpContext.Request.Host}{environment.EnvironmentName.ToReturnUrlPrefix()}/{form}/{path}/payment-response",
             NotifyURL = string.Empty,
             CallingAppTranReference = reference,
             PaymentItems = new List<PaymentItem>
@@ -75,7 +61,7 @@ public class CivicaPayProvider(
         if (!string.IsNullOrEmpty(paymentInformation.Settings.Email))
             basket.PaymentItems[0].PaymentDetails.EmailAddress = paymentInformation.Settings.Email;
 
-        var civicaResponse = await _civicaPayGateway.CreateImmediateBasketAsync(basket);
+        var civicaResponse = await civicaPayGateway.CreateImmediateBasketAsync(basket);
 
         if (!civicaResponse.IsSuccessStatusCode)
             throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway response with a non ok status code {civicaResponse.StatusCode}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
@@ -85,7 +71,7 @@ public class CivicaPayProvider(
             throw new Exception($"CivicaPayProvider::GeneratePaymentUrl, CivicaPay gateway responded with a non successful response from the provider, {civicaResponse.ResponseContent.ResponseCode}, Summary: {civicaResponse.ResponseContent.ErrorMessage} - {civicaResponse.ResponseContent.ErrorSummary}, HttpResponse: {JsonConvert.SerializeObject(civicaResponse)}");
         }
 
-        return _civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
+        return civicaPayGateway.GetPaymentUrl(civicaResponse.ResponseContent.BasketReference, civicaResponse.ResponseContent.BasketToken, reference);
     }
 
     public void VerifyPaymentResponse(string responseCode)

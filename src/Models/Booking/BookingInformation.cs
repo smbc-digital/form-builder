@@ -1,5 +1,3 @@
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
-
 namespace form_builder.Models.Booking;
 
 public class BookingInformation

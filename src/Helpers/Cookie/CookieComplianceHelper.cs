@@ -1,14 +1,7 @@
-﻿using System.Reflection;
-using form_builder.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace StockportWebapp.Utils;
+﻿namespace form_builder.Helpers.Cookie;
 
 public class CookieComplianceHelper(IHttpContextAccessor accessor) : ICookieComplianceHelper
 {
-    private readonly IHttpContextAccessor httpContextAccessor = accessor;
-
     public List<T> PopulateCookies<T>(List<T> items, string cookieType)
     {
         Dictionary<string, List<string>> cookiesAsObject = GetCookiesAsObject(cookieType);
@@ -78,16 +71,16 @@ public class CookieComplianceHelper(IHttpContextAccessor accessor) : ICookieComp
 
     public void RemoveCookie(string key)
     {
-        string cookie = httpContextAccessor.HttpContext.Request.Cookies[key];
+        string cookie = accessor.HttpContext.Request.Cookies[key];
         if (string.IsNullOrEmpty(cookie))
             return;
 
-        httpContextAccessor.HttpContext.Response.Cookies.Append(key, string.Empty, new CookieOptions { Expires = DateTime.Now.AddDays(-1) });
+        accessor.HttpContext.Response.Cookies.Append(key, string.Empty, new CookieOptions { Expires = DateTime.Now.AddDays(-1) });
     }
 
     public void RemoveCookiesStartingWith(string startKey)
     {
-        IEnumerable<KeyValuePair<string, string>> cookies = httpContextAccessor.HttpContext.Request.Cookies.Where(cookie => cookie.Key.StartsWith(startKey));
+        IEnumerable<KeyValuePair<string, string>> cookies = accessor.HttpContext.Request.Cookies.Where(cookie => cookie.Key.StartsWith(startKey));
         if (!cookies.Any())
             return;
 
@@ -115,7 +108,7 @@ public class CookieComplianceHelper(IHttpContextAccessor accessor) : ICookieComp
     private Dictionary<string, List<string>> GetCookiesAsObject(string cookieType)
     {
 
-        string cookies = httpContextAccessor.HttpContext.Request.Cookies[cookieType];
+        string cookies = accessor.HttpContext.Request.Cookies[cookieType];
         Dictionary<string, List<string>> alertDictionary = new();
         
         if (cookies is not null && !cookies.Equals(string.Empty))
@@ -127,19 +120,19 @@ public class CookieComplianceHelper(IHttpContextAccessor accessor) : ICookieComp
     private void UpdateCookies(Dictionary<string, List<string>> cookies, string cookieType)
     {
         string data = JsonConvert.SerializeObject(cookies);
-        httpContextAccessor.HttpContext.Response.Cookies.Append(cookieType, data, new CookieOptions { Expires = DateTime.Now.AddMonths(1) });
+        accessor.HttpContext.Response.Cookies.Append(cookieType, data, new CookieOptions { Expires = DateTime.Now.AddMonths(1) });
     }
 
     public bool HasCookieConsentBeenCollected()
     {
-        string consentAcctepted = httpContextAccessor.HttpContext.Request.Cookies["cookie_consent_user_accepted"];
+        string consentAccepted = accessor.HttpContext.Request.Cookies["cookie_consent_user_accepted"];
 
-        return !string.IsNullOrEmpty(consentAcctepted);
+        return !string.IsNullOrEmpty(consentAccepted);
     }
 
     public CookieConsentLevel GetCurrentCookieConsentLevel()
     {
-        string consentAcceptedValue = httpContextAccessor.HttpContext.Request.Cookies["cookie_consent_user_accepted"];
+        string consentAcceptedValue = accessor.HttpContext.Request.Cookies["cookie_consent_user_accepted"];
 
         if (string.IsNullOrEmpty(consentAcceptedValue))
             return new CookieConsentLevel();
@@ -147,7 +140,7 @@ public class CookieComplianceHelper(IHttpContextAccessor accessor) : ICookieComp
         if (!bool.Parse(consentAcceptedValue))
             return new CookieConsentLevel();
 
-        string consentLevel = httpContextAccessor.HttpContext.Request.Cookies["cookie_consent_level"];
+        string consentLevel = accessor.HttpContext.Request.Cookies["cookie_consent_level"];
 
         return string.IsNullOrEmpty(consentLevel)
             ? new CookieConsentLevel()

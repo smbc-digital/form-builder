@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.Models.Elements;
-
-namespace form_builder.Mappers;
+﻿namespace form_builder.Mappers.Element;
 
 public interface IElementMapper
 {

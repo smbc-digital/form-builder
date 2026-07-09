@@ -45,7 +45,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.EXCLUSIVE
         });
@@ -78,14 +78,14 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-ex")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.EXCLUSIVE
         });
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-in")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -131,7 +131,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.EXCLUSIVE
         });
@@ -167,7 +167,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -203,14 +203,14 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-ex")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.EXCLUSIVE
         });
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-d-in")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -256,14 +256,14 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-ex")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.MONTH,
             Type = DateInputConstants.EXCLUSIVE
         });
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-in")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.MONTH,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -309,7 +309,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.MONTH,
             Type = DateInputConstants.EXCLUSIVE
         });
@@ -345,7 +345,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.MONTH,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -381,14 +381,14 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-ex")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.MONTH,
             Type = DateInputConstants.EXCLUSIVE
         });
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("3-m-in")).Returns(new RelativeDate()
         {
-            Ammount = 3,
+            Amount = 3,
             Unit = DateInputConstants.MONTH,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -434,14 +434,14 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-ex")).Returns(new RelativeDate()
         {
-            Ammount = 2,
+            Amount = 2,
             Unit = DateInputConstants.YEAR,
             Type = DateInputConstants.EXCLUSIVE
         });
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-in")).Returns(new RelativeDate()
         {
-            Ammount = 2,
+            Amount = 2,
             Unit = DateInputConstants.YEAR,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -487,14 +487,14 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-ex")).Returns(new RelativeDate()
         {
-            Ammount = 2,
+            Amount = 2,
             Unit = DateInputConstants.YEAR,
             Type = DateInputConstants.EXCLUSIVE
         });
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate("2-y-in")).Returns(new RelativeDate()
         {
-            Ammount = 2,
+            Amount = 2,
             Unit = DateInputConstants.YEAR,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -540,7 +540,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 2,
+            Amount = 2,
             Unit = DateInputConstants.YEAR,
             Type = DateInputConstants.EXCLUSIVE
         });
@@ -576,7 +576,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 2,
+            Amount = 2,
             Unit = DateInputConstants.YEAR,
             Type = DateInputConstants.INCLUSIVE
         });
@@ -613,7 +613,7 @@ public class DateInputIsPastDateAfterRelativeValidatorTests
 
         _mockRelativeDateHelper.Setup(_ => _.GetRelativeDate(It.IsAny<string>())).Returns(new RelativeDate()
         {
-            Ammount = 2,
+            Amount = 2,
             Unit = DateInputConstants.DAY,
             Type = DateInputConstants.EXCLUSIVE
         });

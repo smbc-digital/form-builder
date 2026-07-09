@@ -1,24 +1,17 @@
-﻿using Amazon.S3;
-using form_builder.Configuration;
-using form_builder.Gateways;
-using Microsoft.Extensions.Options;
+﻿namespace form_builder.Providers.FileStorage;
 
-namespace form_builder.Providers.FileStorage;
-
-public class S3FileStorageProvider(
-    IS3Gateway s3Service,
+public class S3FileStorageProvider(IS3Gateway s3Gateway,
     IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
     : IFileStorageProvider
 {
-    public string ProviderName { get => "S3"; }
-    private readonly IS3Gateway _s3Gateway = s3Service;
+    public string ProviderName => "S3";
     private readonly FileStorageProviderConfiguration _fileStorageConfiguration = fileStorageConfiguration.Value;
 
     public async Task<string> GetString(string key)
     {
         try
         {
-            var s3Response = await _s3Gateway.GetObject(_fileStorageConfiguration.S3BucketName, key);
+            var s3Response = await s3Gateway.GetObject(_fileStorageConfiguration.S3BucketName, key);
             var s3StringResponse = new StreamReader(s3Response.ResponseStream).ReadToEnd();
             return s3StringResponse;
         }
@@ -36,7 +29,7 @@ public class S3FileStorageProvider(
     {
         try
         {
-            await _s3Gateway.DeleteObject(_fileStorageConfiguration.S3BucketName, filename);
+            await s3Gateway.DeleteObject(_fileStorageConfiguration.S3BucketName, filename);
         }
         catch (AmazonS3Exception e)
         {
@@ -52,7 +45,7 @@ public class S3FileStorageProvider(
     {
         try
         {
-            await _s3Gateway.PutObject(_fileStorageConfiguration.S3BucketName, filename, value);
+            await s3Gateway.PutObject(_fileStorageConfiguration.S3BucketName, filename, value);
         }
         catch (AmazonS3Exception e)
         {

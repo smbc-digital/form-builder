@@ -14,7 +14,6 @@ public class S3ReusableElementTransformDataProviderTests
 {
     private readonly S3ReusableElementTransformDataProvider _s3TransformProvider;
     private readonly Mock<IS3Gateway> _mockS3Gateway = new();
-    private readonly Mock<ILogger<S3ReusableElementTransformDataProvider>> _mockLogger = new();
     private readonly Mock<IWebHostEnvironment> _mockHostingEnv = new();
     private readonly Mock<IOptions<S3SchemaProviderConfiguration>> _mockConfiguration = new();
 
@@ -22,7 +21,7 @@ public class S3ReusableElementTransformDataProviderTests
     {
         _mockHostingEnv.Setup(_ => _.EnvironmentName).Returns("uitest");
         _mockConfiguration.Setup(_ => _.Value).Returns(new S3SchemaProviderConfiguration { S3BucketKey = "forms-storage" });
-        _s3TransformProvider = new S3ReusableElementTransformDataProvider(_mockS3Gateway.Object, _mockLogger.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
+        _s3TransformProvider = new S3ReusableElementTransformDataProvider(_mockS3Gateway.Object, _mockHostingEnv.Object, _mockConfiguration.Object);
     }
 
     [Fact]

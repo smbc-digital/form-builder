@@ -95,7 +95,7 @@ using StockportGovUK.NetStandard.Gateways.MailingServiceProxy;
 using StockportGovUK.NetStandard.Gateways.OrganisationService;
 using StockportGovUK.NetStandard.Gateways.StreetService;
 using StockportGovUK.NetStandard.Gateways.VerintService;
-using StockportWebapp.Utils;
+using AnalyticsConfiguration = form_builder.Configuration.AnalyticsConfiguration;
 
 namespace form_builder.Utils.Startup;
 

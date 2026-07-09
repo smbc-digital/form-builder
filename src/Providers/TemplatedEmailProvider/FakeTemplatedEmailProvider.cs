@@ -2,7 +2,7 @@ namespace form_builder.Providers.TemplatedEmailProvider;
 
 public class FakeTemplatedEmailProvider : ITemplatedEmailProvider
 {
-    public string ProviderName { get => "Fake"; }
+    public string ProviderName => "Fake";
 
     public Task SendEmailAsync(
         string emailAddress,

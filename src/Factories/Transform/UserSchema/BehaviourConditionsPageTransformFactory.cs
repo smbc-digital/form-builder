@@ -1,7 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-
-namespace form_builder.Factories.Transform.UserSchema;
+﻿namespace form_builder.Factories.Transform.UserSchema;
 
 public class BehaviourConditionsPageTransformFactory : IUserPageTransformFactory
 {

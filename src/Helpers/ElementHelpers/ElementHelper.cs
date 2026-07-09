@@ -1,28 +1,10 @@
-﻿using System.Text;
-using form_builder.Builders;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Mappers;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
-using Newtonsoft.Json;
+﻿namespace form_builder.Helpers.ElementHelpers;
 
-namespace form_builder.Helpers.ElementHelpers;
-
-public class ElementHelper(
-    IDistributedCacheWrapper distributedCacheWrapper,
+public class ElementHelper(IDistributedCacheWrapper distributedCache,
     IElementMapper elementMapper,
-    IWebHostEnvironment environment,
     IHttpContextAccessor httpContextAccessor)
     : IElementHelper
 {
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCacheWrapper;
-    private readonly IElementMapper _elementMapper = elementMapper;
-    private readonly IWebHostEnvironment _environment = environment;
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-
     public string CurrentValue(string questionId, Dictionary<string, dynamic> viewmodel, FormAnswers answers, string suffix = "")
     {
         //Todo
@@ -170,7 +152,7 @@ public class ElementHelper(
 
     public object GetFormDataValue(string cacheKey, string key)
     {
-        var formData = _distributedCache.GetString(cacheKey);
+        var formData = distributedCache.GetString(cacheKey);
         var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
         if (!string.IsNullOrEmpty(formData))
@@ -181,7 +163,7 @@ public class ElementHelper(
 
     public FormAnswers GetFormData(string cacheKey)
     {
-        var formData = _distributedCache.GetString(cacheKey);
+        var formData = distributedCache.GetString(cacheKey);
         var convertedAnswers = new FormAnswers { Pages = new List<PageAnswers>() };
 
         if (!string.IsNullOrEmpty(formData))
@@ -266,7 +248,7 @@ public class ElementHelper(
             if (element.Type.Equals(EElementType.AddAnother) || (element.Properties.IsDynamicallyGeneratedElement && ignoreDynamicallyGeneratedElements))
                 continue;
 
-            var answer = await _elementMapper.GetAnswerStringValue(element, formAnswers);
+            var answer = await elementMapper.GetAnswerStringValue(element, formAnswers);
             var summaryLabelText = element.GetLabelText(page.Title);
 
             summaryBuilder.Add(summaryLabelText, answer, element.Type);
@@ -277,7 +259,7 @@ public class ElementHelper(
 
     public string GenerateDocumentUploadUrl(Element element, FormSchema formSchema, FormAnswers formAnswers)
     {
-        var urlOrigin = $"https://{_httpContextAccessor.HttpContext.Request.Host}/";
+        var urlOrigin = $"https://{httpContextAccessor.HttpContext.Request.Host}/";
         var urlPath = $"{formSchema.BaseURL}/{FileUploadConstants.DOCUMENT_UPLOAD_URL_PATH}{SystemConstants.CaseReferenceQueryString}{Convert.ToBase64String(Encoding.ASCII.GetBytes(formAnswers.CaseReference))}";
 
         return $"{urlOrigin}{urlPath}";

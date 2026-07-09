@@ -1,9 +1,3 @@
-using Elasticsearch.Net;
-using form_builder.Enum;
-using form_builder.Helpers.DocumentCreation;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Pdf;
-
 namespace form_builder.Providers.DocumentCreation.Generic;
 
 public class TextFileDocumentCreator : IDocumentCreation

@@ -21,13 +21,13 @@ public class DateInputIsPastDateAfterRelativeValidator(IRelativeDateHelper relat
             var maximumDate = DateTime.Today;
 
             if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
-                maximumDate = DateTime.Today.AddYears(-relativeDate.Ammount);
+                maximumDate = DateTime.Today.AddYears(-relativeDate.Amount);
 
             if (relativeDate.Unit.Equals(DateInputConstants.MONTH))
-                maximumDate = DateTime.Today.AddMonths(-relativeDate.Ammount);
+                maximumDate = DateTime.Today.AddMonths(-relativeDate.Amount);
 
             if (relativeDate.Unit.Equals(DateInputConstants.DAY))
-                maximumDate = DateTime.Today.AddDays(-relativeDate.Ammount);
+                maximumDate = DateTime.Today.AddDays(-relativeDate.Amount);
 
             var chosenDate = _relativeDateHelper.GetChosenDate(element, viewModel);
 

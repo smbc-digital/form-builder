@@ -1,6 +1,4 @@
-﻿using MimeDetective;
-
-namespace form_builder.Models;
+﻿namespace form_builder.Models;
 
 public class MimeTypeFile
 {

@@ -20,27 +20,4 @@ public class SessionHelperTests
         // Assert
         Assert.NotNull(result);
     }
-
-    [Fact]
-    public void SetSessionGuid()
-    {
-        // Arrange
-        var guid = Guid.NewGuid();
-
-        // Act
-        var result = _mockSession.Setup(_ => _.SetSessionGuid(guid.ToString()));
-
-        // Assert
-        Assert.NotNull(result);
-    }
-
-    [Fact]
-    public void RemoveSessionGuid()
-    {
-        // Act
-        var result = _mockSession.Setup(_ => _.RemoveSessionGuid());
-
-        // Assert
-        Assert.NotNull(result);
-    }
 }

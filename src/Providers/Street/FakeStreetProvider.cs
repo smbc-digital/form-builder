@@ -1,10 +1,8 @@
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
-
 namespace form_builder.Providers.Street;
 
 public class FakeStreetProvider : IStreetProvider
 {
-    public string ProviderName { get => "Fake"; }
+    public string ProviderName => "Fake";
 
     public async Task<IEnumerable<AddressSearchResult>> SearchAsync(string street)
     {

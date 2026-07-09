@@ -21,13 +21,13 @@ public class DateInputIsFutureDateAfterRelativeValidator(IRelativeDateHelper rel
             var minimumDate = DateTime.Today;
 
             if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
-                minimumDate = DateTime.Today.AddYears(relativeDate.Ammount);
+                minimumDate = DateTime.Today.AddYears(relativeDate.Amount);
 
             if (relativeDate.Unit.Equals(DateInputConstants.MONTH))
-                minimumDate = DateTime.Today.AddMonths(relativeDate.Ammount);
+                minimumDate = DateTime.Today.AddMonths(relativeDate.Amount);
 
             if (relativeDate.Unit.Equals(DateInputConstants.DAY))
-                minimumDate = DateTime.Today.AddDays(relativeDate.Ammount);
+                minimumDate = DateTime.Today.AddDays(relativeDate.Amount);
 
             if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && minimumDate > _relativeDateHelper.GetChosenDate(element, viewModel) ||
                 relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && minimumDate >= _relativeDateHelper.GetChosenDate(element, viewModel))

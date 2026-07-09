@@ -1,8 +1,3 @@
-using System.Text.RegularExpressions;
-using form_builder.Constants;
-using form_builder.Models;
-using form_builder.Models.Elements;
-
 namespace form_builder.Helpers.RelativeDateHelper;
 
 public class RelativeDateHelper : IRelativeDateHelper
@@ -47,7 +42,7 @@ public class RelativeDateHelper : IRelativeDateHelper
 
         return new RelativeDate()
         {
-            Ammount = Convert.ToInt32(tokens[0].Trim()),
+            Amount = Convert.ToInt32(tokens[0].Trim()),
             Unit = tokens[1].Trim().ToUpper(),
             Type = tokens[2].Trim().ToUpper()
         };
