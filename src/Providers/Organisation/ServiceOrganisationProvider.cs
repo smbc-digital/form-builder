@@ -1,19 +1,12 @@
-using StockportGovUK.NetStandard.Gateways.Enums;
-using StockportGovUK.NetStandard.Gateways.Models.Organisation;
-using StockportGovUK.NetStandard.Gateways.Models.Verint.Lookup;
-using StockportGovUK.NetStandard.Gateways.OrganisationService;
-
 namespace form_builder.Providers.Organisation;
 
 public class ServiceOrganisationProvider(IOrganisationServiceGateway organisationServiceGateway) : IOrganisationProvider
 {
     public string ProviderName => "CRM";
 
-    private readonly IOrganisationServiceGateway _organisationServiceGateway = organisationServiceGateway;
-
     public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation)
     {
-        var result = await _organisationServiceGateway.SearchAsync(new OrganisationSearch { OrganisationProvider = EOrganisationProvider.CRM, SearchTerm = organisation });
+        var result = await organisationServiceGateway.SearchAsync(new OrganisationSearch { OrganisationProvider = EOrganisationProvider.CRM, SearchTerm = organisation });
 
         return result.ResponseContent;
     }

@@ -1,15 +1,7 @@
-using form_builder.ContentFactory.SuccessPageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
-using form_builder.Providers.EmailProvider;
-using form_builder.Services.MappingService;
-using Newtonsoft.Json;
-
 namespace form_builder.Models.Actions;
 
 public class UserEmail : Action
 {
-        
     public UserEmail() => Type = EActionType.UserEmail;
 
     public override async Task Process(IActionHelper actionHelper, IEmailProvider emailProvider, FormAnswers formAnswers)

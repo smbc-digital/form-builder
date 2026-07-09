@@ -22,13 +22,13 @@ public class DateInputIsFutureDateBeforeRelativeValidator(IRelativeDateHelper re
             var maximumDate = DateTime.Today;
 
             if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
-                maximumDate = DateTime.Today.AddYears(relativeDate.Ammount);
+                maximumDate = DateTime.Today.AddYears(relativeDate.Amount);
 
             if (relativeDate.Unit.Equals(DateInputConstants.MONTH))
-                maximumDate = DateTime.Today.AddMonths(relativeDate.Ammount);
+                maximumDate = DateTime.Today.AddMonths(relativeDate.Amount);
 
             if (relativeDate.Unit.Equals(DateInputConstants.DAY))
-                maximumDate = DateTime.Today.AddDays(relativeDate.Ammount);
+                maximumDate = DateTime.Today.AddDays(relativeDate.Amount);
 
             if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && maximumDate < _relativeDateHelper.GetChosenDate(element, viewModel) ||
                 relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate <= _relativeDateHelper.GetChosenDate(element, viewModel))

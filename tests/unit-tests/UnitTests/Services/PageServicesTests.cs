@@ -150,10 +150,6 @@ public class PageServicesTests
         mockSession.Setup(_ => _.IsAvailable).Returns(true);
         mockSession.Setup(_ => _.Id).Returns("SessionMockId");
 
-        _sessionHelper
-            .Setup(_ => _.GetSession())
-            .Returns(mockSession.Object);
-
         _service = new PageService(
             _validators.Object,
             _mockPageHelper.Object,
@@ -287,10 +283,6 @@ public class PageServicesTests
         _sessionHelper
             .Setup(_ => _.GetBrowserSessionId())
             .Returns(string.Empty);
-
-        _sessionHelper
-            .Setup(_ => _.GetSessionForm())
-            .Returns("TestForm");
 
         var element = new ElementBuilder()
             .WithType(EElementType.H1)

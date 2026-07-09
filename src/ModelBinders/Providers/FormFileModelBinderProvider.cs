@@ -1,8 +1,4 @@
-﻿using form_builder.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-
-namespace form_builder.ModelBinders.Providers;
+﻿namespace form_builder.ModelBinders.Providers;
 
 public class CustomFormFileModelBinderProvider : IModelBinderProvider
 {

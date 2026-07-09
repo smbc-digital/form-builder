@@ -1,10 +1,4 @@
-﻿using form_builder.Models;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
-
-namespace form_builder.Providers.Address;
+﻿namespace form_builder.Providers.Address;
 
 public class OSPlacesAddressProvider(
     IGateway gateway,

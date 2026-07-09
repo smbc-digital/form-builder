@@ -1,9 +1,4 @@
-﻿using System.Text;
-using Amazon.S3;
-using Amazon.S3.Model;
-using Amazon.S3.Transfer;
-
-namespace form_builder.Gateways;
+﻿namespace form_builder.Gateways;
 
 public class S3Gateway(IAmazonS3 s3Client) : IS3Gateway
 {

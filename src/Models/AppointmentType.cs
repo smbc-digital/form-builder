@@ -1,5 +1,3 @@
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-
 namespace form_builder.Models;
 
 public class AppointmentType

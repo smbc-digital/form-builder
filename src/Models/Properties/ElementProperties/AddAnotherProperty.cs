@@ -1,6 +1,4 @@
-﻿using form_builder.Models.Elements;
-
-namespace form_builder.Models.Properties.ElementProperties;
+﻿namespace form_builder.Models.Properties.ElementProperties;
 
 public partial class BaseProperty
 {

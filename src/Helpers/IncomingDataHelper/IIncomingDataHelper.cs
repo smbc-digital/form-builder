@@ -1,6 +1,4 @@
-﻿using form_builder.Models;
-
-namespace form_builder.Helpers.IncomingDataHelper;
+﻿namespace form_builder.Helpers.IncomingDataHelper;
 
 public interface IIncomingDataHelper
 {

@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace form_builder.Providers.Transforms.PaymentConfiguration;
+﻿namespace form_builder.Providers.Transforms.PaymentConfiguration;
 
 public class LocalPaymentConfigurationTransformDataProvider : IPaymentConfigurationTransformDataProvider
 {

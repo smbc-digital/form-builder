@@ -1,6 +1,3 @@
-using form_builder.Models;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
-
 namespace form_builder.Providers.Lookup;
 
 public interface ILookupProvider

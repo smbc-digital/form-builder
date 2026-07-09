@@ -3,7 +3,7 @@ using form_builder.Builders;
 using form_builder.Constants;
 using form_builder.Enum;
 using form_builder.Helpers.ElementHelpers;
-using form_builder.Mappers;
+using form_builder.Mappers.Element;
 using form_builder.Models;
 using form_builder.Models.Elements;
 using form_builder.Providers.StorageProvider;
@@ -20,7 +20,6 @@ public class ElementHelperTests
 {
     private readonly Mock<IDistributedCacheWrapper> _mockDistributedCacheWrapper = new();
     private readonly Mock<IElementMapper> _mockElementMapper = new();
-    private readonly Mock<IWebHostEnvironment> _mockWebHostEnvironment = new();
     private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor = new();
     private readonly ElementHelper _elementHelper;
     private readonly Mock<IElementHelper> _mockElementHelper = new();
@@ -29,10 +28,7 @@ public class ElementHelperTests
     {
         _elementHelper = new ElementHelper(_mockDistributedCacheWrapper.Object,
             _mockElementMapper.Object,
-            _mockWebHostEnvironment.Object,
             _mockHttpContextAccessor.Object);
-
-        _mockWebHostEnvironment.Setup(_ => _.EnvironmentName).Returns("local");
 
         _mockHttpContextAccessor.Setup(_ => _.HttpContext.Request.Host)
             .Returns(new HostString("www.test.com"));
@@ -847,7 +843,6 @@ public class ElementHelperTests
         var elementHelper = new ElementHelper(
             _mockDistributedCacheWrapper.Object,
             _mockElementMapper.Object,
-            _mockWebHostEnvironment.Object,
             _mockHttpContextAccessor.Object
         );
         //Act
@@ -884,7 +879,6 @@ public class ElementHelperTests
         var elementHelper = new ElementHelper(
             _mockDistributedCacheWrapper.Object,
             _mockElementMapper.Object,
-            _mockWebHostEnvironment.Object,
             _mockHttpContextAccessor.Object
         );
         //Act
@@ -920,7 +914,6 @@ public class ElementHelperTests
         var elementHelper = new ElementHelper(
             _mockDistributedCacheWrapper.Object,
             _mockElementMapper.Object,
-            _mockWebHostEnvironment.Object,
             _mockHttpContextAccessor.Object
         );
         //Act

@@ -1,6 +1,4 @@
-﻿using form_builder.Services.MappingService.Entities;
-
-namespace form_builder.Helpers.Submit;
+﻿namespace form_builder.Helpers.Submit;
 
 public interface ISubmitHelper
 {

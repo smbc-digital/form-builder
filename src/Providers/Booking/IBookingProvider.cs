@@ -1,7 +1,4 @@
-﻿using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
-
-namespace form_builder.Providers.Booking;
+﻿namespace form_builder.Providers.Booking;
 
 public interface IBookingProvider
 {

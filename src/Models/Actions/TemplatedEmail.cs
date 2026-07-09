@@ -1,8 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
-using form_builder.Providers.TemplatedEmailProvider;
-
-namespace form_builder.Models.Actions;
+﻿namespace form_builder.Models.Actions;
 
 public class TemplatedEmail : Action
 {

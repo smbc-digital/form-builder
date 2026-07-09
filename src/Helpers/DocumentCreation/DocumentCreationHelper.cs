@@ -1,15 +1,7 @@
-using form_builder.Builders;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Mappers;
-using form_builder.Models;
-
 namespace form_builder.Helpers.DocumentCreation;
 
 public class DocumentCreationHelper(IElementMapper elementMapper) : IDocumentCreationHelper
 {
-    private readonly IElementMapper _elementMapper = elementMapper;
-
     public async Task<List<string>> GenerateQuestionAndAnswersList(FormAnswers formAnswers, FormSchema formSchema)
     {
         var summaryBuilder = new SummaryAnswerBuilder();
@@ -32,7 +24,7 @@ public class DocumentCreationHelper(IElementMapper elementMapper) : IDocumentCre
 
             formSchemaQuestions.ForEach(async question =>
             {
-                var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
+                var answer = await elementMapper.GetAnswerStringValue(question, formAnswers);
                 summaryBuilder.Add(question.GetLabelText(page.Title), answer, question.Type);
 
                 summaryBuilder.AddBlankLine();
@@ -65,7 +57,7 @@ public class DocumentCreationHelper(IElementMapper elementMapper) : IDocumentCre
 
             foreach (var question in formSchemaQuestions)
             {
-                var answer = await _elementMapper.GetAnswerStringValue(question, formAnswers);
+                var answer = await elementMapper.GetAnswerStringValue(question, formAnswers);
 
                 if (question.Type.Equals(EElementType.FileUpload) ||
                     question.Type.Equals(EElementType.MultipleFileUpload))

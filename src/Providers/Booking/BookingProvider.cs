@@ -1,20 +1,12 @@
-﻿using System.Net;
-using form_builder.Exceptions;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.BookingService;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
-
-namespace form_builder.Providers.Booking;
+﻿namespace form_builder.Providers.Booking;
 
 public class BookingProvider(IBookingServiceGateway gateway) : IBookingProvider
 {
-    public string ProviderName { get => "SMBC"; }
-    private readonly IBookingServiceGateway _gateway = gateway;
+    public string ProviderName => "SMBC";
 
     public async Task<AvailabilityDayResponse> NextAvailability(AvailabilityRequest request)
     {
-        var result = await _gateway.NextAvailability(request);
+        var result = await gateway.NextAvailability(request);
 
         if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
             throw new ApplicationException($"BookingProvider::NextAvailability, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
@@ -30,7 +22,7 @@ public class BookingProvider(IBookingServiceGateway gateway) : IBookingProvider
 
     public async Task<List<AvailabilityDayResponse>> GetAvailability(AvailabilityRequest request)
     {
-        var result = await _gateway.GetAvailability(request);
+        var result = await gateway.GetAvailability(request);
 
         if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
             throw new ApplicationException($"BookingProvider::GetAvailability, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
@@ -46,7 +38,7 @@ public class BookingProvider(IBookingServiceGateway gateway) : IBookingProvider
 
     public async Task<Guid> Reserve(BookingRequest request)
     {
-        var result = await _gateway.Reserve(request);
+        var result = await gateway.Reserve(request);
 
         if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
             throw new ApplicationException($"BookingProvider::Reserve, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
@@ -62,7 +54,7 @@ public class BookingProvider(IBookingServiceGateway gateway) : IBookingProvider
 
     public async Task<string> GetLocation(LocationRequest request)
     {
-        var result = await _gateway.GetLocation(request);
+        var result = await gateway.GetLocation(request);
 
         if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
             throw new ApplicationException($"BookingProvider::GetLocation, BookingServiceGateway returned 400 status code, gateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");
@@ -78,7 +70,7 @@ public class BookingProvider(IBookingServiceGateway gateway) : IBookingProvider
 
     public async Task<BookingInformationResponse> GetBooking(Guid bookingId)
     {
-        var response = await _gateway.GetBooking(bookingId);
+        var response = await gateway.GetBooking(bookingId);
 
         if (response.StatusCode.Equals(HttpStatusCode.NotFound))
             throw new ApplicationException($"BookingProvider::GetBooking, BookingServiceGateway returned not found for bookingId: {bookingId}");
@@ -94,7 +86,7 @@ public class BookingProvider(IBookingServiceGateway gateway) : IBookingProvider
 
     public async Task Cancel(Guid bookingId)
     {
-        var response = await _gateway.Cancel(bookingId.ToString());
+        var response = await gateway.Cancel(bookingId.ToString());
 
         if (response.StatusCode.Equals(HttpStatusCode.BadRequest))
             throw new ApplicationException($"BookingProvider::Cancel, BookingServiceGateway returned 400 status code, Gateway received bad request, Request:{bookingId}, Response: {JsonConvert.SerializeObject(response)}");
@@ -108,7 +100,7 @@ public class BookingProvider(IBookingServiceGateway gateway) : IBookingProvider
 
     public async Task Confirm(ConfirmationRequest request)
     {
-        var result = await _gateway.Confirmation(request);
+        var result = await gateway.Confirmation(request);
 
         if (result.StatusCode.Equals(HttpStatusCode.BadRequest))
             throw new ApplicationException($"BookingProvider::Confirmation, BookingServiceGateway received a bad request, Request:{JsonConvert.SerializeObject(request)}, Response: {JsonConvert.SerializeObject(result)}");

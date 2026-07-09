@@ -1,8 +1,3 @@
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
-
 namespace form_builder.Models.Time;
 
 public class TimePeriod

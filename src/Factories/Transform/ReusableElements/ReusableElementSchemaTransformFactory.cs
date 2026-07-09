@@ -1,16 +1,8 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.Transforms.ReusableElements;
+﻿namespace form_builder.Factories.Transform.ReusableElements;
 
-namespace form_builder.Factories.Transform.ReusableElements;
-
-public class ReusableElementSchemaTransformFactory(
-    IReusableElementTransformDataProvider reusableElementTransformDataProvider)
+public class ReusableElementSchemaTransformFactory(IReusableElementTransformDataProvider reusableElementTransformDataProvider)
     : IReusableElementSchemaTransformFactory
 {
-    private readonly IReusableElementTransformDataProvider _reusableElementTransformDataProvider = reusableElementTransformDataProvider;
-
     public async Task<FormSchema> Transform(FormSchema formSchema)
     {
         // I haven't found a reasonable way to both calculate then changes required and apply them concurrently, 
@@ -64,12 +56,12 @@ public class ReusableElementSchemaTransformFactory(
     {
         var reusableElement = (Reusable)entry;
         if (string.IsNullOrEmpty(reusableElement.Properties.QuestionId))
-            throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no question ID was specified");
+            throw new Exception("ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no question ID was specified");
 
         if (string.IsNullOrEmpty(reusableElement.ElementRef))
-            throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no reusable element reference ID was specified");
+            throw new Exception("ReusableElementSchemaTransformFactory::CreateSubstituteRecord, no reusable element reference ID was specified");
 
-        var substituteElement = await _reusableElementTransformDataProvider.Get(reusableElement.ElementRef);
+        var substituteElement = await reusableElementTransformDataProvider.Get(reusableElement.ElementRef);
 
         if (substituteElement is null)
             throw new Exception($"ReusableElementSchemaTransformFactory::CreateSubstituteRecord, No substitute element could be created for question {reusableElement.Properties.QuestionId}");

@@ -1,18 +1,9 @@
-﻿using System.Text.RegularExpressions;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Models.Actions;
-using form_builder.Services.RetrieveExternalDataService.Entities;
-using form_builder.TagParsers.Formatters;
-
-namespace form_builder.Helpers.ActionsHelpers;
+﻿namespace form_builder.Helpers.ActionsHelpers;
 
 public class ActionHelper(IEnumerable<IFormatter> formatters, ILogger<ActionHelper> logger)
     : IActionHelper
 {
-    private readonly IEnumerable<IFormatter> _formatters = formatters;
-    private readonly ILogger<ActionHelper> _logger = logger;
-    private static Regex TagRegex => new Regex("(?<={{).*?(?=}})", RegexOptions.Compiled);
+    private static Regex TagRegex => new("(?<={{).*?(?=}})", RegexOptions.Compiled);
 
     public RequestEntity GenerateUrl(string baseUrl, FormAnswers formAnswers)
     {
@@ -49,7 +40,7 @@ public class ActionHelper(IEnumerable<IFormatter> formatters, ILogger<ActionHelp
 
                     // Format on ":" split of string
                     if (splitMatch.Length > 1)
-                        answer = _formatters.Get(splitMatch[1]).Parse(answer);
+                        answer = formatters.Get(splitMatch[1]).Parse(answer);
 
                     // Replace and return string...
                     content = content.Replace($"{{{{{m.Groups[0].Value}}}}}", answer);
@@ -82,7 +73,7 @@ public class ActionHelper(IEnumerable<IFormatter> formatters, ILogger<ActionHelp
         if (emailList.Count > 0)
             return emailList.Aggregate((current, email) => current + "," + email);
 
-        _logger.LogInformation($"{formAnswers.FormName}: form action email couldn't find and email in the submitted anwsers");
+        logger.LogInformation($"{formAnswers.FormName}: form action email couldn't find and email in the submitted anwsers");
 
         return string.Empty;
 

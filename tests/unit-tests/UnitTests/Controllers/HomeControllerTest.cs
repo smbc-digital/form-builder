@@ -68,9 +68,6 @@ public class HomeControllerTest
         _mockSessionHelper.Setup(_ => _.GetBrowserSessionId())
             .Returns("d96bceca-f5c6-49f8-98ff-2d823090c198");
 
-        _mockSessionHelper.Setup(_ => _.GetSession())
-            .Returns(mockSession.Object);
-
         var context = new Mock<HttpContext>();
         context.SetupGet(_ => _.Request.Query)
             .Returns(new QueryCollection());

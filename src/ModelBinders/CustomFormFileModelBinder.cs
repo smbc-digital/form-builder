@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-
-namespace form_builder.ModelBinders;
+﻿namespace form_builder.ModelBinders;
 
 public class CustomFormFileModelBinder : IModelBinder
 {

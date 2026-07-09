@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using form_builder.Models;
-using StockportWebapp.Utils;
-
-namespace form_builder.Middleware;
+﻿namespace form_builder.Middleware;
 
 /// <summary>
 /// This is a one off piece of middleware to  ensure 
@@ -37,7 +33,7 @@ public class CookiesComplianceMiddleware(RequestDelegate next, ICookieCompliance
         if (!consentLevels.Tracking)
             RemoveTrackingCookies();
 
-        if (!consentLevels.Targetting)
+        if (!consentLevels.Targeting)
             RemoveTargettingCookies();
 
         return _next(httpContext);

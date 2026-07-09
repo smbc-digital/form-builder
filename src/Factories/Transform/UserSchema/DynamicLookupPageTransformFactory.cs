@@ -1,26 +1,10 @@
-﻿using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Helpers.ActionsHelpers;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
-using form_builder.Providers.Lookup;
-using form_builder.Services.RetrieveExternalDataService.Entities;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
+﻿namespace form_builder.Factories.Transform.UserSchema;
 
-namespace form_builder.Factories.Transform.UserSchema;
-
-public class DynamicLookupPageTransformFactory(
-    IActionHelper actionHelper,
+public class DynamicLookupPageTransformFactory(IActionHelper actionHelper,
     IEnumerable<ILookupProvider> lookupProviders,
     IWebHostEnvironment environment)
     : IUserPageTransformFactory
 {
-    private readonly IActionHelper _actionHelper = actionHelper;
-    private readonly IEnumerable<ILookupProvider> _lookupProviders = lookupProviders;
-    private readonly IWebHostEnvironment _environment = environment;
-
     public async Task<Page> Transform(Page page, FormAnswers convertedAnswers)
     {
         if (page.HasDynamicLookupElements)
@@ -39,17 +23,17 @@ public class DynamicLookupPageTransformFactory(
     {
         LookupSource submitDetails = element.Properties.LookupSources
             .SingleOrDefault(x => x.EnvironmentName
-                .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
+                .Equals(environment.EnvironmentName, StringComparison.OrdinalIgnoreCase));
 
         if (submitDetails is null)
             throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Environment specific details found");
 
-        RequestEntity request = _actionHelper.GenerateUrl(submitDetails.URL, convertedAnswers);
+        RequestEntity request = actionHelper.GenerateUrl(submitDetails.URL, convertedAnswers);
 
         if (string.IsNullOrEmpty(submitDetails.Provider))
             throw new Exception("DynamicLookupPageTransformFactory::AddDynamicOptions, No Provider name given in LookupSources");
 
-        var lookupProvider = _lookupProviders.Get(submitDetails.Provider);
+        var lookupProvider = lookupProviders.Get(submitDetails.Provider);
         OptionsResponse lookupOptionsResult = await lookupProvider.GetAsync(request.Url, submitDetails.AuthToken);
 
         if (!lookupOptionsResult.Options.Any())

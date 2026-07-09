@@ -1,7 +1,3 @@
-using System.Text;
-using form_builder.Configuration;
-using Microsoft.Extensions.Options;
-
 namespace form_builder.Providers.ReferenceNumbers;
 
 /// <summary>
@@ -18,8 +14,8 @@ public class ReferenceNumberProvider(IOptions<FormConfiguration> formConfig) : I
     /// </summary>
     /// <param name="length">Required length of reference number</param>
     /// <param name="caseSensitive">
-    /// Determies whether the ID will contain case sensitive characters. 
-    /// Setting this value to false will result in an reference only containing upper case aplhanumeric characters, this reduces the possible number of reference combinations
+    /// Determines whether the ID will contain case-sensitive characters. 
+    /// Setting this value to false will result in a reference only containing upper case alphanumeric characters, this reduces the possible number of reference combinations
     /// </param>
     /// <returns></returns>
     private string GetReference(int length)

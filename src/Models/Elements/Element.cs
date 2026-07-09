@@ -1,9 +1,3 @@
-using form_builder.Enum;
-using form_builder.Helpers.ElementHelpers;
-using form_builder.Helpers.ViewRender;
-using form_builder.Models.Properties.ElementProperties;
-using form_builder.Validators;
-
 namespace form_builder.Models.Elements;
 
 public class Element : IElement

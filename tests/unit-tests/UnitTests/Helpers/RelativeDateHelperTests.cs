@@ -123,7 +123,7 @@ public class RelativeDateHelperTests
         var result = _relativeDateHelper.GetRelativeDate(relativeDateString);
 
         // Assert
-        Assert.Equal(3, result.Ammount);
+        Assert.Equal(3, result.Amount);
         Assert.Equal(DateInputConstants.YEAR, result.Unit);
         Assert.Equal(DateInputConstants.EXCLUSIVE, result.Type);
     }

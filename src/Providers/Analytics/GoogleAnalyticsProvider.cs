@@ -1,45 +1,35 @@
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Providers.Analytics.Entities;
-using form_builder.Providers.Analytics.Request;
-using Microsoft.Extensions.Options;
-using StockportGovUK.NetStandard.Gateways;
-
 namespace form_builder.Providers.Analytics;
 
-public class GoogleAnalyticsProvider(
-    ILogger<IAnalyticsProvider> logger,
+public class GoogleAnalyticsProvider(ILogger<IAnalyticsProvider> logger,
     IGateway gateway,
     IOptions<GoogleAnalyticsConfiguration> configuration)
     : IAnalyticsProvider
 {
-    public string ProviderName { get => "GA"; }
-    private ILogger<IAnalyticsProvider> _logger = logger;
-    private IGateway _gateway = gateway;
-    private IOptions<GoogleAnalyticsConfiguration> _configuration = configuration;
+    public string ProviderName => "GA";
+    private readonly IOptions<GoogleAnalyticsConfiguration> _configuration = configuration;
 
     public async Task RaiseEventAsync(AnalyticsEventRequest request)
     {
         try
         {
-            var googleanalyticsEventOptions = ToModel(request);
+            var googleAnalyticsEventOptions = ToModel(request);
             var payload = new GoogleAnalyticsEventPayload
             {
                 TrackingId = _configuration.Value.TrackingId,
-                EventCategory = googleanalyticsEventOptions.EventCategory,
-                EventAction = googleanalyticsEventOptions.EventAction,
-                EventLabel = googleanalyticsEventOptions.EventLabel,
+                EventCategory = googleAnalyticsEventOptions.EventCategory,
+                EventAction = googleAnalyticsEventOptions.EventAction,
+                EventLabel = googleAnalyticsEventOptions.EventLabel,
                 ClientId = _configuration.Value.ClientId
             };
 
-            var result = await _gateway.GetAsync(payload.ToString(_configuration.Value.ApiUrl));
+            var result = await gateway.GetAsync(payload.ToString(_configuration.Value.ApiUrl));
 
             if (!result.IsSuccessStatusCode)
                 throw new ApplicationException($"GoogleAnalyticsProvider::RaiseEventAsync gateway returned a unsuccessful status code, {result.StatusCode}");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"GoogleAnalyticsProvider::RaiseEventAsync, failed to send event to {ProviderName} for {request.EventType} on form {request.Form}. Exception: {ex.Message}");
+            logger.LogError($"GoogleAnalyticsProvider::RaiseEventAsync, failed to send event to {ProviderName} for {request.EventType} on form {request.Form}. Exception: {ex.Message}");
         }
     }
 

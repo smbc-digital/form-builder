@@ -1,6 +1,4 @@
-﻿using Amazon.S3.Model;
-
-namespace form_builder.Gateways;
+﻿namespace form_builder.Gateways;
 
 public interface IS3Gateway
 {

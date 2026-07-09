@@ -1,6 +1,4 @@
-using form_builder.Models;
-
-namespace StockportWebapp.Utils;
+namespace form_builder.Helpers.Cookie;
 
 public interface ICookieComplianceHelper
 {
