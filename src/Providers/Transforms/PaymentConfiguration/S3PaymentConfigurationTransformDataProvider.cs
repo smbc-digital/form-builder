@@ -21,7 +21,7 @@ public class S3PaymentConfigurationTransformDataProvider(IS3Gateway s3Gateway,
         }
         catch (AmazonS3Exception e)
         {
-            throw new Exception($"S3PaymentConfigurationTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {environment.EnvironmentName.ToS3EnvPrefix()}/payment-config/paymentconfiguration.{_environment.EnvironmentName.ToS3EnvPrefix()}.json ", e);
+            throw new Exception($"S3PaymentConfigurationTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {environment.EnvironmentName.ToS3EnvPrefix()}/payment-config/paymentconfiguration.{environment.EnvironmentName.ToS3EnvPrefix()}.json ", e);
         }
         catch (Exception e)
         {

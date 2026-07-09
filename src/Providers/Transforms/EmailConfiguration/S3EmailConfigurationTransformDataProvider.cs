@@ -11,7 +11,7 @@ public class S3EmailConfigurationTransformDataProvider(IS3Gateway s3Gateway,
     {
         try
         {
-            var s3Result = await s3Gateway.GetObject(_s3SchemaConfiguration.S3BucketKey, $"{environment.EnvironmentName.ToS3EnvPrefix()}/email-config/emailconfiguration.{_environment.EnvironmentName}.json");
+            var s3Result = await s3Gateway.GetObject(_s3SchemaConfiguration.S3BucketKey, $"{environment.EnvironmentName.ToS3EnvPrefix()}/email-config/emailconfiguration.{environment.EnvironmentName}.json");
 
             using Stream responseStream = s3Result.ResponseStream;
             using StreamReader sr = new(responseStream);
@@ -21,7 +21,7 @@ public class S3EmailConfigurationTransformDataProvider(IS3Gateway s3Gateway,
         }
         catch (AmazonS3Exception e)
         {
-            throw new Exception($"S3EmailConfigurationTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {environment.EnvironmentName.ToS3EnvPrefix()}/email-config/emailconfiguration.{_environment.EnvironmentName.ToS3EnvPrefix()}.json ", e);
+            throw new Exception($"S3EmailConfigurationTransformDataProvider: An error has occured while attempting to get S3 Object, Exception: {e.Message}. {environment.EnvironmentName.ToS3EnvPrefix()}/email-config/emailconfiguration.{environment.EnvironmentName.ToS3EnvPrefix()}.json ", e);
         }
         catch (Exception e)
         {
