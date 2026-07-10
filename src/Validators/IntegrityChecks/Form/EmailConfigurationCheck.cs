@@ -1,9 +1,4 @@
-﻿using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Providers.Transforms.EmailConfiguration;
-
-namespace form_builder.Validators.IntegrityChecks.Form;
+﻿namespace form_builder.Validators.IntegrityChecks.Form;
 
 public class EmailConfigurationCheck(IEmailConfigurationTransformDataProvider emailConfigProvider)
     : IFormSchemaIntegrityCheck

@@ -1,29 +1,11 @@
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.DocumentCreation;
-using form_builder.Models;
-using form_builder.Providers.DocumentCreation;
-using form_builder.Services.DocumentService.Entities;
-
 namespace form_builder.Services.DocumentService;
 
-public class DocumentSummaryService : IDocumentSummaryService
+public class DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers) : IDocumentSummaryService
 {
-    private readonly IDocumentCreation _textfileProvider;
-    private readonly IDocumentCreationHelper _documentCreationHelper;
-    private readonly ISchemaFactory _schemaFactory;
-
-    public DocumentSummaryService(IDocumentCreationHelper documentCreationHelper, IEnumerable<IDocumentCreation> providers, ISchemaFactory schemaFactory)
-    {
-        _textfileProvider = providers
-            .Where(_ => _.DocumentType.Equals(EDocumentType.Txt))
-            .OrderByDescending(_ => _.Priority)
-            .FirstOrDefault();
-
-        _documentCreationHelper = documentCreationHelper;
-        _schemaFactory = schemaFactory;
-    }
+    private readonly IDocumentCreation _textFileProvider = providers
+        .Where(_ => _.DocumentType.Equals(EDocumentType.Txt))
+        .OrderByDescending(_ => _.Priority)
+        .FirstOrDefault();
 
     public async Task<byte[]> GenerateDocument(DocumentSummaryEntity entity) =>
         entity.DocumentType switch
@@ -36,22 +18,22 @@ public class DocumentSummaryService : IDocumentSummaryService
 
     private async Task<byte[]> GenerateTextFile(FormAnswers formAnswers, FormSchema formSchema)
     {
-        var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+        var data = await documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-        return _textfileProvider.CreateDocument(data);
+        return _textFileProvider.CreateDocument(data);
     }
 
     private async Task<byte[]> GenerateHtmlFile(FormAnswers formAnswers, FormSchema formSchema)
     {
-        var data = await _documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
+        var data = await documentCreationHelper.GenerateQuestionAndAnswersList(formAnswers, formSchema);
 
-        return _textfileProvider.CreateHtmlDocument(data, formSchema.FormName);
+        return _textFileProvider.CreateHtmlDocument(data, formSchema.FormName);
     }
 
     private async Task<byte[]> GeneratePdfFile(FormAnswers formAnswers, FormSchema formSchema)
     {
-        var data = await _documentCreationHelper.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
+        var data = await documentCreationHelper.GenerateQuestionAndAnswersListForPdf(formAnswers, formSchema);
 
-        return _textfileProvider.CreatePdfDocument(data, formSchema.FormName);
+        return _textFileProvider.CreatePdfDocument(data, formSchema.FormName);
     }
 }

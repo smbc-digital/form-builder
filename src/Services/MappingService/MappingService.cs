@@ -1,22 +1,8 @@
-﻿using System.Dynamic;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Mappers;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.MappingService.Entities;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
+﻿using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Services.MappingService;
 
-public class MappingService(
-    IDistributedCacheWrapper distributedCache,
+public class MappingService(IDistributedCacheWrapper distributedCache,
     IPageHelper pageHelper,
     IElementMapper elementMapper,
     ISchemaFactory schemaFactory,
@@ -24,13 +10,6 @@ public class MappingService(
     ILogger<MappingService> logger)
     : IMappingService
 {
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-    private readonly IElementMapper _elementMapper = elementMapper;
-    private readonly ISchemaFactory _schemaFactory = schemaFactory;
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IWebHostEnvironment _environment = environment;
-    private ILogger<MappingService> _logger = logger;
-
     public async Task<MappingEntity> Map(string cacheKey, string form, FormAnswers convertedAnswers = null, FormSchema baseForm = null)
     {
         if (convertedAnswers is null || baseForm is null)
@@ -49,7 +28,7 @@ public class MappingService(
         var (convertedAnswers, baseForm) = await GetFormAnswers(form, cacheKey);
 
         AppointmentType appointmentType = bookingElement.Properties.AppointmentTypes
-            .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+            .GetAppointmentTypeForEnvironment(environment.EnvironmentName);
 
         if (appointmentType.NeedsAppointmentIdMapping)
             MapAppointmentId(appointmentType, convertedAnswers);
@@ -74,18 +53,18 @@ public class MappingService(
 
     private async Task<(FormAnswers convertedAnswers, FormSchema baseForm)> GetFormAnswers(string form, string cacheKey)
     {
-        var baseForm = await _schemaFactory.Build(form);
+        var baseForm = await schemaFactory.Build(form);
 
         if (string.IsNullOrEmpty(cacheKey))
             throw new ApplicationException($"MappingService::GetFormAnswers:{cacheKey}, Session has expired");
 
-        var sessionData = _distributedCache.GetString(cacheKey);
+        var sessionData = distributedCache.GetString(cacheKey);
         if (sessionData is null)
             throw new ApplicationException($"MappingService::GetFormAnswer:{cacheKey}, Session data is null");
 
         var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(sessionData);
 
-        _logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}:{cacheKey} " +
+        logger.LogInformation($"{nameof(MappingService)}::{nameof(GetFormAnswers)}:{cacheKey} " +
                                $"Cached Form Answers before processing Reduced Answers - {JsonConvert.SerializeObject(convertedAnswers.Pages)}");
 
         convertedAnswers.Pages = convertedAnswers.GetReducedAnswers(baseForm);
@@ -93,12 +72,12 @@ public class MappingService(
         IEnumerable<string> visitedPageSlugs = convertedAnswers.Pages?.Select(page => page.PageSlug);
         foreach (var pageSlug in visitedPageSlugs)
         {
-            await _schemaFactory.TransformPage(baseForm.GetPage(_pageHelper, pageSlug, form), convertedAnswers);
+            await schemaFactory.TransformPage(baseForm.GetPage(pageHelper, pageSlug, form), convertedAnswers);
         }
 
         convertedAnswers.FormName = form;
         if (convertedAnswers.Pages is null || !convertedAnswers.Pages.Any())
-            _logger.LogInformation($"MappingService::GetFormAnswers:: Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {cacheKey}");
+            logger.LogInformation($"MappingService::GetFormAnswers:: Reduced Answers returned empty or null list, Creating submit data but no answers collected. Form {form}, Session {cacheKey}");
 
         return (convertedAnswers, baseForm);
     }
@@ -143,7 +122,7 @@ public class MappingService(
             .FirstOrDefault(_ =>
                 _.Properties.QuestionId is not null &&
                 _.Properties.QuestionId.Contains(bookingElement.Properties.CustomerAddressId));
-        customer.Address = await _elementMapper.GetAnswerStringValue(addressElement, formAnswers);
+        customer.Address = await elementMapper.GetAnswerStringValue(addressElement, formAnswers);
 
         return customer;
     }
@@ -188,7 +167,7 @@ public class MappingService(
             if (element.Type.Equals(EElementType.AddAnother))
                 return await CheckAndCreateForAddAnother(splitTargets[0], element, formAnswers, obj);
 
-            object answerValue = await _elementMapper.GetAnswerValue(element, formAnswers);
+            object answerValue = await elementMapper.GetAnswerValue(element, formAnswers);
 
             if (answerValue is not null && obj.TryGetValue(splitTargets[0], out var objectValue))
             {
@@ -247,7 +226,7 @@ public class MappingService(
     private async Task<IDictionary<string, dynamic>> CheckAndCreateForFileUpload(string target, IElement element, FormAnswers formAnswers, IDictionary<string, dynamic> obj)
     {
         object objectValue;
-        var value = await _elementMapper.GetAnswerValue(element, formAnswers);
+        var value = await elementMapper.GetAnswerValue(element, formAnswers);
 
         if (obj.TryGetValue(target, out objectValue))
         {

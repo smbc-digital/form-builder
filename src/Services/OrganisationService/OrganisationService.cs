@@ -1,28 +1,11 @@
-﻿using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Providers.Organisation;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
-using Newtonsoft.Json;
+﻿namespace form_builder.Services.OrganisationService;
 
-namespace form_builder.Services.OrganisationService;
-
-public class OrganisationService(
-    IDistributedCacheWrapper distributedCache,
+public class OrganisationService(IDistributedCacheWrapper distributedCache,
     IEnumerable<IOrganisationProvider> organisationProviders,
     IPageHelper pageHelper,
     IPageFactory pageFactory)
     : IOrganisationService
 {
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IEnumerable<IOrganisationProvider> _organisationProviders = organisationProviders;
-    private readonly IPageFactory _pageFactory = pageFactory;
-
     public async Task<ProcessRequestEntity> ProcessOrganisation(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string cacheKey, string path)
     {
         viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
@@ -43,7 +26,7 @@ public class OrganisationService(
         string cacheKey,
         string path)
     {
-        var cachedAnswers = _distributedCache.GetString(cacheKey);
+        var cachedAnswers = distributedCache.GetString(cacheKey);
         var organisationElement = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Organisation));
         var convertedAnswers = cachedAnswers is null
             ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -58,7 +41,7 @@ public class OrganisationService(
 
         if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
         {
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
             {
@@ -69,7 +52,7 @@ public class OrganisationService(
         if (!currentPage.IsValid)
         {
             var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
-            var model = await _pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers, cachedSearchResults.ToList());
+            var model = await pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers, cachedSearchResults.ToList());
 
             return new ProcessRequestEntity
             {
@@ -78,7 +61,7 @@ public class OrganisationService(
             };
         }
 
-        _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+        pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
 
         return new ProcessRequestEntity
         {
@@ -93,7 +76,7 @@ public class OrganisationService(
         string cacheKey,
         string path)
     {
-        var cachedAnswers = _distributedCache.GetString(cacheKey);
+        var cachedAnswers = distributedCache.GetString(cacheKey);
         var organisationElement = currentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.Organisation));
 
         var convertedAnswers = cachedAnswers is null
@@ -104,7 +87,7 @@ public class OrganisationService(
 
         if (currentPage.IsValid && organisationElement.Properties.Optional && string.IsNullOrEmpty(organisation))
         {
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
             {
@@ -114,7 +97,7 @@ public class OrganisationService(
 
         if (!currentPage.IsValid)
         {
-            var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers);
+            var formModel = await pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers);
 
             formModel.Path = currentPage.PageSlug;
             formModel.FormName = baseForm.FormName;
@@ -142,15 +125,15 @@ public class OrganisationService(
         {
             try
             {
-                searchResults = (await _organisationProviders.Get(organisationElement.Properties.OrganisationProvider).SearchAsync(organisation)).ToList<object>();
+                searchResults = (await organisationProviders.Get(organisationElement.Properties.OrganisationProvider).SearchAsync(organisation)).ToList<object>();
             }
             catch (Exception e)
             {
                 throw new ApplicationException($"OrganisationService.ProcessInitialOrganisation:: An exception has occurred while attempting to perform organisation lookup, Exception: {e.Message}");
             }
 
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
-            _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, cacheKey, baseForm.BaseURL);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, cacheKey, baseForm.BaseURL);
         }
 
         return new ProcessRequestEntity

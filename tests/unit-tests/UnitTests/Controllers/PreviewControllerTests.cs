@@ -4,6 +4,7 @@ using form_builder.Controllers.Preview;
 using form_builder.Models;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.PreviewService;
+using form_builder.Services.PreviewService.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;

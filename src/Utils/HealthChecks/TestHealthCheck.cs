@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-
 namespace form_builder.Utils.HealthChecks;
 
 public class TestHealthCheck : IHealthCheck

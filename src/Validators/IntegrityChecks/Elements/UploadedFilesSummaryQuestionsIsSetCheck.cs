@@ -1,6 +1,3 @@
-using form_builder.Enum;
-using form_builder.Models.Elements;
-
 namespace form_builder.Validators.IntegrityChecks.Elements;
 
 public class UploadedFilesSummaryQuestionsIsSetCheck : IElementSchemaIntegrityCheck

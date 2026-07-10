@@ -1,30 +1,12 @@
-﻿using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Providers.Address;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
-using Newtonsoft.Json;
+﻿namespace form_builder.Services.AddressService;
 
-namespace form_builder.Services.AddressService;
-
-public class AddressService(
-    IDistributedCacheWrapper distributedCache,
+public class AddressService(IDistributedCacheWrapper distributedCache,
     IPageHelper pageHelper,
     IEnumerable<IAddressProvider> addressProviders,
     IPageFactory pageFactory,
     ILogger<AddressService> logger)
     : IAddressService
 {
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IEnumerable<IAddressProvider> _addressProviders = addressProviders;
-    private readonly IPageFactory _pageFactory = pageFactory;
-    private readonly ILogger<AddressService> _logger = logger;
-
     public async Task<ProcessRequestEntity> ProcessAddress(
         Dictionary<string, dynamic> viewModel,
         Page currentPage,
@@ -52,11 +34,11 @@ public class AddressService(
         string guid,
         string path)
     {
-        _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+        pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
         if (!currentPage.IsValid)
         {
-            var cachedAnswers = _distributedCache.GetString(guid);
+            var cachedAnswers = distributedCache.GetString(guid);
 
             var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -64,7 +46,7 @@ public class AddressService(
 
             var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-            var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
+            var model = await pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
             return new ProcessRequestEntity
             {
@@ -86,7 +68,7 @@ public class AddressService(
         string guid,
         string path)
     {
-        var cachedAnswers = _distributedCache.GetString(guid);
+        var cachedAnswers = distributedCache.GetString(guid);
 
         var convertedAnswers = cachedAnswers is null
             ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -105,7 +87,7 @@ public class AddressService(
 
         if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
         {
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
             return new ProcessRequestEntity
             {
                 Page = currentPage
@@ -114,7 +96,7 @@ public class AddressService(
 
         if (currentPage.IsValid && addressElement.Properties.Optional && string.IsNullOrEmpty(address) && !string.IsNullOrEmpty(postcode))
         {
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
             return new ProcessRequestEntity
             {
                 Page = currentPage
@@ -125,7 +107,7 @@ public class AddressService(
         {
             var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-            var model = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
+            var model = await pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, cachedSearchResults.ToList());
 
             return new ProcessRequestEntity
             {
@@ -134,7 +116,7 @@ public class AddressService(
             };
         }
 
-        _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+        pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
 
         return new ProcessRequestEntity
         {
@@ -149,7 +131,7 @@ public class AddressService(
         string guid,
         string path)
     {
-        var cachedAnswers = _distributedCache.GetString(guid);
+        var cachedAnswers = distributedCache.GetString(guid);
 
         var convertedAnswers = cachedAnswers is null
             ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -159,7 +141,7 @@ public class AddressService(
 
         if (!currentPage.IsValid)
         {
-            var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, null);
+            var formModel = await pageFactory.Build(currentPage, viewModel, baseForm, guid, convertedAnswers, null);
 
             return new ProcessRequestEntity
             {
@@ -172,7 +154,7 @@ public class AddressService(
 
         if (addressElement.Properties.Optional && string.IsNullOrEmpty(postcode))
         {
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
             return new ProcessRequestEntity
             {
                 Page = currentPage
@@ -198,36 +180,36 @@ public class AddressService(
                 if (fullUKPostcode)
                     postcode = postcode + ":full";
 
-                addressProv = _addressProviders.Get(addressElement.Properties.AddressProvider);
+                addressProv = addressProviders.Get(addressElement.Properties.AddressProvider);
 
                 if (addressProv is null)
                 {
-                    _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider could not be set for {addressElement.Properties.AddressProvider}");
+                    logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider could not be set for {addressElement.Properties.AddressProvider}");
                     throw new ApplicationException($"AddressService::ProcessSearchAddress, An exception has occurred while attempting to get address provider = '{addressElement.Properties.AddressProvider}'");
                 }
 
-                _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider set successfully for {addressElement.Properties.AddressProvider}");
+                logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Address Provider set successfully for {addressElement.Properties.AddressProvider}");
             }
             catch (Exception exception)
             {
-                _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected exception getting address provider {addressElement.Properties.AddressProvider}");
+                logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected exception getting address provider {addressElement.Properties.AddressProvider}");
                 throw exception;
             }
 
             try
             {
-                _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Starting search async {postcode}");
+                logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Starting search async {postcode}");
                 addressResults = new List<object>(await addressProv.SearchAsync(postcode));
 
             }
             catch (Exception exception)
             {
-                _logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected error occurred searching for {postcode}");
+                logger.LogWarning($"{nameof(AddressService)}::{nameof(ProcessSearchAddress)}: Unexpected error occurred searching for {postcode}");
                 throw exception;
             }
 
-            _pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
-            _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid, baseForm.BaseURL);
+            pageHelper.SaveAnswers(viewModel, guid, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", addressResults, guid, baseForm.BaseURL);
         }
 
         if (!addressResults.Any() && !addressElement.Properties.DisableManualAddress)

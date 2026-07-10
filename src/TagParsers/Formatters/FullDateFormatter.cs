@@ -1,5 +1,3 @@
-using form_builder.Extensions;
-
 namespace form_builder.TagParsers.Formatters;
 
 public class FullDateFormatter : IFormatter

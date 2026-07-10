@@ -1,7 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-
-namespace form_builder.Validators.IntegrityChecks.Form;
+﻿namespace form_builder.Validators.IntegrityChecks.Form;
 
 public class EnabledForTimeWindowCheck : IFormSchemaIntegrityCheck
 {
@@ -18,14 +15,14 @@ public class EnabledForTimeWindowCheck : IFormSchemaIntegrityCheck
             result.AddFailureMessage("EnabledFor Check, Unknown EnabledFor type configured.");
         }
 
-        var TimeWindows = schema.EnvironmentAvailabilities
+        var timeWindows = schema.EnvironmentAvailabilities
             .Where(_ => _.EnabledFor is not null)
             .SelectMany(_ => _.EnabledFor)
             .Where(_ => _.Type.Equals(EEnabledFor.TimeWindow));
 
-        if (TimeWindows.Any())
+        if (timeWindows.Any())
         {
-            foreach (var timeWindow in TimeWindows)
+            foreach (var timeWindow in timeWindows)
             {
                 if (timeWindow.Properties is null)
                 {

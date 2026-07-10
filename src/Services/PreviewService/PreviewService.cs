@@ -1,25 +1,6 @@
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.Cookie;
-using form_builder.Models;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.FileUploadService;
-using form_builder.Services.PageService.Entities;
-using form_builder.Validators;
-using form_builder.ViewModels;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-
 namespace form_builder.Services.PreviewService;
 
-public class PreviewService(
-    IEnumerable<IElementValidator> validators,
+public class PreviewService(IEnumerable<IElementValidator> validators,
     IFileUploadService fileUploadService,
     IDistributedCacheWrapper distributedCache,
     ISchemaFactory schemaFactory,
@@ -28,51 +9,44 @@ public class PreviewService(
     IPageFactory pageFactory)
     : IPreviewService
 {
-    private readonly IEnumerable<IElementValidator> _validators = validators;
-    private readonly IPageFactory _pageContentFactory = pageFactory;
-    private readonly IFileUploadService _fileUploadService = fileUploadService;
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-    private readonly ISchemaFactory _schemaFactory = schemaFactory;
-    private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration = previewModeConfiguration;
-    private readonly ICookieHelper _cookieHelper = cookieHelper;
-    private int _expiryMinutes => 30;
+    private static int _expiryMinutes => 30;
 
     public async Task<FormBuilderViewModel> GetPreviewPage()
     {
-        if (!_previewModeConfiguration.Value.IsEnabled)
-            throw new ApplicationException("PreviewService: Request to access preview service recieved but preview service is disabled in current enviroment");
+        if (!previewModeConfiguration.Value.IsEnabled)
+            throw new ApplicationException("PreviewService: Request to access preview service received but preview service is disabled in current environment");
 
         var previewPage = PreviewPage();
-        return await _pageContentFactory.Build(previewPage, new Dictionary<string, dynamic>(), PreviewModeFormSchema(previewPage), string.Empty, new FormAnswers());
+        return await pageFactory.Build(previewPage, new Dictionary<string, dynamic>(), PreviewModeFormSchema(previewPage), string.Empty, new FormAnswers());
     }
 
     public void ExitPreviewMode()
     {
-        if (!_previewModeConfiguration.Value.IsEnabled)
-            throw new ApplicationException("PreviewService: Request to exit preview mode recieved but preview service is disabled in current enviroment");
+        if (!previewModeConfiguration.Value.IsEnabled)
+            throw new ApplicationException("PreviewService: Request to exit preview mode received but preview service is disabled in current environment");
 
-        var cookiePreviewKeyValue = _cookieHelper.GetCookie(CookieConstants.PREVIEW_MODE);
-        _cookieHelper.DeleteCookie(cookiePreviewKeyValue);
-        _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{cookiePreviewKeyValue}");
+        var cookiePreviewKeyValue = cookieHelper.GetCookie(CookieConstants.PREVIEW_MODE);
+        cookieHelper.DeleteCookie(cookiePreviewKeyValue);
+        distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{cookiePreviewKeyValue}");
     }
 
     public async Task<ProcessPreviewRequestEntity> VerifyPreviewRequest(IEnumerable<CustomFormFile> fileUpload)
     {
-        if (!_previewModeConfiguration.Value.IsEnabled)
-            throw new ApplicationException("PreviewService: Request to upload from in preview service recieved but preview service is disabled in current enviroment");
+        if (!previewModeConfiguration.Value.IsEnabled)
+            throw new ApplicationException("PreviewService: Request to upload from in preview service received but preview service is disabled in current environment");
 
         var viewModel = new Dictionary<string, dynamic>();
 
         if (fileUpload is not null && fileUpload.Any())
-            viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
+            viewModel = fileUploadService.AddFiles(viewModel, fileUpload);
 
         var previewPage = PreviewPage();
         var previewFormSchema = PreviewModeFormSchema(previewPage);
-        previewPage.Validate(viewModel, _validators, previewFormSchema);
+        previewPage.Validate(viewModel, validators, previewFormSchema);
 
         if (!previewPage.IsValid)
         {
-            var formModel = await _pageContentFactory.Build(previewPage, viewModel, previewFormSchema, string.Empty, new FormAnswers());
+            var formModel = await pageFactory.Build(previewPage, viewModel, previewFormSchema, string.Empty, new FormAnswers());
 
             return new ProcessPreviewRequestEntity
             {
@@ -85,20 +59,20 @@ public class PreviewService(
         List<DocumentModel> uploadedPreviewDocument = viewModel.Values.First();
 
         var fileContent = Convert.FromBase64String(uploadedPreviewDocument.First().Content);
-        await _distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", fileContent, new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(_expiryMinutes) });
+        await distributedCache.SetAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", fileContent, new DistributedCacheEntryOptions { AbsoluteExpiration = DateTime.Now.AddMinutes(_expiryMinutes) });
 
         try
         {
-            var formSchema = await _schemaFactory.Build(previewKey);
+            var formSchema = await schemaFactory.Build(previewKey);
             formSchema.BaseURL = previewKey;
-            await _distributedCache.SetStringAbsoluteAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", JsonConvert.SerializeObject(formSchema), _expiryMinutes);
+            await distributedCache.SetStringAbsoluteAsync($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}", JsonConvert.SerializeObject(formSchema), _expiryMinutes);
         }
         catch (Exception e)
         {
-            _distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}");
+            distributedCache.Remove($"{ESchemaType.FormJson.ToESchemaTypePrefix()}{previewKey}");
             var errorPage = PreviewErrorPage(e.Message, e.Source);
             var errorSchema = PreviewModeFormSchema(errorPage);
-            var formModel = await _pageContentFactory.Build(errorPage, viewModel, errorSchema, string.Empty, new FormAnswers());
+            var formModel = await pageFactory.Build(errorPage, viewModel, errorSchema, string.Empty, new FormAnswers());
             return new ProcessPreviewRequestEntity
             {
                 Page = errorPage,
@@ -107,7 +81,7 @@ public class PreviewService(
             };
         }
 
-        _cookieHelper.AddCookie(CookieConstants.PREVIEW_MODE, previewKey);
+        cookieHelper.AddCookie(CookieConstants.PREVIEW_MODE, previewKey);
 
         return new ProcessPreviewRequestEntity
         {
@@ -153,7 +127,7 @@ public class PreviewService(
             .Build();
 
         if (errorSource.Equals(LibConstants.NEWTONSOFT_LIBRARY_NAME))
-            errorMessage = $"The provided file is not valid JSON data format. Check the provided file JSON data strcuture. {SystemConstants.NEW_LINE_CHARACTER} {errorMessage}";
+            errorMessage = $"The provided file is not valid JSON data format. Check the provided file JSON data structure. {SystemConstants.NEW_LINE_CHARACTER} {errorMessage}";
 
         string[] errorMessages = errorMessage.Split(SystemConstants.NEW_LINE_CHARACTER);
 

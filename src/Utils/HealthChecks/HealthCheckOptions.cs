@@ -1,9 +1,3 @@
-using System.Net.Mime;
-using System.Reflection;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Newtonsoft.Json;
-
 namespace form_builder.Utils.HealthChecks;
 
 public static class HealthCheckConfig

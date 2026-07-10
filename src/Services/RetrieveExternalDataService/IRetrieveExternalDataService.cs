@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.Models.Actions;
-
-namespace form_builder.Services.RetrieveExternalDataService;
+﻿namespace form_builder.Services.RetrieveExternalDataService;
 
 public interface IRetrieveExternalDataService
 {

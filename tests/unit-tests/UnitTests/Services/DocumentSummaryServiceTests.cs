@@ -1,6 +1,5 @@
 ﻿using form_builder.Builders;
 using form_builder.Enum;
-using form_builder.Factories.Schema;
 using form_builder.Helpers.DocumentCreation;
 using form_builder.Models;
 using form_builder.Providers.DocumentCreation;
@@ -15,7 +14,6 @@ namespace form_builder_tests.UnitTests.Services;
 public class DocumentSummaryServiceTests
 {
     private readonly Mock<IDocumentCreationHelper> _mockDocumentCreationHelper = new();
-    private readonly Mock<ISchemaFactory> _mockSchemaFactory = new();
     private readonly Mock<IDocumentCreation> _mockProvider = new();
     private readonly DocumentSummaryService _documentSummaryService;
     private readonly FormSchema _formSchema;
@@ -59,16 +57,13 @@ public class DocumentSummaryServiceTests
             .WithFirstPageSlug("page-1")
             .Build();
 
-        _mockSchemaFactory.Setup(_ => _.TransformPage(page1, It.IsAny<FormAnswers>())).ReturnsAsync(page1);
-        _mockSchemaFactory.Setup(_ => _.TransformPage(page2, It.IsAny<FormAnswers>())).ReturnsAsync(page2);
-
         _mockDocumentCreationHelper
             .Setup(_ => _.GenerateQuestionAndAnswersList(It.IsAny<FormAnswers>(), It.IsAny<FormSchema>()))
             .ReturnsAsync(new List<string>());
 
         _mockProvider.Setup(_ => _.CreateDocument(It.IsAny<List<string>>())).Returns(new byte[1]);
 
-        _documentSummaryService = new DocumentSummaryService(_mockDocumentCreationHelper.Object, providers, _mockSchemaFactory.Object);
+        _documentSummaryService = new DocumentSummaryService(_mockDocumentCreationHelper.Object, providers);
     }
 
     [Fact]
@@ -82,7 +77,7 @@ public class DocumentSummaryServiceTests
     }
 
     [Fact]
-    public async Task GenerateDocument_ShouldCallTextfileProvider_WhenDocumentTypeIsTxt()
+    public async Task GenerateDocument_ShouldCallTextFileProvider_WhenDocumentTypeIsTxt()
     {
         // Act
         await _documentSummaryService.GenerateDocument(new DocumentSummaryEntity { FormSchema = _formSchema, DocumentType = EDocumentType.Txt, PreviousAnswers = _formAnswers });

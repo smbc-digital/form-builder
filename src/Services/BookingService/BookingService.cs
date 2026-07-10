@@ -1,32 +1,6 @@
-﻿using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Exceptions;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Booking;
-using form_builder.Models.Elements;
-using form_builder.Providers.Booking;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.BookingService.Entities;
-using form_builder.Services.MappingService;
-using form_builder.Services.PageService.Entities;
-using form_builder.TagParsers;
-using form_builder.Extensions;
-using form_builder.Utils.Hash;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
+﻿namespace form_builder.Services.BookingService;
 
-namespace form_builder.Services.BookingService;
-
-public class BookingService(
-    IDistributedCacheWrapper distributedCache,
+public class BookingService(IDistributedCacheWrapper distributedCache,
     IPageHelper pageHelper,
     IEnumerable<IBookingProvider> bookingProviders,
     IPageFactory pageFactory,
@@ -40,18 +14,7 @@ public class BookingService(
     IEnumerable<ITagParser> tagParsers)
     : IBookingService
 {
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IEnumerable<IBookingProvider> _bookingProviders = bookingProviders;
-    private readonly IPageFactory _pageFactory = pageFactory;
-    private readonly IMappingService _mappingService = mappingService;
-    private readonly IWebHostEnvironment _environment = environment;
-    private readonly ISchemaFactory _schemaFactory = schemaFactory;
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-    private readonly IHashUtil _hashUtil = hashUtil;
     private readonly DistributedCacheExpirationConfiguration _distributedCacheExpirationConfiguration = distributedCacheExpirationConfiguration.Value;
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
 
     public async Task<BookingProcessEntity> Get(string baseUrl, Page currentPage, string cacheKey)
     {
@@ -62,21 +25,21 @@ public class BookingService(
         List<AvailabilityDayResponse> appointmentTimes = new();
 
         var appointmentType = bookingElement.Properties.AppointmentTypes
-            .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+            .GetAppointmentTypeForEnvironment(environment.EnvironmentName);
 
         var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:" +
                                          $"{bookingElement.Properties.LimitNextAvailableFromDate}:" +
                                          $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
                                          $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
-        var cachedAnswers = _distributedCache.GetString(cacheKey);
+        var cachedAnswers = distributedCache.GetString(cacheKey);
         FormAnswers convertedAnswers = new();
         if (cachedAnswers is not null)
         {
             convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             if (appointmentType.NeedsAppointmentIdMapping)
-                _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+                mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
             if (convertedAnswers.FormData.ContainsKey(bookingInformationCacheKey))
             {
@@ -88,7 +51,7 @@ public class BookingService(
             }
         }
 
-        var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+        var bookingProvider = bookingProviders.Get(bookingElement.Properties.BookingProvider);
 
         var nextAvailability = await RetrieveNextAvailability(bookingElement, bookingProvider, appointmentType);
 
@@ -118,7 +81,7 @@ public class BookingService(
             bookingInformation.AppointmentEndTime = DateTime.Today.Add(nextAvailability.DayResponse.AppointmentTimes.First().EndTime);
         }
 
-        _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, cacheKey, baseUrl);
+        pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, cacheKey, baseUrl);
 
         return new BookingProcessEntity { BookingInfo = new() { bookingInformation } };
     }
@@ -139,30 +102,30 @@ public class BookingService(
 
     public async Task ProcessMonthRequest(Dictionary<string, object> viewModel, string form, string path)
     {
-        var baseForm = await _schemaFactory.Build(form);
+        var baseForm = await schemaFactory.Build(form);
 
         if (baseForm is null)
             throw new ApplicationException($"Requested form '{form}' could not be found.");
 
-        var currentPage = baseForm.GetPage(_pageHelper, path, form);
+        var currentPage = baseForm.GetPage(pageHelper, path, form);
         if (currentPage is null)
             throw new ApplicationException($"Requested path '{path}' object could not be found for form '{form}'");
 
-        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string browserSessionId = sessionHelper.GetBrowserSessionId();
 
         if (string.IsNullOrEmpty(browserSessionId))
             throw new ApplicationException("BookingService::ProcessMonthRequest Session has expired");
 
         string cacheKey = $"{form}::{browserSessionId}";
-        var cachedAnswers = _distributedCache.GetString(cacheKey);
+        var cachedAnswers = distributedCache.GetString(cacheKey);
 
         if (cachedAnswers is null)
             throw new ApplicationException("BookingService::ProcessMonthRequest, Session data is null");
 
         var convertedAnswers = JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
-        await _schemaFactory.TransformPage(currentPage, convertedAnswers);
-        foreach (var tagParser in _tagParsers)
+        await schemaFactory.TransformPage(currentPage, convertedAnswers);
+        foreach (var tagParser in tagParsers)
         {
             await tagParser.Parse(currentPage, convertedAnswers, baseForm);
         }
@@ -187,17 +150,17 @@ public class BookingService(
             throw new ApplicationException("BookingService::ProcessMonthRequest, Invalid request for appointment search, Start date provided is before today");
 
         var appointmentType = bookingElement.Properties.AppointmentTypes
-            .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+            .GetAppointmentTypeForEnvironment(environment.EnvironmentName);
 
         if (appointmentType.NeedsAppointmentIdMapping)
-            _mappingService.MapAppointmentId(appointmentType, convertedAnswers);
+            mappingService.MapAppointmentId(appointmentType, convertedAnswers);
 
         var bookingInformationCacheKey = $"{bookingElement.Properties.QuestionId}:{appointmentType.AppointmentId}:" +
                                          $"{bookingElement.Properties.LimitNextAvailableFromDate}:" +
                                          $"{appointmentType.OptionalResources.CreateKeyFromResources()}:" +
                                          $"{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}";
 
-        var appointmentTimes = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
+        var appointmentTimes = await bookingProviders.Get(bookingElement.Properties.BookingProvider)
             .GetAvailability(new AvailabilityRequest
             {
                 StartDate = requestedMonth.Date,
@@ -221,15 +184,15 @@ public class BookingService(
             AppointmentStartTime = cachedBookingInformation.AppointmentStartTime
         };
 
-        _pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, cacheKey, baseForm.BaseURL);
+        pageHelper.SaveFormData(bookingInformationCacheKey, bookingInformation, cacheKey, baseForm.BaseURL);
     }
 
     public async Task<CancelledAppointmentInformation> ValidateCancellationRequest(string formName, Guid bookingGuid, string hash)
     {
-        if (!_hashUtil.Check(bookingGuid.ToString(), hash))
+        if (!hashUtil.Check(bookingGuid.ToString(), hash))
             throw new ApplicationException($"BookingService::ValidateCancellationRequest,Booking Guid does not match hash, unable to verify request integrity");
 
-        var formSchema = await _schemaFactory.Build(formName);
+        var formSchema = await schemaFactory.Build(formName);
 
         if (formSchema is null)
             throw new ApplicationException($"BookingService::ValidateCancellationRequest, Provided formname '{formName}' is not valid and cannot be resolved");
@@ -239,12 +202,12 @@ public class BookingService(
             .SelectMany(page => page.Elements)
             .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
 
-        var bookingInformation = await _bookingProviders.Get(provider).GetBooking(bookingGuid);
+        var bookingInformation = await bookingProviders.Get(provider).GetBooking(bookingGuid);
 
         if (!bookingInformation.CanCustomerCancel)
             throw new BookingCannotBeCancelledException($"BookingSerivice::ValidateCancellationRequest, booking: {bookingGuid} specified it can not longer be cancelled");
 
-        var envStartPageUrl = $"https://{_httpContextAccessor.HttpContext.Request.Host}{_environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}";
+        var envStartPageUrl = $"https://{httpContextAccessor.HttpContext.Request.Host}{environment.EnvironmentName.ToReturnUrlPrefix()}/{formName}/{formSchema.StartPageUrl}";
 
         return new CancelledAppointmentInformation
         {
@@ -262,10 +225,10 @@ public class BookingService(
 
     public async Task Cancel(string formName, Guid bookingGuid, string hash)
     {
-        if (!_hashUtil.Check(bookingGuid.ToString(), hash))
+        if (!hashUtil.Check(bookingGuid.ToString(), hash))
             throw new ApplicationException($"BookingService::Cancel, Booking Guid does not match hash, unable to verify request integrity");
 
-        var formSchema = await _schemaFactory.Build(formName);
+        var formSchema = await schemaFactory.Build(formName);
 
         if (formSchema is null)
             throw new ApplicationException($"BookingService::Cancel, Provided formname '{formName}' is not valid and cannot be resolved");
@@ -275,7 +238,7 @@ public class BookingService(
             .SelectMany(page => page.Elements)
             .First(element => element.Type.Equals(EElementType.Booking)).Properties.BookingProvider;
 
-        await _bookingProviders.Get(provider).Cancel(bookingGuid);
+        await bookingProviders.Get(provider).Cancel(bookingGuid);
     }
 
     private async Task<BookingNextAvailabilityEntity> RetrieveNextAvailability(IElement bookingElement, IBookingProvider bookingProvider, AppointmentType appointmentType)
@@ -284,7 +247,7 @@ public class BookingService(
                                                $"{bookingElement.Properties.LimitNextAvailableFromDate}-" +
                                                $"{appointmentType.AppointmentId}{appointmentType.OptionalResources.CreateKeyFromResources()}";
 
-        var bookingNextAvailabilityCachedResponse = _distributedCache.GetString(bookingNextAvailabilityCachedKey);
+        var bookingNextAvailabilityCachedResponse = distributedCache.GetString(bookingNextAvailabilityCachedKey);
         if (bookingNextAvailabilityCachedResponse is not null)
             return JsonConvert.DeserializeObject<BookingNextAvailabilityEntity>(bookingNextAvailabilityCachedResponse);
 
@@ -311,12 +274,12 @@ public class BookingService(
         catch (BookingNoAvailabilityException)
         {
             result = new BookingNextAvailabilityEntity { BookingHasNoAvailableAppointments = true };
-            await _distributedCache.SetStringAbsoluteAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
+            await distributedCache.SetStringAbsoluteAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.BookingNoAppointmentsAvailable);
             return result;
         }
 
         result = new BookingNextAvailabilityEntity { DayResponse = nextAvailability };
-        await _distributedCache.SetStringAbsoluteAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
+        await distributedCache.SetStringAbsoluteAsync(bookingNextAvailabilityCachedKey, JsonConvert.SerializeObject(result), _distributedCacheExpirationConfiguration.Booking);
         return result;
     }
 
@@ -324,17 +287,17 @@ public class BookingService(
     {
         if (!currentPage.IsValid)
         {
-            var cachedAnswers = _distributedCache.GetString(cacheKey);
+            var cachedAnswers = distributedCache.GetString(cacheKey);
 
             var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }
                 : JsonConvert.DeserializeObject<FormAnswers>(cachedAnswers);
 
             var appointmentType = element.Properties.AppointmentTypes
-                .GetAppointmentTypeForEnvironment(_environment.EnvironmentName);
+                .GetAppointmentTypeForEnvironment(environment.EnvironmentName);
 
-            await _schemaFactory.TransformPage(currentPage, convertedAnswers);
-            foreach (var tagParser in _tagParsers)
+            await schemaFactory.TransformPage(currentPage, convertedAnswers);
+            foreach (var tagParser in tagParsers)
             {
                 await tagParser.Parse(currentPage, convertedAnswers, baseForm);
             }
@@ -349,7 +312,7 @@ public class BookingService(
 
             var cachedBookingInformation = JsonConvert.DeserializeObject<BookingInformation>(convertedAnswers.FormData[$"{bookingInformationCacheKey}"].ToString());
             var bookingInformation = new List<object> { cachedBookingInformation };
-            var model = await _pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, null, bookingInformation);
+            var model = await pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, null, bookingInformation);
 
             return new ProcessRequestEntity
             {
@@ -362,7 +325,7 @@ public class BookingService(
         {
             await ReserveAppointment(element, viewModel, baseForm.BaseURL, cacheKey);
 
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
 
             return new ProcessRequestEntity
             {
@@ -370,7 +333,7 @@ public class BookingService(
             };
         }
 
-        _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+        pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
 
         return new ProcessRequestEntity
         {
@@ -389,7 +352,7 @@ public class BookingService(
     {
         await ReserveAppointment(element, viewModel, baseForm.BaseURL, cacheKey);
 
-        _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+        pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
 
         return new ProcessRequestEntity { Page = currentPage };
     }
@@ -407,7 +370,7 @@ public class BookingService(
         var currentlySelectedBookingStartTime = bookingElement.StartTimeQuestionId;
         var currentlySelectedBookingEndTime = bookingElement.EndTimeQuestionId;
 
-        var bookingRequest = await _mappingService.MapBookingRequest(cacheKey, bookingElement, viewModel, form);
+        var bookingRequest = await mappingService.MapBookingRequest(cacheKey, bookingElement, viewModel, form);
         var location = await GetReservedBookingLocation(bookingElement, bookingRequest);
         viewModel.Add(bookingElement.AppointmentLocation, location);
 
@@ -435,7 +398,7 @@ public class BookingService(
         viewModel.Remove(reservedBookingStartTime);
         viewModel.Remove(reservedBookingEndTime);
 
-        var result = await _bookingProviders.Get(bookingElement.Properties.BookingProvider)
+        var result = await bookingProviders.Get(bookingElement.Properties.BookingProvider)
             .Reserve(bookingRequest);
 
         viewModel.Add(reservedBookingAppointmentId, bookingRequest.AppointmentId.ToString());
@@ -449,7 +412,7 @@ public class BookingService(
 
     private async Task<string> GetReservedBookingLocation(Booking bookingElement, BookingRequest bookingRequest)
     {
-        var bookingProvider = _bookingProviders.Get(bookingElement.Properties.BookingProvider);
+        var bookingProvider = bookingProviders.Get(bookingElement.Properties.BookingProvider);
         var location = await bookingProvider.GetLocation(new LocationRequest
         {
             AppointmentId = bookingRequest.AppointmentId,

@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.Services.PageService.Entities;
-
-namespace form_builder.Services.AddAnotherService;
+﻿namespace form_builder.Services.AddAnotherService;
 
 public interface IAddAnotherService
 {

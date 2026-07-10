@@ -1,26 +1,15 @@
-using form_builder.Constants;
-using form_builder.Models;
-using form_builder.Validators.IntegrityChecks.Behaviours;
-using form_builder.Validators.IntegrityChecks.Elements;
-using form_builder.Validators.IntegrityChecks.Form;
-
 namespace form_builder.Validators.IntegrityChecks;
 
-public class FormSchemaIntegrityValidator(
-    IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks,
+public class FormSchemaIntegrityValidator(IEnumerable<IFormSchemaIntegrityCheck> formSchemaIntegrityChecks,
     IEnumerable<IBehaviourSchemaIntegrityCheck> behaviorSchemaIntegrityChecks,
     IEnumerable<IElementSchemaIntegrityCheck> elementSchemaIntegrityChecks)
     : IFormSchemaIntegrityValidator
 {
-    IEnumerable<IFormSchemaIntegrityCheck> _formSchemaIntegrityChecks = formSchemaIntegrityChecks;
-    IEnumerable<IBehaviourSchemaIntegrityCheck> _behaviorSchemaIntegrityChecks = behaviorSchemaIntegrityChecks;
-    IEnumerable<IElementSchemaIntegrityCheck> _elementSchemaIntegrityChecks = elementSchemaIntegrityChecks;
-
     public async Task Validate(FormSchema schema)
     {
         List<IntegrityCheckResult> integrityCheckResults = new();
 
-        foreach (var integrityCheck in _formSchemaIntegrityChecks)
+        foreach (var integrityCheck in formSchemaIntegrityChecks)
         {
             integrityCheckResults.Add(await integrityCheck.ValidateAsync(schema));
         }
@@ -29,7 +18,7 @@ public class FormSchemaIntegrityValidator(
         {
             if (page.Behaviours is not null)
             {
-                foreach (var integrityCheck in _behaviorSchemaIntegrityChecks)
+                foreach (var integrityCheck in behaviorSchemaIntegrityChecks)
                 {
                     integrityCheckResults.Add(await integrityCheck.ValidateAsync(page.Behaviours));
                 }
@@ -45,14 +34,14 @@ public class FormSchemaIntegrityValidator(
                     {
                         foreach (var nestedElement in element.Properties.Elements)
                         {
-                            foreach (var integrityCheck in _elementSchemaIntegrityChecks)
+                            foreach (var integrityCheck in elementSchemaIntegrityChecks)
                             {
                                 integrityCheckResults.Add(await integrityCheck.ValidateAsync(nestedElement));
                             }
                         }
                     }
 
-                    foreach (var integrityCheck in _elementSchemaIntegrityChecks)
+                    foreach (var integrityCheck in elementSchemaIntegrityChecks)
                     {
                         integrityCheckResults.Add(await integrityCheck.ValidateAsync(element));
                     }

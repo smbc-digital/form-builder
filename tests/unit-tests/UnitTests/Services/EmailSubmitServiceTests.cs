@@ -29,10 +29,8 @@ namespace form_builder_tests.UnitTests.Services;
 
 public class EmailSubmitServiceTests
 {
-    private readonly Mock<IMappingService> _mappingService = new();
     private readonly Mock<IEmailHelper> _mockEmailHelper = new();
     private readonly Mock<IElementMapper> _mockElementMapper = new();
-    private readonly Mock<ISessionHelper> _sessionHelper = new();
     private readonly Mock<IEmailProvider> _emailProvider = new();
     private readonly Mock<IDocumentSummaryService> _documentSummaryService = new();
     private readonly Mock<IReferenceNumberProvider> _referenceNumberProvider = new();
@@ -57,14 +55,6 @@ public class EmailSubmitServiceTests
             .Setup(m => m.GetEnumerator())
             .Returns(() => tagParserItems.GetEnumerator());
 
-        _sessionHelper
-            .Setup(_ => _.GetBrowserSessionId())
-            .Returns("123454");
-
-        _mappingService
-            .Setup(_ => _.Map(It.IsAny<string>(), It.IsAny<string>(), null, null))
-            .ReturnsAsync(new MappingEntity { BaseForm = new FormSchema() });
-
         _documentSummaryService
             .Setup(_ => _.GenerateDocument(It.IsAny<DocumentSummaryEntity>()))
             .ReturnsAsync(new byte[] { 0x1a, 0x0f, 0x00 });
@@ -86,11 +76,8 @@ public class EmailSubmitServiceTests
                 Recipient = new List<string> { "google" }
             });
 
-        _emailSubmitService = new EmailSubmitService(
-            _mappingService.Object,
-            _mockEmailHelper.Object,
+        _emailSubmitService = new EmailSubmitService(_mockEmailHelper.Object,
             _mockElementMapper.Object,
-            _sessionHelper.Object,
             _pageHelper.Object,
             _emailProvider.Object,
             _referenceNumberProvider.Object,

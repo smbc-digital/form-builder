@@ -1,7 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-
-namespace form_builder.Services.DocumentService.Entities;
+﻿namespace form_builder.Services.DocumentService.Entities;
 
 public class DocumentSummaryEntity
 {

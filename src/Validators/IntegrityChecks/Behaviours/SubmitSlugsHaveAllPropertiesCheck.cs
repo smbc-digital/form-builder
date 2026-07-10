@@ -1,11 +1,7 @@
-using form_builder.Models;
-
 namespace form_builder.Validators.IntegrityChecks.Behaviours;
 
 public class SubmitSlugsHaveAllPropertiesCheck(IWebHostEnvironment environment) : IBehaviourSchemaIntegrityCheck
 {
-    readonly IWebHostEnvironment _environment = environment;
-
     public IntegrityCheckResult Validate(List<Behaviour> behaviours)
     {
         IntegrityCheckResult result = new();
@@ -15,17 +11,17 @@ public class SubmitSlugsHaveAllPropertiesCheck(IWebHostEnvironment environment) 
             foreach (var submitSlug in behaviour.SubmitSlugs)
             {
                 if (string.IsNullOrEmpty(submitSlug.URL))
-                    result.AddFailureMessage($"No URL found for SubmitSlug in environmment '{submitSlug.Environment}'");
+                    result.AddFailureMessage($"No URL found for SubmitSlug in environment '{submitSlug.Environment}'");
 
                 if (string.IsNullOrEmpty(submitSlug.AuthToken))
-                    result.AddFailureMessage($"No auth token found for SubmitSlug in environmment '{submitSlug.Environment}'");
+                    result.AddFailureMessage($"No auth token found for SubmitSlug in environment '{submitSlug.Environment}'");
 
-                if (!_environment.IsEnvironment("local") &&
+                if (!environment.IsEnvironment("local") &&
                     !submitSlug.Environment.Equals("local", StringComparison.OrdinalIgnoreCase) &&
                     !submitSlug.URL.StartsWith("https://"))
                 {
                     result.AddFailureMessage(
-                        $"SubmitUrl '{submitSlug.URL}' must start with https for environmment '{submitSlug.Environment}'");
+                        $"SubmitUrl '{submitSlug.URL}' must start with https for environment '{submitSlug.Environment}'");
                 }
             }
         }

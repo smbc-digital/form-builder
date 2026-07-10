@@ -1,8 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Models.Actions;
-
-namespace form_builder.Validators.IntegrityChecks.Form;
+﻿namespace form_builder.Validators.IntegrityChecks.Form;
 
 public class TemplatedEmailActionCheck : IFormSchemaIntegrityCheck
 {

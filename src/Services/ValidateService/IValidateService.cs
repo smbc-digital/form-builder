@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.Models.Actions;
-
-namespace form_builder.Services.ValidateService;
+﻿namespace form_builder.Services.ValidateService;
 
 public interface IValidateService
 {

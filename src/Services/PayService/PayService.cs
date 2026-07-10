@@ -1,30 +1,8 @@
-﻿using System.Net;
-using form_builder.Configuration;
-using form_builder.Exceptions;
-using form_builder.Extensions;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.PaymentHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Providers.PaymentProvider;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using form_builder.TagParsers;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Serilog;
-using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Gateways.Enums;
-using StockportGovUK.NetStandard.Gateways.MailingService;
-using StockportGovUK.NetStandard.Gateways.MailingServiceProxy;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
-using StockportGovUK.NetStandard.Gateways.Models.GenericReport;
-using StockportGovUK.NetStandard.Gateways.Models.Mail;
-using EPaymentStatus = StockportGovUK.NetStandard.Gateways.Models.FormBuilder.EPaymentStatus;
+﻿using EPaymentStatus = StockportGovUK.NetStandard.Gateways.Models.FormBuilder.EPaymentStatus;
 
 namespace form_builder.Services.PayService;
 
-public class PayService(
-    IEnumerable<IPaymentProvider> paymentProviders,
+public class PayService(IEnumerable<IPaymentProvider> paymentProviders,
     ILogger<PayService> logger,
     IGateway gateway,
     ISessionHelper sessionHelper,
@@ -39,60 +17,50 @@ public class PayService(
     IOptions<ErrorEmailConfiguration> errorEmailConfiguration)
     : IPayService
 {
-    private readonly IGateway _gateway = gateway;
-    private readonly ILogger<PayService> _logger = logger;
-    private readonly IEnumerable<IPaymentProvider> _paymentProviders = paymentProviders;
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-    private readonly IMappingService _mappingService = mappingService;
-    private readonly IWebHostEnvironment _hostingEnvironment = hostingEnvironment;
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IPaymentHelper _paymentHelper = paymentHelper;
     private readonly PaymentConfiguration _paymentConfiguration = paymentConfiguration.Value;
     private readonly SubmissionServiceConfiguration _submissionServiceConfiguration = submissionServiceConfiguration.Value;
-    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
-    private readonly IMailingServiceProxyGateway _mailingServiceGateway = mailingServiceGateway;
     private readonly ErrorEmailConfiguration _errorEmailConfiguration = errorEmailConfiguration.Value;
 
     public async Task<string> ProcessPayment(MappingEntity formData, string form, string path, string reference, string cacheKey)
     {
-        var formAnswers = _pageHelper.GetSavedAnswers(cacheKey);
-        var paymentInformation = JsonConvert.SerializeObject(await _paymentHelper.GetFormPaymentInformation(form, formData.FormAnswers, formData.BaseForm));
-        paymentInformation = _tagParsers.Aggregate(paymentInformation, (current, tagParser) => tagParser.ParseString(current, formAnswers));
+        var formAnswers = pageHelper.GetSavedAnswers(cacheKey);
+        var paymentInformation = JsonConvert.SerializeObject(await paymentHelper.GetFormPaymentInformation(form, formData.FormAnswers, formData.BaseForm));
+        paymentInformation = tagParsers.Aggregate(paymentInformation, (current, tagParser) => tagParser.ParseString(current, formAnswers));
         var parsedPaymentInformation = JsonConvert.DeserializeObject<PaymentInformation>(paymentInformation);
         var paymentProvider = GetFormPaymentProvider(parsedPaymentInformation);
 
-        _logger.LogInformation($"PayService::ProcessPayment:{cacheKey} {form} - Creating payment request - for {reference}");
+        logger.LogInformation($"PayService::ProcessPayment:{cacheKey} {form} - Creating payment request - for {reference}");
 
         return await paymentProvider.GeneratePaymentUrl(form, path, reference, cacheKey, parsedPaymentInformation);
     }
 
     public async Task<string> ProcessPaymentResponse(string form, string responseCode, string reference)
     {
-        _logger.LogInformation($"PayService::ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
+        logger.LogInformation($"PayService::ProcessPaymentResponse: {form} - Payment response received - {responseCode} for {reference}");
 
-        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string browserSessionId = sessionHelper.GetBrowserSessionId();
         string formSessionId = $"{form}::{browserSessionId}";
 
         if (string.IsNullOrWhiteSpace(formSessionId))
-            _logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Session expired for {reference}");
+            logger.LogWarning($"PayService.ProcessPaymentResponse: {form} - Session expired for {reference}");
 
-        var mappingEntity = await _mappingService.Map(formSessionId, form, null, null);
+        var mappingEntity = await mappingService.Map(formSessionId, form, null, null);
         if (mappingEntity is null)
             throw new Exception($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)} No mapping entity found for {form}");
 
-        var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
-        var paymentInformation = await _paymentHelper.GetFormPaymentInformation(form, mappingEntity.FormAnswers, mappingEntity.BaseForm);
+        var currentPage = mappingEntity.BaseForm.GetPage(pageHelper, mappingEntity.FormAnswers.Path, form);
+        var paymentInformation = await paymentHelper.GetFormPaymentInformation(form, mappingEntity.FormAnswers, mappingEntity.BaseForm);
 
-        _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers, mappingEntity.BaseForm));
+        tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers, mappingEntity.BaseForm));
 
-        var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
+        var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, hostingEnvironment.EnvironmentName.ToS3EnvPrefix());
             
         var paymentProvider = GetFormPaymentProvider(paymentInformation);
 
         if (string.IsNullOrWhiteSpace(postUrl.CallbackUrl))
             throw new ArgumentException($"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, Callback url has not been specified");
 
-        _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+        gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
 
         try
         {
@@ -104,7 +72,7 @@ public class PayService(
                     $"{nameof(PayService)}::{nameof(ProcessPaymentResponse)}, " +
                     $"Callback failed for case {reference}: {callbackResponse.ReasonPhrase}");
 
-            _logger.LogInformation($"PayService::ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
+            logger.LogInformation($"PayService::ProcessPaymentResponse:{form} - Payment callback handled successfully for {reference}");
         }
         catch (PaymentDeclinedException)
         {
@@ -125,7 +93,7 @@ public class PayService(
             throw new PaymentCallbackException(ex.Message);
         }
 
-        _pageHelper.SavePaymentAmount(formSessionId, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
+        pageHelper.SavePaymentAmount(formSessionId, paymentInformation.Settings.Amount, mappingEntity.BaseForm.PaymentAmountMapping);
         return reference;
     }
 
@@ -139,25 +107,25 @@ public class PayService(
 
         try
         {
-            var result = await _gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });
+            var result = await gateway.PostAsync(callbackUrl, new PostPaymentUpdateRequest { Reference = reference, PaymentStatus = paymentStatus });
             if (!result.IsSuccessStatusCode)
             {
                 string log = $"{nameof(PayService)}::{nameof(HandleCallback)}, " +
                              $"Payment callback for {paymentStatus} failed with status code: {result.StatusCode}, " +
                              $"Payment reference {reference}, Response: {JsonConvert.SerializeObject(result)}";
 
-                _logger.LogError(log);
+                logger.LogError(log);
                 foreach (string recipient in _errorEmailConfiguration.Recipients)
                 {
-                    _mailingServiceGateway.Send(new Mail
+                    mailingServiceGateway.Send(new Mail
                     {
                         Payload = JsonConvert.SerializeObject(new GenericReportMailModel
                         {
-                            Header = $"Payment callback failure - {_hostingEnvironment.EnvironmentName}",
+                            Header = $"Payment callback failure - {hostingEnvironment.EnvironmentName}",
                             RecipientAddress = recipient,
                             Reference = reference,
                             FormText = new[] { log },
-                            Subject = $"Payment callback failure - {_hostingEnvironment.EnvironmentName}"
+                            Subject = $"Payment callback failure - {hostingEnvironment.EnvironmentName}"
                         }),
                         Template = EMailTemplate.GenericReport
                     });
@@ -173,18 +141,18 @@ public class PayService(
                          $"Payment status was {paymentStatus}, " +
                          $"failed with Exception: {exception.Message}, Payment reference {reference}";
 
-            _logger.LogError(log);
+            logger.LogError(log);
             foreach (string recipient in _errorEmailConfiguration.Recipients)
             {
-                _mailingServiceGateway.Send(new Mail
+                mailingServiceGateway.Send(new Mail
                 {
                     Payload = JsonConvert.SerializeObject(new GenericReportMailModel
                     {
-                        Header = $"Payment callback exception - {_hostingEnvironment.EnvironmentName}",
+                        Header = $"Payment callback exception - {hostingEnvironment.EnvironmentName}",
                         RecipientAddress = recipient,
                         Reference = reference,
                         FormText = new[] { log },
-                        Subject = $"Payment callback exception - {_hostingEnvironment.EnvironmentName}"
+                        Subject = $"Payment callback exception - {hostingEnvironment.EnvironmentName}"
                     }),
                     Template = EMailTemplate.GenericReport
                 });
@@ -196,16 +164,16 @@ public class PayService(
 
     private IPaymentProvider GetFormPaymentProvider(PaymentInformation paymentInfo)
     {
-        if (!_paymentProviders.Any())
+        if (!paymentProviders.Any())
             throw new Exception(
                 $"{nameof(PayService)}::{nameof(GetFormPaymentProvider)}, " +
                 $"No payment providers are configured");
 
-        if (_paymentConfiguration.FakePayment && _paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
-            return _paymentProviders
+        if (_paymentConfiguration.FakePayment && paymentProviders.Any(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName)))
+            return paymentProviders
                 .FirstOrDefault(_ => _.ProviderName.Equals(_paymentConfiguration.FakeProviderName));
 
-        var paymentProvider = _paymentProviders
+        var paymentProvider = paymentProviders
             .FirstOrDefault(_ => _.ProviderName.Equals(paymentInfo.PaymentProvider));
 
         if (paymentProvider is null)

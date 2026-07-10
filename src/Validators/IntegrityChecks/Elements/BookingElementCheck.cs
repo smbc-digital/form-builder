@@ -1,14 +1,7 @@
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Models.Elements;
-
 namespace form_builder.Validators.IntegrityChecks.Elements;
 
-public class BookingElementCheck(IWebHostEnvironment enviroment) : IElementSchemaIntegrityCheck
+public class BookingElementCheck(IWebHostEnvironment environment) : IElementSchemaIntegrityCheck
 {
-    private readonly IWebHostEnvironment _environment = enviroment;
-
     public IntegrityCheckResult Validate(IElement element)
     {
         IntegrityCheckResult result = new();
@@ -28,7 +21,7 @@ public class BookingElementCheck(IWebHostEnvironment enviroment) : IElementSchem
 
         AppointmentType appointmentTypeForEnv = element.Properties.AppointmentTypes
             .FirstOrDefault(appointmentType => appointmentType.Environment
-                .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
+                .Equals(environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
         if (appointmentTypeForEnv is null)
         {

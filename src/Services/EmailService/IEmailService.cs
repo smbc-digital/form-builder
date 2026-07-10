@@ -1,6 +1,4 @@
-﻿using form_builder.Models.Actions;
-
-namespace form_builder.Services.EmailService;
+﻿namespace form_builder.Services.EmailService;
 
 public interface IEmailService
 {

@@ -1,12 +1,8 @@
-using System.Text.RegularExpressions;
-using form_builder.Models;
-using form_builder.TagParsers.Formatters;
-
 namespace form_builder.TagParsers;
 
 public class LinkTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser, ISimpleTagParser
 {
-    public Regex Regex => new Regex("(?<={{)LINK:.*?(?=}})", RegexOptions.Compiled);
+    public Regex Regex => new("(?<={{)LINK:.*?(?=}})", RegexOptions.Compiled);
     public string _htmlContent => "<a class='govuk-link' rel='noreferrer noopener' target='_blank' href='https://{0}'>{1}</a>";
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

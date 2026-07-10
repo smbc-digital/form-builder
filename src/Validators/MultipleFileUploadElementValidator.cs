@@ -1,19 +1,8 @@
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
-using Newtonsoft.Json;
-
 namespace form_builder.Validators;
 
 public class MultipleFileUploadElementValidator(ISessionHelper sessionHelper, IDistributedCacheWrapper distributedCache)
     : IElementValidator
 {
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-
     public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
     {
         if (!element.Type.Equals(EElementType.MultipleFileUpload))
@@ -33,9 +22,9 @@ public class MultipleFileUploadElementValidator(ISessionHelper sessionHelper, ID
 
         if (value is null)
         {
-            string browserSessionId = _sessionHelper.GetBrowserSessionId();
+            string browserSessionId = sessionHelper.GetBrowserSessionId();
             string formSessionId = $"{baseForm.BaseURL}::{browserSessionId}";
-            var cachedAnswers = _distributedCache.GetString(formSessionId);
+            var cachedAnswers = distributedCache.GetString(formSessionId);
 
             var convertedAnswers = cachedAnswers is null
                 ? new FormAnswers { Pages = new List<PageAnswers>() }

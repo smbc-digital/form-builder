@@ -9,6 +9,7 @@ using form_builder.Providers.StorageProvider;
 using form_builder.Services.FileUploadService;
 using form_builder.Services.PageService.Entities;
 using form_builder.Services.PreviewService;
+using form_builder.Services.PreviewService.Entities;
 using form_builder.Validators;
 using form_builder.ViewModels;
 using Microsoft.Extensions.Caching.Distributed;
@@ -62,7 +63,7 @@ public class PreviewServiceTests
 
         var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.GetPreviewPage());
 
-        Assert.Equal("PreviewService: Request to access preview service recieved but preview service is disabled in current enviroment", result.Message);
+        Assert.Equal("PreviewService: Request to access preview service received but preview service is disabled in current environment", result.Message);
     }
 
     [Fact]
@@ -87,7 +88,7 @@ public class PreviewServiceTests
 
         var result = Assert.Throws<ApplicationException>(() => _service.ExitPreviewMode());
 
-        Assert.Equal("PreviewService: Request to exit preview mode recieved but preview service is disabled in current enviroment", result.Message);
+        Assert.Equal("PreviewService: Request to exit preview mode received but preview service is disabled in current environment", result.Message);
     }
 
     [Fact]
@@ -118,11 +119,11 @@ public class PreviewServiceTests
 
         var result = await Assert.ThrowsAsync<ApplicationException>(() => _service.VerifyPreviewRequest(new List<CustomFormFile>()));
 
-        Assert.Equal("PreviewService: Request to upload from in preview service recieved but preview service is disabled in current enviroment", result.Message);
+        Assert.Equal("PreviewService: Request to upload from in preview service received but preview service is disabled in current environment", result.Message);
     }
 
     [Fact]
-    public async Task VerifyPreviewRequest_ShouldRetuenView_WhenRequest_IsNotValid()
+    public async Task VerifyPreviewRequest_ShouldReturnView_WhenRequest_IsNotValid()
     {
         var result = await _service.VerifyPreviewRequest(new List<CustomFormFile>());
 

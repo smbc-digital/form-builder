@@ -1,8 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.Services.BookingService.Entities;
-using form_builder.Services.PageService.Entities;
-
-namespace form_builder.Services.BookingService;
+﻿namespace form_builder.Services.BookingService;
 
 public interface IBookingService
 {
