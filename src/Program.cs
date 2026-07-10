@@ -1,18 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using form_builder.Middleware;
-using form_builder.ModelBinders.Providers;
-using form_builder.Utils.HealthChecks;
-using form_builder.Utils.Startup;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.FeatureManagement;
-using StockportGovUK.AspNetCore.Middleware.App;
-using Serilog;
-using Serilog.Events;
-using StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws;
-using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
+﻿using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 var builder = WebApplication.CreateBuilder(args);
 

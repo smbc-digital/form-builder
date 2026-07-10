@@ -1,5 +1,3 @@
-using form_builder.Models.Booking;
-
 namespace form_builder.ViewModels;
 
 public class CalendarDayViewModel

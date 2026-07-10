@@ -1,46 +1,37 @@
-﻿using form_builder.Helpers.Session;
-using form_builder.Services.MappingService;
-using form_builder.Services.SubmitService;
+﻿namespace form_builder.Workflows.SubmitWorkflow;
 
-namespace form_builder.Workflows.SubmitWorkflow;
-
-public class SubmitWorkflow(
-    ISubmitService submitService,
+public class SubmitWorkflow(ISubmitService submitService,
     IMappingService mappingService,
     ISessionHelper sessionHelper)
     : ISubmitWorkflow
 {
-    private readonly ISubmitService _submitService = submitService;
-    private readonly IMappingService _mappingService = mappingService;
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-
     public async Task<string> Submit(string form)
     {
-        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string browserSessionId = sessionHelper.GetBrowserSessionId();
         if (string.IsNullOrEmpty(browserSessionId))
             throw new ApplicationException("A Session GUID was not provided.");
 
         string formSessionId = $"{form}::{browserSessionId}";
 
-        await _submitService.PreProcessSubmission(form, formSessionId);
+        await submitService.PreProcessSubmission(form, formSessionId);
 
-        var data = await _mappingService.Map(formSessionId, form, null, null);
+        var data = await mappingService.Map(formSessionId, form, null, null);
 
-        return await _submitService.ProcessSubmission(data, form, formSessionId);
+        return await submitService.ProcessSubmission(data, form, formSessionId);
     }
 
     public async Task SubmitWithoutSubmission(string form)
     {
-        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string browserSessionId = sessionHelper.GetBrowserSessionId();
         if (string.IsNullOrEmpty(browserSessionId))
             throw new ApplicationException("A Session GUID was not provided.");
 
         string formSessionId = $"{form}::{browserSessionId}";
 
-        await _submitService.PreProcessSubmission(form, formSessionId);
+        await submitService.PreProcessSubmission(form, formSessionId);
 
-        var data = await _mappingService.Map(formSessionId, form, null, null);
+        var data = await mappingService.Map(formSessionId, form, null, null);
 
-        await _submitService.ProcessWithoutSubmission(data, form, formSessionId);
+        await submitService.ProcessWithoutSubmission(data, form, formSessionId);
     }
 }

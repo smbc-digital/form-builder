@@ -1,6 +1,3 @@
-using form_builder.Enum;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
-
 namespace form_builder.ViewModels;
 
 public class TimePeriodViewModel

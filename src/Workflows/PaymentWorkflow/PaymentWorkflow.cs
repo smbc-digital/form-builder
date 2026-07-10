@@ -1,35 +1,24 @@
-using form_builder.Helpers.Session;
-using form_builder.Services.MappingService;
-using form_builder.Services.PayService;
-using form_builder.Services.SubmitService;
-
 namespace form_builder.Workflows.PaymentWorkflow;
 
-public class PaymentWorkflow(
-    IPayService payService,
+public class PaymentWorkflow(IPayService payService,
     ISubmitService submitService,
     IMappingService mappingService,
     ISessionHelper sessionHelper)
     : IPaymentWorkflow
 {
-    private readonly ISubmitService _submitService = submitService;
-    private readonly IMappingService _mappingService = mappingService;
-    private readonly IPayService _payService = payService;
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-
     public async Task<string> Submit(string form, string path)
     {
-        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string browserSessionId = sessionHelper.GetBrowserSessionId();
         if (string.IsNullOrEmpty(browserSessionId))
             throw new ApplicationException("A Session GUID was not provided.");
 
         string formSessionId = $"{form}::{browserSessionId}";
 
-        await _submitService.PreProcessSubmission(form, formSessionId);
+        await submitService.PreProcessSubmission(form, formSessionId);
 
-        var data = await _mappingService.Map(formSessionId, form, null, null);
-        var paymentReference = await _submitService.PaymentSubmission(data, form, formSessionId);
+        var data = await mappingService.Map(formSessionId, form, null, null);
+        var paymentReference = await submitService.PaymentSubmission(data, form, formSessionId);
 
-        return await _payService.ProcessPayment(data, form, path, paymentReference, formSessionId);
+        return await payService.ProcessPayment(data, form, path, paymentReference, formSessionId);
     }
 }
