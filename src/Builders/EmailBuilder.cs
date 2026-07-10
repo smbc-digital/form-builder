@@ -1,4 +1,6 @@
-﻿namespace form_builder.Builders;
+﻿using ContentDisposition = MimeKit.ContentDisposition;
+
+namespace form_builder.Builders;
 
 public class EmailBuilder
 {

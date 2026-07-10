@@ -1,14 +1,10 @@
-using System.Text.RegularExpressions;
-using form_builder.Models;
-using form_builder.TagParsers.Formatters;
-
 namespace form_builder.TagParsers;
 
 public class FormAnswerOptionalTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    private readonly bool allowOptional = true;
+    private readonly bool _allowOptional = true;
 
-    public Regex Regex => new Regex("(?<={{)QUESTIONOPT:.*?(?=}})", RegexOptions.Compiled);
+    public Regex Regex => new("(?<={{)QUESTIONOPT:.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
     {
@@ -17,26 +13,24 @@ public class FormAnswerOptionalTagParser(IEnumerable<IFormatter> formatters) : T
         var leadingParagraphRegexIsMatch = !string.IsNullOrEmpty(page.LeadingParagraph) && Regex.IsMatch(page.LeadingParagraph);
 
         if (leadingParagraphRegexIsMatch)
-        {
-            page.LeadingParagraph = Parse(page.LeadingParagraph, answersDictionary, Regex, allowOptional);
-        }   
+            page.LeadingParagraph = Parse(page.LeadingParagraph, answersDictionary, Regex, _allowOptional);
 
-        page.Elements.Select((element) =>
+        page.Elements.Select(element =>
         {
             if (!string.IsNullOrEmpty(element.Properties?.Text))
-                element.Properties.Text = Parse(element.Properties.Text, answersDictionary, Regex, allowOptional);
+                element.Properties.Text = Parse(element.Properties.Text, answersDictionary, Regex, _allowOptional);
 
             if (!string.IsNullOrEmpty(element.Properties?.Hint))
-                element.Properties.Hint = Parse(element.Properties.Hint, answersDictionary, Regex, allowOptional);
+                element.Properties.Hint = Parse(element.Properties.Hint, answersDictionary, Regex, _allowOptional);
 
             if (!string.IsNullOrEmpty(element.Properties?.LimitNextAvailableFromDate))
-                element.Properties.LimitNextAvailableFromDate = Parse(element.Properties.LimitNextAvailableFromDate, answersDictionary, Regex, allowOptional);
+                element.Properties.LimitNextAvailableFromDate = Parse(element.Properties.LimitNextAvailableFromDate, answersDictionary, Regex, _allowOptional);
 
             if (element.Properties.ListItems.Any())
             {
                 for (int item = 0; item < element.Properties.ListItems.Count; item++)
                 {
-                    element.Properties.ListItems[item] = Parse(element.Properties.ListItems[item], answersDictionary, Regex, allowOptional);
+                    element.Properties.ListItems[item] = Parse(element.Properties.ListItems[item], answersDictionary, Regex, _allowOptional);
                 }
             }
 
@@ -58,7 +52,7 @@ public class FormAnswerOptionalTagParser(IEnumerable<IFormatter> formatters) : T
 
             try
             {
-                var replacedContent = Parse(questionId, answersDictionary, Regex, allowOptional);
+                var replacedContent = Parse(questionId, answersDictionary, Regex, _allowOptional);
                 updatedContent = updatedContent.Replace(questionId, replacedContent);
             }
             catch (Exception)

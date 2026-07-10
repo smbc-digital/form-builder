@@ -1,12 +1,8 @@
-using System.Text.RegularExpressions;
-using form_builder.Models;
-using form_builder.TagParsers.Formatters;
-
 namespace form_builder.TagParsers;
 
 public class FormAnswerTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser
 {
-    public Regex Regex => new Regex("(?<={{)QUESTION:.*?(?=}})", RegexOptions.Compiled);
+    public Regex Regex => new("(?<={{)QUESTION:.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
     {

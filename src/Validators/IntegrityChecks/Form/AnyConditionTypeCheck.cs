@@ -1,5 +1,4 @@
-using form_builder.Enum;
-using form_builder.Models;
+using Condition = form_builder.Models.Condition;
 
 namespace form_builder.Validators.IntegrityChecks.Form;
 

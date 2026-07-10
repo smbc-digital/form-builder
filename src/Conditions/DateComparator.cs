@@ -1,4 +1,6 @@
-﻿namespace form_builder.Conditions;
+﻿using Condition = form_builder.Models.Condition;
+
+namespace form_builder.Conditions;
 
 public static class DateComparator
 {

@@ -1,23 +1,15 @@
-﻿using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Helpers.RelativeDateHelper;
-using form_builder.Models;
-using form_builder.Models.Elements;
-
-namespace form_builder.Validators;
+﻿namespace form_builder.Validators;
 
 public class DateInputIsFutureDateAfterRelativeValidator(IRelativeDateHelper relativeDateHelper) : IElementValidator
 {
-    private IRelativeDateHelper _relativeDateHelper = relativeDateHelper;
-
     public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
     {
         if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsFutureDateAfterRelative))
             return new ValidationResult { IsValid = true };
 
-        if (_relativeDateHelper.HasValidDate(element, viewModel))
+        if (relativeDateHelper.HasValidDate(element, viewModel))
         {
-            var relativeDate = _relativeDateHelper.GetRelativeDate(element.Properties.IsFutureDateAfterRelative);
+            var relativeDate = relativeDateHelper.GetRelativeDate(element.Properties.IsFutureDateAfterRelative);
             var minimumDate = DateTime.Today;
 
             if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
@@ -29,8 +21,8 @@ public class DateInputIsFutureDateAfterRelativeValidator(IRelativeDateHelper rel
             if (relativeDate.Unit.Equals(DateInputConstants.DAY))
                 minimumDate = DateTime.Today.AddDays(relativeDate.Amount);
 
-            if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && minimumDate > _relativeDateHelper.GetChosenDate(element, viewModel) ||
-                relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && minimumDate >= _relativeDateHelper.GetChosenDate(element, viewModel))
+            if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && minimumDate > relativeDateHelper.GetChosenDate(element, viewModel) ||
+                relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && minimumDate >= relativeDateHelper.GetChosenDate(element, viewModel))
             {
                 return new ValidationResult
                 {

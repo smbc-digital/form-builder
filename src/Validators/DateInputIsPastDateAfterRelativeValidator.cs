@@ -1,23 +1,15 @@
-﻿using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Helpers.RelativeDateHelper;
-using form_builder.Models;
-using form_builder.Models.Elements;
-
-namespace form_builder.Validators;
+﻿namespace form_builder.Validators;
 
 public class DateInputIsPastDateAfterRelativeValidator(IRelativeDateHelper relativeDateHelper) : IElementValidator
 {
-    private IRelativeDateHelper _relativeDateHelper = relativeDateHelper;
-
     public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
     {
         if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsPastDateAfterRelative))
             return new ValidationResult { IsValid = true };
 
-        if (_relativeDateHelper.HasValidDate(element, viewModel))
+        if (relativeDateHelper.HasValidDate(element, viewModel))
         {
-            var relativeDate = _relativeDateHelper.GetRelativeDate(element.Properties.IsPastDateAfterRelative);
+            var relativeDate = relativeDateHelper.GetRelativeDate(element.Properties.IsPastDateAfterRelative);
             var maximumDate = DateTime.Today;
 
             if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
@@ -29,10 +21,10 @@ public class DateInputIsPastDateAfterRelativeValidator(IRelativeDateHelper relat
             if (relativeDate.Unit.Equals(DateInputConstants.DAY))
                 maximumDate = DateTime.Today.AddDays(-relativeDate.Amount);
 
-            var chosenDate = _relativeDateHelper.GetChosenDate(element, viewModel);
+            var chosenDate = relativeDateHelper.GetChosenDate(element, viewModel);
 
-            if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && maximumDate > _relativeDateHelper.GetChosenDate(element, viewModel) ||
-                relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate >= _relativeDateHelper.GetChosenDate(element, viewModel))
+            if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && maximumDate > chosenDate ||
+                relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate >= chosenDate)
             {
                 return new ValidationResult
                 {

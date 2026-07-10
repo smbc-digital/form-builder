@@ -1,7 +1,3 @@
-using System.Text.RegularExpressions;
-using form_builder.Helpers.ElementHelpers;
-using form_builder.Models.Elements;
-
 namespace form_builder.Validators.IntegrityChecks.Elements;
 
 public class InvalidQuestionCheck(IElementHelper elementHelper) : IElementSchemaIntegrityCheck

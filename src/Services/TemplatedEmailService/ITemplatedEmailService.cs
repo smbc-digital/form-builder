@@ -1,6 +1,4 @@
-﻿using form_builder.Models.Actions;
-
-namespace form_builder.Services.TemplatedEmailService;
+﻿namespace form_builder.Services.TemplatedEmailService;
 
 public interface ITemplatedEmailService
 {

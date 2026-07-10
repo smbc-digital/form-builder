@@ -1,24 +1,6 @@
-﻿using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.PaymentHelpers;
-using form_builder.Helpers.Submit;
-using form_builder.Models;
-using form_builder.Providers.ReferenceNumbers;
-using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Submit;
-using form_builder.Services.MappingService.Entities;
-using form_builder.TagParsers;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
+﻿namespace form_builder.Services.SubmitService;
 
-namespace form_builder.Services.SubmitService;
-
-public class SubmitService(
-    IGateway gateway,
+public class SubmitService(IGateway gateway,
     IPageHelper pageHelper,
     IWebHostEnvironment environment,
     IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
@@ -32,27 +14,16 @@ public class SubmitService(
     ILogger<SubmitService> logger)
     : ISubmitService
 {
-    private readonly IGateway _gateway = gateway;
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IWebHostEnvironment _environment = environment;
     private readonly SubmissionServiceConfiguration _submissionServiceConfiguration = submissionServiceConfiguration.Value;
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
-    private readonly ISchemaFactory _schemaFactory = schemaFactory;
-    private readonly IReferenceNumberProvider _referenceNumberProvider = referenceNumberProvider;
-    private readonly IEnumerable<ISubmitProvider> _submitProviders = submitProviders;
-    private readonly IPaymentHelper _paymentHelper = paymentHelper;
-    private readonly ISubmitHelper _submitHelper = submitHelper;
-    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
-    private readonly ILogger<SubmitService> _logger = logger;
 
     public async Task PreProcessSubmission(string form, string cacheKey)
     {
-        var baseForm = await _schemaFactory.Build(form);
+        var baseForm = await schemaFactory.Build(form);
         if (baseForm.GenerateReferenceNumber)
-            _pageHelper.SaveCaseReference(cacheKey, _referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
+            pageHelper.SaveCaseReference(cacheKey, referenceNumberProvider.GetReference(baseForm.ReferencePrefix), true, baseForm.GeneratedReferenceNumberMapping);
 
         if (baseForm.SavePaymentAmount)
-            _pageHelper.SavePaymentAmount(cacheKey, _paymentHelper.GetFormPaymentInformation(form, null, baseForm).Result.Settings.Amount, baseForm.PaymentAmountMapping);
+            pageHelper.SavePaymentAmount(cacheKey, paymentHelper.GetFormPaymentInformation(form, null, baseForm).Result.Settings.Amount, baseForm.PaymentAmountMapping);
     }
 
     public async Task<string> ProcessSubmission(MappingEntity mappingEntity, string form, string cacheKey)
@@ -61,19 +32,19 @@ public class SubmitService(
 
         if (mappingEntity.BaseForm.GenerateReferenceNumber)
         {
-            var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(cacheKey));
+            var answers = JsonConvert.DeserializeObject<FormAnswers>(distributedCache.GetString(cacheKey));
             reference = answers.CaseReference;
         }
 
         if (mappingEntity.BaseForm.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Booking) && element.Properties.AutoConfirm)))
-            await _submitHelper.ConfirmBookings(mappingEntity, _environment.EnvironmentName, reference);
+            await submitHelper.ConfirmBookings(mappingEntity, environment.EnvironmentName, reference);
 
-        _logger.LogInformation($"SubmitService.ProcessSubmission:{cacheKey} Submitting {form}");
+        logger.LogInformation($"SubmitService.ProcessSubmission:{cacheKey} Submitting {form}");
         var submissionReference = _submissionServiceConfiguration.FakeSubmission
             ? ProcessFakeSubmission(mappingEntity, form, cacheKey, reference)
             : await ProcessGenuineSubmission(mappingEntity, form, cacheKey, reference);
             
-        _logger.LogInformation($"SubmitService.ProcessSubmission:{cacheKey} Submitted successfully {form} - {submissionReference}");
+        logger.LogInformation($"SubmitService.ProcessSubmission:{cacheKey} Submitted successfully {form} - {submissionReference}");
         return submissionReference;
     }
 
@@ -82,20 +53,20 @@ public class SubmitService(
         if (!string.IsNullOrEmpty(reference))
             return reference;
 
-        _pageHelper.SaveCaseReference(cacheKey, "123456");
+        pageHelper.SaveCaseReference(cacheKey, "123456");
         return "123456";
     }
 
     private async Task<string> ProcessGenuineSubmission(MappingEntity mappingEntity, string form, string cacheKey, string reference)
     {
-        var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
-        _tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers, mappingEntity.BaseForm));
-        var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+        var currentPage = mappingEntity.BaseForm.GetPage(pageHelper, mappingEntity.FormAnswers.Path, form);
+        tagParsers.ToList().ForEach(_ => _.Parse(currentPage, mappingEntity.FormAnswers, mappingEntity.BaseForm));
+        var submitSlug = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, environment.EnvironmentName.ToS3EnvPrefix());
 
-        _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{cacheKey} {form} Posting Request");
+        logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{cacheKey} {form} Posting Request");
 
-        HttpResponseMessage response = await _submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
-        _logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{cacheKey} {form} Response Received");
+        HttpResponseMessage response = await submitProviders.Get(submitSlug.Type).PostAsync(mappingEntity, submitSlug);
+        logger.LogInformation($"SubmitService:ProcessGenuineSubmission:{cacheKey} {form} Response Received");
 
         if (!response.IsSuccessStatusCode)
             throw new ApplicationException($"SubmitService::ProcessSubmission, An exception has occurred while attempting to call {submitSlug.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
@@ -104,7 +75,7 @@ public class SubmitService(
         {
             var content = await response.Content.ReadAsStringAsync() ?? string.Empty;
             reference = JsonConvert.DeserializeObject<string>(content);
-            _pageHelper.SaveCaseReference(cacheKey, reference);
+            pageHelper.SaveCaseReference(cacheKey, reference);
         }
 
         return reference;
@@ -112,23 +83,23 @@ public class SubmitService(
 
     public async Task<string> PaymentSubmission(MappingEntity mappingEntity, string form, string cacheKey)
     {
-        _logger.LogInformation($"SubmitService.PaymentSubmission:{cacheKey} Submitting {form}");
+        logger.LogInformation($"SubmitService.PaymentSubmission:{cacheKey} Submitting {form}");
 
         if (_submissionServiceConfiguration.FakeSubmission)
             return ProcessFakeSubmission(mappingEntity, form, cacheKey, string.Empty);
 
-        var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
+        var currentPage = mappingEntity.BaseForm.GetPage(pageHelper, mappingEntity.FormAnswers.Path, form);
 
-        var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+        var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, environment.EnvironmentName.ToS3EnvPrefix());
 
         if (string.IsNullOrEmpty(postUrl.URL))
-            throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
+            throw new ApplicationException($"SubmitService::PaymentSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {environment.EnvironmentName}");
 
-        _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
+        gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
 
-        _logger.LogInformation($"SubmitService:PaymentSubmission:{cacheKey} {form} Posting Request");
-        var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
-        _logger.LogInformation($"SubmitService:PaymentSubmission:{cacheKey} {form} Response Received");
+        logger.LogInformation($"SubmitService:PaymentSubmission:{cacheKey} {form} Posting Request");
+        var response = await gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+        logger.LogInformation($"SubmitService:PaymentSubmission:{cacheKey} {form} Response Received");
 
         if (!response.IsSuccessStatusCode)
             throw new ApplicationException($"SubmitService::PaymentSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
@@ -142,9 +113,9 @@ public class SubmitService(
 
             var submissionReference = JsonConvert.DeserializeObject<string>(content);
 
-            _pageHelper.SaveCaseReference(cacheKey, submissionReference);
+            pageHelper.SaveCaseReference(cacheKey, submissionReference);
 
-            _logger.LogInformation($"SubmitService.PaymentSubmission:{cacheKey} Submitted successfully {form} - {submissionReference}");
+            logger.LogInformation($"SubmitService.PaymentSubmission:{cacheKey} Submitted successfully {form} - {submissionReference}");
 
             return submissionReference;
         }
@@ -154,17 +125,17 @@ public class SubmitService(
 
     public async Task<string> RedirectSubmission(MappingEntity mappingEntity, string form, string cacheKey)
     {
-        var currentPage = mappingEntity.BaseForm.GetPage(_pageHelper, mappingEntity.FormAnswers.Path, form);
+        var currentPage = mappingEntity.BaseForm.GetPage(pageHelper, mappingEntity.FormAnswers.Path, form);
 
-        var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, _environment.EnvironmentName.ToS3EnvPrefix());
+        var postUrl = currentPage.GetSubmitFormEndpoint(mappingEntity.FormAnswers, environment.EnvironmentName.ToS3EnvPrefix());
 
         if (string.IsNullOrEmpty(postUrl.URL))
-            throw new ApplicationException($"SubmitService::RedirectSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
+            throw new ApplicationException($"SubmitService::RedirectSubmission, No submission URL has been provided for FORM: {form}, ENVIRONMENT: {environment.EnvironmentName}");
 
         if (string.IsNullOrEmpty(postUrl.RedirectUrl))
-            throw new ApplicationException($"SubmitService::RedirectSubmission, No redirect URL has been provided for FORM: {form}, ENVIRONMENT: {_environment.EnvironmentName}");
+            throw new ApplicationException($"SubmitService::RedirectSubmission, No redirect URL has been provided for FORM: {form}, ENVIRONMENT: {environment.EnvironmentName}");
 
-        _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
+        gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(postUrl.AuthToken) ? string.Empty : postUrl.AuthToken);
 
         string content;
 
@@ -174,7 +145,7 @@ public class SubmitService(
         }
         else
         {
-            var response = await _gateway.PostAsync(postUrl.URL, mappingEntity.Data);
+            var response = await gateway.PostAsync(postUrl.URL, mappingEntity.Data);
 
             if (!response.IsSuccessStatusCode)
                 throw new ApplicationException($"SubmitService::RedirectSubmission, An exception has occurred while attempting to call {postUrl.URL}, Gateway responded with {response.StatusCode} status code, Message: {JsonConvert.SerializeObject(response)}");
@@ -186,16 +157,16 @@ public class SubmitService(
         }
 
         mappingEntity.FormAnswers.CaseReference = JsonConvert.DeserializeObject<string>(content);
-        return _tagParsers.Aggregate(postUrl.RedirectUrl, (current, tagParser) => tagParser.ParseString(current, mappingEntity.FormAnswers));
+        return tagParsers.Aggregate(postUrl.RedirectUrl, (current, tagParser) => tagParser.ParseString(current, mappingEntity.FormAnswers));
     }
 
     public async Task<string> ProcessWithoutSubmission(MappingEntity mappingEntity, string form, string cacheKey)
     {
-        var answers = JsonConvert.DeserializeObject<FormAnswers>(_distributedCache.GetString(cacheKey));
+        var answers = JsonConvert.DeserializeObject<FormAnswers>(distributedCache.GetString(cacheKey));
         var reference = answers.CaseReference;
 
         if (mappingEntity.BaseForm.Pages.Any(page => page.Elements.Any(element => element.Type.Equals(EElementType.Booking) && element.Properties.AutoConfirm)))
-            await _submitHelper.ConfirmBookings(mappingEntity, _environment.EnvironmentName, reference);
+            await submitHelper.ConfirmBookings(mappingEntity, environment.EnvironmentName, reference);
 
         return reference;
     }

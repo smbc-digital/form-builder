@@ -1,16 +1,11 @@
-﻿using System.Text.RegularExpressions;
-using form_builder.Helpers.PaymentHelpers;
-using form_builder.Models;
-using form_builder.TagParsers.Formatters;
-
-namespace form_builder.TagParsers;
+﻿namespace form_builder.TagParsers;
 
 public class PaymentAmountTagParser(IEnumerable<IFormatter> formatters, IPaymentHelper paymentHelper)
     : TagParser(formatters), ITagParser
 {
     private readonly IPaymentHelper _paymentHelper = paymentHelper;
 
-    public Regex Regex => new Regex("(?<={{)PAYMENTAMOUNT.*?(?=}})", RegexOptions.Compiled);
+    public Regex Regex => new("(?<={{)PAYMENTAMOUNT.*?(?=}})", RegexOptions.Compiled);
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)
     {

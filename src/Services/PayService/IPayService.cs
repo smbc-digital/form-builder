@@ -1,6 +1,4 @@
-﻿using form_builder.Services.MappingService.Entities;
-
-namespace form_builder.Services.PayService;
+﻿namespace form_builder.Services.PayService;
 
 public interface IPayService
 {

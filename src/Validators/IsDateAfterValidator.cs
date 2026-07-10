@@ -1,15 +1,7 @@
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers;
-
 namespace form_builder.Validators;
 
 public class IsDateAfterValidator(IFormAnswersProvider formAnswersProvider) : IElementValidator
 {
-    private readonly IFormAnswersProvider _formAnswersProvider = formAnswersProvider;
-
     public ValidationResult Validate(Element currentElement, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
     {
         IElement comparisonElement = baseForm.GetElement(currentElement.Properties.IsDateAfter);
@@ -24,7 +16,7 @@ public class IsDateAfterValidator(IFormAnswersProvider formAnswersProvider) : IE
         DateTime? comparisonElementValue = GetElementValue(comparisonElement, viewModel);
         if (!comparisonElementValue.HasValue)
         {
-            FormAnswers answers = _formAnswersProvider.GetFormAnswers(baseForm.BaseURL);
+            FormAnswers answers = formAnswersProvider.GetFormAnswers(baseForm.BaseURL);
             comparisonElementValue = GetElementValue(comparisonElement, answers);
         }
 

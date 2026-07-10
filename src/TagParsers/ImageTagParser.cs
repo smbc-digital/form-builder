@@ -1,12 +1,8 @@
-﻿using System.Text.RegularExpressions;
-using form_builder.Models;
-using form_builder.TagParsers.Formatters;
-
-namespace form_builder.TagParsers;
+﻿namespace form_builder.TagParsers;
 
 public class ImageTagParser(IEnumerable<IFormatter> formatters) : TagParser(formatters), ITagParser, ISimpleTagParser
 {
-    public Regex Regex => new Regex("(?<={{)IMAGE::.*?(?=}})", RegexOptions.Compiled);
+    public Regex Regex => new("(?<={{)IMAGE::.*?(?=}})", RegexOptions.Compiled);
     public string _htmlContent => "<img class='form-builder-img' src='{0}' alt='{1}'>";
 
     public async Task<Page> Parse(Page page, FormAnswers formAnswers, FormSchema baseForm = null)

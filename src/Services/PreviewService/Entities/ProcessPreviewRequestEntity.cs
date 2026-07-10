@@ -1,4 +1,4 @@
-namespace form_builder.Services.PageService.Entities;
+namespace form_builder.Services.PreviewService.Entities;
 
 public class ProcessPreviewRequestEntity : ProcessRequestEntity
 {

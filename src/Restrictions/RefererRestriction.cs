@@ -1,21 +1,16 @@
-using form_builder.Models;
-
 namespace form_builder.Restrictions;
 
 public class RefererRestriction(IHttpContextAccessor httpContextAccessor) : IFormAccessRestriction
 {
-
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-
     public bool IsRestricted(FormSchema baseForm)
     {
         if (baseForm.FormAccessReferrers is null || !baseForm.FormAccessReferrers.Any())
             return false;
             
-        if (string.IsNullOrEmpty(_httpContextAccessor.HttpContext.Request.Headers.Referer) || !_httpContextAccessor.HttpContext.Request.Headers.Referer.Any())
+        if (string.IsNullOrEmpty(httpContextAccessor.HttpContext.Request.Headers.Referer) || !httpContextAccessor.HttpContext.Request.Headers.Referer.Any())
             return true;
 
-        if (!baseForm.FormAccessReferrers.Any(referer => _httpContextAccessor.HttpContext.Request.Headers.Referer.ToString().Contains(referer)))
+        if (!baseForm.FormAccessReferrers.Any(referer => httpContextAccessor.HttpContext.Request.Headers.Referer.ToString().Contains(referer)))
             return true;
 
         return false;

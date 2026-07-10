@@ -1,6 +1,3 @@
-using System.Text.RegularExpressions;
-using form_builder.Models.Elements;
-
 namespace form_builder.Validators.IntegrityChecks.Elements;
 
 public class InvalidTargetMappingValueCheck : IElementSchemaIntegrityCheck

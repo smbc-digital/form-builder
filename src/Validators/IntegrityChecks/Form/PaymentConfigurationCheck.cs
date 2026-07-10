@@ -1,22 +1,10 @@
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Providers.PaymentProvider;
-using form_builder.Providers.Transforms.PaymentConfiguration;
-
 namespace form_builder.Validators.IntegrityChecks.Form;
 
-public class PaymentConfigurationCheck(
-    IWebHostEnvironment environment,
+public class PaymentConfigurationCheck(IWebHostEnvironment environment,
     IEnumerable<IPaymentProvider> paymentProviders,
     IPaymentConfigurationTransformDataProvider paymentConfigProvider)
     : IFormSchemaIntegrityCheck
 {
-    private IWebHostEnvironment _environment = environment;
-    private readonly IPaymentConfigurationTransformDataProvider _paymentConfigProvider = paymentConfigProvider;
-    private IEnumerable<IPaymentProvider> _paymentProviders = paymentProviders;
-
     public IntegrityCheckResult Validate(FormSchema schema) => ValidateAsync(schema).Result;
 
     public async Task<IntegrityCheckResult> ValidateAsync(FormSchema schema)
@@ -31,7 +19,7 @@ public class PaymentConfigurationCheck(
         if (!containsPayment)
             return result;
 
-        List<PaymentInformation> paymentInformation = await _paymentConfigProvider.Get<List<PaymentInformation>>();
+        List<PaymentInformation> paymentInformation = await paymentConfigProvider.Get<List<PaymentInformation>>();
         PaymentInformation formPaymentInformation = paymentInformation
             .FirstOrDefault(payment => payment.FormName
                 .Any(_ => _.Equals(schema.BaseURL)));
@@ -42,7 +30,7 @@ public class PaymentConfigurationCheck(
             return result;
         }
 
-        IPaymentProvider paymentProvider = _paymentProviders
+        IPaymentProvider paymentProvider = paymentProviders
             .FirstOrDefault(provider => provider.ProviderName
                 .Equals(formPaymentInformation.PaymentProvider));
 
@@ -72,7 +60,7 @@ public class PaymentConfigurationCheck(
 
         if (paymentSetting.CalculationSlug is not null)
         {
-            if (!_environment.IsEnvironment("local") && !paymentSetting.CalculationSlug.URL.StartsWith("https://"))
+            if (!environment.IsEnvironment("local") && !paymentSetting.CalculationSlug.URL.StartsWith("https://"))
                 result.AddFailureMessage("PaymentConfiguration::CalculateCostUrl must start with https");
         }
 

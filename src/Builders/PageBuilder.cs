@@ -1,4 +1,6 @@
-﻿namespace form_builder.Builders;
+﻿using Condition = form_builder.Models.Condition;
+
+namespace form_builder.Builders;
 
 public class PageBuilder
 {

@@ -1,31 +1,13 @@
-﻿using System.Net;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Providers.FileStorage;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+﻿namespace form_builder.Services.FileUploadService;
 
-namespace form_builder.Services.FileUploadService;
-
-public class FileUploadService(
-    IDistributedCacheWrapper distributedCache,
+public class FileUploadService(IDistributedCacheWrapper distributedCache,
     IEnumerable<IFileStorageProvider> fileStorageProviders,
     IPageFactory pageFactory,
     IPageHelper pageHelper,
     IOptions<FileStorageProviderConfiguration> fileStorageConfiguration)
     : IFileUploadService
 {
-    private readonly IDistributedCacheWrapper _distributedCache = distributedCache;
     private readonly IFileStorageProvider _fileStorageProvider = fileStorageProviders.Get(fileStorageConfiguration.Value.Type);
-    private readonly IPageFactory _pageFactory = pageFactory;
-    private readonly IPageHelper _pageHelper = pageHelper;
 
     public Dictionary<string, dynamic> AddFiles(Dictionary<string, dynamic> viewModel, IEnumerable<CustomFormFile> fileUpload)
     {
@@ -66,7 +48,7 @@ public class FileUploadService(
         string path,
         string cacheKey)
     {
-        var cachedAnswers = _distributedCache.GetString(cacheKey);
+        var cachedAnswers = distributedCache.GetString(cacheKey);
 
         var convertedAnswers = cachedAnswers is null
             ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -79,7 +61,7 @@ public class FileUploadService(
         response.Remove(fileToRemove);
         convertedAnswers.Pages.FirstOrDefault(_ => _.PageSlug.Equals(path)).Answers.FirstOrDefault().Response = response;
 
-        _distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
+        distributedCache.SetStringAsync(cacheKey, JsonConvert.SerializeObject(convertedAnswers), CancellationToken.None);
         _fileStorageProvider.Remove(fileToRemove.Key);
 
         return new ProcessRequestEntity
@@ -105,7 +87,7 @@ public class FileUploadService(
     {
         if (!currentPage.IsValid)
         {
-            var formModel = await _pageFactory.Build(currentPage, new Dictionary<string, dynamic>(), baseForm, cacheKey);
+            var formModel = await pageFactory.Build(currentPage, new Dictionary<string, dynamic>(), baseForm, cacheKey);
 
             return new ProcessRequestEntity
             {
@@ -117,7 +99,7 @@ public class FileUploadService(
         if (currentPage.IsValid && viewModel.ContainsKey(ButtonConstants.SUBMIT) && (files is null || !files.Any()) && modelStateIsValid)
         {
             if (currentPage.Elements.Where(_ => _.Type.Equals(EElementType.MultipleFileUpload)).Any(_ => _.Properties.Optional))
-                _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, files, currentPage.IsValid, true);
+                pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, files, currentPage.IsValid, true);
 
             return new ProcessRequestEntity
             {
@@ -140,7 +122,7 @@ public class FileUploadService(
         }
 
         if (files is not null && files.Any())
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, files, currentPage.IsValid, true);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, files, currentPage.IsValid, true);
 
         if (viewModel.ContainsKey(ButtonConstants.SUBMIT) && modelStateIsValid)
         {
@@ -157,7 +139,7 @@ public class FileUploadService(
                 { "modelStateInvalid", null }
             };
 
-            var formModel = await _pageFactory.Build(currentPage, newViewModel, baseForm, cacheKey);
+            var formModel = await pageFactory.Build(currentPage, newViewModel, baseForm, cacheKey);
 
             return new ProcessRequestEntity
             {

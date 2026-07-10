@@ -1,33 +1,9 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Helpers.EmailHelpers;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Mappers;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.EmailProvider;
-using form_builder.Providers.ReferenceNumbers;
-using form_builder.Services.DocumentService;
-using form_builder.Services.DocumentService.Entities;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using form_builder.TagParsers;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
-using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
+﻿using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder.Services.EmailSubmitService;
 
-public class EmailSubmitService(
-    IMappingService mappingService,
-    IEmailHelper emailHelper,
+public class EmailSubmitService(IEmailHelper emailHelper,
     IElementMapper elementMapper,
-    ISessionHelper sessionHelper,
     IPageHelper pageHelper,
     IEmailProvider emailProvider,
     IReferenceNumberProvider referenceNumberProvider,
@@ -39,20 +15,6 @@ public class EmailSubmitService(
     IOptions<PowerAutomateConfiguration> configuration)
     : IEmailSubmitService
 {
-    private readonly IMappingService _mappingService = mappingService;
-    private readonly IElementMapper _elementMapper = elementMapper;
-    private readonly IEmailHelper _emailHelper = emailHelper;
-    private readonly ISessionHelper _sessionHelper = sessionHelper;
-    private readonly IEmailProvider _emailProvider = emailProvider;
-    private readonly IPageHelper _pageHelper = pageHelper;
-    private readonly IDocumentSummaryService _documentSummaryService = documentSummaryService;
-    private readonly IReferenceNumberProvider _referenceNumberProvider = referenceNumberProvider;
-    private readonly IEnumerable<ITagParser> _tagParsers = tagParsers;
-    private readonly ILogger<EmailSubmitService> _logger = logger;
-    private readonly IGateway _gateway = gateway;
-    private readonly IWebHostEnvironment _hostingEnvironment = hostingEnvironment;
-    private IOptions<PowerAutomateConfiguration> _configuration = configuration;
-
     public async Task<string> EmailSubmission(MappingEntity data, string form, string cacheKey)
     {
         var reference = string.Empty;
@@ -61,12 +23,12 @@ public class EmailSubmitService(
 
         if (data.BaseForm.GenerateReferenceNumber)
         {
-            data.FormAnswers.CaseReference = _referenceNumberProvider.GetReference(data.BaseForm.ReferencePrefix);
+            data.FormAnswers.CaseReference = referenceNumberProvider.GetReference(data.BaseForm.ReferencePrefix);
             reference = data.FormAnswers.CaseReference;
-            _pageHelper.SaveCaseReference(cacheKey, reference);
+            pageHelper.SaveCaseReference(cacheKey, reference);
         }
 
-        var doc = _documentSummaryService.GenerateDocument(
+        var doc = documentSummaryService.GenerateDocument(
             new DocumentSummaryEntity
             {
                 DocumentType = EDocumentType.Html,
@@ -74,19 +36,19 @@ public class EmailSubmitService(
                 FormSchema = data.BaseForm
             });
 
-        var email = await _emailHelper.GetEmailInformation(form);
+        var email = await emailHelper.GetEmailInformation(form);
         var parsedSubjectInformation = new EmailConfiguration();
 
         try
         {
             var subjectInformation = JsonConvert.SerializeObject(email);
-            subjectInformation = _tagParsers.Aggregate(subjectInformation, (current, tagParser) => tagParser.ParseString(current, data.FormAnswers));
+            subjectInformation = tagParsers.Aggregate(subjectInformation, (current, tagParser) => tagParser.ParseString(current, data.FormAnswers));
             parsedSubjectInformation = JsonConvert.DeserializeObject<EmailConfiguration>(subjectInformation);
         }
         catch (Exception ex)
         {
             parsedSubjectInformation.Subject = Regex.Replace(email.Subject, "{{.+}}", "");
-            _logger.LogInformation($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: '{email.Subject}' QuestionID contains a null value.", ex);
+            logger.LogInformation($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: '{email.Subject}' QuestionID contains a null value.", ex);
         }
 
         var subject = !string.IsNullOrEmpty(parsedSubjectInformation.Subject)
@@ -94,7 +56,7 @@ public class EmailSubmitService(
             : string.Empty;
 
         var body = string.IsNullOrWhiteSpace(email.Body)
-            ? System.Text.Encoding.Default.GetString(doc.Result)
+            ? Encoding.Default.GetString(doc.Result)
             : $"<p>{email.Body}</p>";
 
         var emailMessage = new EmailMessage(
@@ -115,7 +77,7 @@ public class EmailSubmitService(
 
             foreach (var element in fileElements)
             {
-                files = (List<File>)_elementMapper.GetAnswerValue(element, data.FormAnswers).Result;
+                files = (List<File>)elementMapper.GetAnswerValue(element, data.FormAnswers).Result;
                 foreach (File file in files ?? new List<File>())
                     fileUploads.Add(file);
             }
@@ -134,7 +96,7 @@ public class EmailSubmitService(
 
         if (email.AttachPdf)
         {
-            var pdfdoc = _documentSummaryService.GenerateDocument(
+            var pdfdoc = documentSummaryService.GenerateDocument(
                 new DocumentSummaryEntity
                 {
                     DocumentType = EDocumentType.Pdf,
@@ -143,7 +105,7 @@ public class EmailSubmitService(
                 });
 
             emailMessage = fileUploads.Any() ?
-                emailMessage = new EmailMessage(
+                new EmailMessage(
                     subject,
                     body,
                     email.Sender,
@@ -152,7 +114,7 @@ public class EmailSubmitService(
                     $"{data.FormAnswers.CaseReference}_data.pdf",
                     fileUploads
                 )
-                : emailMessage = new EmailMessage(
+                : new EmailMessage(
                     subject,
                     body,
                     email.Sender,
@@ -162,31 +124,30 @@ public class EmailSubmitService(
                 );
         }
 
-        var result = _emailProvider.SendEmail(emailMessage).Result;
+        var result = emailProvider.SendEmail(emailMessage).Result;
 
-        if (!result.Equals(System.Net.HttpStatusCode.OK))
+        if (!result.Equals(HttpStatusCode.OK))
             throw new ApplicationException($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: threw an exception {result}");
 
         HttpResponseMessage response = new();
 
         try
         {
-            FormSchema baseForm = new FormSchema();
-            var powerAutomateUrl = _configuration.Value.BaseUrl;
-            var powerAutomateDetails = new PowerAutomateDetails()
+            var powerAutomateUrl = configuration.Value.BaseUrl;
+            var powerAutomateDetails = new PowerAutomateDetails
             {
                 FormName = form,
-                Environment = _hostingEnvironment.EnvironmentName
+                Environment = hostingEnvironment.EnvironmentName
             };
-            response = await _gateway.PostAsync(powerAutomateUrl, powerAutomateDetails);
+            response = await gateway.PostAsync(powerAutomateUrl, powerAutomateDetails);
 
-            if (!response.IsSuccessStatusCode) _logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
-                                                                $"An unexpected error occurred writting to PowerAutomate {response}");
+            if (!response.IsSuccessStatusCode) logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
+                                                                $"An unexpected error occurred writing to PowerAutomate {response}");
         }
         catch (Exception)
         {
-            _logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
-                             $"An unexpected error occurred writting to PowerAutomate {response}");
+            logger.LogError($"{nameof(EmailSubmitService)}::{nameof(EmailSubmission)}: " +
+                             $"An unexpected error occurred writing to PowerAutomate {response}");
         }
 
         return reference;

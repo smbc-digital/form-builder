@@ -1,17 +1,8 @@
-using form_builder.Constants;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.Lookup;
-
 namespace form_builder.Validators.IntegrityChecks.Form;
 
 public class DynamicLookupCheck(IWebHostEnvironment environment, IEnumerable<ILookupProvider> lookupProviders)
     : IFormSchemaIntegrityCheck
 {
-    IWebHostEnvironment _environment = environment;
-    IEnumerable<ILookupProvider> _lookupProviders = lookupProviders;
-
     public IntegrityCheckResult Validate(FormSchema schema)
     {
         IntegrityCheckResult result = new();
@@ -38,10 +29,10 @@ public class DynamicLookupCheck(IWebHostEnvironment environment, IEnumerable<ILo
 
             if (!element.Properties.LookupSources
                     .Any(lookup => lookup.EnvironmentName
-                        .Equals(_environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
+                        .Equals(environment.EnvironmentName, StringComparison.OrdinalIgnoreCase)))
             {
                 result.AddFailureMessage(
-                    $"The provided json has no Environment details for this:({_environment.EnvironmentName}) Environment");
+                    $"The provided json has no Environment details for this:({environment.EnvironmentName}) Environment");
             }
 
             foreach (var env in element.Properties.LookupSources)
@@ -54,7 +45,7 @@ public class DynamicLookupCheck(IWebHostEnvironment environment, IEnumerable<ILo
 
                 try
                 {
-                    _lookupProviders.Get(env.Provider);
+                    lookupProviders.Get(env.Provider);
                 }
                 catch (Exception e)
                 {
@@ -67,7 +58,7 @@ public class DynamicLookupCheck(IWebHostEnvironment environment, IEnumerable<ILo
                 if (string.IsNullOrEmpty(env.AuthToken))
                     result.AddFailureMessage($"The provided json has no auth token for the API");
 
-                if (!_environment.IsEnvironment("local") &&
+                if (!environment.IsEnvironment("local") &&
                     !env.EnvironmentName.Equals("local", StringComparison.OrdinalIgnoreCase) &&
                     !env.URL.StartsWith("https://"))
                 {

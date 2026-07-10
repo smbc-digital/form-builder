@@ -1,15 +1,9 @@
-using form_builder.Configuration;
-using form_builder.Models;
-using Microsoft.Extensions.Options;
-
 namespace form_builder.Restrictions;
 
-public class KeyFormAccessRestriction(
-    IHttpContextAccessor httpContextAccessor,
+public class KeyFormAccessRestriction(IHttpContextAccessor httpContextAccessor,
     IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken)
     : IFormAccessRestriction
 {
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly QAFormAccessTokenConfiguration _qaFormAccessToken = qaFormAccessToken.Value;
 
     public bool IsRestricted(FormSchema baseForm)
@@ -17,7 +11,7 @@ public class KeyFormAccessRestriction(
         if (string.IsNullOrEmpty(baseForm.FormAccessKey) && string.IsNullOrEmpty(baseForm.FormAccessKeyName))
             return false;
 
-        var context = _httpContextAccessor.HttpContext;
+        var context = httpContextAccessor.HttpContext;
         if (!context.Request.Query.Any(keyValuePair => keyValuePair.Key.Equals(baseForm.FormAccessKeyName, StringComparison.OrdinalIgnoreCase)))
             return true;
             

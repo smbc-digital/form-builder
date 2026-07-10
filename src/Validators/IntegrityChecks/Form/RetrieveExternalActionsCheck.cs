@@ -1,15 +1,7 @@
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Models.Actions;
-using form_builder.Models.Properties.ActionProperties;
-
 namespace form_builder.Validators.IntegrityChecks.Form;
 
-public class RetrieveExternalActionsCheck(IWebHostEnvironment enviroment) : IFormSchemaIntegrityCheck
+public class RetrieveExternalActionsCheck(IWebHostEnvironment environment) : IFormSchemaIntegrityCheck
 {
-    private readonly IWebHostEnvironment _environment = enviroment;
-
     public IntegrityCheckResult Validate(FormSchema schema)
     {
         IntegrityCheckResult result = new();
@@ -26,13 +18,13 @@ public class RetrieveExternalActionsCheck(IWebHostEnvironment enviroment) : IFor
         {
             PageActionSlug slug = action.Properties.PageActionSlugs
                 .FirstOrDefault(slugs => slugs.Environment
-                    .Equals(_environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
+                    .Equals(environment.EnvironmentName.ToS3EnvPrefix(), StringComparison.OrdinalIgnoreCase));
 
             if (slug is null)
             {
                 result.AddFailureMessage(
                     "Retrieve External Data Action, " +
-                    $"there is no PageActionSlug for environment '{_environment.EnvironmentName}'");
+                    $"there is no PageActionSlug for environment '{environment.EnvironmentName}'");
             }
             else
             {
