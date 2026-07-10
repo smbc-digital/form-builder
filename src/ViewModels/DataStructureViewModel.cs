@@ -1,6 +1,4 @@
-﻿using form_builder.Models;
-
-namespace form_builder.ViewModels;
+﻿namespace form_builder.ViewModels;
 
 public class DataStructureViewModel
 {

@@ -1,6 +1,4 @@
-﻿using form_builder.Extensions;
-
-namespace form_builder.ViewModels;
+﻿namespace form_builder.ViewModels;
 
 public class CancelBookingViewModel : FormBuilderViewModel
 {

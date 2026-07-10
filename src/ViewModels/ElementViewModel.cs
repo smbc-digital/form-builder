@@ -1,6 +1,4 @@
-﻿using form_builder.Models.Elements;
-
-namespace form_builder.ViewModels;
+﻿namespace form_builder.ViewModels;
 
 public class ElementViewModel
 {
