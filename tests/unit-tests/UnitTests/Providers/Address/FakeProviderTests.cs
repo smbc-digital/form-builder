@@ -1,7 +1,4 @@
-﻿using form_builder.Providers.Address;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.Address;
+﻿namespace form_builder_tests.UnitTests.Providers.Address;
 
 public class FakeProviderTests
 {

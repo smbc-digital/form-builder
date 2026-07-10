@@ -1,18 +1,4 @@
-﻿using System.Net;
-using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Actions;
-using form_builder.Providers.EmailProvider;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.EmailService;
-using form_builder_tests.Builders;
-using Moq;
-using Newtonsoft.Json;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class EmailServiceTests
 {
@@ -30,7 +16,7 @@ public class EmailServiceTests
 
         _mockSessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("sessionGuid");
 
-        var formData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+        var formData = JsonSerializer.Serialize(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(formData);
 

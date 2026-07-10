@@ -1,15 +1,4 @@
-﻿using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Helpers.PaymentHelpers;
-using form_builder.Models;
-using form_builder.TagParsers;
-using form_builder.TagParsers.Formatters;
-using form_builder_tests.Builders;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.TagParsers;
+﻿namespace form_builder_tests.UnitTests.TagParsers;
 
 public class PaymentAmountTagParserTests
 {

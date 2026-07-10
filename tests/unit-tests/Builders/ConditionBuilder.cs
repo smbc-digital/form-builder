@@ -1,11 +1,8 @@
-using form_builder.Enum;
-using form_builder.Models;
-
 namespace form_builder_tests.Builders;
 
 public class ConditionBuilder
 {
-    private List<Condition> _conditions = new List<Condition>();
+    private readonly List<Condition> _conditions = new();
     private ECondition _conditionType;
     private string _comparisonValue;
     private string _questionId;

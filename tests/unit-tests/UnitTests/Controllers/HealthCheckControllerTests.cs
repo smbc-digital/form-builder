@@ -1,8 +1,4 @@
-﻿using form_builder.Controllers.Healthcheck;
-using Microsoft.AspNetCore.Mvc;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Controllers;
+﻿namespace form_builder_tests.UnitTests.Controllers;
 
 public class HealthCheckControllerTests
 {

@@ -1,11 +1,7 @@
-using form_builder.Providers.Analytics.Request;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.Analytics;
+namespace form_builder_tests.UnitTests.Providers.Analytics.Request;
 
 public class GoogleAnalyticsEventPayloadTests
 {
-
     [Fact]
     public void ToString_ShouldBuild_Valid_Url()
     {

@@ -1,14 +1,11 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-
-namespace form_builder_tests.Builders;
+﻿namespace form_builder_tests.Builders;
 
 public class BehaviourBuilder
 {
-    private List<Condition> _conditions = new List<Condition>();
+    private readonly List<Condition> _conditions = new();
     private EBehaviourType _behaviourType = EBehaviourType.GoToExternalPage;
     private string _pageSlug;
-    private List<SubmitSlug> _submitSlugs = new List<SubmitSlug>();
+    private readonly List<SubmitSlug> _submitSlugs = new();
 
 
 

@@ -1,13 +1,4 @@
-﻿using form_builder.Configuration;
-using form_builder.Controllers.Payment;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Controllers;
+﻿namespace form_builder_tests.UnitTests.Controllers;
 
 public class FakePaymentControllerTests
 {

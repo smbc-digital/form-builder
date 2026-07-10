@@ -1,13 +1,4 @@
-﻿using System.Net;
-using form_builder.Models;
-using form_builder.Providers.Lookup;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.Lookup;
+﻿namespace form_builder_tests.UnitTests.Providers.Lookup;
 
 public class LookupProviderTests
 {
@@ -66,7 +57,7 @@ public class LookupProviderTests
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonConvert.SerializeObject(optionsResponse))
+                Content = new StringContent(JsonSerializer.Serialize(optionsResponse))
             });
 
         // Act
@@ -124,7 +115,7 @@ public class LookupProviderTests
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(JsonConvert.SerializeObject(appointmentTypesResponse))
+                Content = new StringContent(JsonSerializer.Serialize(appointmentTypesResponse))
             });
 
         // Act

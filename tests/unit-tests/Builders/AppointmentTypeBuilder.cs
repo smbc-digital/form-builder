@@ -1,6 +1,3 @@
-using form_builder.Models;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-
 namespace form_builder_tests.Builders;
 
 public class AppointmentTypeBuilder
@@ -8,9 +5,9 @@ public class AppointmentTypeBuilder
     private string _environment = "test";
     private Guid _appointmentId = Guid.NewGuid();
     private string _appointmentIdKey = "00000000-0000-0000-0000-000000000000";
-    private List<BookingResource> _optionalResources = new List<BookingResource>();
+    private List<BookingResource> _optionalResources = new();
 
-    public AppointmentType Build() => new AppointmentType
+    public AppointmentType Build() => new()
     {
         Environment = _environment,
         AppointmentId = _appointmentId,

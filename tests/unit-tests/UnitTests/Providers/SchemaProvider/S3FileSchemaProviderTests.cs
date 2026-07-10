@@ -1,16 +1,4 @@
-﻿using Amazon.S3;
-using Amazon.S3.Model;
-using form_builder.Configuration;
-using form_builder.Gateways;
-using form_builder.Providers.SchemaProvider;
-using form_builder.Providers.StorageProvider;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.SchemaProvider;
+﻿namespace form_builder_tests.UnitTests.Providers.SchemaProvider;
 
 public class S3FileSchemaProviderTests
 {

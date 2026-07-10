@@ -1,10 +1,4 @@
-﻿using form_builder.Conditions;
-using form_builder.Enum;
-using form_builder.Models;
-using Newtonsoft.Json;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Conditions;
+﻿namespace form_builder_tests.UnitTests.Conditions;
 
 public class ConditionTestsWithComparisonValue
 {
@@ -176,7 +170,7 @@ public class ConditionTestsWithComparisonValue
 
         var viewModel = new Dictionary<string, dynamic>
         {
-            { "test-fileupload", JsonConvert.SerializeObject(file) }
+            { "test-fileupload", JsonSerializer.Serialize(file) }
         };
 
         var condition1 = new Condition { ComparisonValue = "true", QuestionId = "test", ConditionType = ECondition.IsFileUploadNullOrEmpty };

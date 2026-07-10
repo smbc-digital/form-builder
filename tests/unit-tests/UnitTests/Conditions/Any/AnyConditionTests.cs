@@ -1,13 +1,8 @@
-using form_builder.Conditions;
-using form_builder.Enum;
-using form_builder_tests.Builders;
-using Xunit;
-
 namespace form_builder_tests.UnitTests.Conditions.Any;
 
 public class AnyConditionTests
 {
-    private readonly ConditionValidator _conditionValidator = new ConditionValidator();
+    private readonly ConditionValidator _conditionValidator = new();
 
     [Theory]
     [InlineData(1)]

@@ -1,24 +1,5 @@
-﻿using System.Net;
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Helpers.ElementHelpers;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Helpers.ViewRender;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
-using form_builder.Providers.FileStorage;
-using form_builder.Providers.StorageProvider;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using Newtonsoft.Json;
-using Xunit;
+﻿using Address = form_builder.Models.Elements.Address;
+using Street = form_builder.Models.Elements.Street;
 
 namespace form_builder_tests.UnitTests.Helpers;
 
@@ -457,7 +438,7 @@ public class PageHelperTests
             }
         };
 
-        var existingAnswers = JsonConvert.SerializeObject(new FormAnswers
+        var existingAnswers = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>
@@ -491,7 +472,7 @@ public class PageHelperTests
 
         // Act
         _pageHelper.RemoveFieldset(viewModel, "form", Guid.NewGuid().ToString(), "page-one", removeKey);
-        var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+        var callbackModel = JsonSerializer.Deserialize<FormAnswers>(callbackCacheProvider);
 
         // Assert
         Assert.Equal("answer_0_", callbackModel.Pages[0].Answers[0].QuestionId);
@@ -556,7 +537,7 @@ public class PageHelperTests
         // Arrange
         var guid = Guid.NewGuid();
         var viewModel = new Dictionary<string, dynamic> { { "Path", "path" } };
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>()
@@ -598,7 +579,7 @@ public class PageHelperTests
             }
         };
 
-        var mockData = JsonConvert.SerializeObject(formAnswers);
+        var mockData = JsonSerializer.Serialize(formAnswers);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
             .Returns(mockData);
@@ -616,7 +597,7 @@ public class PageHelperTests
 
         // Act
         _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
-        var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+        var callbackModel = JsonSerializer.Deserialize<FormAnswers>(callbackCacheProvider);
 
         // Assert
         Assert.Equal("Item1", callbackModel.Pages[0].Answers[0].QuestionId);
@@ -635,7 +616,7 @@ public class PageHelperTests
                 _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Callback<string, string, CancellationToken>((x, y, z) => callbackCacheProvider = y);
 
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>()
@@ -648,7 +629,7 @@ public class PageHelperTests
 
         // Act
         _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
-        var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+        var callbackModel = JsonSerializer.Deserialize<FormAnswers>(callbackCacheProvider);
 
         // Assert
         Assert.Empty(callbackModel.Pages[0].Answers);
@@ -661,7 +642,7 @@ public class PageHelperTests
         var callbackCacheProvider = string.Empty;
         var item1Data = "item1-data";
         var item2Data = "item2-data";
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>()
@@ -683,7 +664,7 @@ public class PageHelperTests
 
         // Act
         _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", null, true);
-        var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+        var callbackModel = JsonSerializer.Deserialize<FormAnswers>(callbackCacheProvider);
 
         // Assert
         Assert.Equal("Item1", callbackModel.Pages[0].Answers[0].QuestionId);
@@ -708,7 +689,7 @@ public class PageHelperTests
             Path = "page-one",
             Pages = new List<PageAnswers>()
         };
-        var mockData = JsonConvert.SerializeObject(allTheAnswers);
+        var mockData = JsonSerializer.Serialize(allTheAnswers);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
             .Returns(mockData);
@@ -768,7 +749,7 @@ public class PageHelperTests
         };
         form.Pages.Add(page);
 
-        var mockData = JsonConvert.SerializeObject(form);
+        var mockData = JsonSerializer.Serialize(form);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
             .Returns(mockData);
@@ -785,11 +766,11 @@ public class PageHelperTests
 
         // Act
         _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
-        var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+        var callbackModel = JsonSerializer.Deserialize<FormAnswers>(callbackCacheProvider);
 
         // Assert
         Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
-        var fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
+        var fileUploadModel = JsonSerializer.Deserialize<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
         Assert.Equal(questionId, fileUploadModel.Key);
     }
 
@@ -832,7 +813,7 @@ public class PageHelperTests
         };
 
         form.Pages.Add(page);
-        var mockData = JsonConvert.SerializeObject(form);
+        var mockData = JsonSerializer.Serialize(form);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
             .Returns(mockData);
@@ -849,11 +830,11 @@ public class PageHelperTests
 
         // Act
         _pageHelper.SaveAnswers(viewModel, Guid.NewGuid().ToString(), "formName", collection, true);
-        var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+        var callbackModel = JsonSerializer.Deserialize<FormAnswers>(callbackCacheProvider);
 
         // Assert
         Assert.Equal(questionId, callbackModel.Pages[0].Answers[0].QuestionId);
-        FileUploadModel fileUploadModel = JsonConvert.DeserializeObject<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
+        FileUploadModel fileUploadModel = JsonSerializer.Deserialize<FileUploadModel>(callbackModel.Pages[0].Answers[0].Response.ToString());
         Assert.Equal(fileName, fileUploadModel.UntrustedOriginalFileName);
     }
 
@@ -861,7 +842,7 @@ public class PageHelperTests
     public void SaveAnswers_ShouldNotCallDistributedCache_ForFileUpload_WhenNoFile()
     {
         // Arrange
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>()
@@ -890,7 +871,7 @@ public class PageHelperTests
     {
         // Arrange
         var callbackValue = string.Empty;
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>
@@ -903,7 +884,7 @@ public class PageHelperTests
                         new Answers
                         {
                             QuestionId = "fileupload",
-                            Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel() })
+                            Response = JsonSerializer.Serialize(new List<FileUploadModel>{ new FileUploadModel() })
                         }
                     }
                 }
@@ -925,7 +906,7 @@ public class PageHelperTests
         _mockDistributedCache.Verify(
             _ => _.SetStringAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Once);
-        var result = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
+        var result = JsonSerializer.Deserialize<FormAnswers>(callbackValue);
         Assert.Single(result.Pages);
         Assert.Single(result.Pages.FirstOrDefault().Answers);
     }
@@ -1003,7 +984,7 @@ public class PageHelperTests
             page2
         };
 
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>
@@ -1080,7 +1061,7 @@ public class PageHelperTests
             page2
         };
 
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>(),
@@ -1168,8 +1149,8 @@ public class PageHelperTests
             PageSlug = "path",
             Answers = new List<Answers>
             {
-                new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel()}) },
-                new Answers { QuestionId = "Item2", Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel()}) }
+                new Answers { QuestionId = "Item1", Response = JsonSerializer.Serialize(new List<FileUploadModel>{ new FileUploadModel()}) },
+                new Answers { QuestionId = "Item2", Response = JsonSerializer.Serialize(new List<FileUploadModel>{ new FileUploadModel()}) }
             }
         };
 
@@ -1208,7 +1189,7 @@ public class PageHelperTests
             PageSlug = "path",
             Answers = new()
             {
-                new() { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                new() { QuestionId = "Item1", Response = JsonSerializer.Serialize(fileUpload) }
             }
         };
 
@@ -1247,7 +1228,7 @@ public class PageHelperTests
             PageSlug = "path",
             Answers = new List<Answers>
             {
-                new Answers { QuestionId = "Item1", Response = JsonConvert.SerializeObject(fileUpload) }
+                new Answers { QuestionId = "Item1", Response = JsonSerializer.Serialize(fileUpload) }
             }
         };
 
@@ -1372,7 +1353,7 @@ public class PageHelperTests
             PageSlug = "path",
             Answers = new()
             {
-                new() { QuestionId = questionId, Response = JsonConvert.SerializeObject(fileUpload) }
+                new() { QuestionId = questionId, Response = JsonSerializer.Serialize(fileUpload) }
             }
         };
 
@@ -1413,7 +1394,7 @@ public class PageHelperTests
         // Assert
         _mockDistributedCache.Verify(_ => _.GetString(It.Is<string>(x => x.Equals(guid))), Times.Once);
         _mockDistributedCache.Verify(_ => _.SetStringAsync(It.Is<string>(x => x.Equals(guid)), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
-        var callbackData = JsonConvert.DeserializeObject<FormAnswers>(callbackValue);
+        var callbackData = JsonSerializer.Deserialize<FormAnswers>(callbackValue);
         Assert.Single(callbackData.AdditionalFormData);
     }
 
@@ -1432,7 +1413,7 @@ public class PageHelperTests
     {
         // Arrange
         var callbackCacheProvider = string.Empty;
-        var mockData = JsonConvert.SerializeObject(new FormAnswers
+        var mockData = JsonSerializer.Serialize(new FormAnswers
         {
             Path = "page-one",
             Pages = new List<PageAnswers>(),
@@ -1448,7 +1429,7 @@ public class PageHelperTests
 
         // Act
         _pageHelper.RemoveFormData("key", "guid", "form-name");
-        var callbackModel = JsonConvert.DeserializeObject<FormAnswers>(callbackCacheProvider);
+        var callbackModel = JsonSerializer.Deserialize<FormAnswers>(callbackCacheProvider);
 
         // Assert
         Assert.False(callbackModel.FormData.ContainsKey("key"));

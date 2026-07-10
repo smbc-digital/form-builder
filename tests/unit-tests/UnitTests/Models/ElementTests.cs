@@ -1,10 +1,5 @@
-using form_builder.Builders;
-using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Validators;
-using Moq;
-using Xunit;
+using Address = form_builder.Models.Elements.Address;
+using Street = form_builder.Models.Elements.Street;
 
 namespace form_builder_tests.UnitTests.Models;
 

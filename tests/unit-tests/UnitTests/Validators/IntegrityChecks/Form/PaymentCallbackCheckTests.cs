@@ -1,9 +1,4 @@
-﻿using form_builder.Constants;
-using form_builder.Models;
-using form_builder.Validators.IntegrityChecks.Form;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form;
+﻿namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Form;
 
 public class PaymentCallbackCheckTests
 {

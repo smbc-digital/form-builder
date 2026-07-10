@@ -1,13 +1,4 @@
-﻿using System.Net;
-using Amazon.Runtime;
-using Amazon.SimpleEmail;
-using Amazon.SimpleEmail.Model;
-using form_builder.Models;
-using form_builder.Providers.EmailProvider;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.EmailProvider;
+﻿namespace form_builder_tests.UnitTests.Providers.EmailProvider;
 
 public class AwsSesProviderTests
 {

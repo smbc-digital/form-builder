@@ -1,31 +1,4 @@
-﻿using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Helpers.EmailHelpers;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Mappers.Element;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.EmailProvider;
-using form_builder.Providers.ReferenceNumbers;
-using form_builder.Services.DocumentService;
-using form_builder.Services.DocumentService.Entities;
-using form_builder.Services.EmailSubmitService;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using form_builder.TagParsers;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using StockportGovUK.NetStandard.Gateways;
-using System.Net;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class EmailSubmitServiceTests
 {

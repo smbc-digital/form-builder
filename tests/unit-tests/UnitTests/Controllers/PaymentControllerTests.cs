@@ -1,17 +1,4 @@
-﻿using form_builder.Controllers.Payment;
-using form_builder.Exceptions;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using form_builder.Services.PayService;
-using form_builder.Workflows.SuccessWorkflow;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Controllers;
+﻿namespace form_builder_tests.UnitTests.Controllers;
 
 public class PaymentControllerTests
 {

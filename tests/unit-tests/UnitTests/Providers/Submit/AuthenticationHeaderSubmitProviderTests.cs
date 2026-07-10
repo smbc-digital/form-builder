@@ -1,14 +1,4 @@
-﻿using System.Dynamic;
-using System.Net;
-using form_builder.Models;
-using form_builder.Providers.Submit;
-using form_builder.Services.MappingService.Entities;
-using form_builder_tests.Builders;
-using Moq;
-using StockportGovUK.NetStandard.Gateways;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.Submit;
+﻿namespace form_builder_tests.UnitTests.Providers.Submit;
 
 public class AuthenticationHeaderSubmitProviderTests
 {

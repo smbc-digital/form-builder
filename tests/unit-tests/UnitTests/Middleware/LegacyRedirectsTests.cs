@@ -1,10 +1,4 @@
-﻿using System.Web;
-using form_builder.Middleware;
-using Microsoft.AspNetCore.Http;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Middleware;
+﻿namespace form_builder_tests.UnitTests.Middleware;
 
 public class LegacyRedirectsTests
 {

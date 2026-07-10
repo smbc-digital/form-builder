@@ -1,18 +1,4 @@
-﻿using form_builder.Builders;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Street;
-using form_builder.Services.StreetService;
-using form_builder_tests.Builders;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Enums;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class StreetServiceTests
 {
@@ -62,7 +48,7 @@ public class StreetServiceTests
             }
         };
 
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Street)
@@ -118,7 +104,7 @@ public class StreetServiceTests
             }
         };
 
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Street)
@@ -176,7 +162,7 @@ public class StreetServiceTests
             }
         };
 
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Street)
@@ -232,7 +218,7 @@ public class StreetServiceTests
             }
         };
 
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Street)

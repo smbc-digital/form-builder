@@ -1,11 +1,4 @@
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Providers.Analytics;
-using form_builder.Providers.Analytics.Request;
-using form_builder.Services.AnalyticsService;
-using Microsoft.Extensions.Options;
-using Moq;
-using Xunit;
+using AnalyticsConfiguration = form_builder.Configuration.AnalyticsConfiguration;
 
 namespace form_builder_tests.UnitTests.Services;
 

@@ -1,15 +1,12 @@
-﻿using form_builder.Models;
-using form_builder.Services.MappingService.Entities;
-
-namespace form_builder_tests.Builders;
+﻿namespace form_builder_tests.Builders;
 
 public class MappingEntityBuilder
 {
-    private FormSchema _baseForm = new FormSchema();
-    private FormAnswers _formAnswers = new FormAnswers();
-    private object _data = new object();
+    private FormSchema _baseForm = new();
+    private FormAnswers _formAnswers = new();
+    private object _data = new();
 
-    public MappingEntity Build() => new MappingEntity
+    public MappingEntity Build() => new()
     {
         BaseForm = _baseForm,
         FormAnswers = _formAnswers,

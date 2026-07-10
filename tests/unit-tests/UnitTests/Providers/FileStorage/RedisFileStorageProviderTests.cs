@@ -1,11 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.Providers.FileStorage;
-using form_builder.Providers.StorageProvider;
-using Moq;
-using Newtonsoft.Json;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.FileStorage;
+﻿namespace form_builder_tests.UnitTests.Providers.FileStorage;
 
 public class RedisFileStorageProviderTests
 {
@@ -14,7 +7,7 @@ public class RedisFileStorageProviderTests
 
     public RedisFileStorageProviderTests()
     {
-        var formData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+        var formData = JsonSerializer.Serialize(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(formData);
 

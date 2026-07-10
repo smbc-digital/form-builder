@@ -1,13 +1,4 @@
-﻿using Amazon.S3;
-using form_builder.Configuration;
-using form_builder.Gateways;
-using form_builder.Providers.Transforms.PaymentConfiguration;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Providers.TransformDataProvider;
+﻿namespace form_builder_tests.UnitTests.Providers.TransformDataProvider;
 
 public class S3PaymentConfigurationTransformDataProviderTests
 {

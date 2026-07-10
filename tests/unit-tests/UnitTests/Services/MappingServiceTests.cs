@@ -1,23 +1,4 @@
-﻿using System.Dynamic;
-using form_builder.Builders;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Mappers.Element;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.SchemaProvider;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.MappingService;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using Xunit;
-using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
+﻿using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder_tests.UnitTests.Services;
 
@@ -58,7 +39,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>
                 {
@@ -287,7 +268,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 Path = page.PageSlug
@@ -349,7 +330,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 Path = page.PageSlug
@@ -410,7 +391,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 Path = page.PageSlug
@@ -460,7 +441,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 Path = page.PageSlug
@@ -528,7 +509,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 Path = page.PageSlug
@@ -592,7 +573,7 @@ public class MappingServiceTests
             .ReturnsAsync(new { });
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 FormData = new Dictionary<string, object> { { $"{AddAnotherConstants.IncrementKeyPrefix}person", 1 } },
@@ -639,7 +620,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 AdditionalFormData = new Dictionary<string, object> { { "additional", "answerData" } },
@@ -691,7 +672,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 PaymentAmount = "10.00",
@@ -726,7 +707,7 @@ public class MappingServiceTests
             .ReturnsAsync(schema);
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>(),
                 PaymentAmount = "10.00"
@@ -840,7 +821,7 @@ public class MappingServiceTests
             .ReturnsAsync("Address 1");
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 Pages = new List<PageAnswers>
                 {
