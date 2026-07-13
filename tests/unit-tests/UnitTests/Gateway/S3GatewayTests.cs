@@ -1,10 +1,4 @@
-﻿using Amazon.S3;
-using Amazon.S3.Model;
-using form_builder.Gateways;
-using Moq;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Gateway;
+﻿namespace form_builder_tests.UnitTests.Gateway;
 
 public class S3GatewayTests
 {

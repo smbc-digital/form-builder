@@ -1,20 +1,4 @@
-﻿using form_builder.Builders;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Providers.Address;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.AddressService;
-using form_builder.ViewModels;
-using form_builder_tests.Builders;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class AddressServiceTests
 {
@@ -62,7 +46,7 @@ public class AddressServiceTests
             }
         };
 
-        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Address)
@@ -117,7 +101,7 @@ public class AddressServiceTests
             }
         };
 
-        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Address)

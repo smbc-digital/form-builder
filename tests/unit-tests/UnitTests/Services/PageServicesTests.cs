@@ -1,43 +1,4 @@
-﻿using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.ContentFactory.SuccessPageFactory;
-using form_builder.Enum;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.IncomingDataHelper;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Actions;
-using form_builder.Models.Elements;
-using form_builder.Providers.FileStorage;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.AddAnotherService;
-using form_builder.Services.AddressService;
-using form_builder.Services.BookingService;
-using form_builder.Services.BookingService.Entities;
-using form_builder.Services.FileUploadService;
-using form_builder.Services.FormAvailabilityService;
-using form_builder.Services.OrganisationService;
-using form_builder.Services.PageService;
-using form_builder.Services.PageService.Entities;
-using form_builder.Services.StreetService;
-using form_builder.TagParsers;
-using form_builder.Validators;
-using form_builder.Validators.IntegrityChecks;
-using form_builder.ViewModels;
-using form_builder.Workflows.ActionsWorkflow;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using Newtonsoft.Json;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class PageServicesTests
 {
@@ -136,11 +97,11 @@ public class PageServicesTests
 
         _distributedCache
             .Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(cacheData));
+            .Returns(JsonSerializer.Serialize(cacheData));
 
         _fileStorageProvider
             .Setup(_ => _.GetString(It.IsAny<string>()))
-            .ReturnsAsync(JsonConvert.SerializeObject(cacheData));
+            .ReturnsAsync(JsonSerializer.Serialize(cacheData));
 
         _mockDistributedCacheExpirationConfiguration
             .Setup(_ => _.Value)
@@ -377,7 +338,7 @@ public class PageServicesTests
     public async Task ProcessPage_ShouldCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
     {
         _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "other-form" }));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(new FormAnswers { FormName = "other-form" }));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Street)
@@ -411,7 +372,7 @@ public class PageServicesTests
     public async Task ProcessPage_ShouldNotCallDistributedCache_ToDeleteSessionData_WhenNavigating_ToDifferentForm()
     {
         _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("1234567");
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { FormName = "new-form" }));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(new FormAnswers { FormName = "new-form" }));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Street)
@@ -599,7 +560,7 @@ public class PageServicesTests
 
         _distributedCache
             .Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(convertedAnswers));
+            .Returns(JsonSerializer.Serialize(convertedAnswers));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Textbox)
@@ -1430,7 +1391,7 @@ public class PageServicesTests
     public async Task GetBehaviour_ShouldCallSession_And_DistributedCache_And_TagParsers()
     {
         _sessionHelper.Setup(_ => _.GetBrowserSessionId()).Returns("12345");
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(new FormAnswers { Pages = new List<PageAnswers>() }));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(new FormAnswers { Pages = new List<PageAnswers>() }));
 
         var behaviour = new BehaviourBuilder()
             .WithBehaviourType(EBehaviourType.GoToPage)
@@ -1539,7 +1500,7 @@ public class PageServicesTests
             }
         };
 
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.FileUpload)
@@ -1627,7 +1588,7 @@ public class PageServicesTests
             }
         };
 
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.MultipleFileUpload)
@@ -1697,7 +1658,7 @@ public class PageServicesTests
             }
         };
 
-        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _distributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.MultipleFileUpload)

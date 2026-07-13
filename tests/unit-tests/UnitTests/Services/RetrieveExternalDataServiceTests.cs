@@ -1,23 +1,4 @@
-﻿using System.Dynamic;
-using System.Net;
-using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Actions;
-using form_builder.Models.Properties.ActionProperties;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using form_builder.Services.RetrieveExternalDataService;
-using form_builder.Services.RetrieveExternalDataService.Entities;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Moq;
-using StockportGovUK.NetStandard.Gateways;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class RetrieveExternalDataServiceTests
 {

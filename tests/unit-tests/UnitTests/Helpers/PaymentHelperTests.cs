@@ -1,21 +1,4 @@
-﻿using System.Net;
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Helpers.PaymentHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Providers.Transforms.PaymentConfiguration;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
-using Moq;
-using StockportGovUK.NetStandard.Gateways;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Helpers;
+﻿namespace form_builder_tests.UnitTests.Helpers;
 
 public class PaymentHelperTests
 {

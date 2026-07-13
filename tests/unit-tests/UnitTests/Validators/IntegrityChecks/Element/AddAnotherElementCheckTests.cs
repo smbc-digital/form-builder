@@ -1,9 +1,4 @@
-﻿using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Models.Properties.ElementProperties;
-using form_builder.Validators.IntegrityChecks.Elements;
-using Xunit;
-using Elements = form_builder.Models.Elements;
+﻿using Elements = form_builder.Models.Elements;
 
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element;
 

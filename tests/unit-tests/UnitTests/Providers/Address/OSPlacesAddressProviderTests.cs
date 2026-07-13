@@ -1,14 +1,4 @@
-﻿using form_builder.Providers.Address;
-using Moq;
-using StockportGovUK.NetStandard.Gateways;
-using Xunit;
-using Microsoft.Extensions.Options;
-using form_builder.Models;
-using Newtonsoft.Json;
-using Microsoft.Extensions.Logging;
-using form_builder.Configuration;
-
-namespace form_builder_tests.UnitTests.Providers.Address;
+﻿namespace form_builder_tests.UnitTests.Providers.Address;
 
 public class OSPlacesAddressProviderTests
 {
@@ -33,7 +23,7 @@ public class OSPlacesAddressProviderTests
         _mockGateway.Setup(_ => _.GetAsync(It.IsAny<string>()))
             .ReturnsAsync(new HttpResponseMessage()
             {
-                Content = new StringContent(JsonConvert.SerializeObject(new OSProperty()
+                Content = new StringContent(JsonSerializer.Serialize(new OSProperty()
                 {
                     results = new List<Result>()
                     {

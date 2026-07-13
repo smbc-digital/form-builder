@@ -1,8 +1,3 @@
-using form_builder.Builders;
-using form_builder.Enum;
-using form_builder.Validators.IntegrityChecks.Elements;
-using Xunit;
-
 namespace form_builder_tests.UnitTests.Validators.IntegrityChecks.Element;
 
 public class DocumentDownloadCheckTests

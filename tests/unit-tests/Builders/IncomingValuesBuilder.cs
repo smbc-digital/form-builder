@@ -1,7 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-
-namespace form_builder_tests.Builders;
+﻿namespace form_builder_tests.Builders;
 
 public class IncomingValuesBuilder
 {
@@ -11,7 +8,7 @@ public class IncomingValuesBuilder
     private EHttpActionType _httpActionType;
     private bool _base64Encoded;
 
-    public IncomingValue Build() => new IncomingValue
+    public IncomingValue Build() => new()
     {
         QuestionId = _questionId,
         Name = _name,

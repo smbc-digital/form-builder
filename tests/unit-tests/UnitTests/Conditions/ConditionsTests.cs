@@ -1,9 +1,4 @@
-﻿using form_builder.Conditions;
-using form_builder.Enum;
-using form_builder.Models;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Conditions;
+﻿namespace form_builder_tests.UnitTests.Conditions;
 
 public class ConditionTests
 {

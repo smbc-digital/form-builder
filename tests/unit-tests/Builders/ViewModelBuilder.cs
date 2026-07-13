@@ -2,7 +2,7 @@
 
 public class ViewModelBuilder
 {
-    private Dictionary<string, string[]> _viewModel = new Dictionary<string, string[]>();
+    private readonly Dictionary<string, string[]> _viewModel = new();
 
     public Dictionary<string, string[]> Build()
     {
@@ -11,7 +11,7 @@ public class ViewModelBuilder
 
     public ViewModelBuilder WithEntry(string key, string value)
     {
-        _viewModel.Add(key, new[] { value });
+        _viewModel.Add(key, [value]);
 
         return this;
     }

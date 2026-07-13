@@ -1,7 +1,3 @@
-using form_builder.Extensions;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using Xunit;
-
 namespace form_builder_tests.UnitTests.Extensions;
 
 public class BookingResourceExtensionsTests
@@ -16,7 +12,7 @@ public class BookingResourceExtensionsTests
     }
 
     [Fact]
-    public void BookingResources_ShouldReturn_String_WhenQuanity_And_ResourceId()
+    public void BookingResources_ShouldReturn_String_WhenQuantity_And_ResourceId()
     {
         var guid = Guid.NewGuid();
         var quantity = 2;

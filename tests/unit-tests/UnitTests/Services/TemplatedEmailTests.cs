@@ -1,17 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Helpers.ActionsHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Actions;
-using form_builder.Providers.StorageProvider;
-using form_builder.Providers.TemplatedEmailProvider;
-using form_builder.Services.TemplatedEmailService;
-using form_builder_tests.Builders;
-using Moq;
-using Newtonsoft.Json;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class TemplatedEmailTests
 {
@@ -63,7 +50,7 @@ public class TemplatedEmailTests
             .Setup(mock => mock.GetEmailToAddresses(It.IsAny<IAction>(), It.IsAny<FormAnswers>()))
             .Returns("test@testemail.com");
 
-        var formData = JsonConvert.SerializeObject(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
+        var formData = JsonSerializer.Serialize(new FormAnswers { Path = "page-one", Pages = new List<PageAnswers>() });
 
         _mockDistributedCache
             .Setup(mock => mock.GetString(It.IsAny<string>()))
@@ -117,7 +104,7 @@ public class TemplatedEmailTests
         };
         _mockDistributedCache
             .Setup(mock => mock.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(cacheData));
+            .Returns(JsonSerializer.Serialize(cacheData));
 
         var personalisationSent = new Dictionary<string, dynamic>();
 
@@ -171,7 +158,7 @@ public class TemplatedEmailTests
             }
         };
 
-        _mockDistributedCache.Setup(mock => mock.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(mock => mock.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var personalisationSent = new Dictionary<string, dynamic>();
         _mockTemplatedEmailProvider

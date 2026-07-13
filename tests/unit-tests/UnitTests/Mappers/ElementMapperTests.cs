@@ -1,18 +1,5 @@
-﻿using form_builder.Builders;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Mappers.Element;
-using form_builder.Models;
-using form_builder.Providers.FileStorage;
-using form_builder.Extensions;
-using form_builder.Utils.Hash;
-using Microsoft.Extensions.Configuration;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
-using StockportGovUK.NetStandard.Gateways.Models.Booking;
-using StockportGovUK.NetStandard.Gateways.Models.FormBuilder;
-using Xunit;
+﻿using Address = StockportGovUK.NetStandard.Gateways.Models.Addresses.Address;
+using Booking = StockportGovUK.NetStandard.Gateways.Models.Booking.Booking;
 using File = StockportGovUK.NetStandard.Gateways.Models.FileManagement.File;
 
 namespace form_builder_tests.UnitTests.Mappers;
@@ -757,7 +744,7 @@ public class ElementMapperTests
                         new Answers
                         {
                             QuestionId = "fileUpload_fileUploadTestKey-fileupload",
-                            Response = JsonConvert.SerializeObject(new List<FileUploadModel>{ new FileUploadModel{ UntrustedOriginalFileName = key, TrustedOriginalFileName = key } })
+                            Response = JsonSerializer.Serialize(new List<FileUploadModel>{ new FileUploadModel{ UntrustedOriginalFileName = key, TrustedOriginalFileName = key } })
                         }
                     }
                 }
@@ -798,7 +785,7 @@ public class ElementMapperTests
                         new Answers
                         {
                             QuestionId = "fileUpload_fileUploadTestKey-fileupload",
-                            Response = JsonConvert.SerializeObject(new List<FileUploadModel>
+                            Response = JsonSerializer.Serialize(new List<FileUploadModel>
                             {
                                 new FileUploadModel{  UntrustedOriginalFileName ="file1.txt",  TrustedOriginalFileName = "file1.txt", Key = "datakeyfile1" },
                                 new FileUploadModel{  UntrustedOriginalFileName ="file2.txt", TrustedOriginalFileName = "file2.txt", Key = "datakeyfile2"  }
@@ -845,7 +832,7 @@ public class ElementMapperTests
                         new Answers
                         {
                             QuestionId = $"{key}-fileupload",
-                            Response = JsonConvert.SerializeObject(
+                            Response = JsonSerializer.Serialize(
                                 new List<FileUploadModel>
                                 {
                                     new FileUploadModel
@@ -1165,7 +1152,7 @@ public class ElementMapperTests
         var questionId = "test-questionID";
         var labelText = "Evidence file";
         var value = new List<FileUploadModel> { new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" } };
-        var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } } } };
+        var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = JsonSerializer.Serialize(value) } } } } };
 
         var element = new ElementBuilder()
             .WithType(type)
@@ -1187,7 +1174,7 @@ public class ElementMapperTests
         var questionId = "test-questionID";
         var labelText = "Evidence file";
         var value = new List<FileUploadModel> { new FileUploadModel { TrustedOriginalFileName = "your_upload_file.txt" }, new FileUploadModel { TrustedOriginalFileName = "filetwo.jpg" } };
-        var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = Newtonsoft.Json.JsonConvert.SerializeObject(value) } } } } };
+        var formAnswers = new FormAnswers { Pages = new List<PageAnswers> { new PageAnswers { Answers = new List<Answers> { new Answers { QuestionId = $"{questionId}-fileupload", Response = JsonSerializer.Serialize(value) } } } } };
 
         var element = new ElementBuilder()
             .WithType(EElementType.MultipleFileUpload)

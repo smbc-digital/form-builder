@@ -1,33 +1,3 @@
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Exceptions;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Booking;
-using form_builder.Models.Elements;
-using form_builder.Providers.Booking;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.BookingService;
-using form_builder.Services.BookingService.Entities;
-using form_builder.Services.MappingService;
-using form_builder.Services.PageService.Entities;
-using form_builder.TagParsers;
-using form_builder.Utils.Hash;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;
-using Xunit;
-
 namespace form_builder_tests.UnitTests.Services;
 
 public class BookingServiceTests
@@ -104,7 +74,7 @@ public class BookingServiceTests
             .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
         _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers()));
+            .Returns(JsonSerializer.Serialize(new FormAnswers()));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Booking)
@@ -142,7 +112,7 @@ public class BookingServiceTests
             .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
         _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
-            .Returns(JsonConvert.SerializeObject(new()));
+            .Returns(JsonSerializer.Serialize(new object()));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Booking)
@@ -173,7 +143,7 @@ public class BookingServiceTests
 
         BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
         _mockDistributedCache.Setup(_ => _.GetString(sessionGuid))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 FormData = new Dictionary<string, object>
                 {
@@ -230,7 +200,7 @@ public class BookingServiceTests
             });
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Booking)
@@ -273,7 +243,7 @@ public class BookingServiceTests
             .ReturnsAsync(new List<AvailabilityDayResponse> { new() });
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Booking)
@@ -319,7 +289,7 @@ public class BookingServiceTests
             });
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
         var appointmentType = new AppointmentTypeBuilder()
             .WithAppointmentId(guid)
@@ -365,7 +335,7 @@ public class BookingServiceTests
             .Throws(new BookingNoAvailabilityException("BookingNoAvailabilityException"));
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Booking)
@@ -401,10 +371,10 @@ public class BookingServiceTests
             .ReturnsAsync(new List<AvailabilityDayResponse>());
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion--{guid}"))))
-            .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse() }));
+            .Returns(JsonSerializer.Serialize(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse() }));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Booking)
@@ -454,10 +424,10 @@ public class BookingServiceTests
             });
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object>() }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object>() }));
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals($"testBookingProvider-bookingQuestion--{guid}"))))
-            .Returns(JsonConvert.SerializeObject(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
+            .Returns(JsonSerializer.Serialize(new BookingNextAvailabilityEntity { DayResponse = new AvailabilityDayResponse { AppointmentTimes = new List<AppointmentTime> { new() { StartTime = startTime, EndTime = endTime } } } }));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Booking)
@@ -500,7 +470,7 @@ public class BookingServiceTests
 
         BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 FormData = new Dictionary<string, object> { { bookingCacheKey, cachedBookingInfo } }
             }));
@@ -563,7 +533,7 @@ public class BookingServiceTests
 
         BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 FormData = new Dictionary<string, object> { { bookingCacheKey, cachedBookingInfo } }
             }));
@@ -736,7 +706,7 @@ public class BookingServiceTests
 
         BookingInformation cachedBookingInfo = new() { AppointmentTypeId = appointmentId };
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 FormData = new Dictionary<string, object> { { bookingCacheKey, cachedBookingInfo } }
             }));
@@ -812,7 +782,7 @@ public class BookingServiceTests
             .Returns("guid");
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 FormData = new Dictionary<string, object>()
             }));
@@ -857,7 +827,7 @@ public class BookingServiceTests
             .Returns("guid");
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 FormData = new Dictionary<string, object>()
             }));
@@ -906,7 +876,7 @@ public class BookingServiceTests
             .Returns("guid");
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers
+            .Returns(JsonSerializer.Serialize(new FormAnswers
             {
                 FormData = new Dictionary<string, object>()
             }));
@@ -954,7 +924,7 @@ public class BookingServiceTests
             .Returns("guid");
 
         _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object> { { bookingInformationCacheKey, new BookingInformation() } } }));
 
         _schemaFactory.Setup(_ => _.Build("form"))
             .ReturnsAsync(formSchema);
@@ -1064,7 +1034,7 @@ public class BookingServiceTests
         var bookingInfo = new BookingInformation();
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
 
         var appointmentTypeGuid = new Guid();
         var element = new ElementBuilder()
@@ -1106,7 +1076,7 @@ public class BookingServiceTests
         var bookingInfo = new BookingInformation();
 
         _mockDistributedCache.Setup(_ => _.GetString(It.Is<string>(_ => _.Equals("guid"))))
-            .Returns(Newtonsoft.Json.JsonConvert.SerializeObject(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
+            .Returns(JsonSerializer.Serialize(new FormAnswers { FormData = new Dictionary<string, object> { { $"bookingQuestion{BookingConstants.APPOINTMENT_TYPE_SEARCH_RESULTS}", bookingInfo } } }));
 
         var appointmentTypeGuid = new Guid();
         var element = new ElementBuilder()

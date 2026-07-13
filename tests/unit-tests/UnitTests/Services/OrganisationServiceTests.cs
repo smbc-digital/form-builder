@@ -1,19 +1,4 @@
-﻿using form_builder.Builders;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Providers.Organisation;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.OrganisationService;
-using form_builder_tests.Builders;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways.Enums;
-using StockportGovUK.NetStandard.Gateways.Models.Organisation;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class OrganisationServiceTests
 {
@@ -71,7 +56,7 @@ public class OrganisationServiceTests
             }
         };
 
-        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Organisation)
@@ -127,7 +112,7 @@ public class OrganisationServiceTests
             }
         };
 
-        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Organisation)
@@ -186,7 +171,7 @@ public class OrganisationServiceTests
             }
         };
 
-        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Organisation)
@@ -242,7 +227,7 @@ public class OrganisationServiceTests
             }
         };
 
-        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonConvert.SerializeObject(cacheData));
+        _mockDistributedCache.Setup(_ => _.GetString(It.IsAny<string>())).Returns(JsonSerializer.Serialize(cacheData));
 
         var element = new ElementBuilder()
             .WithType(EElementType.Organisation)

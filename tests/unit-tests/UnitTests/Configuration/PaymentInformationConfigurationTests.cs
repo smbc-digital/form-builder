@@ -1,7 +1,4 @@
-﻿using form_builder.Configuration;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Configuration;
+﻿namespace form_builder_tests.UnitTests.Configuration;
 
 public class PaymentInformationConfigurationTests
 {

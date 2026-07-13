@@ -1,29 +1,4 @@
-﻿using System.Dynamic;
-using System.Net;
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Enum;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.PaymentHelpers;
-using form_builder.Helpers.Submit;
-using form_builder.Models;
-using form_builder.Providers.ReferenceNumbers;
-using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Submit;
-using form_builder.Services.MappingService.Entities;
-using form_builder.Services.SubmitService;
-using form_builder.TagParsers;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Moq;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class SubmitServiceTests
 {
@@ -352,7 +327,7 @@ public class SubmitServiceTests
             })
             .Callback<string, object>((x, y) => callbackValue = (ExpandoObject)y);
 
-        var json = JsonConvert.SerializeObject(new FormAnswers
+        var json = JsonSerializer.Serialize(new FormAnswers
         {
             CaseReference = "TEST123456",
             AdditionalFormData = new Dictionary<string, object>()
@@ -877,7 +852,7 @@ public class SubmitServiceTests
 
         _mockDistributedCache
             .Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(formAnswers));
+            .Returns(JsonSerializer.Serialize(formAnswers));
 
         // Act
         await _service.ProcessWithoutSubmission(mappingEntity, "form", "123454");

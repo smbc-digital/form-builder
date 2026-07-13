@@ -1,21 +1,3 @@
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Factories.Schema;
-using form_builder.Factories.Transform.Lookups;
-using form_builder.Factories.Transform.ReusableElements;
-using form_builder.Factories.Transform.UserSchema;
-using form_builder.Models;
-using form_builder.Providers.SchemaProvider;
-using form_builder.Providers.StorageProvider;
-using form_builder.Validators.IntegrityChecks;
-using form_builder_tests.Builders;
-using Microsoft.Extensions.Options;
-using Moq;
-using Newtonsoft.Json;
-using Xunit;
-
 namespace form_builder_tests.UnitTests.Factories.Schema;
 
 public class SchemaFactoryTests
@@ -123,7 +105,7 @@ public class SchemaFactoryTests
 
         _mockDistributedCache
             .Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(formSchema));
+            .Returns(JsonSerializer.Serialize(formSchema));
 
         // Act
         var result = await _schemaFactory.Build("form");
@@ -305,7 +287,7 @@ public class SchemaFactoryTests
     {
         _mockDistributedCache
             .Setup(_ => _.GetString(It.IsAny<string>()))
-            .Returns(JsonConvert.SerializeObject(new FormSchema { Pages = new List<Page>(), BaseURL = PreviewConstants.PREVIEW_MODE_PREFIX }));
+            .Returns(JsonSerializer.Serialize(new FormSchema { Pages = new List<Page>(), BaseURL = PreviewConstants.PREVIEW_MODE_PREFIX }));
 
         _mockPreviewModeConfiguration
             .Setup(_ => _.Value)

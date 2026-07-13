@@ -1,24 +1,4 @@
-﻿using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.FileStorage;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.FileUploadService;
-using form_builder.Services.PageService.Entities;
-using form_builder.Validators;
-using form_builder.ViewModels;
-using form_builder_tests.Builders;
-using Microsoft.Extensions.Options;
-using Moq;
-using Newtonsoft.Json;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Services;
+﻿namespace form_builder_tests.UnitTests.Services;
 
 public class FileUploadServiceTests
 {
@@ -114,7 +94,7 @@ public class FileUploadServiceTests
         var result = _service.AddFiles(new Dictionary<string, dynamic>(), fileUpload);
 
         // Assert
-        Assert.Equal(JsonConvert.SerializeObject(expectedViewModel), JsonConvert.SerializeObject(result));
+        Assert.Equal(JsonSerializer.Serialize(expectedViewModel), JsonSerializer.Serialize(result));
     }
 
     [Fact]
@@ -262,7 +242,7 @@ public class FileUploadServiceTests
         Assert.IsType<ProcessRequestEntity>(result);
         Assert.True(result.RedirectToAction);
         Assert.Equal("Index", result.RedirectAction);
-        Assert.Equal(JsonConvert.SerializeObject(expectedRouteValues), JsonConvert.SerializeObject(result.RouteValues));
+        Assert.Equal(JsonSerializer.Serialize(expectedRouteValues), JsonSerializer.Serialize(result.RouteValues));
         Assert.Null(result.Page);
     }
 
@@ -321,7 +301,7 @@ public class FileUploadServiceTests
         Assert.IsType<ProcessRequestEntity>(result);
         Assert.True(result.RedirectToAction);
         Assert.Equal("Index", result.RedirectAction);
-        Assert.Equal(JsonConvert.SerializeObject(expectedRouteValues), JsonConvert.SerializeObject(result.RouteValues));
+        Assert.Equal(JsonSerializer.Serialize(expectedRouteValues), JsonSerializer.Serialize(result.RouteValues));
         Assert.Null(result.Page);
     }
 

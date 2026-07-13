@@ -1,15 +1,11 @@
-﻿using System.Reflection;
-using form_builder.Enum;
-using form_builder.Models.Actions;
-using form_builder.Models.Properties.ActionProperties;
-using Action = form_builder.Models.Actions.Action;
+﻿using Action = form_builder.Models.Actions.Action;
 
 namespace form_builder_tests.Builders;
 
 public class ActionBuilder
 {
     private EActionType _type = EActionType.RetrieveExternalData;
-    private BaseActionProperty _actionProperties = new BaseActionProperty();
+    private readonly BaseActionProperty _actionProperties = new();
 
     public IAction Build()
     {

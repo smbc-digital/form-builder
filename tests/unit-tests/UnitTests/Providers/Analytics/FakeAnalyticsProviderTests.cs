@@ -1,10 +1,3 @@
-using form_builder.Enum;
-using form_builder.Providers.Analytics;
-using form_builder.Providers.Analytics.Request;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Xunit;
-
 namespace form_builder_tests.UnitTests.Providers.Analytics;
 
 public class FakeAnalyticsProviderTests

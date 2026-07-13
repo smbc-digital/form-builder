@@ -1,10 +1,3 @@
-using form_builder.Restrictions;
-using form_builder_tests.Builders;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using Moq;
-using Xunit;
-
 namespace form_builder_tests.UnitTests.Restrictions;
 
 public class RefererRestrictionsTests

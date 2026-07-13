@@ -1,13 +1,12 @@
-﻿using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
+﻿using Address = form_builder.Models.Elements.Address;
 
 namespace form_builder_tests.Builders;
 
 public class AddressBuilder
 {
-    private readonly BaseProperty _property = new BaseProperty();
+    private readonly BaseProperty _property = new();
 
-    public Address Build() => new Address
+    public Address Build() => new()
     {
         Properties = _property,
     };
