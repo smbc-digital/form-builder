@@ -476,7 +476,7 @@ public class PageHelperTests
 
         // Assert
         Assert.Equal("answer_0_", callbackModel.Pages[0].Answers[0].QuestionId);
-        Assert.Equal("answer1", callbackModel.Pages[0].Answers[0].Response);
+        Assert.Equal("answer1", callbackModel.Pages[0].Answers[0].Response.ToString());
         Assert.Single(callbackModel.Pages[0].Answers);
     }
 
@@ -601,9 +601,9 @@ public class PageHelperTests
 
         // Assert
         Assert.Equal("Item1", callbackModel.Pages[0].Answers[0].QuestionId);
-        Assert.Equal(item1Data, callbackModel.Pages[0].Answers[0].Response);
+        Assert.Equal(item1Data, callbackModel.Pages[0].Answers[0].Response.ToString());
         Assert.Equal("Item2", callbackModel.Pages[0].Answers[1].QuestionId);
-        Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response);
+        Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response.ToString());
     }
 
     [Fact]
@@ -668,9 +668,9 @@ public class PageHelperTests
 
         // Assert
         Assert.Equal("Item1", callbackModel.Pages[0].Answers[0].QuestionId);
-        Assert.Equal(item1Data, callbackModel.Pages[0].Answers[0].Response);
+        Assert.Equal(item1Data, callbackModel.Pages[0].Answers[0].Response.ToString());
         Assert.Equal("Item2", callbackModel.Pages[0].Answers[1].QuestionId);
-        Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response);
+        Assert.Equal(item2Data, callbackModel.Pages[0].Answers[1].Response.ToString());
     }
 
     [Fact]
