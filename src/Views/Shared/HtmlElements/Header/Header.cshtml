@@ -22,9 +22,10 @@
             <div class="govuk-header__content">
                 @if (!isError)
                 {
-                    <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name govuk-grid-column-two-thirds govuk-!-padding-0">
+                    @* <a href="@startPageUrl" class="govuk-header__link smbc-header__link--service-name govuk-grid-column-two-thirds govuk-!-padding-0">
                         @Model.FormName
-                    </a>
+                    </a> *@
+                    <p class="smbc-body govuk-!-font-size-24 govuk-!-font-weight-bold govuk-grid-column-two-thirds govuk-!-padding-0 govuk-!-margin-bottom-2" style="color: white !important">@Model.FormName</p>
                 }
                 <partial name="ReciteMe" />
             </div>
