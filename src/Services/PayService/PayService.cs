@@ -13,7 +13,7 @@ public class PayService(IEnumerable<IPaymentProvider> paymentProviders,
     IOptions<PaymentConfiguration> paymentConfiguration,
     IOptions<SubmissionServiceConfiguration> submissionServiceConfiguration,
     IEnumerable<ITagParser> tagParsers,
-    IMailingServiceProxyGateway mailingServiceGateway,
+    ICloudMailingServiceGateway mailingServiceGateway,
     IOptions<ErrorEmailConfiguration> errorEmailConfiguration)
     : IPayService
 {
@@ -117,7 +117,7 @@ public class PayService(IEnumerable<IPaymentProvider> paymentProviders,
                 logger.LogError(log);
                 foreach (string recipient in _errorEmailConfiguration.Recipients)
                 {
-                    mailingServiceGateway.Send(new Mail
+                    mailingServiceGateway.SendSesEmail(new Mail
                     {
                         Payload = JsonConvert.SerializeObject(new GenericReportMailModel
                         {
@@ -144,7 +144,7 @@ public class PayService(IEnumerable<IPaymentProvider> paymentProviders,
             logger.LogError(log);
             foreach (string recipient in _errorEmailConfiguration.Recipients)
             {
-                mailingServiceGateway.Send(new Mail
+                mailingServiceGateway.SendSesEmail(new Mail
                 {
                     Payload = JsonConvert.SerializeObject(new GenericReportMailModel
                     {
