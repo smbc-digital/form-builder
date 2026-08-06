@@ -84,7 +84,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<IStreetServiceGateway, StreetServiceGateway>(configuration);
         services.AddHttpClient<IOrganisationServiceGateway, OrganisationServiceGateway>(configuration);
         services.AddHttpClient<IBookingServiceGateway, BookingServiceGateway>(configuration);
-        services.AddHttpClient<IMailingServiceProxyGateway, MailingServiceProxyGateway>(configuration);
+        services.AddHttpClient<ICloudMailingServiceGateway, CloudMailingServiceGateway>(configuration);
 
         return services;
     }

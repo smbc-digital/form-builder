@@ -167,7 +167,7 @@ global using StockportGovUK.NetStandard.Gateways.BookingService;
 global using StockportGovUK.NetStandard.Gateways.CivicaPay;
 global using StockportGovUK.NetStandard.Gateways.Enums;
 global using StockportGovUK.NetStandard.Gateways.Extensions;
-global using StockportGovUK.NetStandard.Gateways.MailingServiceProxy;
+global using StockportGovUK.NetStandard.Gateways.MailingService;
 global using StockportGovUK.NetStandard.Gateways.Models.Addresses;
 global using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
 global using StockportGovUK.NetStandard.Gateways.Models.Booking.Response;

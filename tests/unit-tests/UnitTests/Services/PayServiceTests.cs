@@ -19,7 +19,7 @@ public class PayServiceTests
     private readonly Mock<ITagParser> _tagParser = new();
     private readonly Mock<IOptions<PaymentConfiguration>> _mockPaymentConfiguration = new();
     private readonly Mock<IOptions<SubmissionServiceConfiguration>> _mockSubmissionServiceConfiguration = new();
-    private readonly Mock<IMailingServiceProxyGateway> _mockMailingServiceGateway = new();
+    private readonly Mock<ICloudMailingServiceGateway> _mockMailingServiceGateway = new();
     private readonly Mock<IOptions<ErrorEmailConfiguration>> _mockErrorEmailConfiguration = new();
 
     public PayServiceTests()
