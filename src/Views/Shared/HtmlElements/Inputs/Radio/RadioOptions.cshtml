@@ -57,7 +57,7 @@
 
 			@if (Model.Properties.Options[i].HasHint)
 			{
-				<span class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</span>
+				<div class="govuk-hint govuk-radios__hint" id="@Model.GetListItemHintId(i)">@Html.Raw(Model.Properties.Options[i].Hint)</div>
 			}
 
 		</div>
