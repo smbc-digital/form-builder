@@ -26,9 +26,9 @@
             @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties)
         </div>
 
-        <span id=@Model.GetCustomItemId("info") class="govuk-hint govuk-character-count__message" aria-live="polite">
+        <div id=@Model.GetCustomItemId("info") class="govuk-hint govuk-character-count__message">
             You can enter up to @Model.Properties.MaxLength characters
-        </span>
+        </div>
     </div>
 }
 else
