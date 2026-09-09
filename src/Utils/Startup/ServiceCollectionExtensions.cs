@@ -464,7 +464,7 @@ public static class ServiceCollectionExtensions
             case "Redis":
                 services.AddStackExchangeRedisCache(options =>
                 {
-                    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
+                    options.ConfigurationOptions = new ConfigurationOptions
                     {
                         EndPoints =
                         {
@@ -473,6 +473,14 @@ public static class ServiceCollectionExtensions
                         ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
                         SyncTimeout = 60000,
                         AsyncTimeout = 60000
+                    };
+
+                    options.ConfigurationOptions.CertificateValidation += (sender, cert, chain, errors) =>
+                    {
+                        if (cert is not null)
+                            return cert.Subject.Contains(".cache.amazonaws.com") || cert.Issuer.Contains("Amazon");
+
+                        return false;
                     };
                 });
 
