@@ -1,4 +1,5 @@
-﻿using AnalyticsConfiguration = form_builder.Configuration.AnalyticsConfiguration;
+﻿using System.Security.Authentication;
+using AnalyticsConfiguration = form_builder.Configuration.AnalyticsConfiguration;
 
 namespace form_builder.Utils.Startup;
 
@@ -462,34 +463,35 @@ public static class ServiceCollectionExtensions
         switch (storageProviderConfiguration["Type"])
         {
             case "Redis":
-                services.AddStackExchangeRedisCache(options =>
+                var options = new ConfigurationOptions
                 {
-                    options.ConfigurationOptions = new ConfigurationOptions
+                    EndPoints =
                     {
-                        EndPoints =
-                        {
-                            { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379 }
-                        },
-                        Ssl = true,
-                        SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
-                        AbortOnConnectFail = false,
-                        ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
-                        SyncTimeout = 60000,
-                        AsyncTimeout = 60000,
-                        IncludePerformanceCountersInExceptions = true
-                    };
+                        { storageProviderConfiguration["Address"] ?? "127.0.0.1", 6379 }
+                    },
+                    Ssl = true,
+                    SslProtocols = SslProtocols.Tls12,
+                    AbortOnConnectFail = false,
+                    ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
+                    SyncTimeout = 60000,
+                    AsyncTimeout = 60000,
+                    IncludePerformanceCountersInExceptions = true
+                };
 
-                    options.ConfigurationOptions.CertificateValidation += (sender, cert, chain, errors) =>
-                    {
-                        if (cert is not null)
-                            return cert.Subject.Contains(".cache.amazonaws.com") || cert.Issuer.Contains("Amazon");
+                options.CertificateValidation += (sender, cert, chain, errors) =>
+                {
+                    if (cert is not null)
+                        return cert.Subject.Contains(".cache.amazonaws.com") || cert.Issuer.Contains("Amazon");
 
-                        return false;
-                    };
+                    return false;
+                };
+
+                services.AddStackExchangeRedisCache(cacheOptions =>
+                {
+                    cacheOptions.ConfigurationOptions = options;
                 });
 
-                var redis = ConnectionMultiplexer.Connect(storageProviderConfiguration["Address"]);
-                redis.IncludePerformanceCountersInExceptions = true;
+                var redis = ConnectionMultiplexer.Connect(options);
                 services.AddDataProtection().PersistKeysToStackExchangeRedis(redis, $"{storageProviderConfiguration["InstanceName"]}DataProtection-Keys");
                 break;
 
