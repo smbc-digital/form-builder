@@ -468,7 +468,7 @@ public static class ServiceCollectionExtensions
                     {
                         EndPoints =
                         {
-                            { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379}
+                            { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379 }
                         },
                         ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
                         SyncTimeout = 60000,
