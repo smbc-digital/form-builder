@@ -1,4 +1,5 @@
-﻿using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
+﻿using Serilog.Events;
+using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,8 +78,12 @@ builder.Services
     .AddFeatureManagement();
 
 Log.Logger = new LoggerConfiguration()
+    .Filter.ByExcluding(e =>
+        e.Properties.ContainsKey("RequestPath") &&
+        (e.Properties["RequestPath"].ToString().Contains("/_healthcheck", StringComparison.OrdinalIgnoreCase)
+        || e.Properties["RequestPath"].ToString().Contains("/view/", StringComparison.OrdinalIgnoreCase)))
     .ReadFrom.Configuration(builder.Configuration)
-    .WriteToElasticsearchAws(builder.Configuration)
+    .WriteToOpenSearchAws(builder.Configuration)
     .CreateLogger();
 
 builder.Logging.ClearProviders();
@@ -96,6 +101,20 @@ else
     app.UseMiddleware<AppExceptionHandling>()
         .UseHsts();
 }
+
+app.UseSerilogRequestLogging(options =>
+{
+    options.Logger = Log.Logger;
+    options.IncludeQueryInRequestPath = true;
+    options.GetMessageTemplateProperties = (ctx, _, elapsedMs, status) =>
+    [
+        new LogEventProperty("Elapsed", new ScalarValue(TimeSpan.FromMilliseconds(elapsedMs))),
+        new LogEventProperty("RequestPath", new ScalarValue(ctx.Request.Path)),
+        new LogEventProperty("Application", new ScalarValue("form-builder")),
+        new LogEventProperty("Status", new ScalarValue(status))
+    ];
+    options.MessageTemplate = "Finished handling request path for {Application}: {RequestPath} in {Elapsed} with code {Status}";
+});
 
 app.UseMiddleware<HeaderConfiguration>()
     .UseMiddleware<LegacyRedirect>()
