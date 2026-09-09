@@ -157,6 +157,7 @@ global using PdfSharpCore.Drawing;
 global using PdfSharpCore.Drawing.Layout;
 global using PdfSharpCore.Pdf;
 global using Serilog;
+global using Serilog.Events;
 global using StackExchange.Redis;
 global using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
 global using StockportGovUK.AspNetCore.Middleware.App;
