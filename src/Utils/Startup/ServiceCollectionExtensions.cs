@@ -470,9 +470,13 @@ public static class ServiceCollectionExtensions
                         {
                             { storageProviderConfiguration["Address"] ?? "127.0.0.1",  6379 }
                         },
+                        Ssl = true,
+                        SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
+                        AbortOnConnectFail = false,
                         ClientName = storageProviderConfiguration["InstanceName"] ?? Assembly.GetEntryAssembly()?.GetName().Name,
                         SyncTimeout = 60000,
-                        AsyncTimeout = 60000
+                        AsyncTimeout = 60000,
+                        IncludePerformanceCountersInExceptions = true
                     };
 
                     options.ConfigurationOptions.CertificateValidation += (sender, cert, chain, errors) =>
