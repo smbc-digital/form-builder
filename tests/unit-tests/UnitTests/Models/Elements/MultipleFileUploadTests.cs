@@ -147,6 +147,6 @@ public class MultipleFileUploadTests
             .Build();
 
         //Act
-        Assert.Equal("10MB", element.MaxFileSizeText);
+        Assert.Equal("19MB", element.MaxFileSizeText);
     }
 }
