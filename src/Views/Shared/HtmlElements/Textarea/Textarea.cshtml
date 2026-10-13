@@ -11,24 +11,6 @@
 
 @if (Model.DisplayCharacterCount)
 {
-    @* <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty) govuk-character-count" data-module="govuk-character-count" data-maxlength="@Model.Properties.MaxLength">
-        <partial name="LabelH1" />
-
-        <partial name="WarningText" />
-
-        <partial name="InsetText" model="Model.Properties.IAG" />
-
-        <partial name="Hint" />
-
-        <partial name="Error" />
-
-        @Html.TextArea(Model.QuestionId, Model.Properties.Value, elementProperties)
-
-        <div id=@Model.GetCustomItemId("info") class="govuk-hint govuk-character-count__message">
-            You can enter up to @Model.Properties.MaxLength characters
-        </div>
-    </div> *@
-
     <div class="govuk-form-group govuk-character-count @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" data-module="govuk-character-count" data-maxlength="@Model.Properties.MaxLength">
         <partial name="LabelH1" />
 
