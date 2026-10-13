@@ -26,9 +26,13 @@
 </head>
 
 <body class="govuk-template__body">
-    <partial name="CookieBanner" />
-    <partial name="TagManagerHead" />
-    <partial name="TagManagerBody" />
+    <script>
+            document.body.className += ' govuk-frontend-supported' +
+                ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported--modules' : '');
+    </script>
+    <partial name="CookieBanner"/>
+    <partial name="TagManagerHead"/>
+    <partial name="TagManagerBody"/>
 
     <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
 
@@ -36,12 +40,12 @@
         <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
     </div>
 
-    @if(displayPreviewModeBanner)
+    @if (displayPreviewModeBanner)
     {
-        <partial name="PreviewMode" />
+        <partial name="PreviewMode"/>
     }
 
-    <partial name="Header" />
+    <partial name="Header"/>
 
     <div class="govuk-width-container @(Model.Embeddable ? "smbc-container-embeddable" : string.Empty)">
 
@@ -58,12 +62,12 @@
                 </p>
             </div>
         }
-        
+
         @if (displayBreadcrumbs)
         {
-            <partial name="Breadcrumbs" model="@breadcrumbs" />
+            <partial name="Breadcrumbs" model="@breadcrumbs"/>
         }
-        
+
         @if (!Model.HideBackButton)
         {
             <a href="javascript:history.back(-1)" class="govuk-back-link">Back</a>
@@ -78,7 +82,7 @@
         </main>
     </div>
 
-    <partial name="Footer" />
+    <partial name="Footer"/>
     <script type="text/javascript" src="@JavascriptConfiguration.Value.Javascript"></script>
     @* <script type="text/javascript" src="~/assets/css/smbc-frontend.min.js"></script> *@
     <script>window.GOVUKFrontend.initAll()</script>
@@ -86,7 +90,7 @@
 
     @if (Model.Embeddable)
     {
-        <partial name="../Embedded/Index" />
+        <partial name="../Embedded/Index"/>
     }
 </body>
 </html>
