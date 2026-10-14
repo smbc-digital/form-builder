@@ -702,5 +702,19 @@ namespace form_builder.Builders
 
             return this;
         }
+
+        public ElementBuilder WithMinTime(string minTime)
+        {
+            _property.MinTime = minTime;
+
+            return this;
+        }
+
+        public ElementBuilder WithMaxTime(string maxTime)
+        {
+            _property.MaxTime = maxTime;
+
+            return this;
+        }
     }
 }

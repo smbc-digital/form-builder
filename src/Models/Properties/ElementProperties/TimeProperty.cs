@@ -11,5 +11,9 @@
         public string CustomValidationMessageAmPm { get; set; } = string.Empty;
 
         public string ValidationMessageInvalidTime { get; set; } = string.Empty;
+
+        public string MinTime { get; set; } = string.Empty;
+
+        public string MaxTime { get; set; } = string.Empty;
     }
 }
