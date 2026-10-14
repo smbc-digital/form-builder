@@ -1,24 +1,9 @@
-﻿using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Services.PageService.Entities;
+﻿namespace form_builder.Services.AddAnotherService;
 
-namespace form_builder.Services.AddAnotherService;
-
-public class AddAnotherService : IAddAnotherService
+public class AddAnotherService(IPageHelper pageHelper,
+    IPageFactory pageContentFactory)
+    : IAddAnotherService
 {
-    private readonly IPageHelper _pageHelper;
-    private readonly IPageFactory _pageContentFactory;
-
-    public AddAnotherService(IPageHelper pageHelper,
-        IPageFactory pageContentFactory)
-    {
-        _pageHelper = pageHelper;
-        _pageContentFactory = pageContentFactory;
-    }
-
     public async Task<ProcessRequestEntity> ProcessAddAnother(
         Dictionary<string, dynamic> viewModel,
         Page dynamicCurrentPage,
@@ -29,7 +14,7 @@ public class AddAnotherService : IAddAnotherService
         string removeKey = viewModel.Keys.FirstOrDefault(_ => _.Contains("remove"));
         bool addEmptyFieldset = viewModel.Keys.Any(_ => _.Equals(AddAnotherConstants.AddAnotherButtonKey));
 
-        FormAnswers convertedFormAnswers = _pageHelper.GetSavedAnswers(cacheKey);
+        FormAnswers convertedFormAnswers = pageHelper.GetSavedAnswers(cacheKey);
         var minimumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.MinimumFieldsets;
         var maximumFieldsets = dynamicCurrentPage.Elements.FirstOrDefault(_ => _.Type.Equals(EElementType.AddAnother)).Properties.MaximumFieldsets;
 
@@ -63,19 +48,19 @@ public class AddAnotherService : IAddAnotherService
                 }
 
                 if (allOptionalElementsEmpty)
-                    _pageHelper.RemoveFormData(formDataIncrementKey, cacheKey, baseForm.BaseURL);
+                    pageHelper.RemoveFormData(formDataIncrementKey, cacheKey, baseForm.BaseURL);
                 else
-                    _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, cacheKey, baseForm.BaseURL);
+                    pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, cacheKey, baseForm.BaseURL);
             }
             else
             {
-                _pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, cacheKey, baseForm.BaseURL);
+                pageHelper.SaveFormData(formDataIncrementKey, currentIncrement, cacheKey, baseForm.BaseURL);
             }
         }
 
         if (!string.IsNullOrEmpty(removeKey))
         {
-            _pageHelper.RemoveFieldset(viewModel, baseForm.BaseURL, cacheKey, path, removeKey);
+            pageHelper.RemoveFieldset(viewModel, baseForm.BaseURL, cacheKey, path, removeKey);
             return new ProcessRequestEntity
             {
                 RedirectToAction = true,
@@ -88,11 +73,11 @@ public class AddAnotherService : IAddAnotherService
             };
         }
 
-        _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, dynamicCurrentPage.IsValid);
+        pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, dynamicCurrentPage.IsValid);
 
         if (!dynamicCurrentPage.IsValid)
         {
-            var invalidFormModel = await _pageContentFactory.Build(dynamicCurrentPage, viewModel, baseForm, cacheKey);
+            var invalidFormModel = await pageContentFactory.Build(dynamicCurrentPage, viewModel, baseForm, cacheKey);
 
             return new ProcessRequestEntity
             {

@@ -1,12 +1,4 @@
-﻿using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Helpers.ElementHelpers;
-using form_builder.Helpers.ViewRender;
-using form_builder.Validators;
-using form_builder.ViewModels;
-
-namespace form_builder.Models.Elements;
+﻿namespace form_builder.Models.Elements;
 
 public class AddressManual : Element
 {

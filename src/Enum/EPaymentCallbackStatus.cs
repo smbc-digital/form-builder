@@ -1,10 +1,9 @@
-namespace form_builder.Enum
+namespace form_builder.Enum;
+
+public enum EPaymentCallbackStatus
 {
-    public enum EPaymentCallbackStatus
-    {
-        Unknown,
-        Success,
-        Declined,
-        Failure
-    }
+    Unknown,
+    Success,
+    Declined,
+    Failure
 }

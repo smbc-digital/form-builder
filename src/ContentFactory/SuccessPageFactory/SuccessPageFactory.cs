@@ -1,49 +1,17 @@
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.StorageProvider;
-using form_builder.Services.PageService.Entities;
-using Microsoft.Extensions.Options;
-
 namespace form_builder.ContentFactory.SuccessPageFactory;
 
-public class SuccessPageFactory : ISuccessPageFactory
+public class SuccessPageFactory(IPageHelper pageHelper,
+    IPageFactory pageFactory,
+    IDistributedCacheWrapper distributedCache,
+    IOptions<PreviewModeConfiguration> previewModeConfiguration,
+    ILogger<SuccessPageFactory> logger)
+    : ISuccessPageFactory
 {
-    private readonly IPageHelper _pageHelper;
-    private readonly IPageFactory _pageFactory;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration;
-
-    private readonly ILogger<SuccessPageFactory> _logger;
-
-    public SuccessPageFactory(IPageHelper pageHelper, 
-        IPageFactory pageFactory,
-        ISessionHelper sessionHelper, 
-        IDistributedCacheWrapper distributedCache,
-        IOptions<PreviewModeConfiguration> previewModeConfiguration,
-        IWebHostEnvironment environment,
-        ILogger<SuccessPageFactory> logger)
-    {
-        _pageHelper = pageHelper;
-        _pageFactory = pageFactory;
-        _sessionHelper = sessionHelper;
-        _distributedCache = distributedCache;
-        _environment = environment;
-        _previewModeConfiguration = previewModeConfiguration;
-        _logger = logger;
-    }
+    private readonly IOptions<PreviewModeConfiguration> _previewModeConfiguration = previewModeConfiguration;
 
     public async Task<SuccessPageEntity> Build(string form, FormSchema baseForm, string cacheKey, FormAnswers formAnswers, EBehaviourType behaviourType)
     {
-        var page = baseForm.GetPage(_pageHelper, "success", form);
+        var page = baseForm.GetPage(pageHelper, "success", form);
             
         if (page is null && behaviourType.Equals(EBehaviourType.SubmitAndPay))
         {
@@ -53,8 +21,8 @@ public class SuccessPageFactory : ISuccessPageFactory
 
         if (page is null)
         {
-            _logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
-            _distributedCache.Remove(cacheKey);
+            logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
+            distributedCache.Remove(cacheKey);
 
             return new SuccessPageEntity
             {
@@ -70,10 +38,10 @@ public class SuccessPageFactory : ISuccessPageFactory
             };
         }
 
-        var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
+        var result = await pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
 
-        _logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
-        _distributedCache.Remove(cacheKey);
+        logger.LogInformation($"SuccessPageFactory:Build:{cacheKey} Disposing session");
+        distributedCache.Remove(cacheKey);
 
         return new SuccessPageEntity
         {
@@ -97,7 +65,7 @@ public class SuccessPageFactory : ISuccessPageFactory
     {
         var page = GenerateGenericBookingPage(baseForm);
 
-        var result = await _pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
+        var result = await pageFactory.Build(page, new Dictionary<string, dynamic>(), baseForm, cacheKey, formAnswers);
 
         return new SuccessPageEntity
         {

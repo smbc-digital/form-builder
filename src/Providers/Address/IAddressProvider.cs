@@ -1,11 +1,8 @@
-using StockportGovUK.NetStandard.Gateways.Models.Addresses;
+namespace form_builder.Providers.Address;
 
-namespace form_builder.Providers.Address
+public interface IAddressProvider
 {
-    public interface IAddressProvider
-    {
-        string ProviderName { get; }
+    string ProviderName { get; }
 
-        Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode);
-    }
+    Task<IEnumerable<AddressSearchResult>> SearchAsync(string streetOrPostcode);
 }

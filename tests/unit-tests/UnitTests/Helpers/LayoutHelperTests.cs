@@ -1,9 +1,4 @@
-﻿using form_builder.Helpers.DocumentCreation;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Pdf;
-using Xunit;
-
-namespace form_builder_tests.UnitTests.Helpers;
+﻿namespace form_builder_tests.UnitTests.Helpers;
 
 public class LayoutHelperTests
 {

@@ -1,8 +1,7 @@
-﻿namespace form_builder.Models
+﻿namespace form_builder.Models;
+
+public class PowerAutomateDetails
 {
-    public class PowerAutomateDetails
-    {
-        public string FormName { get; set; }
-        public string Environment { get; set; }
-    }
+    public string FormName { get; set; }
+    public string Environment { get; set; }
 }

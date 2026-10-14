@@ -1,47 +1,24 @@
-﻿using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Helpers.Session;
-using form_builder.Models;
-using form_builder.Providers.Transforms.PaymentConfiguration;
-using form_builder.Services.MappingService;
-using form_builder.Services.MappingService.Entities;
-using Newtonsoft.Json;
-using StockportGovUK.NetStandard.Gateways;
+﻿namespace form_builder.Helpers.PaymentHelpers;
 
-namespace form_builder.Helpers.PaymentHelpers;
-
-public class PaymentHelper : IPaymentHelper
+public class PaymentHelper(IGateway gateway,
+    ISessionHelper sessionHelper,
+    IMappingService mappingService,
+    IWebHostEnvironment hostingEnvironment,
+    IPaymentConfigurationTransformDataProvider paymentConfigProvider,
+    IOptions<PaymentConfiguration> paymentConfiguration)
+    : IPaymentHelper
 {
-    private readonly IGateway _gateway;
-    private readonly IPaymentConfigurationTransformDataProvider _paymentConfigProvider;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IMappingService _mappingService;
-    private readonly IWebHostEnvironment _hostingEnvironment;
-
-
-    public PaymentHelper(
-        IGateway gateway,
-        ISessionHelper sessionHelper,
-        IMappingService mappingService,
-        IWebHostEnvironment hostingEnvironment,
-        IPaymentConfigurationTransformDataProvider paymentConfigProvider)
-    {
-        _gateway = gateway;
-        _sessionHelper = sessionHelper;
-        _mappingService = mappingService;
-        _hostingEnvironment = hostingEnvironment;
-        _paymentConfigProvider = paymentConfigProvider;
-    }
+    private readonly PaymentConfiguration _paymentConfiguration = paymentConfiguration.Value;
 
     public async Task<PaymentInformation> GetFormPaymentInformation(string formName, FormAnswers formAnswers, FormSchema baseForm)
     {
-        string browserSessionId = _sessionHelper.GetBrowserSessionId();
+        string browserSessionId = sessionHelper.GetBrowserSessionId();
         string cacheKey = $"{formName}::{browserSessionId}";
-        MappingEntity mappingEntity = await _mappingService.Map(cacheKey, formName, formAnswers, baseForm);
+        MappingEntity mappingEntity = await mappingService.Map(cacheKey, formName, formAnswers, baseForm);
         if (mappingEntity is null)
             throw new Exception($"PayService:: No mapping entity found for {formName}");
 
-        List<PaymentInformation> paymentConfig = await _paymentConfigProvider.Get<List<PaymentInformation>>();
+        List<PaymentInformation> paymentConfig = await paymentConfigProvider.Get<List<PaymentInformation>>();
         PaymentInformation formPaymentConfig = paymentConfig.FirstOrDefault(_ => _.FormName.Any(_ => _.Equals(formName)));
 
         if (formPaymentConfig is null)
@@ -58,23 +35,26 @@ public class PaymentHelper : IPaymentHelper
 
     private async Task<string> GetPaymentAmountAsync(MappingEntity formData, PaymentInformation formPaymentConfig)
     {
+        if (_paymentConfiguration.FakePaymentCalculation)
+            return "0.01";
+
         try
         {
             var postUrl = formPaymentConfig.Settings.CalculationSlug;
 
             if (postUrl.URL is null || postUrl.AuthToken is null)
-                throw new Exception($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: slug for {_hostingEnvironment.EnvironmentName} not found or incomplete");
+                throw new Exception($"{nameof(PaymentHelper)}::{nameof(GetPaymentAmountAsync)}: slug for {hostingEnvironment.EnvironmentName} not found or incomplete");
 
             HttpResponseMessage response;
 
             if (postUrl.Type.Equals("flowtoken"))
             {
-                response = await _gateway.PostAsync(postUrl.URL, formData.Data, postUrl.Type, postUrl.AuthToken);
+                response = await gateway.PostAsync(postUrl.URL, formData.Data, postUrl.Type, postUrl.AuthToken);
             }
             else
             {
-                _gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
-                response = await _gateway.PostAsync(postUrl.URL, formData.Data);
+                gateway.ChangeAuthenticationHeader(postUrl.AuthToken);
+                response = await gateway.PostAsync(postUrl.URL, formData.Data);
             }
 
             if (!response.IsSuccessStatusCode)

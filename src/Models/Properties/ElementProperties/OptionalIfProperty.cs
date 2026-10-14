@@ -1,7 +1,6 @@
-﻿namespace form_builder.Models.Properties.ElementProperties
+﻿namespace form_builder.Models.Properties.ElementProperties;
+
+public partial class BaseProperty
 {
-    public partial class BaseProperty
-    {
-        public Condition OptionalIf { get; set; } = new();
-    }
+    public Condition OptionalIf { get; set; } = new();
 }

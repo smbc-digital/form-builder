@@ -1,11 +1,10 @@
-namespace form_builder.Enum
+namespace form_builder.Enum;
+
+public enum ESize
 {
-    public enum ESize
-    {
-        Unspecified,
-        Small,
-        Medium,
-        Large,
-        ExtraLarge
-    }
+    Unspecified,
+    Small,
+    Medium,
+    Large,
+    ExtraLarge
 }

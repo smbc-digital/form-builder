@@ -1,7 +1,6 @@
-﻿namespace form_builder.Providers.Transforms.EmailConfiguration
+﻿namespace form_builder.Providers.Transforms.EmailConfiguration;
+
+public interface IEmailConfigurationTransformDataProvider
 {
-    public interface IEmailConfigurationTransformDataProvider
-    {
-        Task<T> Get<T>();
-    }
+    Task<T> Get<T>();
 }

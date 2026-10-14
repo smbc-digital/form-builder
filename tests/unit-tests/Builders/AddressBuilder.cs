@@ -1,29 +1,27 @@
-﻿using form_builder.Models.Elements;
-using form_builder.Models.Properties.ElementProperties;
+﻿using Address = form_builder.Models.Elements.Address;
 
-namespace form_builder_tests.Builders
+namespace form_builder_tests.Builders;
+
+public class AddressBuilder
 {
-    public class AddressBuilder
+    private readonly BaseProperty _property = new();
+
+    public Address Build() => new()
     {
-        private readonly BaseProperty _property = new BaseProperty();
+        Properties = _property,
+    };
 
-        public Address Build() => new Address
-        {
-            Properties = _property,
-        };
+    public AddressBuilder WithPropertyText(string propertyText)
+    {
+        _property.Text = propertyText;
 
-        public AddressBuilder WithPropertyText(string propertyText)
-        {
-            _property.Text = propertyText;
+        return this;
+    }
 
-            return this;
-        }
+    public AddressBuilder WithQuestionId(string questionId)
+    {
+        _property.QuestionId = questionId;
 
-        public AddressBuilder WithQuestionId(string questionId)
-        {
-            _property.QuestionId = questionId;
-
-            return this;
-        }
+        return this;
     }
 }

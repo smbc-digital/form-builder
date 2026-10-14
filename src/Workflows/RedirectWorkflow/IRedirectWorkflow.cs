@@ -1,7 +1,6 @@
-﻿namespace form_builder.Workflows.RedirectWorkflow
+﻿namespace form_builder.Workflows.RedirectWorkflow;
+
+public interface IRedirectWorkflow
 {
-    public interface IRedirectWorkflow
-    {
-        Task<string> Submit(string form, string path);
-    }
+    Task<string> Submit(string form, string path);
 }

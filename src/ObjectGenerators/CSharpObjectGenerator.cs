@@ -1,7 +1,3 @@
-using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using NJsonSchema.CodeGeneration.CSharp;
-
 namespace form_builder.ObjectGenerators;
 
 public static class CSharpObjectGenerator

@@ -1,9 +1,8 @@
-﻿namespace form_builder.Models.Properties.ElementProperties
-{
-    public partial class BaseProperty
-    {
-        public string RequiredIf { get; set; } = string.Empty;
+﻿namespace form_builder.Models.Properties.ElementProperties;
 
-        public string RequiredIfValidationMessage { get; set; } = string.Empty;
-    }
+public partial class BaseProperty
+{
+    public string RequiredIf { get; set; } = string.Empty;
+
+    public string RequiredIfValidationMessage { get; set; } = string.Empty;
 }

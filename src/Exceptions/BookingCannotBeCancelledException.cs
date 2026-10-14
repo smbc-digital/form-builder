@@ -1,10 +1,3 @@
-namespace form_builder.Exceptions
-{
-    public class BookingCannotBeCancelledException : Exception
-    {
-        public BookingCannotBeCancelledException(string message)
-            : base(message)
-        {
-        }
-    }
-}
+namespace form_builder.Exceptions;
+
+public class BookingCannotBeCancelledException(string message) : Exception(message);

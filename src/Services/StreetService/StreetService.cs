@@ -1,36 +1,11 @@
-﻿using form_builder.Constants;
-using form_builder.ContentFactory.PageFactory;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Helpers.PageHelpers;
-using form_builder.Models;
-using form_builder.Providers.StorageProvider;
-using form_builder.Providers.Street;
-using form_builder.Services.PageService.Entities;
-using Newtonsoft.Json;
+﻿namespace form_builder.Services.StreetService;
 
-namespace form_builder.Services.StreetService;
-
-public class StreetService : IStreetService
+public class StreetService(IDistributedCacheWrapper distributedCache,
+    IEnumerable<IStreetProvider> streetProviders,
+    IPageHelper pageHelper,
+    IPageFactory pageFactory)
+    : IStreetService
 {
-    private readonly IDistributedCacheWrapper _distributedCache;
-    private readonly IPageHelper _pageHelper;
-    private readonly IEnumerable<IStreetProvider> _streetProviders;
-    private readonly IPageFactory _pageFactory;
-
-
-    public StreetService(
-        IDistributedCacheWrapper distributedCache,
-        IEnumerable<IStreetProvider> streetProviders,
-        IPageHelper pageHelper,
-        IPageFactory pageFactory)
-    {
-        _distributedCache = distributedCache;
-        _pageHelper = pageHelper;
-        _streetProviders = streetProviders;
-        _pageFactory = pageFactory;
-    }
-
     public async Task<ProcessRequestEntity> ProcessStreet(Dictionary<string, dynamic> viewModel, Page currentPage, FormSchema baseForm, string cacheKey, string path)
     {
         viewModel.TryGetValue(LookUpConstants.SubPathViewModelKey, out var subPath);
@@ -51,7 +26,7 @@ public class StreetService : IStreetService
         string cacheKey,
         string path)
     {
-        var cachedAnswers = _distributedCache.GetString(cacheKey);
+        var cachedAnswers = distributedCache.GetString(cacheKey);
         var streetElement = currentPage.Elements.Where(_ => _.Type.Equals(EElementType.Street)).FirstOrDefault();
         var convertedAnswers = cachedAnswers is null
             ? new FormAnswers { Pages = new List<PageAnswers>() }
@@ -66,7 +41,7 @@ public class StreetService : IStreetService
 
         if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
         {
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
             return new ProcessRequestEntity
             {
                 Page = currentPage
@@ -77,7 +52,7 @@ public class StreetService : IStreetService
         {
             var cachedSearchResults = convertedAnswers.FormData[$"{path}{LookUpConstants.SearchResultsKeyPostFix}"] as IEnumerable<object>;
 
-            var model = await _pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers, cachedSearchResults.ToList());
+            var model = await pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers, cachedSearchResults.ToList());
 
             return new ProcessRequestEntity
             {
@@ -86,7 +61,7 @@ public class StreetService : IStreetService
             };
         }
 
-        _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+        pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
 
         return new ProcessRequestEntity
         {
@@ -101,7 +76,7 @@ public class StreetService : IStreetService
         string cacheKey,
         string path)
     {
-        var cachedAnswers = _distributedCache.GetString(cacheKey);
+        var cachedAnswers = distributedCache.GetString(cacheKey);
         var streetElement = currentPage.Elements.Where(_ => _.Type.Equals(EElementType.Street)).FirstOrDefault();
 
         var convertedAnswers = cachedAnswers is null
@@ -112,7 +87,7 @@ public class StreetService : IStreetService
 
         if (currentPage.IsValid && streetElement.Properties.Optional && string.IsNullOrEmpty(street))
         {
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
             return new ProcessRequestEntity
             {
                 Page = currentPage
@@ -121,7 +96,7 @@ public class StreetService : IStreetService
 
         if (!currentPage.IsValid)
         {
-            var formModel = await _pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers);
+            var formModel = await pageFactory.Build(currentPage, viewModel, baseForm, cacheKey, convertedAnswers);
 
             return new ProcessRequestEntity
             {
@@ -144,15 +119,15 @@ public class StreetService : IStreetService
         {
             try
             {
-                searchResults = (await _streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
+                searchResults = (await streetProviders.Get(streetElement.Properties.StreetProvider).SearchAsync(street)).ToList<object>();
             }
             catch (Exception e)
             {
                 throw new ApplicationException($"StreetService::ProcessInitialStreet: An exception has occurred while attempting to perform street lookup on Provider '{streetElement.Properties.StreetProvider}' with searchterm '{street}' Exception: {e.Message}");
             }
 
-            _pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
-            _pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, cacheKey, baseForm.BaseURL);
+            pageHelper.SaveAnswers(viewModel, cacheKey, baseForm.BaseURL, null, currentPage.IsValid);
+            pageHelper.SaveFormData($"{path}{LookUpConstants.SearchResultsKeyPostFix}", searchResults, cacheKey, baseForm.BaseURL);
         }
 
         try

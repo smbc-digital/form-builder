@@ -1,8 +1,7 @@
-namespace form_builder.Enum
+namespace form_builder.Enum;
+
+public enum EDocumentContentType
 {
-    public enum EDocumentContentType
-    {
-        Unknown,
-        Summary
-    }
+    Unknown,
+    Summary
 }

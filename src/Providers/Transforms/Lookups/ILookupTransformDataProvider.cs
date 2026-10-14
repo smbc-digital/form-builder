@@ -1,7 +1,6 @@
-namespace form_builder.Providers.Transforms.Lookups
+namespace form_builder.Providers.Transforms.Lookups;
+
+public interface ILookupTransformDataProvider
 {
-    public interface ILookupTransformDataProvider
-    {
-        Task<T> Get<T>(string schemaName);
-    }
+    Task<T> Get<T>(string schemaName);
 }

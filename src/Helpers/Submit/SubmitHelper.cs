@@ -1,21 +1,7 @@
-﻿using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Models;
-using form_builder.Models.Elements;
-using form_builder.Providers.Booking;
-using form_builder.Services.MappingService.Entities;
-using StockportGovUK.NetStandard.Gateways.Enums;
-using StockportGovUK.NetStandard.Gateways.Models.Booking.Request;
+﻿namespace form_builder.Helpers.Submit;
 
-namespace form_builder.Helpers.Submit;
-
-public class SubmitHelper : ISubmitHelper
+public class SubmitHelper(IEnumerable<IBookingProvider> bookingProviders) : ISubmitHelper
 {
-    private readonly IEnumerable<IBookingProvider> _bookingProviders;
-
-    public SubmitHelper(IEnumerable<IBookingProvider> bookingProviders) =>
-        _bookingProviders = bookingProviders;
-
     public async Task ConfirmBookings(MappingEntity mappingEntity, string environmentName, string caseReference)
     {
         List<Page> journeyPages = mappingEntity.BaseForm.GetReducedPages(mappingEntity.FormAnswers);
@@ -45,7 +31,7 @@ public class SubmitHelper : ISubmitHelper
                     }
                 };
 
-            await _bookingProviders
+            await bookingProviders
                 .Get(booking.Properties.BookingProvider)
                 .Confirm(confirmationRequest);
         }

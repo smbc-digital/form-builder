@@ -1,9 +1,6 @@
-﻿using form_builder.Models;
+﻿namespace form_builder.Factories.Transform.ReusableElements;
 
-namespace form_builder.Factories.Transform.ReusableElements
+public interface IReusableElementSchemaTransformFactory
 {
-    public interface IReusableElementSchemaTransformFactory
-    {
-        Task<FormSchema> Transform(FormSchema formSchema);
-    }
+    Task<FormSchema> Transform(FormSchema formSchema);
 }

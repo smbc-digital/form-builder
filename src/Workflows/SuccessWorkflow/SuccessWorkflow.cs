@@ -1,42 +1,22 @@
-﻿using form_builder.Enum;
-using form_builder.Factories.Schema;
-using form_builder.Services.AnalyticsService;
-using form_builder.Services.PageService;
-using form_builder.Services.PageService.Entities;
-using form_builder.Workflows.ActionsWorkflow;
+﻿namespace form_builder.Workflows.SuccessWorkflow;
 
-namespace form_builder.Workflows.SuccessWorkflow
+public class SuccessWorkflow(IPageService pageService,
+    ISchemaFactory schemaFactory,
+    IActionsWorkflow actionsWorkflow,
+    IAnalyticsService analyticsService)
+    : ISuccessWorkflow
 {
-    public class SuccessWorkflow : ISuccessWorkflow
+    public async Task<SuccessPageEntity> Process(EBehaviourType behaviourType, string form)
     {
-        private readonly IPageService _pageService;
-        private readonly ISchemaFactory _schemaFactory;
-        private readonly IActionsWorkflow _actionsWorkflow;
-        private readonly IAnalyticsService _analyticsService;
+        var baseForm = await schemaFactory.Build(form);
 
-        public SuccessWorkflow(IPageService pageService,
-            ISchemaFactory schemaFactory,
-            IActionsWorkflow actionsWorkflow,
-            IAnalyticsService analyticsService)
-        {
-            _pageService = pageService;
-            _schemaFactory = schemaFactory;
-            _actionsWorkflow = actionsWorkflow;
-            _analyticsService = analyticsService;
-        }
+        if (baseForm.FormActions.Any())
+            await actionsWorkflow.Process(baseForm.FormActions, baseForm, form);
 
-        public async Task<SuccessPageEntity> Process(EBehaviourType behaviourType, string form)
-        {
-            var baseForm = await _schemaFactory.Build(form);
+        var result = await pageService.FinalisePageJourney(form, behaviourType, baseForm);
 
-            if (baseForm.FormActions.Any())
-                await _actionsWorkflow.Process(baseForm.FormActions, baseForm, form);
+        analyticsService.RaiseEvent(form, EAnalyticsEventType.Finish);
 
-            var result = await _pageService.FinalisePageJourney(form, behaviourType, baseForm);
-
-            _analyticsService.RaiseEvent(form, EAnalyticsEventType.Finish);
-
-            return result;
-        }
+        return result;
     }
 }

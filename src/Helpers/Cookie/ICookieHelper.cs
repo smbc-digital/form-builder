@@ -1,9 +1,8 @@
-namespace form_builder.Helpers.Cookie
+namespace form_builder.Helpers.Cookie;
+
+public interface ICookieHelper
 {
-    public interface ICookieHelper
-    {
-        void AddCookie(string name, string value);
-        void DeleteCookie(string key);
-        string GetCookie(string key);
-    }
+    void AddCookie(string name, string value);
+    void DeleteCookie(string key);
+    string GetCookie(string key);
 }

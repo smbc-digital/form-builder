@@ -1,9 +1,8 @@
-﻿namespace form_builder.Configuration
+﻿namespace form_builder.Configuration;
+
+public class CivicaPaymentConfiguration
 {
-    public class CivicaPaymentConfiguration
-    {
-        public const string ConfigValue = "CivicaPaymentConfiguration";
-        public string CustomerId { get; set; }
-        public string ApiPassword { get; set; }
-    }
+    public const string ConfigValue = "CivicaPaymentConfiguration";
+    public string CustomerId { get; set; }
+    public string ApiPassword { get; set; }
 }

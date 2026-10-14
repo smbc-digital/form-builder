@@ -1,7 +1,4 @@
-﻿using form_builder.Models;
-using form_builder.Services.PageService.Entities;
-
-namespace form_builder.Services.OrganisationService;
+﻿namespace form_builder.Services.OrganisationService;
 
 public interface IOrganisationService
 {

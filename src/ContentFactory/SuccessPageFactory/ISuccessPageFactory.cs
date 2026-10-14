@@ -1,8 +1,4 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
-using form_builder.Services.PageService.Entities;
-
-namespace form_builder.ContentFactory.SuccessPageFactory;
+﻿namespace form_builder.ContentFactory.SuccessPageFactory;
 
 public interface ISuccessPageFactory
 {

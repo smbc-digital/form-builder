@@ -1,8 +1,7 @@
-namespace form_builder.Configuration
+namespace form_builder.Configuration;
+
+public class StylesheetConfiguration
 {
-    public class StylesheetConfiguration
-    {
-        public const string ConfigValue = "StylesheetUrl";
-        public string Stylesheet { get; set; }
-    }
+    public const string ConfigValue = "StylesheetUrl";
+    public string Stylesheet { get; set; }
 }

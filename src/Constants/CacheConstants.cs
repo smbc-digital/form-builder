@@ -1,7 +1,6 @@
-namespace form_builder.Constants
+namespace form_builder.Constants;
+
+public class CacheConstants
 {
-    public class CacheConstants
-    {
-        public const string INDEX_SCHEMA = "index-schema";
-    }
+    public const string INDEX_SCHEMA = "index-schema";
 }

@@ -1,9 +1,6 @@
-using form_builder.Models;
+namespace form_builder.Restrictions;
 
-namespace form_builder.Restrictions
+public interface IFormAccessRestriction
 {
-    public interface IFormAccessRestriction
-    {
-        bool IsRestricted(FormSchema baseForm);
-    }
+    bool IsRestricted(FormSchema baseForm);
 }

@@ -1,11 +1,7 @@
-using StockportGovUK.NetStandard.Gateways.Models.Verint.Lookup;
+namespace form_builder.Providers.Organisation;
 
-namespace form_builder.Providers.Organisation
+public interface IOrganisationProvider
 {
-    public interface IOrganisationProvider
-    {
-        string ProviderName { get; }
-
-        Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation);
-    }
+    string ProviderName { get; }
+    Task<IEnumerable<OrganisationSearchResult>> SearchAsync(string organisation);
 }

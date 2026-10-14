@@ -1,7 +1,6 @@
-﻿namespace form_builder.Workflows.EmailWorkflow
+﻿namespace form_builder.Workflows.EmailWorkflow;
+
+public interface IEmailWorkflow
 {
-    public interface IEmailWorkflow
-    {
-        Task<string> Submit(string form);
-    }
+    Task<string> Submit(string form);
 }

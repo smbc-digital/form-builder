@@ -1,9 +1,4 @@
-﻿using PdfSharpCore.Drawing.Layout;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Pdf;
-using PdfSharpCore;
-
-namespace form_builder.Helpers.DocumentCreation;
+﻿namespace form_builder.Helpers.DocumentCreation;
 
 public class LayoutHelper
 {

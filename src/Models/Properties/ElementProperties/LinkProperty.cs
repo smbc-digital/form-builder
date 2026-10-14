@@ -1,9 +1,8 @@
-﻿namespace form_builder.Models.Properties.ElementProperties
+﻿namespace form_builder.Models.Properties.ElementProperties;
+
+public partial class BaseProperty
 {
-    public partial class BaseProperty
-    {
-        public string Url { get; set; }
-        public bool OpenInTab { get; set; } = true;
-        public bool DisplayRightChevron { get; set; } = false;
-    }
+    public string Url { get; set; }
+    public bool OpenInTab { get; set; } = true;
+    public bool DisplayRightChevron { get; set; } = false;
 }

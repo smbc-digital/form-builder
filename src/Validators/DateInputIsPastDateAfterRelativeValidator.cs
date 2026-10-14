@@ -1,54 +1,43 @@
-﻿using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Helpers.RelativeDateHelper;
-using form_builder.Models;
-using form_builder.Models.Elements;
+﻿namespace form_builder.Validators;
 
-namespace form_builder.Validators
+public class DateInputIsPastDateAfterRelativeValidator(IRelativeDateHelper relativeDateHelper) : IElementValidator
 {
-    public class DateInputIsPastDateAfterRelativeValidator : IElementValidator
+    public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
     {
-        private IRelativeDateHelper _relativeDateHelper;
+        if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsPastDateAfterRelative))
+            return new ValidationResult { IsValid = true };
 
-        public DateInputIsPastDateAfterRelativeValidator(IRelativeDateHelper relativeDateHelper) => _relativeDateHelper = relativeDateHelper;
-
-        public ValidationResult Validate(Element element, Dictionary<string, dynamic> viewModel, FormSchema baseForm)
+        if (relativeDateHelper.HasValidDate(element, viewModel))
         {
-            if (!element.Type.Equals(EElementType.DateInput) || string.IsNullOrEmpty(element.Properties.IsPastDateAfterRelative))
-                return new ValidationResult { IsValid = true };
+            var relativeDate = relativeDateHelper.GetRelativeDate(element.Properties.IsPastDateAfterRelative);
+            var maximumDate = DateTime.Today;
 
-            if (_relativeDateHelper.HasValidDate(element, viewModel))
+            if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
+                maximumDate = DateTime.Today.AddYears(-relativeDate.Amount);
+
+            if (relativeDate.Unit.Equals(DateInputConstants.MONTH))
+                maximumDate = DateTime.Today.AddMonths(-relativeDate.Amount);
+
+            if (relativeDate.Unit.Equals(DateInputConstants.DAY))
+                maximumDate = DateTime.Today.AddDays(-relativeDate.Amount);
+
+            var chosenDate = relativeDateHelper.GetChosenDate(element, viewModel);
+
+            if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && maximumDate > chosenDate ||
+                relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate >= chosenDate)
             {
-                var relativeDate = _relativeDateHelper.GetRelativeDate(element.Properties.IsPastDateAfterRelative);
-                var maximumDate = DateTime.Today;
-
-                if (relativeDate.Unit.Equals(DateInputConstants.YEAR))
-                    maximumDate = DateTime.Today.AddYears(-relativeDate.Ammount);
-
-                if (relativeDate.Unit.Equals(DateInputConstants.MONTH))
-                    maximumDate = DateTime.Today.AddMonths(-relativeDate.Ammount);
-
-                if (relativeDate.Unit.Equals(DateInputConstants.DAY))
-                    maximumDate = DateTime.Today.AddDays(-relativeDate.Ammount);
-
-                var chosenDate = _relativeDateHelper.GetChosenDate(element, viewModel);
-
-                if (relativeDate.Type.Equals(DateInputConstants.INCLUSIVE) && maximumDate > _relativeDateHelper.GetChosenDate(element, viewModel) ||
-                    relativeDate.Type.Equals(DateInputConstants.EXCLUSIVE) && maximumDate >= _relativeDateHelper.GetChosenDate(element, viewModel))
+                return new ValidationResult
                 {
-                    return new ValidationResult
-                    {
-                        IsValid = false,
-                        Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageIsPastDateAfterRelative) ? element.Properties.ValidationMessageIsPastDateAfterRelative : "Check the date and try again"
-                    };
-                }
+                    IsValid = false,
+                    Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageIsPastDateAfterRelative) ? element.Properties.ValidationMessageIsPastDateAfterRelative : "Check the date and try again"
+                };
             }
-
-            return new ValidationResult
-            {
-                IsValid = true,
-                Message = string.Empty
-            };
         }
+
+        return new ValidationResult
+        {
+            IsValid = true,
+            Message = string.Empty
+        };
     }
 }

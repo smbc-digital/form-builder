@@ -1,9 +1,8 @@
-﻿namespace form_builder.Utils.Hash
-{
-    public interface IHashUtil
-    {
-        string Hash(string reference);
+﻿namespace form_builder.Utils.Hash;
 
-        public bool Check(string reference, string hash);
-    }
+public interface IHashUtil
+{
+    string Hash(string reference);
+
+    public bool Check(string reference, string hash);
 }

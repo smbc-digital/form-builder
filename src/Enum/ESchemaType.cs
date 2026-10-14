@@ -1,9 +1,8 @@
-﻿namespace form_builder.Enum
+﻿namespace form_builder.Enum;
+
+public enum ESchemaType
 {
-    public enum ESchemaType
-    {
-        Unknown,
-        FormJson,
-        PaymentConfiguration
-    }
+    Unknown,
+    FormJson,
+    PaymentConfiguration
 }

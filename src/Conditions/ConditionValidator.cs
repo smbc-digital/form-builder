@@ -1,13 +1,11 @@
-﻿using form_builder.Enum;
-using form_builder.Models;
+﻿using Condition = form_builder.Models.Condition;
 
-namespace form_builder.Conditions
+namespace form_builder.Conditions;
+
+public class ConditionValidator
 {
-    public class ConditionValidator
-    {
-        private readonly Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> ConditionList =
-
-        new Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>>
+    private readonly Dictionary<ECondition, Func<Condition, Dictionary<string, dynamic>, bool>> _conditionList =
+        new()
         {
             { ECondition.IsBefore, DateComparator.DateIsBefore },
             { ECondition.IsAfter, DateComparator.DateIsAfter },
@@ -23,29 +21,28 @@ namespace form_builder.Conditions
             { ECondition.EndsWith, StringComparator.EndsWith }
         };
 
-        public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel)
-        {
-            if (condition.ConditionType.Equals(ECondition.Any))
-                return AnyNumberOfConditionsIsValid(condition, viewModel);
+    public bool IsValid(Condition condition, Dictionary<string, dynamic> viewModel)
+    {
+        if (condition.ConditionType.Equals(ECondition.Any))
+            return AnyNumberOfConditionsIsValid(condition, viewModel);
 
-            return ConditionList[condition.ConditionType](condition, viewModel);
+        return _conditionList[condition.ConditionType](condition, viewModel);
+    }
+
+    public bool AnyNumberOfConditionsIsValid(Condition condition, Dictionary<string, dynamic> viewModel)
+    {
+        var isValidCount = 0;
+        var targetConditionCount = int.Parse(condition.ComparisonValue);
+
+        foreach (var con in condition.Conditions)
+        {
+            if (_conditionList[con.ConditionType](con, viewModel))
+                isValidCount++;
+
+            if (isValidCount >= targetConditionCount)
+                break;
         }
 
-        public bool AnyNumberOfConditionsIsValid(Condition condition, Dictionary<string, dynamic> viewModel)
-        {
-            var isValidCount = 0;
-            var targetConditionCount = int.Parse(condition.ComparisonValue);
-
-            foreach (var con in condition.Conditions)
-            {
-                if (ConditionList[con.ConditionType](con, viewModel))
-                    isValidCount++;
-
-                if (isValidCount >= targetConditionCount)
-                    break;
-            }
-
-            return isValidCount >= targetConditionCount;
-        }
+        return isValidCount >= targetConditionCount;
     }
 }

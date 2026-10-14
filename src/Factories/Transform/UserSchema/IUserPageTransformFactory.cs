@@ -1,9 +1,6 @@
-﻿using form_builder.Models;
+﻿namespace form_builder.Factories.Transform.UserSchema;
 
-namespace form_builder.Factories.Transform.UserSchema
+public interface IUserPageTransformFactory
 {
-    public interface IUserPageTransformFactory
-    {
-        Task<Page> Transform(Page page, FormAnswers convertedAnswers);
-    }
+    Task<Page> Transform(Page page, FormAnswers convertedAnswers);
 }

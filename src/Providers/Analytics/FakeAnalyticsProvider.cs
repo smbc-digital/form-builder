@@ -1,16 +1,9 @@
-using form_builder.Providers.Analytics.Request;
+namespace form_builder.Providers.Analytics;
 
-namespace form_builder.Providers.Analytics
+public class FakeAnalyticsProvider(ILogger<IAnalyticsProvider> logger) : IAnalyticsProvider
 {
-    public class FakeAnalyticsProvider : IAnalyticsProvider
-    {
-        public string ProviderName { get => "Fake"; }
-        private ILogger<IAnalyticsProvider> _logger;
+    public string ProviderName => "Fake";
 
-        public FakeAnalyticsProvider(ILogger<IAnalyticsProvider> logger)
-            => _logger = logger;
-
-        public async Task RaiseEventAsync(AnalyticsEventRequest request) =>
-            _logger.LogInformation($"FakeAnalyticsProvider raised event for {request.EventType} on form {request.Form}");
-    }
+    public async Task RaiseEventAsync(AnalyticsEventRequest request) =>
+        logger.LogInformation($"FakeAnalyticsProvider raised event for {request.EventType} on form {request.Form}");
 }

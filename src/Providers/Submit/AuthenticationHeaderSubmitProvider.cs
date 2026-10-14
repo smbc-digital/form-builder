@@ -1,22 +1,14 @@
-﻿using form_builder.Models;
-using form_builder.Services.MappingService.Entities;
-using StockportGovUK.NetStandard.Gateways;
+﻿namespace form_builder.Providers.Submit;
 
-namespace form_builder.Providers.Submit
+public class AuthenticationHeaderSubmitProvider(IGateway gateway) : ISubmitProvider
 {
-    public class AuthenticationHeaderSubmitProvider : ISubmitProvider
+    public string ProviderName => "AuthHeader";
+
+    public async Task<HttpResponseMessage> PostAsync(MappingEntity mappingEntity, SubmitSlug submitSlug)
     {
-        public string ProviderName => "AuthHeader";
-        private IGateway _gateway;
+        gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
+            ? string.Empty : submitSlug.AuthToken);
 
-        public AuthenticationHeaderSubmitProvider(IGateway gateway) => _gateway = gateway;
-
-        public async Task<HttpResponseMessage> PostAsync(MappingEntity mappingEntity, SubmitSlug submitSlug)
-        {
-            _gateway.ChangeAuthenticationHeader(string.IsNullOrWhiteSpace(submitSlug.AuthToken)
-                    ? string.Empty : submitSlug.AuthToken);
-
-            return await _gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
-        }
+        return await gateway.PostAsync(submitSlug.URL, mappingEntity.Data);
     }
 }

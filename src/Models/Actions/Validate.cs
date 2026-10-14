@@ -1,12 +1,9 @@
-﻿using form_builder.Enum;
+﻿namespace form_builder.Models.Actions;
 
-namespace form_builder.Models.Actions
+public class Validate : Action
 {
-    public class Validate : Action
+    public Validate()
     {
-        public Validate()
-        {
-            Type = EActionType.Validate;
-        }
+        Type = EActionType.Validate;
     }
 }

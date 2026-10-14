@@ -45,9 +45,9 @@
 <div class="govuk-form-group @(!Model.IsValid ? "govuk-form-group--error" : string.Empty)" id="multiple-file-upload-form-group">
     <partial name="Error" />
 
-    <span class="govuk-error-message" id="@sizeValidationError" style="display: none">
+    <p class="govuk-error-message" id="@sizeValidationError" style="display: none">
         <span class="govuk-visually-hidden" Error:></span>
-    </span>
+    </p>
 
     @Html.TextBox(Model.QuestionId, Model.Properties.Value, elements)
 

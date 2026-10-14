@@ -1,8 +1,7 @@
-﻿namespace form_builder.Workflows.SubmitWorkflow
+﻿namespace form_builder.Workflows.SubmitWorkflow;
+
+public interface ISubmitWorkflow
 {
-    public interface ISubmitWorkflow
-    {
-        Task<string> Submit(string form);
-        Task SubmitWithoutSubmission(string form);
-    }
+    Task<string> Submit(string form);
+    Task SubmitWithoutSubmission(string form);
 }

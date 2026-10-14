@@ -1,100 +1,29 @@
-﻿using System.Linq;
-using form_builder.Attributes;
-using form_builder.Builders;
-using form_builder.Configuration;
-using form_builder.Constants;
-using form_builder.Enum;
-using form_builder.Extensions;
-using form_builder.Factories.Schema;
-using form_builder.Helpers.Session;
-using form_builder.Mappers.Structure;
-using form_builder.Models;
-using form_builder.ObjectGenerators;
-using form_builder.Providers.SchemaProvider;
-using form_builder.Services.FileUploadService;
-using form_builder.Services.PageService;
-using form_builder.ViewModels;
-using form_builder.Workflows.ActionsWorkflow;
-using form_builder.Workflows.EmailWorkflow;
-using form_builder.Workflows.PaymentWorkflow;
-using form_builder.Workflows.RedirectWorkflow;
-using form_builder.Workflows.SubmitWorkflow;
-using form_builder.Workflows.SuccessWorkflow;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
-using Microsoft.FeatureManagement;
-using Microsoft.FeatureManagement.Mvc;
-using NJsonSchema;
+﻿namespace form_builder.Controllers.Home;
 
-namespace form_builder.Controllers.Home;
-
-public class HomeController : Controller
+public class HomeController(IPageService pageService,
+    ISchemaProvider schemaProvider,
+    ISchemaFactory schemaFactory,
+    ISubmitWorkflow submitWorkflow,
+    IPaymentWorkflow paymentWorkflow,
+    IRedirectWorkflow redirectWorkflow,
+    IFileUploadService fileUploadService,
+    IActionsWorkflow actionsWorkflow,
+    IEmailWorkflow emailWorkFlow,
+    ISuccessWorkflow successWorkflow,
+    IStructureMapper structureMapper,
+    IOptions<DataStructureConfiguration> dataStructureConfiguration,
+    IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken)
+    : Controller
 {
-    private readonly IPageService _pageService;
-    private readonly ISchemaProvider _schemaProvider;
-    private readonly ISchemaFactory _schemaFactory;
-    private readonly ISubmitWorkflow _submitWorkflow;
-    private readonly IEmailWorkflow _emailWorkFlow;
-    private readonly IRedirectWorkflow _redirectWorkflow;
-    private readonly IPaymentWorkflow _paymentWorkflow;
-    private readonly IActionsWorkflow _actionsWorkflow;
-    private readonly ISuccessWorkflow _successWorkflow;
-    private readonly IFileUploadService _fileUploadService;
-    private readonly IWebHostEnvironment _hostingEnvironment;
-    private readonly IStructureMapper _structureMapper;
-    private readonly DataStructureConfiguration _dataStructureConfiguration;
-    private readonly ILogger<HomeController> _logger;
-    private readonly ISessionHelper _sessionHelper;
-    private readonly IFeatureManager _featureManager;
-    private readonly QAFormAccessTokenConfiguration _qaFormAccessToken;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public HomeController(IPageService pageService,
-        ISchemaProvider schemaProvider,
-        ISchemaFactory schemaFactory,
-        ISubmitWorkflow submitWorkflow,
-        IPaymentWorkflow paymentWorkflow,
-        IRedirectWorkflow redirectWorkflow,
-        IFileUploadService fileUploadService,
-        IWebHostEnvironment hostingEnvironment,
-        IActionsWorkflow actionsWorkflow,
-        IEmailWorkflow emailWorkFlow,
-        ISuccessWorkflow successWorkflow,
-        IStructureMapper structureMapper,
-        IOptions<DataStructureConfiguration> dataStructureConfiguration,
-        ILogger<HomeController> logger,
-        ISessionHelper sessionHelper,
-        IFeatureManager featureManager,
-        IOptions<QAFormAccessTokenConfiguration> qaFormAccessToken,
-        IHttpContextAccessor httpContextAccessor)
-    {
-        _pageService = pageService;
-        _schemaProvider = schemaProvider;
-        _schemaFactory = schemaFactory;
-        _submitWorkflow = submitWorkflow;
-        _redirectWorkflow = redirectWorkflow;
-        _paymentWorkflow = paymentWorkflow;
-        _fileUploadService = fileUploadService;
-        _hostingEnvironment = hostingEnvironment;
-        _actionsWorkflow = actionsWorkflow;
-        _successWorkflow = successWorkflow;
-        _structureMapper = structureMapper;
-        _logger = logger;
-        _dataStructureConfiguration = dataStructureConfiguration.Value;
-        _emailWorkFlow = emailWorkFlow;
-        _sessionHelper = sessionHelper;
-        _featureManager = featureManager;
-        _qaFormAccessToken = qaFormAccessToken.Value;
-        _httpContextAccessor = httpContextAccessor;
-    }
+    private readonly DataStructureConfiguration _dataStructureConfiguration = dataStructureConfiguration.Value;
+    private readonly QAFormAccessTokenConfiguration _qaFormAccessToken = qaFormAccessToken.Value;
 
     [HttpGet]
     [Route("/")]
     [FeatureGate("HomePageFormListings")]
     public async Task<IActionResult> Home()
     {
-        var forms = await _schemaProvider.IndexSchema();
+        var forms = await schemaProvider.IndexSchema();
 
         var viewModel = new HomeViewModel
         {
@@ -103,10 +32,7 @@ public class HomeController : Controller
             StartPageUrl = "/",
             FormName = "",
             HideBackButton = true,
-            QAFormAccessToken = _qaFormAccessToken.AccessKey,
-            RequestHeaders = _httpContextAccessor.HttpContext.Request.Headers,
-            Scheme = _httpContextAccessor.HttpContext.Request.Scheme,
-            Host = _httpContextAccessor.HttpContext.Request.Host.Value
+            QAFormAccessToken = _qaFormAccessToken.AccessKey
         };
 
         return View("Home", viewModel);
@@ -117,7 +43,7 @@ public class HomeController : Controller
     [FeatureGate("HomePageFormListings")]
     public async Task<IActionResult> FormView(string form)
     {
-        var schema = await _schemaFactory.Build(form);
+        var schema = await schemaFactory.Build(form);
         var incomingValues = schema.Pages.First().IncomingValues;
 
         if (incomingValues.Any())
@@ -156,7 +82,7 @@ public class HomeController : Controller
         string subPath = "")
     {
         var queryParameters = Request.Query;
-        var response = await _pageService.ProcessPage(form, path, subPath, queryParameters);
+        var response = await pageService.ProcessPage(form, path, subPath, queryParameters);
 
         if (response is null)
             return RedirectToAction("NotFound", "Error");
@@ -193,9 +119,9 @@ public class HomeController : Controller
         var viewModel = formData.ToNormaliseDictionary(subPath);
 
         if (fileUpload is not null && fileUpload.Any())
-            viewModel = _fileUploadService.AddFiles(viewModel, fileUpload);
+            viewModel = fileUploadService.AddFiles(viewModel, fileUpload);
 
-        var currentPageResult = await _pageService.ProcessRequest(form, path, viewModel, fileUpload, ModelState.IsValid);
+        var currentPageResult = await pageService.ProcessRequest(form, path, viewModel, fileUpload, ModelState.IsValid);
 
         if (currentPageResult.RedirectToAction && !string.IsNullOrWhiteSpace(currentPageResult.RedirectAction))
         {
@@ -211,9 +137,9 @@ public class HomeController : Controller
         }
 
         if (currentPageResult.Page.HasPageActionsPostValues)
-            await _actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form);
+            await actionsWorkflow.Process(currentPageResult.Page.PageActions.Where(_ => _.Properties.HttpActionType.Equals(EHttpActionType.Post)).ToList(), null, form);
 
-        var behaviour = await _pageService.GetBehaviour(currentPageResult, form);
+        var behaviour = await pageService.GetBehaviour(currentPageResult, form);
 
         switch (behaviour.BehaviourType)
         {
@@ -239,11 +165,11 @@ public class HomeController : Controller
                 });
 
             case EBehaviourType.SubmitAndPay:
-                var result = await _paymentWorkflow.Submit(form, path);
+                var result = await paymentWorkflow.Submit(form, path);
                 return Redirect(result);
 
             case EBehaviourType.SubmitAndRedirect:
-                var redirectUrl = await _redirectWorkflow.Submit(form, path);
+                var redirectUrl = await redirectWorkflow.Submit(form, path);
                 return Redirect(redirectUrl);
 
             case EBehaviourType.SubmitAndEmail:
@@ -261,7 +187,7 @@ public class HomeController : Controller
     [Route("{form}/submit")]
     public async Task<IActionResult> Submit(string form)
     {
-        await _submitWorkflow.Submit(form);
+        await submitWorkflow.Submit(form);
 
         return RedirectToAction("Success", new
         {
@@ -273,7 +199,7 @@ public class HomeController : Controller
     [Route("{form}/submit-without-submission")]
     public async Task<IActionResult> SubmitWithoutSubmission(string form)
     {
-        await _submitWorkflow.SubmitWithoutSubmission(form);
+        await submitWorkflow.SubmitWithoutSubmission(form);
 
         return RedirectToAction("Success", new
         {
@@ -285,7 +211,7 @@ public class HomeController : Controller
     [Route("{form}/email")]
     public async Task<IActionResult> Email(string form)
     {
-        await _emailWorkFlow.Submit(form);
+        await emailWorkFlow.Submit(form);
 
         return RedirectToAction("Success", new
         {
@@ -297,7 +223,7 @@ public class HomeController : Controller
     [Route("{form}/success")]
     public async Task<IActionResult> Success(string form)
     {
-        var result = await _successWorkflow.Process(EBehaviourType.SubmitForm, form);
+        var result = await successWorkflow.Process(EBehaviourType.SubmitForm, form);
 
         var success = new SuccessViewModel
         {
@@ -327,7 +253,7 @@ public class HomeController : Controller
         if (!_dataStructureConfiguration.IsEnabled)
             return RedirectToAction("Index", new { form });
 
-        object dataStructure = await _structureMapper.CreateBaseFormDataStructure(form);
+        object dataStructure = await structureMapper.CreateBaseFormDataStructure(form);
 
         var viewModel = new DataStructureViewModel
         {

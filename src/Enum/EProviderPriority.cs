@@ -1,9 +1,8 @@
-namespace form_builder.Enum
+namespace form_builder.Enum;
+
+public enum EProviderPriority
 {
-    public enum EProviderPriority
-    {
-        Low,
-        Medium,
-        High
-    }
+    Low,
+    Medium,
+    High
 }

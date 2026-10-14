@@ -1,7 +1,6 @@
-﻿namespace form_builder.Constants
+﻿namespace form_builder.Constants;
+
+public class PageTitleConstants
 {
-    public class PageTitleConstants
-    {
-        public const string VALIDATION_ERROR_PREFIX = "Error: ";
-    }
+    public const string VALIDATION_ERROR_PREFIX = "Error: ";
 }

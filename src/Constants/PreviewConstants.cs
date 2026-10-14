@@ -1,7 +1,6 @@
-namespace form_builder.Constants
+namespace form_builder.Constants;
+
+public class PreviewConstants
 {
-    public class PreviewConstants
-    {
-        public const string PREVIEW_MODE_PREFIX = "FB_PREVIEW_";
-    }
+    public const string PREVIEW_MODE_PREFIX = "FB_PREVIEW_";
 }

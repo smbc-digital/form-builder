@@ -1,7 +1,6 @@
-﻿namespace form_builder.Workflows.PaymentWorkflow
+﻿namespace form_builder.Workflows.PaymentWorkflow;
+
+public interface IPaymentWorkflow
 {
-    public interface IPaymentWorkflow
-    {
-        Task<string> Submit(string form, string path);
-    }
+    Task<string> Submit(string form, string path);
 }

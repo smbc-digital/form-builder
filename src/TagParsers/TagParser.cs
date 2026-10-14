@@ -1,17 +1,8 @@
-using System.Text;
-using System.Text.RegularExpressions;
-using form_builder.Extensions;
-using form_builder.TagParsers.Formatters;
-
 namespace form_builder.TagParsers;
 
-public class TagParser
+public class TagParser(IEnumerable<IFormatter> formatters)
 {
-    private readonly IEnumerable<IFormatter> _formatters;
-    public TagParser(IEnumerable<IFormatter> formatters)
-    {
-        _formatters = formatters;
-    }
+    private readonly IEnumerable<IFormatter> _formatters = formatters;
 
     public string Parse(string value, Dictionary<string, object> answersDictionary, Regex regex, bool allowOptional = false)
     {
@@ -54,7 +45,6 @@ public class TagParser
 
         return value;
     }
-
 
     public string Parse(string value, Regex regex, string data, Func<string[], string> formatContent, string split = ":")
     {
