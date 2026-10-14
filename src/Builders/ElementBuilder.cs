@@ -9,7 +9,7 @@ public class ElementBuilder
 
     public Element Build()
     {
-        Type elementType = typeof(IElement).GetTypeInfo().Assembly
+        var elementType = typeof(IElement).GetTypeInfo().Assembly
             .GetTypes()
             .FirstOrDefault(type => type.Name.Equals(_type.ToString()));
 
