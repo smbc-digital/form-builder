@@ -684,7 +684,7 @@ public class ElementBuilder
 
     public ElementBuilder WithSetAutofocus(bool autofocus)
     {
-        _property.SetAutofocus= autofocus;
+        _property.SetAutofocus = autofocus;
 
         return this;
     }
@@ -692,6 +692,20 @@ public class ElementBuilder
     public ElementBuilder WithStreetMissingText(string streetMissingText)
     {
         _property.StreetMissingText = streetMissingText;
+
+        return this;
+    }
+
+    public ElementBuilder WithMinTime(string minTime)
+    {
+        _property.MinTime = minTime;
+
+        return this;
+    }
+
+    public ElementBuilder WithMaxTime(string maxTime)
+    {
+        _property.MaxTime = maxTime;
 
         return this;
     }

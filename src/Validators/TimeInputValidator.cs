@@ -19,7 +19,6 @@ public class TimeInputValidator : IElementValidator
             ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.AM_PM_SUFFIX}"]
             : null;
 
-
         if (string.IsNullOrEmpty(valueHours) && string.IsNullOrEmpty(valueMinutes) && string.IsNullOrEmpty(valueAmPm) && element.Properties.Optional)
             return new ValidationResult { IsValid = true };
 
@@ -37,6 +36,7 @@ public class TimeInputValidator : IElementValidator
         }
 
         var isSelected = !string.IsNullOrEmpty(valueAmPm);
+
         if (!isSelected)
         {
             return new ValidationResult
@@ -50,14 +50,33 @@ public class TimeInputValidator : IElementValidator
 
         int.TryParse(valueHours, out int hours);
         int.TryParse(valueMinutes, out int minutes);
+
         var isValidTime = (hours < 13 && hours > 0) && (minutes < 60 && minutes >= 0);
+
+        if (!isValidTime)
+        {
+            return new ValidationResult
+            {
+                IsValid = false,
+                Message = !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidTime)
+                    ? element.Properties.ValidationMessageInvalidTime
+                    : "Check the time and try again"
+            };
+        }
+
+        var enteredTime = DateTime.Parse($"{hours}:{minutes:D2} {valueAmPm}").TimeOfDay;
+        var isBeforeMinTime = !string.IsNullOrEmpty(element.Properties.MinTime) && enteredTime < TimeSpan.Parse(element.Properties.MinTime);
+        var isAfterMaxTime = !string.IsNullOrEmpty(element.Properties.MaxTime) && enteredTime > TimeSpan.Parse(element.Properties.MaxTime);
+        var isWithinTimeRange = !isBeforeMinTime && !isAfterMaxTime;
 
         return new ValidationResult
         {
-            IsValid = isValidTime,
-            Message = isValidTime
+            IsValid = isWithinTimeRange,
+            Message = isWithinTimeRange
                 ? string.Empty
-                : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidTime) ? element.Properties.ValidationMessageInvalidTime : "Check the time and try again"
+                : !string.IsNullOrEmpty(element.Properties.ValidationMessageInvalidTime)
+                    ? element.Properties.ValidationMessageInvalidTime
+                    : "Check the time and try again"
         };
     }
 }
