@@ -8,12 +8,11 @@ public class TimeInputValidator : IElementValidator
             return new ValidationResult { IsValid = true };
 
         var valueHours = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}")
-            ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}"] 
+            ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}"]
             : null;
 
         var valueMinutes = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.MINUTES_SUFFIX}")
-            
-        ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.MINUTES_SUFFIX}"]
+            ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.MINUTES_SUFFIX}"]
             : null;
 
         var valueAmPm = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.AM_PM_SUFFIX}")
@@ -52,7 +51,7 @@ public class TimeInputValidator : IElementValidator
         int.TryParse(valueHours, out int hours);
         int.TryParse(valueMinutes, out int minutes);
 
-        var isValidTime = hours >= 1 && hours <= 12 && minutes >= 0 && minutes <= 59;
+        var isValidTime = (hours < 13 && hours > 0) && (minutes < 60 && minutes >= 0);
 
         if (!isValidTime)
         {
