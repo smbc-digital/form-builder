@@ -7,16 +7,25 @@ public class TimeInputValidator : IElementValidator
         if (!element.Type.Equals(EElementType.TimeInput))
             return new ValidationResult { IsValid = true };
 
-        var valueHours = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}") ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}"] : null;
-        var valueMinutes = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.MINUTES_SUFFIX}") ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.MINUTES_SUFFIX}"] : null;
-        var valueAmPm = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.AM_PM_SUFFIX}") ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.AM_PM_SUFFIX}"] : null;
+        var valueHours = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}")
+            ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.HOURS_SUFFIX}"] 
+            : null;
+
+        var valueMinutes = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.MINUTES_SUFFIX}")
+            
+        ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.MINUTES_SUFFIX}"]
+            : null;
+
+        var valueAmPm = viewModel.ContainsKey($"{element.Properties.QuestionId}{TimeConstants.AM_PM_SUFFIX}")
+            ? viewModel[$"{element.Properties.QuestionId}{TimeConstants.AM_PM_SUFFIX}"]
+            : null;
 
         if (string.IsNullOrEmpty(valueHours) && string.IsNullOrEmpty(valueMinutes) && string.IsNullOrEmpty(valueAmPm) && element.Properties.Optional)
             return new ValidationResult { IsValid = true };
 
-        var hasTimeValues = !string.IsNullOrEmpty(valueHours) && !string.IsNullOrEmpty(valueMinutes);
+        var isValid = !string.IsNullOrEmpty(valueHours) && !string.IsNullOrEmpty(valueMinutes);
 
-        if (!hasTimeValues)
+        if (!isValid)
         {
             return new ValidationResult
             {
@@ -27,14 +36,16 @@ public class TimeInputValidator : IElementValidator
             };
         }
 
-        if (string.IsNullOrEmpty(valueAmPm))
+        var isSelected = !string.IsNullOrEmpty(valueAmPm);
+
+        if (!isSelected)
         {
             return new ValidationResult
             {
-                IsValid = false,
-                Message = !string.IsNullOrEmpty(element.Properties.CustomValidationMessageAmPm)
-                    ? element.Properties.CustomValidationMessageAmPm
-                    : "Choose AM or PM"
+                IsValid = isSelected,
+                Message = isSelected
+                    ? string.Empty
+                    : !string.IsNullOrEmpty(element.Properties.CustomValidationMessageAmPm) ? element.Properties.CustomValidationMessageAmPm : "Choose AM or PM"
             };
         }
 
